@@ -1,0 +1,271 @@
+Disc    CDROM SL.DSK
+
+LeadIn MODE1
+PostGap 150
+EndTrack
+
+Track MODE1
+	Pause 150     
+	Volume ISO9660 sl.DSK
+
+	SystemArea "ip.bin" ; emplacement 0-2 extraction avec des blocs de 2048 , taille ip 1er fichier - 19
+	
+	PrimaryVolume
+
+	SystemIdentifier        "SEGA SEGASATURN"
+	VolumeIdentifier        "SL"
+	VolumeSetIdentifier     "SL"
+	LogicalBlockSize        2048
+	PublisherIdentifier     "SEGA ENTERPRISES, LTD."
+	DataPreparerIdentifier  "SEGA ENTERPRISES, LTD."
+	ApplicationIdentifier   "SL"
+	CopyrightFileIdentifier "CPY.TXT"
+	AbstractFileIdentifier  "ABS.TXT"
+	BibliographicFileIdentifier  "BIB.TXT"
+
+	Lpath               ; Path tables as specified for Saturn
+	Mpath
+	
+	Hierarchy
+		File    0.BIN;1
+			Source .\SL.BIN
+		EndFile
+
+		File    ABS.TXT;1
+			Source .\ABS.TXT
+		EndFile
+
+		File    BIB.TXT;1
+			Source .\BIB.TXT
+		EndFile
+
+		File    CPY.TXT;1
+			Source .\CPY.TXT
+		EndFile
+
+		File    SDDRVS.TSK;1
+			Source .\SDDRVS.TSK
+		EndFile
+
+		 FILE    VSWAP.WL1;1
+			SOURCE .\W3D\VSWAP.WL1
+		ENDFILE
+
+		 FILE    MAPHEAD.WL1;1
+			SOURCE .\W3D\MAPHEAD.WL1
+		ENDFILE
+
+		 FILE    GAMEMAPS.WL1;1
+			SOURCE .\W3D\GAMEMAPS.WL1
+		ENDFILE
+
+		 FILE    VGAHEAD.WL1;1
+			SOURCE .\W3D\VGAHEAD.WL1
+		ENDFILE
+
+		 FILE    VGADICT.WL1;1
+			SOURCE .\W3D\VGADICT.WL1
+		ENDFILE
+
+		 FILE    VGAGRAPH.WL1;1
+			SOURCE .\W3D\VGAGRAPH.WL1
+		ENDFILE
+
+;		 FILE    AUDIOHED.WL1;1
+;			SOURCE .\W3D\AUDIOHED.WL1
+;		ENDFILE
+
+;		 FILE    AUDIOT.WL1;1
+;			SOURCE .\W3D\AUDIOT.WL1
+;		ENDFILE
+
+		 FILE    000.PCM;1
+			SOURCE .\SNDW\000.PCM
+		ENDFILE
+
+		 FILE    001.PCM;1
+			SOURCE .\SNDW\001.PCM
+		ENDFILE
+
+		 FILE    002.PCM;1
+			SOURCE .\SNDW\002.PCM
+		ENDFILE
+
+		 FILE    003.PCM;1
+			SOURCE .\SNDW\003.PCM
+		ENDFILE
+
+		 FILE    004.PCM;1
+			SOURCE .\SNDW\004.PCM
+		ENDFILE
+
+		 FILE    005.PCM;1
+			SOURCE .\SNDW\005.PCM
+		ENDFILE
+
+		 FILE    006.PCM;1
+			SOURCE .\SNDW\006.PCM
+		ENDFILE
+
+		 FILE    007.PCM;1
+			SOURCE .\SNDW\007.PCM
+		ENDFILE
+
+		 FILE    008.PCM;1
+			SOURCE .\SNDW\008.PCM
+		ENDFILE
+
+		 FILE    009.PCM;1
+			SOURCE .\SNDW\009.PCM
+		ENDFILE
+
+		 FILE    010.PCM;1
+			SOURCE .\SNDW\010.PCM
+		ENDFILE
+
+		 FILE    011.PCM;1
+			SOURCE .\SNDW\011.PCM
+		ENDFILE
+
+		 FILE    012.PCM;1
+			SOURCE .\SNDW\012.PCM
+		ENDFILE
+
+		 FILE    013.PCM;1
+			SOURCE .\SNDW\013.PCM
+		ENDFILE
+
+		 FILE    014.PCM;1
+			SOURCE .\SNDW\014.PCM
+		ENDFILE
+
+		 FILE    015.PCM;1
+			SOURCE .\SNDW\015.PCM
+		ENDFILE
+
+		 FILE    016.PCM;1
+			SOURCE .\SNDW\016.PCM
+		ENDFILE
+
+		 FILE    017.PCM;1
+			SOURCE .\SNDW\017.PCM
+		ENDFILE
+
+		FILE    018.PCM;1
+			SOURCE .\SNDW\018.PCM
+		ENDFILE
+
+		FILE    020.PCM;1
+			SOURCE .\SNDW\020.PCM
+		ENDFILE
+
+		FILE    021.PCM;1
+			SOURCE .\SNDW\021.PCM
+		ENDFILE
+
+		FILE    022.PCM;1
+			SOURCE .\SNDW\022.PCM
+		ENDFILE
+
+		FILE    023.PCM;1
+			SOURCE .\SNDW\023.PCM
+		ENDFILE
+
+		FILE    024.PCM;1
+			SOURCE .\SNDW\024.PCM
+		ENDFILE
+
+		FILE    025.PCM;1
+			SOURCE .\SNDW\025.PCM
+		ENDFILE
+
+		FILE    026.PCM;1
+			SOURCE .\SNDW\026.PCM
+		ENDFILE
+
+		FILE    027.PCM;1
+			SOURCE .\SNDW\027.PCM
+		ENDFILE
+
+		FILE    028.PCM;1
+			SOURCE .\SNDW\028.PCM
+		ENDFILE
+
+		FILE    029.PCM;1
+			SOURCE .\SNDW\029.PCM
+		ENDFILE
+
+		FILE    030.PCM;1
+			SOURCE .\SNDW\030.PCM
+		ENDFILE
+
+		FILE    031.PCM;1
+			SOURCE .\SNDW\031.PCM
+		ENDFILE
+
+		FILE    032.PCM;1
+			SOURCE .\SNDW\032.PCM
+		ENDFILE
+
+		FILE    033.PCM;1
+			SOURCE .\SNDW\033.PCM
+		ENDFILE
+
+		FILE    034.PCM;1
+			SOURCE .\SNDW\034.PCM
+		ENDFILE
+
+		FILE    035.PCM;1
+			SOURCE .\SNDW\035.PCM
+		ENDFILE
+
+		FILE    036.PCM;1
+			SOURCE .\SNDW\036.PCM
+		ENDFILE
+
+		FILE    037.PCM;1
+			SOURCE .\SNDW\037.PCM
+		ENDFILE
+
+		FILE    038.PCM;1
+			SOURCE .\SNDW\038.PCM
+		ENDFILE
+
+		FILE    039.PCM;1
+			SOURCE .\SNDW\039.PCM
+		ENDFILE
+
+		FILE    040.PCM;1
+			SOURCE .\SNDW\040.PCM
+		ENDFILE
+
+		FILE    041.PCM;1
+			SOURCE .\SNDW\041.PCM
+		ENDFILE
+
+		FILE    042.PCM;1
+			SOURCE .\SNDW\042.PCM
+		ENDFILE
+
+		FILE    043.PCM;1
+			SOURCE .\SNDW\043.PCM
+		ENDFILE
+
+		FILE    044.PCM;1
+			SOURCE .\SNDW\044.PCM
+		ENDFILE
+
+		FILE    045.PCM;1
+			SOURCE .\SNDW\045.PCM
+		ENDFILE
+
+	EndHierarchy
+EndPrimaryVolume
+EndVolume
+PostGap 150
+EndTrack
+
+Leadout CDDA
+ Empty  500
+EndTrack
+EndDisc

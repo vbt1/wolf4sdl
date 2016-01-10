@@ -1,0 +1,45 @@
+# source_program
+  SRCS =	low.s \
+		saturn.cpp \
+		signon.cpp \
+		workarea.cpp \
+		id_ca.cpp \
+		id_in.cpp \
+		id_pm.cpp \
+		id_sd.cpp \
+		id_vl.cpp \
+		id_vh.cpp \
+		id_us_1.cpp \
+		wl_agent.cpp \
+		wl_act1.cpp \
+		wl_act2.cpp \
+		wl_draw.cpp \
+		wl_game.cpp \
+		wl_play.cpp \
+		wl_menu.cpp \
+		wl_state.cpp \
+		wl_inter.cpp \
+		wl_text.cpp \
+		wl_main.cpp 
+
+#src/workarea.c \
+#SYSOBJS = $(SGLLDR)/sglarea.o 
+#OBJS =  $(SRCS:.c=.o) $(SRCS:.cpp=.o)  
+OBJS = $(filter %.o, $(SRCS:.s=.o) $(SRCS:.c=.o) $(SRCS:.cpp=.o))
+#raze/raze.o
+LIBS =	l:/GNUSHv13/sh-elf/sh-elf/lib/m2/libm.a \
+            l:/saturn/SBL6/SEGALIB/LIB/elf/sega_mth.a \
+            l:/saturn/SBL6/SEGALIB/LIB/elf/sega_spr.a \
+            l:/saturn/SBL6/SEGALIB/DMA/elf/sega_dma.a \
+	    l:/saturn/SBL6/SEGALIB/GFS/elf/gfs2.o \
+            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdb2.o \
+            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdc2.o \
+            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdf2.o \
+            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_trn2.o \
+            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_buf2.o \
+            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_dir2.o \
+            l:/saturn/SBL6/SEGALIB/LIB/elf/sega_int.a \
+            L:/saturn/dev/sms_asm3/cdc/cdcrep.a \
+C:/SaturnOrbit/SGL_302j/LIB_ELF/SEGA_SYS.A \
+C:/SaturnOrbit/SGL_302j/LIB_ELF/LIBSGL.A 
+#L:/saturn/dev/phoenix/ELF/LIBSGL.A\
