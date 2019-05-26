@@ -148,7 +148,7 @@ void VH_UpdateScreen()
 ////slPrint("SDL_UpdateRect        ",slLocate(10,22));	
 	SDL_UpdateRect(screen, 0, 0, 0, 0);
 ////slPrint("slSndFlush             ",slLocate(10,22));	
-	slSndFlush() ;
+	//slSndFlush() ;
 ////slPrint("VH_UpdateScreen end ",slLocate(10,22));	
 	//slSynch();
 }

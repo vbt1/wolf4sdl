@@ -10,11 +10,12 @@
 #endif
 extern "C"{
 //extern fixed slAtan(fixed y, fixed x);
+extern fixed MTH_Atan(fixed y, fixed x);
 }
 
-
 #undef atan2
-#define atan2(a,b) slAtan(a,b)
+//#define atan2(a,b) slAtan(a,b)
+#define atan2(a,b) MTH_Atan(a,b)
 /*
 =============================================================================
 
@@ -1382,6 +1383,13 @@ void Died (void)
 
 void GameLoop (void)
 {
+// vbt dernier niveau
+gamestate.mapon = 8;	
+//gamestate.bestweapon = wp_chaingun-1;
+GiveWeapon (gamestate.bestweapon+1);
+gamestate.ammo = 99;	
+// vbt dernier niveau
+		   
     boolean died;
 #ifdef MYPROFILE
     clock_t start,end;

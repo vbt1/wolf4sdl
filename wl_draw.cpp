@@ -33,8 +33,8 @@ unsigned vbufPitch = 0;
 
 int32_t    lasttimecount;
 int32_t    frameon;
-//boolean fpscounter=1;
-boolean fpscounter=0;
+boolean fpscounter=1;
+//boolean fpscounter=0;
 
 int fps_frames=0, fps_time=0, fps=0;
 

@@ -1354,12 +1354,12 @@ SD_StartMusic(int chunk)
         sqHackTime = 0;
         alTimeCount = 0;
         SD_MusicOn();
-		slPrint((char *)"SD_StartMusic",slLocate(10,8));		
+//		slPrint((char *)"SD_StartMusic",slLocate(10,8));		
     }
-	else
+/*	else
 	{
-		slPrint((char *)"NO SD_StartMusic",slLocate(10,8));
-	}
+//		slPrint((char *)"NO SD_StartMusic",slLocate(10,8));
+	}*/
 }
 
 void
@@ -1577,7 +1577,7 @@ SD_StopDigitized(void)
 void
 SD_StartMusic(int chunk)
 {
-	slPrint((char *)"SD_StartMusic",slLocate(10,8));
+//	slPrint((char *)"SD_StartMusic",slLocate(10,8));
 	satPlayMusic(chunk);
 }
 

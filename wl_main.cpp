@@ -1310,6 +1310,9 @@ void Quit (const char *errorStr, ...)
     }
     else error[0] = 0;
  	slPrint((char *)error,slLocate(1,3));
+	
+	while(1);
+	
     if (!pictable)  // don't try to display the red box before it's loaded
     {
         ShutdownId();
@@ -1584,7 +1587,8 @@ int main (int argc, char *argv[])
 #endif	
     //CheckParameters(argc, argv);
 #endif
-
+// vbt : invincible
+	godmode = 1;
     CheckForEpisodes();
 
     InitGame();

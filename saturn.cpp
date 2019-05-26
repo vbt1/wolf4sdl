@@ -225,7 +225,7 @@ int SDL_InitSubSystem(Uint32 flags)
 {
 	if(flags &= SDL_INIT_AUDIO)
 	{
-		char sound_map[] =  {0xff,0xff};//,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
+		char sound_map[] =  {0xff,0xff,0xff,0xff};//,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
 	//slPrint("init sound                                    ",slLocate(2,21));
 #ifdef ACTION_REPLAY
 		slInitSound(sddrvstsk , sizeof(sddrvstsk) , (Uint8 *)sound_map , sizeof(sound_map)) ;
@@ -371,7 +371,8 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 	{
 //		DMA_ScuMemCopy((unsigned char*)(NBG1_CEL_ADR + (i<<9)), (unsigned char*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt 20-22fps
 //		SCU_DMAWait();
-		memcpyl((unsigned long*)(NBG1_CEL_ADR + (i<<9)), (unsigned long*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt : 22-24fps
+//		memcpyl((unsigned long*)(NBG1_CEL_ADR + (i<<9)), (unsigned long*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt : 22-24fps
+		slDMACopy((unsigned long*)(surface->pixels + (i * screenWidth)),(void *)(NBG1_CEL_ADR + (i<<9)),screenWidth);
 	}
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -525,6 +526,7 @@ if((srcrect)!=NULL)
 //		memcpy(d,s,srcrect->w);
 // //slPrint("SDL_UpperBlit memcpyl       ",slLocate(3,22)); 
 		memcpyl((unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),(unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),srcrect->w);
+//		slDMACopy((unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),srcrect->w);
 
 //		Uint8*s = (Uint8*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x; 
 //		Uint8*d = (Uint8*)dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
@@ -1309,10 +1311,10 @@ void	satPlayMusic( Uint8 track ){
   
 //	char toto[50];
 //	sprintf(toto,"start track **%d\n%d\n**new start  : %d**",tno[0],track,track+tno[0])  ;
-slPrintHex(track + tno[0],slLocate(10,8));
+//slPrintHex(track + tno[0],slLocate(10,8));
 //	FNT_Print256_2bpp((volatile Uint8 *)SCL_VDP2_VRAM_B1,(Uint8 *)toto,84,100,2,8,9,0);
 
-//    CDC_PLY_PMODE(&playdata) = CDC_PTYPE_NOCHG;//CDC_PM_DFL + 30;	/* Play Mode. */
+//    CDC_PLY_PMODE(&playdata) = CDC_PTYPE_NOCHG;//CDC_PM_DFL + 30;	// Play Mode. 
 	CDC_POS_PTYPE( &posdata ) = CDC_PTYPE_TNO;
     CDC_PLY_STNO( &playdata ) = (Uint8) (track + tno[0]);
     CDC_PLY_ETNO( &playdata ) = (Uint8) (track + tno[0]);
@@ -1373,10 +1375,10 @@ return (int) CDC_STAT_STATUS(&stat);
 
 #endif
 #endif
-
+/*
 void SCU_DMAWait(void) {
 	Uint32 res;
 
 	while((res = DMA_ScuResult()) == 2);
-}
+}*/
 
