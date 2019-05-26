@@ -845,6 +845,7 @@ void EndText (void)
     UNCACHEGRCHUNK(artnum);
 #else
     free(layout);
+
 #endif
 
 

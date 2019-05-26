@@ -113,8 +113,8 @@ void VblIn(void)
 //        if (fpscounter)
         {
 			char buffer[8];
-			slPrint("fps     ",slLocate(1,10));
-			slPrint(ltoa(fps,buffer,8),slLocate(14,0));
+			//slPrint((char*)"fps     ",slLocate(1,10));
+			//slPrint((char*)ltoa(fps,buffer,8),slLocate(14,0));
             //fontnumber = 0;
             //SETFONTCOLOR(7,127);
             //PrintX=4; PrintY=1;
@@ -171,7 +171,6 @@ noconfig:
         viewsize = 19;                          // start with a good size
         mouseadjustment=5;
     }
-
     SD_SetMusicMode (sm);
     SD_SetSoundMode (sd);
     SD_SetDigiDevice (sds);
@@ -748,10 +747,13 @@ void FinishSignon (void)
     #endif
 
     #endif
+	
     VH_UpdateScreen();
 	
     if (!param_nowait)
+	{
         IN_Ack ();
+	}
 
     #ifndef JAPAN
     VW_Bar (0,189,300,11,VL_GetPixel(0,0));
@@ -910,7 +912,6 @@ void InitDigiMap (void)
     {
 		//slPrintHex(tutu++,slLocate(5,5));
 		//slPrintHex(LASTSOUND,slLocate(9,5));
-		//slPrint("ffffff",slLocate(9,6));
         DigiMap[map[0]] = map[1];
         DigiChannel[map[1]] = map[2];
         SD_PrepareSound(map[1]);
@@ -1124,15 +1125,11 @@ static void InitGame()
 	//ajout VBT
 //param_nowait = true;
     VH_Startup ();
-    //IN_Startup (); // VBT à remettre
+//    IN_Startup (); // VBT à remettre
     PM_Startup ();
- 	//slPrint("init PM_Startup",slLocate(10,8));
     SD_Startup ();
- 	//slPrint("init SD_Startup",slLocate(10,9));
     CA_Startup ();
- 	//slPrint("init CA_Startup",slLocate(10,10));
     US_Startup ();
- 	//slPrint("init US_Startup",slLocate(10,11));
     // TODO: Will any memory checking be needed someday??
 #ifdef NOTYET
 #ifndef SPEAR
@@ -1154,7 +1151,7 @@ static void InitGame()
 
 //
 // build some tables
-//
+
     InitDigiMap ();
 
     ReadConfig ();
@@ -1183,23 +1180,17 @@ static void InitGame()
 // load in and lock down some basic chunks
 //
 
-	//slPrint("VBTCA_CacheGrChunk1",slLocate(10,14));
     CA_CacheGrChunk(STARTFONT);
 	//while(1);
-//slPrint("CA_CacheGrChunk2",slLocate(10,15));
     CA_CacheGrChunk(STATUSBARPIC);
-//slPrint("LoadLatchMem",slLocate(10,16));
 	slTVOff();
     LoadLatchMem ();	   
 //while(1);	
-//slPrint("BuildTables",slLocate(10,17));
     BuildTables ();          // trig tables
-//slPrint("SetupWalls",slLocate(10,18));
     SetupWalls ();
-//slPrint("NewViewSize",slLocate(10,19));
-//slPrintHex(viewsize,slLocate(10,20));
     NewViewSize (viewsize);
 		slTVOn();
+		slSynch();
 //	slPrint("C4 - 2008-2009     www.rockin-b.de",slLocate(2,29));
 //
 // initialize variables
@@ -1305,7 +1296,7 @@ void NewViewSize (int width)
 
 void Quit (const char *errorStr, ...)
 {
-	
+
 #ifdef NOTYET
     byte *screen;
 #endif
@@ -1397,16 +1388,16 @@ void Quit (const char *errorStr, ...)
 static void DemoLoop()
 {
     int LastDemo = 0;
-	//slPrint("DemoLoop",slLocate(10,10));
 //
 // check for launch from ted
 //
+//slPrint((char*)"DemoLoop",slLocate(10,22));
     if (param_tedlevel != -1)
     {
-	//slPrint("DemoLoop2",slLocate(10,10));
         param_nowait = true;
+//slPrint((char*)"EnableEndGameMenuItem",slLocate(10,22));		
         EnableEndGameMenuItem();
-	//slPrint("DemoLoop3",slLocate(10,10));
+//slPrint((char*)"NewGame",slLocate(10,22));		
         NewGame(param_difficulty,0);
 
 #ifndef SPEAR
@@ -1416,7 +1407,7 @@ static void DemoLoop()
         gamestate.episode = 0;
         gamestate.mapon = param_tedlevel;
 #endif
-	//slPrint("DemoLoop4",slLocate(10,10));
+//slPrint((char*)"GameLoop",slLocate(10,22));	
         GameLoop();
         Quit (NULL);
     }
@@ -1447,10 +1438,10 @@ static void DemoLoop()
         #endif
         #endif
     #endif
-	//slPrint("DemoLoopA",slLocate(10,10));
     //StartCPMusic(INTROSONG);
-	//slPrint("DemoLoopB",slLocate(10,10));
 #ifndef JAPAN
+//slPrint((char*)"PG13 or StartCPMusic",slLocate(10,22));	
+
     if (!param_nowait)
         PG13 ();
     else
@@ -1462,10 +1453,8 @@ static void DemoLoop()
 
     while (1)
     {
-	//slPrint("DemoLoopC",slLocate(10,10));
         while (!param_nowait)
         {
-	//slPrint("DemoLoopD",slLocate(10,10));
 //
 // title page
 //
@@ -1488,31 +1477,45 @@ static void DemoLoop()
 
             UNCACHEGRCHUNK (TITLEPALETTE);
 #else
+//slPrint((char*)"CA_CacheScreen1",slLocate(10,22));		
             CA_CacheScreen (TITLEPIC);
+//slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));			
             VW_UpdateScreen ();
+//slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
             VW_FadeIn();
 #endif
 	// VBT déplacé
+//slPrint((char*)"StartCPMusic",slLocate(10,22));	
 	StartCPMusic(INTROSONG);
+//slPrint((char*)"IN_UserInput1",slLocate(10,22));		
             if (IN_UserInput(TickBase*15))
                 break;
+//slPrint((char*)"VW_FadeOut1",slLocate(10,22));					
             VW_FadeOut();
 //
 // credits page
 //
+//slPrint((char*)"CA_CacheScreen2",slLocate(10,22));
             CA_CacheScreen (CREDITSPIC);
+//slPrint((char*)"VW_UpdateScreen2",slLocate(10,22));			
             VW_UpdateScreen();
+//slPrint((char*)"VW_FadeIn2",slLocate(10,22));
             VW_FadeIn ();
+//slPrint((char*)"IN_UserInput2",slLocate(10,22));				
             if (IN_UserInput(TickBase*10))
                 break;
+//slPrint((char*)"VW_FadeOut2",slLocate(10,22));				
             VW_FadeOut ();
 //
 // high scores
 //
+//slPrint((char*)"DrawHighScores",slLocate(10,22));	
             DrawHighScores ();
+//slPrint((char*)"VW_UpdateScreen3",slLocate(10,22));				
             VW_UpdateScreen ();
+//slPrint((char*)"VW_FadeIn3",slLocate(10,22));			
             VW_FadeIn ();
-
+//slPrint((char*)"IN_UserInput3",slLocate(10,22));	
             if (IN_UserInput(TickBase*10))
                 break;
 #endif
@@ -1533,30 +1536,20 @@ static void DemoLoop()
                 VL_ClearScreen(0);
             StartCPMusic(INTROSONG);
         }
-	//slPrint("DemoLoopE",slLocate(10,10));
         VW_FadeOut ();
- 	//slPrint("DemoLoopF",slLocate(10,10));
 #ifdef DEBUGKEYS
- 	//slPrint("DemoLoopG",slLocate(10,10));
         if (Keyboard[sc_Tab] && param_debugmode)
             RecordDemo ();
         else
 		{
- 	//slPrint("DemoLoopH",slLocate(10,10));
-	//slPrint("US_ControlPanel",slLocate(10,11));
             US_ControlPanel (0);
-	//slPrint("US_ControlPanel",slLocate(10,12));
 		}
 #else
-	//slPrint("US_ControlPanelb",slLocate(10,11));
         US_ControlPanel (0);
-	//slPrint("US_ControlPanelc",slLocate(10,11));
 #endif
         if (startgame || loadedgame)
         {
-	//slPrint("GameLoopb",slLocate(10,12));
             GameLoop ();
-	//slPrint("GameLoopc",slLocate(10,12));
             if(!param_nowait)
             {
                 VW_FadeOut();

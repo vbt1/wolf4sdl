@@ -27,19 +27,17 @@
 #OBJS =  $(SRCS:.c=.o) $(SRCS:.cpp=.o)  
 OBJS = $(filter %.o, $(SRCS:.s=.o) $(SRCS:.c=.o) $(SRCS:.cpp=.o))
 #raze/raze.o
-LIBS =	l:/GNUSHv13/sh-elf/sh-elf/lib/m2/libm.a \
-            l:/saturn/SBL6/SEGALIB/LIB/elf/sega_mth.a \
-            l:/saturn/SBL6/SEGALIB/LIB/elf/sega_spr.a \
-            l:/saturn/SBL6/SEGALIB/DMA/elf/sega_dma.a \
-	    l:/saturn/SBL6/SEGALIB/GFS/elf/gfs2.o \
-            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdb2.o \
-            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdc2.o \
-            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdf2.o \
-            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_trn2.o \
-            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_buf2.o \
-            l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_dir2.o \
-            l:/saturn/SBL6/SEGALIB/LIB/elf/sega_int.a \
-            L:/saturn/dev/sms_asm3/cdc/cdcrep.a \
-C:/SaturnOrbit/SGL_302j/LIB_ELF/SEGA_SYS.A \
-C:/SaturnOrbit/SGL_302j/LIB_ELF/LIBSGL.A 
-#L:/saturn/dev/phoenix/ELF/LIBSGL.A\
+LIBS = C:/SaturnOrbit/SGL_302j/LIB_ELF/libsgl3.a \
+L:/vbtsh3/toolchain/sh-elf/lib/libc.a \
+l:/saturn/SBL6/SEGALIB/GFS/elf/gfs2.o \
+l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdb2.o \
+l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdc2.o \
+l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdf2.o \
+l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_trn2.o \
+l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_buf2.o \
+l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_dir2.o \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_dma.a \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_int.a \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_sys.a \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/cdcrep.a 
+

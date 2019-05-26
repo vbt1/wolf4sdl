@@ -149,6 +149,7 @@ void PM_Startup()
         //fread(ptr, 1, size, file);
 		memcpy(ptr,&x[delta2],size);
 		free(x);
+		x = NULL;		
         ptr += size;
     }
 
@@ -169,13 +170,18 @@ void PM_Startup()
 	}
 
 	free(pageLengths);
+	pageLengths = NULL;	
     free(pageOffsets);
+	pageOffsets = NULL;		
 	free(Chunks);
+	Chunks = NULL;		
     //fclose(file);
 }
 
 void PM_Shutdown()
 {
     free(PMPages);
+	PMPages = NULL;	
     free(PMPageData);
+	PMPageData = NULL;	
 }

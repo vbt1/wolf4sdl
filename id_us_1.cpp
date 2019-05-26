@@ -21,9 +21,10 @@
 //
 
 #include "wl_def.h"
-
+#include <stdlib.h>
+//#include <string.h>
 #pragma	hdrstop
-
+//char 	*strdup (const char *) __malloc_like __result_use_check;
 #if _MSC_VER == 1200            // Visual C++ 6
 	#define vsnprintf _vsnprintf
 #endif
@@ -167,6 +168,7 @@ US_Print(const char *sorg)
 			PrintX += w;
 	}
 	free(sstart);
+	sstart = NULL;	
 //#endif
 }
 
@@ -287,6 +289,7 @@ US_CPrint(const char *sorg)
 		}
 	}
 	free(sstart);
+	sstart = NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////

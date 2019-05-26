@@ -119,7 +119,6 @@ static void processEvent(SDL_Event *event)
         // check for keypresses
         case SDL_KEYDOWN:
         {
-			//slPrint("SDL_KEYDOWN",slLocate(20,5));
             LastScan = event->key.keysym.sym;
             SDLMod mod = SDL_GetModState();
             if(Keyboard[sc_Alt])
@@ -146,10 +145,6 @@ static void processEvent(SDL_Event *event)
                 }
             }
 			//LastScan = SDLK_RETURN;
-			//slPrintHex(LastScan,slLocate(20,2));
-
-			//slPrintHex(SDLK_KP_ENTER,slLocate(20,3));
-
 
             int sym = LastScan;
            /* if(sym >= 'a' && sym <= 'z')
@@ -174,7 +169,6 @@ static void processEvent(SDL_Event *event)
 
         case SDL_KEYUP:
         {
-			//slPrint("SDL_KEYUP   ",slLocate(20,5));
             int key = event->key.keysym.sym;
             if(key == SDLK_KP_ENTER) key = SDLK_RETURN;
             else if(key == SDLK_RSHIFT) key = SDLK_LSHIFT;
@@ -214,12 +208,13 @@ static void processEvent(SDL_Event *event)
 void IN_WaitAndProcessEvents()
 {
     SDL_Event event;
-    if(!SDL_WaitEvent(&event)) return;
-    do
+	SDL_PollEvent(&event);
+//    if(!SDL_WaitEvent(&event)) return;
+//    do
     {
         processEvent(&event);
     }
-    while(SDL_PollEvent(&event));
+//    while(SDL_PollEvent(&event));
 }
 
 void IN_ProcessEvents()

@@ -1753,8 +1753,8 @@ void    ThreeDRefresh (void)
         if (fpscounter)
         {
 			char buffer[8];
-			slPrint("fps   ",slLocate(1,0));
-			slPrint(ltoa(fps,buffer,8),slLocate(4,0));
+			slPrint((char*)"fps   ",slLocate(1,0));
+			slPrint((char*)ltoa(fps,buffer,8),slLocate(4,0));
             //fontnumber = 0;
             //SETFONTCOLOR(7,127);
             //PrintX=4; PrintY=1;

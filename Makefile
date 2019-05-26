@@ -25,7 +25,9 @@ OBJECTS = ./objects
 # option
 #CCFLAGS = -O2 -m2 -g -c -I$(SGLIDR)
 # -fomit-frame-pointer -fsort-data 
-CCFLAGS = -O2 -fomit-frame-pointer -m2
+#CCFLAGS = -O2 -m2 -Wno-narrowing -fuse-linker-plugin -fno-web -fno-gcse -fno-unit-at-a-time -fomit-frame-pointer -flto
+CCFLAGS = -O2 -m2 -Wno-conversion-null -Wno-narrowing -fuse-linker-plugin -fno-unit-at-a-time -fomit-frame-pointer -flto
+#CCFLAGS = -O0 -m2 -Wno-write-strings -Wno-narrowing -fno-lto
 CCFLAGS += $(CFLAGS)
 #CCFLAGS += -std=gnu99
 #CCFLAGS += -Werror-implicit-function-declaration
@@ -39,11 +41,12 @@ CCFLAGS += -c -I$(SGLIDR)
 # -m2 must be specified in LDFLAGS so the linker will search the SH2 lib dirs
 # Specify path of libsgl.a by using "-L" option
 
-LDFLAGS = -m2 -L$(SGLLDR)  -Xlinker -T$(LDFILE) -Xlinker --format=coff-sh -Xlinker -Map \
-          -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -nostartfiles -LC:/SaturnOrbit/SGL_302j/LIB_ELF/LIBSGL.A 
-#          -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -nostartfiles -LL:/GNUSHV12/sh-elf/sh-elf/lib/m2/libc.a -LC:/SaturnOrbit/SGL_302j/LIB_ELF/LIBSGL.A 
 DFLAGS =
 include $(OBJECTS)
+
+LDFLAGS = -O2 -m2 -Xlinker -n -Xlinker -flto -Xlinker -T$(LDFILE) -Xlinker -Map \
+          -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -nostartfiles 
+#          -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -nostartfiles -LL:/GNUSHV12/sh-elf/sh-elf/lib/m2/libc.a -LC:/SaturnOrbit/SGL_302j/LIB_ELF/LIBSGL.A 
 
 TARGET   = root/sl.coff
 TARGET1  = root/sl.bin
@@ -112,9 +115,9 @@ $(TARGET1) : $(SYSOBJS) $(OBJS) $(MAKEFILE) $(LDFILE)
 	$(AS) $< $(ASFLAGS) $(_ASFLAGS) -o $@
 
 .c.o:
-	$(CC) $< $(DFLAGS) $(CCFLAGS) $(_CCFLAGS) $(LIBS) -o $@
+	$(CC) $< $(DFLAGS) $(CCFLAGS) $(_CCFLAGS) -o $@
 .cpp.o:
-	$(CXX) $< $(DFLAGS) $(CCFLAGS) $(_CCFLAGS) $(LIBS) -o $@
+	$(CXX) $< $(DFLAGS) $(CCFLAGS) $(_CCFLAGS) -o $@
 
 clean:
 	$(RM) $(OBJS) $(TARGET) $(TARGET1) $(TARGET2) $(MPFILE) cd/0.bin

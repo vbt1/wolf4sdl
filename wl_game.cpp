@@ -9,12 +9,12 @@
 #include <TIME.H>
 #endif
 extern "C"{
-extern fixed MTH_Atan(fixed y, fixed x);
+//extern fixed slAtan(fixed y, fixed x);
 }
 
 
 #undef atan2
-#define atan2(a,b) MTH_Atan(a,b)
+#define atan2(a,b) slAtan(a,b)
 /*
 =============================================================================
 
@@ -1075,6 +1075,7 @@ void FinishDemoRecord (void)
     }
 
     free(demobuffer);
+	demobuffer = NULL;
 }
 
 //==========================================================================
@@ -1616,5 +1617,6 @@ startplayloop:
                 ClearMemory ();
                 break;
         }
+		slSynch(); // vbt ajout 26/05
     } while (1);
 }

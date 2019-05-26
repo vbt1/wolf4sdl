@@ -23,8 +23,76 @@ loaded into the data segment
 #endif
  */
 #include "wl_def.h"
+#include <stdlib.h>
 #pragma hdrstop
 #define THREEBYTEGRSTARTS
+
+#ifdef HEAP_WALK
+extern Uint32  end;
+extern Uint32  __malloc_free_list;
+
+extern "C" {
+extern Uint32  _sbrk(int size);
+}
+
+void heapWalk(void)
+{
+    Uint32 chunkNumber = 1;
+    // The __end__ linker symbol points to the beginning of the heap.
+    Uint32 chunkCurr = (Uint32)&end;
+    // __malloc_free_list is the head pointer to newlib-nano's link list of free chunks.
+    Uint32 freeCurr = __malloc_free_list;
+    // Calling _sbrk() with 0 reserves no more memory but it returns the current top of heap.
+    Uint32 heapEnd = _sbrk(0);
+    
+//    printf("Heap Size: %lu\n", heapEnd - chunkCurr);
+    char toto[200];
+//	sprintf (toto,"Heap Size: %d  e%08x s%08x                     \n", heapEnd - chunkCurr,heapEnd, chunkCurr) ;
+//	FNT_Print256_2bpp((volatile Uint8 *)SS_FONT,(Uint8 *)toto,12,216);
+
+    // Walk through the chunks until we hit the end of the heap.
+    while (chunkCurr < heapEnd)
+    {
+        // Assume the chunk is in use.  Will update later.
+        int      isChunkFree = 0;
+        // The first 32-bit word in a chunk is the size of the allocation.  newlib-nano over allocates by 8 bytes.
+        // 4 bytes for this 32-bit chunk size and another 4 bytes to allow for 8 byte-alignment of returned pointer.
+        Uint32 chunkSize = *(Uint32*)chunkCurr;
+        // The start of the next chunk is right after the end of this one.
+        Uint32 chunkNext = chunkCurr + chunkSize;
+        
+        // The free list is sorted by address.
+        // Check to see if we have found the next free chunk in the heap.
+        if (chunkCurr == freeCurr)
+        {
+            // Chunk is free so flag it as such.
+            isChunkFree = 1;
+            // The second 32-bit word in a free chunk is a pointer to the next free chunk (again sorted by address).
+            freeCurr = *(Uint32*)(freeCurr + 4);
+        }
+        
+        // Skip past the 32-bit size field in the chunk header.
+        chunkCurr += 4;
+        // 8-byte align the data pointer.
+        chunkCurr = (chunkCurr + 7) & ~7;
+        // newlib-nano over allocates by 8 bytes, 4 bytes for the 32-bit chunk size and another 4 bytes to allow for 8
+        // byte-alignment of the returned pointer.
+        chunkSize -= 8;
+//        printf("Chunk: %lu  Address: 0xlX  Size: %lu  %s\n", chunkNumber, chunkCurr, chunkSize, isChunkFree ? "CHUNK FREE" : "");
+        
+	sprintf (toto,"%d A%04x  S%04d %s", chunkNumber, chunkCurr, chunkSize, isChunkFree ? "CHUNK FREE" : "") ;
+	if(chunkNumber>=200)
+	slPrint((char *)toto,slLocate(0,chunkNumber-200));
+	if(chunkNumber>=230)
+	slPrint((char *)toto,slLocate(20,chunkNumber-230));
+
+		chunkCurr = chunkNext;
+        chunkNumber++;
+    }
+//	FNT_Print256_2bpp((volatile Uint8 *)SS_FONT,(Uint8 *)"done",12,131);
+}
+#endif
+
 
 /*
 =============================================================================
@@ -147,15 +215,15 @@ void CAL_GetGrChunkLength (int chunk)
 	Uint16 i,j=0;
 	delta = (uint16_t)(GRFILEPOS(chunk)/2048);
 	delta2 = (GRFILEPOS(chunk) - delta*2048); 
-	Chunks=(uint8_t*)malloc(8192+sizeof(chunkexplen));
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CAL_GetGrChunkLength",slLocate(2,17));
+//	Chunks=(uint8_t*)malloc(8192+sizeof(chunkexplen));
+	Chunks=(uint8_t*)0x002C0000;	
+	
 	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(grhandle, delta, (void *)Chunks, sizeof(chunkexplen));
 
 	memcpy(&chunkexplen,&Chunks[delta2],sizeof(chunkexplen));
-	free(Chunks);
-  
+//	free(Chunks);
+	Chunks = NULL;
 	chunkexplen = SWAP_BYTES_32(chunkexplen);
     chunkcomplen = GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
 	// VBT correct
@@ -179,8 +247,6 @@ static void CAL_HuffExpand(byte *source, byte *dest, int32_t length, huffnode *h
         Quit("length or dest is null!");
         return;
     }
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CAL_HuffExpand",slLocate(2,17));
     headptr = hufftable+254;        // head node is always node 254
 
     int written = 0;
@@ -236,8 +302,6 @@ void CAL_CarmackExpand (byte *source, word *dest, int length)
     word ch,chhigh,count,offset;
     byte *inptr;
     word *copyptr, *outptr;
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CAL_CarmackExpand",slLocate(2,17));
     length/=2;
 
     inptr = (byte *) source;
@@ -319,9 +383,6 @@ int32_t CA_RLEWCompress (word *source, int32_t length, word *dest, word rlewtag)
     unsigned i;
     word *start,*end;
 
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CA_RLEWCompress",slLocate(2,17));
-
     start = dest;
 
     end = source + (length+1)/2;
@@ -375,9 +436,6 @@ void CA_RLEWexpand (word *source, word *dest, int32_t length, word rlewtag)
 {
     word value,count,i;
     word *end=dest+length/2;
-
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CA_RLEWexpand",slLocate(2,17));
 
 //
 // expand it
@@ -441,8 +499,6 @@ void CAL_SetupGrFile (void)
 //
 // load ???dict.ext (huffman dictionary for graphics files)
 //
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CAL_SetupGrFile",slLocate(2,17));
 
     strcpy(fname,gdictname);
     strcat(fname,graphext);
@@ -463,7 +519,8 @@ void CAL_SetupGrFile (void)
 	fileSize = GetFileSize(fileId);
 
 	Uint8 *vbtHuff;
-	vbtHuff=(Uint8 *)malloc(sizeof(grhuffman));
+//	vbtHuff=(Uint8 *)malloc(sizeof(grhuffman));
+	vbtHuff=(Uint8 *)0x002C0000;;
 	CHECKMALLOCRESULT(vbtHuff);
 
 	GFS_Load(fileId, 0, (void *)vbtHuff, sizeof(grhuffman));
@@ -473,16 +530,11 @@ void CAL_SetupGrFile (void)
 		grhuffman[i].bit0=vbtHuff[x] | (vbtHuff[x+1]<<8);
 		grhuffman[i].bit1=vbtHuff[x+2] | (vbtHuff[x+3]<<8);
 		i++;
-	}	 /*
-		slPrintHex(grhuffman[0].bit0,slLocate(10,10));
-		slPrintHex(grhuffman[0].bit1,slLocate(10,11));		
-
-		slPrintHex(grhuffman[254].bit0,slLocate(10,14));
-		slPrintHex(grhuffman[254].bit1,slLocate(10,15));
-					*/
+	}
 
 	// VBT correct
-	free (vbtHuff);
+//	free (vbtHuff);
+	vbtHuff = NULL;
 	i=0;
 
     //read(handle, grhuffman, sizeof(grhuffman));
@@ -558,7 +610,8 @@ void CAL_SetupGrFile (void)
     pictable=(pictabletype *) malloc(NUMPICS*sizeof(pictabletype));
     CHECKMALLOCRESULT(pictable);
     CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
-	compseg =(byte*)malloc((chunkcomplen+4));
+//	compseg =(byte*)malloc((chunkcomplen+4));
+	compseg =(byte*)0x002C0000;
 	CHECKMALLOCRESULT(compseg);
 	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen+4));
     CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
@@ -569,7 +622,8 @@ void CAL_SetupGrFile (void)
 		pictable[xxx].width=SWAP_BYTES_16(pictable[xxx].width);
 	}
 
-	free(compseg);
+//	free(compseg);
+	compseg = NULL;
 	// VBT correct
 }
 
@@ -592,9 +646,6 @@ void CAL_SetupMapFile (void)
     char fname[13];
 	long fileSize;
 
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CAL_SetupMapFile",slLocate(2,17));
-
 //
 // load maphead.ext (offsets and tileinfo for map file)
 //
@@ -616,7 +667,8 @@ void CAL_SetupMapFile (void)
     if(stat(fname, NULL))
         CA_CannotOpen(fname);
     length = NUMMAPS*4+2; // used to be "filelength(handle);"
-    mapfiletype *tinf=(mapfiletype *) malloc(sizeof(mapfiletype));
+//    mapfiletype *tinf=(mapfiletype *) malloc(sizeof(mapfiletype));
+	mapfiletype *tinf=(mapfiletype *)0x002C0000;
     CHECKMALLOCRESULT(tinf);
 	GFS_Load(fileId, 0, (void *)tinf, length);
     //read(handle, tinf, length);
@@ -666,7 +718,8 @@ void CAL_SetupMapFile (void)
 // load all map header
 //
 	Uint8 *vbt;
-	vbt = (Uint8*)malloc(fileSize);
+//	vbt = (Uint8*)malloc(fileSize);
+	vbt = (Uint8*)0x002C0000+sizeof(mapfiletype);
 	CHECKMALLOCRESULT(vbt);
 	GFS_Load(maphandle, 0, (void *)vbt, fileSize);
 
@@ -691,9 +744,10 @@ void CAL_SetupMapFile (void)
 		mapheaderseg[i]->width=SWAP_BYTES_16(mapheaderseg[i]->width);
 		mapheaderseg[i]->height=SWAP_BYTES_16(mapheaderseg[i]->height);
     }
-	free(vbt);
-    free(tinf);
-
+//	free(vbt);
+	vbt = NULL;	
+//    free(tinf);
+	tinf = NULL;
 //
 // allocate space for 3 64*64 planes
 //
@@ -723,9 +777,6 @@ void CAL_SetupAudioFile (void)
 	Sint32 fileId;
 	long fileSize;
 	unsigned int i=0;
-
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CAL_SetupMapFile",slLocate(2,17));
 
 //
 // load audiohed.ext (offsets for audio file)
@@ -831,6 +882,7 @@ void CA_Shutdown (void)
     for(i=0; i<NUMCHUNKS; i++)
         UNCACHEGRCHUNK(i);
     free(pictable);
+	pictable = NULL;
 
     switch(oldsoundmode)
     {
@@ -861,14 +913,11 @@ void CA_Shutdown (void)
 
 int32_t CA_CacheAudioChunk (int chunk)
 {
+
 #ifdef VBT
     int32_t pos = audiostarts[chunk];
     int32_t size = audiostarts[chunk+1]-pos;
 	uint8_t *Chunks; 
-
-//	slPrint("                                    ",slLocate(2,17));
-//	slPrint("CA_CacheAudioChunk",slLocate(2,17));
-
 
     if (audiosegs[chunk])
         return size;                        // already in memory
@@ -884,19 +933,19 @@ int32_t CA_CacheAudioChunk (int chunk)
 
 	delta = (uint16_t)(pos/2048);
 	delta2 = (pos - delta*2048); 
-	Chunks=(uint8_t*)malloc(0x4000);
+//	Chunks=(uint8_t*)malloc(0x4000);
+	Chunks=(uint8_t*)0x002C0000;
 
 	GFS_Load(audiohandle, delta, (void *)Chunks, size);
 
 	Chunks=(uint8_t*)malloc(2048+size);
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CAL_GetGrChunkLength",slLocate(2,17));
 	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(grhandle, delta, (void *)Chunks, 2048+size);
 
 	memcpy(audiosegs[chunk],&Chunks[delta2],size);
-	free(Chunks);
- 
+//	free(Chunks);
+	Chunks = NULL;
+	
     return size;
 #endif
 	return 0;
@@ -906,9 +955,6 @@ void CA_CacheAdlibSoundChunk (int chunk)
 {
 	//c'est la fonction utilisée
 #ifdef VBT
-	slPrint("                                         ",slLocate(2,17));
-	slPrint("CA_CacheAdlibSoundChunk",slLocate(2,17));
-
     int32_t pos = audiostarts[chunk];
     int32_t size = audiostarts[chunk+1]-pos;
 	uint8_t *Chunks; 
@@ -928,15 +974,15 @@ void CA_CacheAdlibSoundChunk (int chunk)
 
 	GFS_Load(audiohandle, delta, (void *)Chunks, 2048+ORIG_ADLIBSOUND_SIZE - 1);
 
-	Chunks=(uint8_t*)malloc(2048+size);
-	//slPrint("                                    ",slLocate(2,17));
-	//slPrint("CAL_GetGrChunkLength",slLocate(2,17));
+//	Chunks=(uint8_t*)malloc(2048+size);
+	Chunks=(uint8_t*)0x002C0000;
 	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(audiohandle, delta, (void *)Chunks, 2048+ORIG_ADLIBSOUND_SIZE - 1);
 //    read(audiohandle, bufferseg, ORIG_ADLIBSOUND_SIZE - 1);   // without data[1]
 
 	memcpy(audiosegs[chunk],&Chunks[delta2],size);
-	free(Chunks);
+//	free(Chunks);
+	Chunks = NULL;
 #endif
 
 
@@ -994,8 +1040,6 @@ void CA_CacheAdlibSoundChunk (int chunk)
 
 void CA_LoadAllSounds (void)
 {
-	//slPrint("                                         ",slLocate(2,17));
-	//slPrint("CA_LoadAllSounds",slLocate(2,17));
 #ifdef VBT
     unsigned start,i;
 
@@ -1021,19 +1065,15 @@ cachein:
     switch (SoundMode)
     {
         case sdm_Off:
-			//slPrint("sdm_Off",slLocate(10,10));
             start = STARTADLIBSOUNDS;   // needed for priorities...
             break;
         case sdm_PC:
-			//slPrint("sdm_PC",slLocate(10,10));
             start = STARTPCSOUNDS;
             break;
         case sdm_AdLib:
-			//slPrint("sdm_AdLib",slLocate(10,10));
             start = STARTADLIBSOUNDS;
             break;
 		default:
-			//slPrint("nothing",slLocate(10,10));
 			break;
     }
 
@@ -1065,9 +1105,6 @@ cachein:
 
 void CAL_ExpandGrChunk (int chunk, int32_t *source)
 {
-	//slPrint("                                         ",slLocate(2,17));
-	//slPrint("CAL_ExpandGrChunk",slLocate(2,17));
-
     int32_t    expanded;
     if (chunk >= STARTTILE8 && chunk < STARTEXTERNS)
     {
@@ -1102,8 +1139,6 @@ void CAL_ExpandGrChunk (int chunk, int32_t *source)
     // allocate final space, decompress it, and free bigbuffer
     // Sprites need to have shifts made and various other junk
     //
-//slPrint("           ",slLocate(2,21));	
-//slPrintHex(expanded,slLocate(2,21));	
     grsegs[chunk]=(byte *) malloc(expanded);
     CHECKMALLOCRESULT(grsegs[chunk]);
 	/*
@@ -1124,8 +1159,6 @@ void CAL_ExpandGrChunk (int chunk, int32_t *source)
 
 	}
    */
-
-//slPrint("CAL_ExpandGrChunk",slLocate(10,17));
 }
 
 
@@ -1141,16 +1174,12 @@ void CAL_ExpandGrChunk (int chunk, int32_t *source)
 
 void CA_CacheGrChunk (int chunk)
 {
-	//slPrint("                                         ",slLocate(2,17));
-	//slPrint("CA_CacheGrChunk",slLocate(2,17));
-
     int32_t pos,compressed;
     int32_t *source;
     int  next;
 
     if (grsegs[chunk])
         return;                             // already in memory
-//slPrint("CA_CacheGrChunk",slLocate(10,15));
 
 //
 // load the chunk into a buffer, either the miscbuffer if it fits, or allocate
@@ -1174,15 +1203,10 @@ void CA_CacheGrChunk (int chunk)
 		Uint16 i,j=0;
 		delta = (uint16_t)(pos/2048);
 		delta2 = (pos - delta*2048); 
-	Chunks=(uint8_t*)malloc(0x4000);
+//	Chunks=(uint8_t*)malloc(0x4000);
+	Chunks=(uint8_t*)0x002C0000;
 	CHECKMALLOCRESULT(Chunks);
-//	slPrint("g",slLocate(2,16));
-//	slPrint("          ",slLocate(2,18));
-//	slPrintHex(delta,slLocate(2,18));
-//	slPrint("          ",slLocate(2,19));
-//	slPrintHex(delta2,slLocate(2,19));
-//	slPrint("          ",slLocate(2,20));
-//	slPrintHex(pos,slLocate(2,20));
+
 	GFS_Load(grhandle, delta, (void *)Chunks, 0x4000);
 	///memset(Chunks,0,sizeof(Chunks));
     //slSynch();
@@ -1204,7 +1228,7 @@ void CA_CacheGrChunk (int chunk)
         source = bufferseg;
 /*
 		for(i=0;i<5;i++)
-		slPrint("           ",slLocate(24,i+3));		 
+		slPrint("           ",slLocate(24,i+3));
 
 		for(i=0;i<5;i++)
 		slPrintHex(source[i],slLocate(24,i+3));
@@ -1229,14 +1253,15 @@ void CA_CacheGrChunk (int chunk)
 		}	  
 		  
     }
-	free(Chunks);
-	//slPrint("j",slLocate(2,16));
+//	free(Chunks);
+	Chunks = NULL;
     CAL_ExpandGrChunk (chunk,source);
 
-	//slPrint("k",slLocate(2,16));
-
     if (compressed>BUFFERSIZE)
+	{
         free(source);
+		source = NULL;
+	}
 	//slSynch();
 }
 
@@ -1253,16 +1278,13 @@ void CA_CacheGrChunk (int chunk)
 =
 ======================
 */
-
 void CA_CacheScreen (int chunk)
 {
     int32_t    pos,compressed,expanded;
     memptr  bigbufferseg;
     int32_t    *source;
     int             next;
-
-	//slPrint("                                         ",slLocate(2,17));
-	//slPrint("CA_CacheScreen",slLocate(2,17));
+//slPrint((char*)"CA_CacheScreenSt",slLocate(10,22));		
 //
 // load the chunk into a buffer
 //
@@ -1276,8 +1298,9 @@ void CA_CacheScreen (int chunk)
  //#ifdef VBT
 
     //lseek(grhandle,pos,SEEK_SET);
-
+//slPrint((char*)"malloc1",slLocate(10,22));	
     bigbufferseg=malloc(compressed);
+//	bigbufferseg=(memptr)0x002C0000;
     CHECKMALLOCRESULT(bigbufferseg);
     //read(grhandle,bigbufferseg,compressed);
 
@@ -1287,14 +1310,20 @@ void CA_CacheScreen (int chunk)
 	Uint16 i,j=0;
 	delta = (uint16_t)(pos/2048);
 	delta2 = (pos - delta*2048); 
-	Chunks=(uint8_t*)malloc(8192*2+compressed);
-	//slPrint("f",slLocate(2,17));
+//slPrint((char*)"malloc2",slLocate(10,22));		
+//	Chunks=(uint8_t*)malloc(8192*2+compressed);
+	Chunks=(uint8_t*)0x002C0000;
+#ifdef HEAP_WALK	
+heapWalk();
+#endif
 	CHECKMALLOCRESULT(Chunks);
+//slPrint((char*)"GFS_Load",slLocate(10,22));		
 	GFS_Load(grhandle, delta, (void *)Chunks, 8192*2+compressed);
-
+//slPrint((char*)"memcpy",slLocate(10,22));		
 	memcpy(bigbufferseg,&Chunks[delta2],compressed);
-	free(Chunks);
-
+//	free(Chunks);
+	Chunks = NULL;
+	
     source = (int32_t *) bigbufferseg;
 
     expanded = *source++;
@@ -1304,8 +1333,11 @@ void CA_CacheScreen (int chunk)
 // allocate final space, decompress it, and free bigbuffer
 // Sprites need to have shifts made and various other junk
 //
-    byte *pic = (byte *) malloc(64000);
+//slPrint((char*)"malloc3",slLocate(10,22));
+//    byte *pic = (byte *) malloc(64000);
+	byte *pic = (byte *)0x002C0000;
     CHECKMALLOCRESULT(pic);
+//slPrint((char*)"CAL_HuffExpand",slLocate(10,22));	
     CAL_HuffExpand((byte *) source, pic, expanded, grhuffman);
 
     byte *vbuf = LOCK();
@@ -1319,9 +1351,12 @@ void CA_CacheScreen (int chunk)
                     vbuf[(scy + i) * curPitch + scx + j] = col;
         }
     }
+//slPrint((char*)"UNLOCK",slLocate(10,22));	
     UNLOCK();
-    free(pic);
+//    free(pic);
+	pic = NULL;
     free(bigbufferseg);
+	bigbufferseg = NULL;
 //#endif
 }
 
@@ -1339,8 +1374,6 @@ void CA_CacheScreen (int chunk)
 
 void CA_CacheMap (int mapnum)
 {
-//	slPrint("                                         ",slLocate(2,17));
-//	slPrint("CA_CacheMap",slLocate(2,17));
     int32_t   pos,compressed;
     int       plane;
     word     *dest;
@@ -1357,10 +1390,6 @@ void CA_CacheMap (int mapnum)
 //
 // load the planes into the allready allocated buffers
 //
-
-	//slPrint("CA_CacheMap",slLocate(10,5));
-
-
     size = maparea*2;
 
     for (plane = 0; plane<MAPPLANES; plane++)
@@ -1389,15 +1418,17 @@ slPrintHex(compressed,slLocate(10,21));
         }
 
 
-	Uint8 *vbt;
+	Uint8 *Chunks;
 	int32_t i;
 	long fileSize = GetFileSize(maphandle);
-	vbt = (Uint8*)malloc(fileSize);
-	CHECKMALLOCRESULT(vbt);
-	GFS_Load(maphandle, 0, (void *)vbt, fileSize);
+//	Chunks = (Uint8*)malloc(fileSize);
+	Chunks=(uint8_t*)0x002C0000;
+	CHECKMALLOCRESULT(Chunks);
+	GFS_Load(maphandle, 0, (void *)Chunks, fileSize);
 
-	memcpy(source,&vbt[pos],compressed);
-	free(vbt);
+	memcpy(source,&Chunks[pos],compressed);
+//	free(Chunks);
+	Chunks = NULL;
         //read(maphandle,source,compressed);
 #ifdef CARMACIZED
 
@@ -1414,6 +1445,7 @@ slPrintHex(compressed,slLocate(10,21));
         source++;
 		source++;
         buffer2seg = (word *) malloc(expanded);
+//		buffer2seg = (word *)0x00200000+fileSize;
         CHECKMALLOCRESULT(buffer2seg);
 
         CAL_CarmackExpand((byte *) source, buffer2seg,expanded);
@@ -1430,7 +1462,8 @@ slPrintHex(compressed,slLocate(10,21));
 #endif
 
         if (compressed>BUFFERSIZE)
-            free(bigbufferseg);
+//            free(bigbufferseg);
+			bigbufferseg = NULL;
     }
 }
 

@@ -685,7 +685,7 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
     }
     else
     {
- 			slPrint("eeeeeeeee",slLocate(10,8));
+ 			//slPrint("eeeeeeeee",slLocate(10,8));
         VL_LockSurface(source);
         byte *src = (byte *) source->pixels;
         unsigned srcPitch = source->pitch;

@@ -559,6 +559,7 @@ US_ControlPanel (ScanCode scancode)
         //
         // "EXIT OPTIONS" OR "NEW GAME" EXITS
         //
+		slSynch(); // vbt ajout 26/05
     }
     while (!StartGame);
     //

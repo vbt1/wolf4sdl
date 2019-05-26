@@ -1232,6 +1232,7 @@ void PlayLoop (void)
                 playstate = ex_abort;
             }
         }
+		slSynch(); // vbt ajout 26/05
     }
     while (!playstate && !startgame);
 

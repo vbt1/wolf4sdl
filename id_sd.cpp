@@ -493,7 +493,7 @@ SD_StopDigitized(void)
             break;
         case sds_SoundBlaster:
 //            SDL_SBStopSampleInIRQ();
-            Mix_HaltChannel(-1);
+//            Mix_HaltChannel(-1);
             break;
     }
 }
@@ -610,13 +610,13 @@ int SD_PlayDigitized(word which,int leftpos,int rightpos)
     Mix_Chunk *sample = SoundChunks[which];
     if(sample == NULL)
     {
-        printf("SoundChunks[%i] is NULL!\n", which);
+//        slPrint("SoundChunks[%i] is NULL!\n", which);
         return 0;
     }
 
     if(Mix_PlayChannel(channel, sample, 0) == -1)
     {
-        printf("Unable to play sound: %s\n", Mix_GetError());
+ //       slPrint("Unable to play sound: %s\n", Mix_GetError(),slLocate(24,10));
         return 0;
     }
 
@@ -940,12 +940,15 @@ SD_SetSoundMode(SDMode mode)
 //      SD_SetMusicMode() - sets the device to use for background music
 //
 ///////////////////////////////////////////////////////////////////////////
+/*
 boolean
 SD_SetMusicMode(SMMode mode)
 {
     boolean result = false;
-
+	//slPrint("SD_FadeOutMusic",slLocate(2,18));
     SD_FadeOutMusic();
+	//slPrint("SD_MusicPlaying",slLocate(2,18));
+	
     while (SD_MusicPlaying())
         SDL_Delay(5);
 
@@ -964,10 +967,11 @@ SD_SetMusicMode(SMMode mode)
         MusicMode = mode;
 
 //    SDL_SetTimerSpeed();
+	//slPrint("SD_MusicPlayingggg    end",slLocate(2,18));
 
     return(result);
 }
-
+*/
 int numreadysamples = 0;
 byte *curAlSound = 0;
 byte *curAlSoundPtr = 0;
@@ -1071,7 +1075,7 @@ SD_Startup(void)
     }
 
     Mix_ReserveChannels(2);  // reserve player and boss weapon channels
-    Mix_GroupChannels(2, MIX_CHANNELS-1, 1); // group remaining channels
+//    Mix_GroupChannels(2, MIX_CHANNELS-1, 1); // group remaining channels
 
     // Init music
 
@@ -1088,7 +1092,7 @@ SD_Startup(void)
     YM3812Write(0,1,0x20); // Set WSE=1
 //    YM3812Write(0,8,0); // Set CSM=0 & SEL=0		 // already set in for statement
 
-    Mix_HookMusic(SDL_IMFMusicPlayer, 0);
+//    Mix_HookMusic(SDL_IMFMusicPlayer, 0);
     Mix_ChannelFinished(SD_ChannelFinished);
     AdLibPresent = false;
     SoundBlasterPresent = true;
@@ -1096,7 +1100,7 @@ SD_Startup(void)
     alTimeCount = 0;
 
     SD_SetSoundMode(sdm_PC);
-    SD_SetMusicMode(sdm_PC);
+ //   SD_SetMusicMode(sdm_PC);
 	SoundMode = sdm_PC;
     SDL_SetupDigi();
 
@@ -1125,7 +1129,7 @@ SD_Shutdown(void)
     }
 
     free(DigiList);
-
+	DigiList = NULL;
     SD_Started = false;
 }
 
@@ -1350,7 +1354,12 @@ SD_StartMusic(int chunk)
         sqHackTime = 0;
         alTimeCount = 0;
         SD_MusicOn();
+		slPrint((char *)"SD_StartMusic",slLocate(10,8));		
     }
+	else
+	{
+		slPrint((char *)"NO SD_StartMusic",slLocate(10,8));
+	}
 }
 
 void
@@ -1447,7 +1456,9 @@ void SD_PrepareSound(int which)
 	char filename[15];
 	unsigned char *mem_buf;
 	sprintf(filename,"%03d.PCM",which);
-	//slPrint(filename,slLocate(10,4));
+	//slPrint("                                    ",slLocate(2,21));
+	//slPrint(filename,slLocate(10,21));
+	
  	fileId = GFS_NameToId((Sint8*)filename);
 
 	if(fileId>0)
@@ -1469,23 +1480,29 @@ void SD_PrepareSound(int which)
 		SoundChunks[which]->alen = fileSize;
 		if (fileSize<0x900)
 		SoundChunks[which]->alen = 0x900;  
+	//slPrint("size std",slLocate(50,21));	
 	}
 	else
+	{
 		   SoundChunks[which]->alen = 0;
+		   	//slPrint("size zero",slLocate(50,21));
+	}
 	//while(1);
+	
+	//slPrint("                                    ",slLocate(2,21));	
 }
 
 
 boolean
 SD_PlaySound(soundnames sound)
 {
-	//slPrint("SD_PlaySound",slLocate(10,16));
-	//slPrintHex(DigiMap[sound],slLocate(23,16));
+	////slPrint("SD_PlaySound",slLocate(10,16));
+	////slPrintHex(DigiMap[sound],slLocate(23,16));
     //Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
 	Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
     if(Mix_PlayChannel(0, sample, 0) == -1)
     {
-        //slPrint("Unable to play sound:", slLocate(10,19));
+        ////slPrint("Unable to play sound:", slLocate(10,19));
         return false;
     }
 	return true;
@@ -1498,17 +1515,17 @@ SD_SoundPlaying(void)
 	{
 		if(slPCMStat(&m_dat[i]))
 		{
-			slSynch();
+			slSynch(); // vbt remis 26/05
 			return true;
 		}
 	}
-	//slPrintHex(SoundMode,slLocate(10,3));
+	////slPrintHex(SoundMode,slLocate(10,3));
 	return false;
 }
 void
 SD_SetDigiDevice(SDSMode mode)
 {
-
+	//slPrint("SD_SetDigiDevice empty",slLocate(2,19));	
 }
 
 void
@@ -1560,6 +1577,7 @@ SD_StopDigitized(void)
 void
 SD_StartMusic(int chunk)
 {
+	slPrint((char *)"SD_StartMusic",slLocate(10,8));
 	satPlayMusic(chunk);
 }
 
@@ -1572,7 +1590,8 @@ SD_MusicOn(void)
 boolean
 SD_SetMusicMode(SMMode mode)
 {
-
+//slPrint("SD_SetMusicMode empty",slLocate(10,18));
+return true;
 }
 
 void
@@ -1584,8 +1603,11 @@ SD_ContinueMusic(int chunk, int startoffs)
 boolean
 SD_SetSoundMode(SDMode mode)
 {
+	//slPrint("SD_SetSoundMode start",slLocate(2,18));	
+	
     boolean result = false;
     word    tableoffset;
+	//slPrint("SD_StopSound       ",slLocate(2,18));	
 
     SD_StopSound();
 
@@ -1619,6 +1641,7 @@ SD_SetSoundMode(SDMode mode)
         SoundMode = mode;
         //SDL_StartDevice();
     }
+	//slPrint("SD_SetSoundMode end",slLocate(2,18));	
 
     return(result);
 

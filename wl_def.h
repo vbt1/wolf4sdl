@@ -93,7 +93,7 @@ void Quit(const char *errorStr, ...);
 #ifdef SPEAR
 #include "f_spear.h"
 #endif
-
+#undef ABS
 #define MAPSPOT(x,y,plane) (mapsegs[plane][((y)<<mapshift)+(x)])
 
 #define SIGN(x)         ((x)>0?1:-1)
@@ -1436,13 +1436,13 @@ inline static fixed FixedMul(fixed a, fixed b)
     #define strcasecmp stricmp
     #define strncasecmp strnicmp
 #else
-    static inline char* itoa(int value, char* string, int radix)
+    inline char* itoa(int value, char* string, int radix)
     {
 	    sprintf(string, "%d", value);
 	    return string;
     }
 
-    static inline char* ltoa(long value, char* string, int radix)
+    inline char* ltoa(long value, char* string, int radix)
     {
 	    sprintf(string, "%ld", value);
 	    return string;

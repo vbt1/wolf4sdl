@@ -30,7 +30,7 @@ int CdUnlock();
 
 extern "C" {
 	extern void DMA_ScuInit(void);
-	extern void SPR_InitSlaveSH(void);
+//	extern void SPR_InitSlaveSH(void);
 	extern void DMA_ScuMemCopy(void *dst, void *src, Uint32 cnt);
 	extern Uint32 DMA_ScuResult(void);
 	extern void memcpywh(char *dst, char *src, short width, short height, short step);// , long srchstep, long srcwstep, char flag);
@@ -216,7 +216,7 @@ int SDL_Init(Uint32 flags)
 	}
 #endif
 	DMA_ScuInit();
-	SPR_InitSlaveSH();
+//	SPR_InitSlaveSH();
 	SDL_InitSubSystem(flags);
 	return 0;
 }
@@ -226,7 +226,7 @@ int SDL_InitSubSystem(Uint32 flags)
 	if(flags &= SDL_INIT_AUDIO)
 	{
 		char sound_map[] =  {0xff,0xff};//,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
-
+	//slPrint("init sound                                    ",slLocate(2,21));
 #ifdef ACTION_REPLAY
 		slInitSound(sddrvstsk , sizeof(sddrvstsk) , (Uint8 *)sound_map , sizeof(sound_map)) ;
 #else
@@ -234,21 +234,23 @@ int SDL_InitSubSystem(Uint32 flags)
 #define	SDDRV_SIZE	26610 //0x7000
 #define	SDDRV_ADDR	0x00202000//0x6080000
 unsigned char *tutu;
-		//slPrint("driver loaded",slLocate(1,1));
-		tutu = (unsigned char *)malloc(SDDRV_SIZE);
+		tutu = (unsigned char *)SDDRV_ADDR;
+//		tutu = (unsigned char *)malloc(SDDRV_SIZE);
 		GFS_Load(GFS_NameToId((Sint8*)SDDRV_NAME),0,(void *) tutu,SDDRV_SIZE);
 		slInitSound(tutu , SDDRV_SIZE , (Uint8 *)sound_map , sizeof(sound_map)) ;
-		free(tutu);		
-		
+//		free(tutu);		
+		tutu = NULL;		
   		//slInitSound(sddrvstsk , sizeof(sddrvstsk) , (Uint8 *)sound_map , sizeof(sound_map)) ;
-
+	//slPrint("                                    ",slLocate(2,21));
 #endif
 	}
 
 	if(flags &= SDL_INIT_TIMER)
 	{
+	//slPrint("init timer                                    ",slLocate(2,21));		
 		TIM_FRT_INIT(TIM_CKS_32);
 		TIM_FRT_SET_16(0);
+	//slPrint("                                    ",slLocate(2,21));		
 	}
 
 	return 0;
@@ -298,12 +300,13 @@ void SDL_JoystickClose(SDL_Joystick *joystick)
 //--------------------------------------------------------------------------------------------------------------------------------------
 SDLMod SDL_GetModState(void)
  {
-
+	//slPrint("SDL_GetModState empty" ,slLocate(2,22));	 
+	return KMOD_NONE;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode)
  {
-
+	return SDL_GRAB_OFF;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 /*
@@ -401,7 +404,7 @@ int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
 		{
 			err--;
 		}	 */
-		slSynch();
+//		slSynch();  // vbt 26/05/2019 remis // change rien
 	}
 	return err;
 }
@@ -430,7 +433,7 @@ void SDL_PauseAudio(int pause_on)
 //--------------------------------------------------------------------------------------------------------------------------------------
 SDL_mutex * SDL_CreateMutex(void)
 {
-
+	return NULL;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_FreeWAV(Uint8 *audio_buf)
@@ -446,7 +449,8 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
     char directory[15];
 	char filename[15];
 	unsigned char *mem_buf;
-
+	//slPrint("                                    ",slLocate(2,21));
+	//slPrint("loadwav                                    ",slLocate(2,21));	
 	if(strlen(src->hidden.stdio.name)>5)
 	{
 		for(i=0;i<strlen(src->hidden.stdio.name);i++)
@@ -467,8 +471,8 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
 			}			 
 			ChangeDir(directory);
 
-			//slPrint(directory,slLocate(1,1));
-			//slPrint(filename,slLocate(1,2));
+			////slPrint(directory,slLocate(1,1));
+			////slPrint(filename,slLocate(1,2));
 		}
 	}
 	else
@@ -505,27 +509,35 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
 		*audio_len = sizeof(tune0);
 	}	  
 #endif
-  
+  	//slPrint("                                    ",slLocate(2,21));
 	return spec;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
 {
 	//slBMPut((dest) == NULL ? 0 : ((SDL_Rect *)dest)->x, (dest) == NULL ? 0 : ((SDL_Rect *)dest)->y, ((dest) == NULL ? 0 : ((SDL_Rect *)dest)->x) + images[img].w - 1, ((dest) == NULL ? 0 : ((SDL_Rect *)dest)->y) + images[img].h - 1, images[img].data);
-  
+ //slPrint("SDL_UpperBlit start       ",slLocate(3,22)); 
 if((srcrect)!=NULL)
 	for( Sint16 i=0;i<srcrect->h;i++)
 	{
 //		Uint8*s = (Uint8*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x; 
 //		Uint8*d = (Uint8*)dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
 //		memcpy(d,s,srcrect->w);
+// //slPrint("SDL_UpperBlit memcpyl       ",slLocate(3,22)); 
 		memcpyl((unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),(unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),srcrect->w);
+
+//		Uint8*s = (Uint8*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x; 
+//		Uint8*d = (Uint8*)dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
+//		memcpy(d,s,srcrect->w);
+////slPrint("SDL_UpperBlit memcpyl end       ",slLocate(3,22)); 
+		
 //		DMA_ScuMemCopy(d, s, srcrect->w);
 //		SCU_DMAWait();
 	}	
-	
+ //slPrint("SDL_UpperBlit end       ",slLocate(3,22));	
 	//srcrect->h=SWAP_BYTES_16(srcrect->h);
 	//srcrect->w=SWAP_BYTES_16(srcrect->w);
+	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_UpdateRects (SDL_Surface *screen, int numrects, SDL_Rect *rects)
@@ -536,7 +548,7 @@ void SDL_UpdateRects (SDL_Surface *screen, int numrects, SDL_Rect *rects)
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_UpdateRect (SDL_Surface *screen, Sint32 x, Sint32 y, Uint32 w, Uint32 h)
 {
-
+//slPrint("SDL_UpdateRect  empty       ",slLocate(10,22));
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 
@@ -608,7 +620,7 @@ int SDL_SetPalette(SDL_Surface *surface, int flags, SDL_Color *colors, int first
 //--------------------------------------------------------------------------------------------------------------------------------------
 char * SDL_GetError(void)
 {
-
+	return (char*)"Error !!!";
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 const SDL_VideoInfo * SDL_GetVideoInfo(void)
@@ -639,7 +651,7 @@ SDL_Surface * SDL_CreateRGBSurfaceFrom(void *pixels,
 			int width, int height, int depth, int pitch,
 			Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask)
 {
-
+	return NULL;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_WM_SetIcon(SDL_Surface *icon, Uint8 *mask)
@@ -675,7 +687,7 @@ int SDL_PollEvent(SDL_Event *event)
  				 //LastScan=0;
 	//event->type = SDL_NOEVENT;
 	//event->key.keysym.sym = SDLK_FIRST;	  
-
+//slPrint("SDL_PollEvent       ",slLocate(3,22));	
 	if(Per_Connect1) {
 		push = ~Smpc_Peripheral[0].push;
 		data = ~Smpc_Peripheral[0].data;
@@ -732,7 +744,7 @@ int SDL_PollEvent(SDL_Event *event)
 	{
 		if (vbt_event[i][1]==1)
 		{
-			//slPrintHex(i,slLocate(3,21));
+			////slPrintHex(i,slLocate(3,21));
 			current_event=i;
 			found=1;
 			break;
@@ -777,7 +789,7 @@ int SDL_PollEvent(SDL_Event *event)
 	{
 		/*char toto[500];
 		sprintf(toto,"evt %d action %d key %d",vbt_event[current_event][0],vbt_event[current_event][1],event->key.keysym.sym );
-				slPrint(toto,slLocate(3,25));	 */
+				//slPrint(toto,slLocate(3,25));	 */
 		event->type = 	 vbt_event[current_event][0];
 		if(vbt_event[current_event][0]==SDL_KEYUP)
 		{
@@ -825,7 +837,7 @@ int SDL_PollEvent(SDL_Event *event)
 			break;	
 
 			case 7:/*PER_DGT_ST: */
-				//slPrint("gros connard",slLocate(3,24));
+				////slPrint("gros connard",slLocate(3,24));
 			event->key.keysym.sym = SDLK_ESCAPE;
 			break;	
 
@@ -838,17 +850,17 @@ int SDL_PollEvent(SDL_Event *event)
 			break;	
 
 			case 1:/*PER_DGT_KD: */
-				//slPrint("gros ggggg",slLocate(3,20));
+				////slPrint("gros ggggg",slLocate(3,20));
 			event->key.keysym.sym = SDLK_KP2;
 			break;	
 
 			case 0:/*PER_DGT_KU: */
-				//slPrint("gros ggggg",slLocate(3,20));
+				////slPrint("gros ggggg",slLocate(3,20));
 			event->key.keysym.sym = SDLK_KP8;
 			break;	
 
 			default:
-				//slPrint("pas trouvé",slLocate(3,20));
+				////slPrint("pas trouvé",slLocate(3,20));
 				//event->key.keysym.sym =999;
 				//event->type = SDL_NOEVENT;
 				event->key.keysym.sym = SDLK_LAST;//SDLK_FIRST;	  
@@ -860,6 +872,8 @@ int SDL_PollEvent(SDL_Event *event)
 	}
 	//else
 	//{
+//slPrint("IN_ClearKeysDown       ",slLocate(3,22));	
+		
 	IN_ClearKeysDown();
 			event->type = SDL_KEYUP;
 			//vbt_event[current_event][0] = SDL_NOEVENT;
@@ -879,6 +893,7 @@ int SDL_PollEvent(SDL_Event *event)
 	//event->type = SDL_KEYUP;
 	//event->key.keysym.sym = SDLK_LAST;	  
 	//slSynch();
+//slPrint("SDL_PollEvent end       ",slLocate(3,22));		
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -1023,6 +1038,7 @@ int SDL_WaitEvent(SDL_Event *event)
 		
 	} while(event->type == SDL_NOEVENT);
 #endif
+	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_DestroyMutex(SDL_mutex *mutex)
@@ -1037,14 +1053,14 @@ void Mix_FreeChunk(Mix_Chunk *chunk)
 //--------------------------------------------------------------------------------------------------------------------------------------
 Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
 {
-
+	return NULL;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 {
 	unsigned int i = 0;
-	//slPrintHex(chunk->alen,slLocate(2,10));
-	//slPrintHex(chunk->alen,slLocate(2,11));
+	////slPrintHex(chunk->alen,slLocate(2,10));
+	////slPrintHex(chunk->alen,slLocate(2,11));
 //	slPCMOn(sounds[chunk].pcm, sounds[chunk].data, sounds[chunk].size);
 	//slPCMOff(&m_dat[0]);
 	//slSynch();
@@ -1058,14 +1074,15 @@ int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 			//slSndFlush() ;
 			//slSynch();
 			slPCMOn(&m_dat[i],chunk->abuf,chunk->alen);
-			slSynch();
+//			slSynch();
 				break;
 		}		 
 	}
 /*
 		slPCMOn(&m_dat[0],chunk->abuf,chunk->alen);
 	*/
-	return 0;
+//	slSynch();	
+	return 1;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
@@ -1098,40 +1115,40 @@ int Mix_GroupOldest(int tag)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-int Mix_GroupChannels(int from, int to, int tag)
+/*int Mix_GroupChannels(int from, int to, int tag)
 {
 	return 0;
-}
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
-void Mix_HookMusic(void (*mix_func)(void *udata, Uint8 *stream, int len),void *arg)
+/*void Mix_HookMusic(void (*mix_func)(void *udata, Uint8 *stream, int len),void *arg)
 {
 
-}
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
-char *Mix_GetError()
+/*char *Mix_GetError()
 {
-
-}
+	return NULL;
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
-int Mix_HaltChannel(int channel)
+/*int Mix_HaltChannel(int channel)
 {
 	return 0;
-}
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
-int SDL_SaveBMP_RW (SDL_Surface *surface, SDL_RWops *dst, int freedst)
+/*int SDL_SaveBMP_RW (SDL_Surface *surface, SDL_RWops *dst, int freedst)
 {
 	return 0;
-}
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
-SDL_RWops *SDL_RWFromMem(void *mem, int size)
+/*SDL_RWops *SDL_RWFromMem(void *mem, int size)
 {
-
-}
+	return NULL;
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
-SDL_RWops *SDL_RWFromFile(const char *file, const char *mode)
+/*SDL_RWops *SDL_RWFromFile(const char *file, const char *mode)
 {
-
-}
+	return NULL;
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 Uint32 SDL_GetTicks(void)
 {
@@ -1292,7 +1309,7 @@ void	satPlayMusic( Uint8 track ){
   
 //	char toto[50];
 //	sprintf(toto,"start track **%d\n%d\n**new start  : %d**",tno[0],track,track+tno[0])  ;
-
+slPrintHex(track + tno[0],slLocate(10,8));
 //	FNT_Print256_2bpp((volatile Uint8 *)SCL_VDP2_VRAM_B1,(Uint8 *)toto,84,100,2,8,9,0);
 
 //    CDC_PLY_PMODE(&playdata) = CDC_PTYPE_NOCHG;//CDC_PM_DFL + 30;	/* Play Mode. */

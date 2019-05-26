@@ -18,14 +18,14 @@ void VWB_DrawPropString(const char* string)
 	byte	    ch;
 
     byte *vbuf = LOCK();
-	//slPrint((char*)string,slLocate(5,5));
+	////slPrint((char*)string,slLocate(5,5));
 
 	font = (fontstruct *) grsegs[STARTFONT+fontnumber];
 	font->height=SWAP_BYTES_16(font->height);
 	height =font->height;//SWAP_BYTES_16(font->height);//font->height;//font->height;//font->height;//SWAP_BYTES_16(font->height);
 
-//slPrintHex(height,slLocate(5,5));	
-//slPrintHex(fontnumber,slLocate(5,7));	
+////slPrintHex(height,slLocate(5,5));	
+////slPrintHex(fontnumber,slLocate(5,7));	
  	
 	for (int vbt=0; vbt<256;vbt++ )
 	{
@@ -38,7 +38,7 @@ void VWB_DrawPropString(const char* string)
 	{
 		width = step = font->width[ch];
 		source = ((byte *)font)+font->location[ch];
-//					slPrintHex(width,slLocate(10,vbt++));	
+//					////slPrintHex(width,slLocate(10,vbt++));	
 
 			/*  while(1);	   	   */
 
@@ -67,7 +67,7 @@ void VWB_DrawPropString(const char* string)
 	
 	font->height=SWAP_BYTES_16(font->height);
 	
-//slPrintHex(height,slLocate(10,5));	
+////slPrintHex(height,slLocate(10,5));	
 
 	UNLOCK();
 		//while(1);
@@ -117,6 +117,7 @@ void VL_MungePic (byte *source, unsigned width, unsigned height)
 	}
 
 	free(temp);
+	temp = NULL;
 }
 
 void VWL_MeasureString (const char *string, word *width, word *height, fontstruct *font)
@@ -142,9 +143,13 @@ void VW_MeasurePropString (const char *string, word *width, word *height)
 
 void VH_UpdateScreen()
 {
+////slPrint("SDL_BlitSurface         ",slLocate(10,22));	
 	SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
+////slPrint("SDL_UpdateRect        ",slLocate(10,22));	
 	SDL_UpdateRect(screen, 0, 0, 0, 0);
+////slPrint("slSndFlush             ",slLocate(10,22));	
 	slSndFlush() ;
+////slPrint("VH_UpdateScreen end ",slLocate(10,22));	
 	//slSynch();
 }
 
@@ -260,32 +265,32 @@ void LoadLatchMem (void)
 //
 // tile 8s
 //
-	//slPrint("LoadLatchMem",slLocate(10,15));
+	////slPrint("LoadLatchMem",slLocate(10,15));
     surf = SDL_CreateRGBSurface(SDL_HWSURFACE, 8*8,
         ((NUMTILE8 + 7) / 8) * 8, 8, 0, 0, 0, 0);
     if(surf == NULL)
     {
-		//slPrint("LoadLatchMem bad",slLocate(10,15));
+		////slPrint("LoadLatchMem bad",slLocate(10,15));
         Quit("Unable to create surface for tiles!");
     }
     SDL_SetColors(surf, gamepal, 0, 256);
 
 	latchpics[0] = surf;
-	//slPrint("LoadLatchMem cache",slLocate(10,16));
+	////slPrint("LoadLatchMem cache",slLocate(10,16));
 	CA_CacheGrChunk (STARTTILE8);
-	//slPrint("LoadLatchMem cache2",slLocate(10,17));
+	////slPrint("LoadLatchMem cache2",slLocate(10,17));
 	src = grsegs[STARTTILE8];
-	//slPrint("LoadLatchMem cache3",slLocate(10,18));
+	////slPrint("LoadLatchMem cache3",slLocate(10,18));
 	for (i=0;i<NUMTILE8;i++)
 	{
-	//slPrint("looping!",slLocate(10,18));
+	////slPrint("looping!",slLocate(10,18));
 		VL_MemToLatch (src, 8, 8, surf, (i & 7) * 8, (i >> 3) * 8);
 		src += 64;
 	}	
-	//slPrint("LoadLatchMem cache2",slLocate(10,19));
+	////slPrint("LoadLatchMem cache2",slLocate(10,19));
 	UNCACHEGRCHUNK (STARTTILE8);
 	//free(surf);
-	//slPrint("LoadLatchMem cache2b",slLocate(10,17));
+	////slPrint("LoadLatchMem cache2b",slLocate(10,17));
 //
 // pics
 //
@@ -296,24 +301,24 @@ void LoadLatchMem (void)
 	{
 		width = pictable[i-STARTPICS].width;
 		height = pictable[i-STARTPICS].height;
-	//slPrint("LoadLatchMem cache2c",slLocate(10,17));
+	////slPrint("LoadLatchMem cache2c",slLocate(10,17));
 		surf = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, 8, 0, 0, 0, 0);
-	//slPrint("LoadLatchMem cache2d",slLocate(10,17));
+	////slPrint("LoadLatchMem cache2d",slLocate(10,17));
         if(surf == NULL)
         {
             Quit("Unable to create surface for picture!");
         }			  
         SDL_SetColors(surf, gamepal, 0, 256);
 		latchpics[2+i-start] = surf;
-	//slPrint("LoadLatchMem cache3",slLocate(10,18));
+	////slPrint("LoadLatchMem cache3",slLocate(10,18));
 		CA_CacheGrChunk (i);
-	//slPrint("LoadLatchMem cache2",slLocate(10,19));
+	////slPrint("LoadLatchMem cache2",slLocate(10,19));
 		VL_MemToLatch (grsegs[i], width, height, surf, 0, 0);
    //while(1);
 		//VL_LatchToScreen (latchpics[2+i-start], 10*8, 10);
 		UNCACHEGRCHUNK(i);
-		//slPrintHex(i,slLocate(10,20));
-		//slPrintHex(end,slLocate(10,21));
+		////slPrintHex(i,slLocate(10,20));
+		////slPrintHex(end,slLocate(10,21));
 		//free(surf);
 	}	
 //free(surf);
@@ -321,7 +326,7 @@ void LoadLatchMem (void)
 	//VL_LatchToScreen (latchpics[2], 10*8, 10);
 
 	//while(1);
-	//slPrint("LoadLatchMem end",slLocate(10,20));	
+	////slPrint("LoadLatchMem end",slLocate(10,20));	
 }
 
 //==========================================================================
