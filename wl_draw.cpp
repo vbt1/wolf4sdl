@@ -1,11 +1,13 @@
 // WL_DRAW.C
-
+#define USE_SPRITES 1
 #include "wl_def.h"
 #pragma hdrstop
 
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
 #include "wl_shade.h"
+
+void heapWalk();
 
 /*
 =============================================================================
@@ -195,7 +197,7 @@ void TransformActor (objtype *ob)
 ========================
 */
 
-boolean TransformTile (int tx, int ty, short *dispx, short *dispheight)
+boolean TransformTile (int tx, int ty, short shapenum, short *dispx, short *dispheight)
 {
     fixed gx,gy,gxt,gyt,nx,ny;
 
@@ -219,7 +221,6 @@ boolean TransformTile (int tx, int ty, short *dispx, short *dispheight)
     gyt = FixedMul(gy,viewcos);
     ny = gyt+gxt;
 
-
 //
 // calculate height / perspective ratio
 //
@@ -229,6 +230,28 @@ boolean TransformTile (int tx, int ty, short *dispx, short *dispheight)
     {
         *dispx = (short)(centerx + ny*scale/nx);
         *dispheight = (short)(heightnumerator/(nx>>8));
+#if 0	
+/*	
+//--------------------------------------------------------------------------------------------
+	extern 	TEXTURE tex_spr[];		
+	TEXTURE *txptr = tex_spr + shapenum;
+		
+    SPRITE user_sprite;
+    user_sprite.CTRL = FUNC_Sprite | _ZmCC;
+    user_sprite.PMOD=CL256Bnk | ECenb | SPdis;
+    user_sprite.SRCA=((txptr->CGadr));
+    user_sprite.COLR=0;
+    user_sprite.SIZE=0x840;
+	user_sprite.XA=(short)(*dispx - centerx);//(ny*scale/nx);
+	user_sprite.YA=0;
+	user_sprite.XB=(short)((*dispheight)>>3)<<1; // vbt : * SPRITESCALEFACTOR à la place ?
+	user_sprite.YB=user_sprite.XB;
+
+    user_sprite.GRDA=0;
+	slSetSprite(&user_sprite, toFIXED(100));	
+*/	
+//--------------------------------------------------------------------------------------------
+#endif
     }
 
 //
@@ -239,9 +262,6 @@ boolean TransformTile (int tx, int ty, short *dispx, short *dispheight)
     else
         return false;
 }
-
-//==========================================================================
-
 /*
 ====================
 =
@@ -272,12 +292,45 @@ int CalcHeight()
 ===================
 */
 
-byte *postsource;
 int postx;
+#if USE_SPRITES	
+
+#else
+byte *postsource;
+#endif
 int postwidth;
+//int vbt=0;
+
 
 void ScalePost()
 {
+#if USE_SPRITES	
+//--------------------------------------------------------------------------------------------
+	extern 	TEXTURE tex_spr[];		
+	TEXTURE *txptr = &tex_spr[currentPage];
+//  a           b          c             d
+// top left, top right, bottom right, bottom left
+    SPRITE user_sprite;
+    user_sprite.CTRL = FUNC_Texture | _ZmCC;
+    user_sprite.PMOD=CL256Bnk | ECdis | SPdis;
+    user_sprite.SRCA=((txptr->CGadr)+(lasttexture/8));
+    user_sprite.COLR=0;
+    user_sprite.SIZE=0x801;
+
+	user_sprite.XD=postx-(viewwidth/2);
+	user_sprite.YD=-(wallheight[postx] >> 3);
+	user_sprite.XC=user_sprite.XD;
+	user_sprite.YC=(wallheight[postx] >> 3);
+	user_sprite.XA=user_sprite.XD-1;
+	user_sprite.YA=user_sprite.YD;
+	user_sprite.XB=user_sprite.XA;
+	user_sprite.YB=user_sprite.YC;
+	
+    user_sprite.GRDA=0;
+	slSetSprite(&user_sprite, toFIXED(300));	
+//--------------------------------------------------------------------------------------------
+#else
+	
     int ywcount, yoffs, yw, yd, yendoffs;
     byte col;
 
@@ -305,13 +358,14 @@ void ScalePost()
         }
         yendoffs--;
     }
-    if(yw < 0) return;
+    if(yw < 0) return;	
 
 #ifdef USE_SHADING
     col = curshades[postsource[yw]];
 #else
     col = postsource[yw];
-#endif
+#endif	
+
     yendoffs = yendoffs * vbufPitch + postx;
     while(yoffs <= yendoffs)
     {
@@ -334,6 +388,7 @@ void ScalePost()
         }
         yendoffs -= vbufPitch;
     }
+#endif	
 }
 
 void GlobalScalePost(byte *vidbuf, unsigned pitch)
@@ -377,7 +432,9 @@ void HitVertWall (void)
         }
         ScalePost();
         wallheight[pixx] = CalcHeight();
+#ifndef USE_SPRITES		
         postsource+=texture-lasttexture;
+#endif		
         postwidth=1;
         postx=pixx;
         lasttexture=texture;
@@ -405,7 +462,11 @@ void HitVertWall (void)
     else
         wallpic = vertwall[tilehit];
 
+#ifndef USE_SPRITES	
     postsource = PM_GetTexture(wallpic) + texture;
+#else	
+	currentPage = wallpic;
+#endif
 }
 
 
@@ -442,7 +503,9 @@ void HitHorizWall (void)
         }
         ScalePost();
         wallheight[pixx] = CalcHeight();
+#ifndef USE_SPRITES			
         postsource+=texture-lasttexture;
+#endif		
         postwidth=1;
         postx=pixx;
         lasttexture=texture;
@@ -469,8 +532,11 @@ void HitHorizWall (void)
     }
     else
         wallpic = horizwall[tilehit];
-
+#ifndef USE_SPRITES	
     postsource = PM_GetTexture(wallpic) + texture;
+#else	
+	currentPage = wallpic;
+#endif
 }
 
 //==========================================================================
@@ -503,7 +569,9 @@ void HitHorizDoor (void)
         }
         ScalePost();
         wallheight[pixx] = CalcHeight();
+#ifndef USE_SPRITES			
         postsource+=texture-lasttexture;
+#endif		
         postwidth=1;
         postx=pixx;
         lasttexture=texture;
@@ -534,8 +602,11 @@ void HitHorizDoor (void)
             doorpage = DOORWALL+4;
             break;
     }
-
+#ifndef USE_SPRITES	
     postsource = PM_GetTexture(doorpage) + texture;
+#else	
+	currentPage = doorpage;
+#endif
 }
 
 //==========================================================================
@@ -568,7 +639,9 @@ void HitVertDoor (void)
         }
         ScalePost();
         wallheight[pixx] = CalcHeight();
+#ifndef USE_SPRITES			
         postsource+=texture-lasttexture;
+#endif		
         postwidth=1;
         postx=pixx;
         lasttexture=texture;
@@ -599,126 +672,14 @@ void HitVertDoor (void)
             doorpage = DOORWALL+5;
             break;
     }
-
+#ifndef USE_SPRITES	
     postsource = PM_GetTexture(doorpage) + texture;
+#else	
+	currentPage = doorpage;
+#endif
 }
 
 //==========================================================================
-
-
-/*
-====================
-=
-= HitHorizPWall
-=
-= A pushable wall in action has been hit
-=
-====================
-*/
-
-void HitHorizPWall (void)
-{
-    int wallpic;
-    int texture,offset;
-
-    texture = (xintercept>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
-    offset = pwallpos<<10;
-    if (ytilestep == -1)
-        yintercept += TILEGLOBAL-offset;
-    else
-    {
-        texture = TEXTUREMASK-texture;
-        yintercept += offset;
-    }
-
-    if(lasttilehit==tilehit && lastside==0)
-    {
-        if((pixx&3) && texture == lasttexture)
-        {
-            ScalePost();
-            postx=pixx;
-            wallheight[pixx] = wallheight[pixx-1];
-            return;
-        }
-        ScalePost();
-        wallheight[pixx] = CalcHeight();
-        postsource+=texture-lasttexture;
-        postwidth=1;
-        postx=pixx;
-        lasttexture=texture;
-        return;
-    }
-
-    if(lastside!=-1) ScalePost();
-
-    lastside=0;
-    lasttilehit=tilehit;
-    lasttexture=texture;
-    wallheight[pixx] = CalcHeight();
-    postx = pixx;
-    postwidth = 1;
-
-    wallpic = horizwall[pwalltile&63];
-
-    postsource = PM_GetTexture(wallpic) + texture;
-}
-
-/*
-====================
-=
-= HitVertPWall
-=
-= A pushable wall in action has been hit
-=
-====================
-*/
-
-void HitVertPWall (void)
-{
-    int wallpic;
-    int texture,offset;
-
-    texture = (yintercept>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
-    offset = pwallpos<<10;
-    if (xtilestep == -1)
-    {
-        xintercept += TILEGLOBAL-offset;
-        texture = TEXTUREMASK-texture;
-    }
-    else
-        xintercept += offset;
-
-    if(lasttilehit==tilehit && lastside==1)
-    {
-        if((pixx&3) && texture == lasttexture)
-        {
-            ScalePost();
-            postx=pixx;
-            wallheight[pixx] = wallheight[pixx-1];
-            return;
-        }
-        ScalePost();
-        wallheight[pixx] = CalcHeight();
-        postsource+=texture-lasttexture;
-        postwidth=1;
-        postx=pixx;
-        lasttexture=texture;
-        return;
-    }
-
-    if(lastside!=-1) ScalePost();
-
-    lastside=1;
-    lasttilehit=tilehit;
-    lasttexture=texture;
-    wallheight[pixx] = CalcHeight();
-    postx = pixx;
-    postwidth = 1;
-
-    wallpic = vertwall[pwalltile&63];
-
-    postsource = PM_GetTexture(wallpic) + texture;
-}
 
 #define HitHorizBorder HitHorizWall
 #define HitVertBorder HitVertWall
@@ -749,8 +710,9 @@ byte vgaCeiling[]=
 =====================
 */
 
-void VGAClearScreen (void)
+void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
 {
+	/*
     byte ceiling=vgaCeiling[gamestate.episode*10+mapon];
 
     int y;
@@ -766,6 +728,7 @@ void VGAClearScreen (void)
     for(; y < viewheight; y++, ptr += vbufPitch)
         memset(ptr, 0x19, viewwidth);
 #endif
+*/
 }
 
 //==========================================================================
@@ -808,16 +771,6 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 {
     t_compshape *shape;
     unsigned scale,pixheight;
-    unsigned starty,endy;
-    word *cmdptr;
-    byte *cline;
-    byte *line;
-    byte *vmem;
-    int actx,i,upperedge;
-    short newstart;
-    int scrstarty,screndy,lpix,rpix,pixcnt,ycnt;
-    unsigned j;
-    byte col;
 
 #ifdef USE_SHADING
     byte *curshades;
@@ -833,11 +786,41 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
     if(!scale) return;   // too close or far away
 
     pixheight=scale*SPRITESCALEFACTOR;
+#if USE_SPRITES	
+//--------------------------------------------------------------------------------------------
+	extern 	TEXTURE tex_spr[];		
+	TEXTURE *txptr = tex_spr + shapenum + 128;
+		
+    SPRITE user_sprite;
+    user_sprite.CTRL = FUNC_Sprite | _ZmCC;
+    user_sprite.PMOD=CL256Bnk | ECenb | SPdis;
+    user_sprite.SRCA=((txptr->CGadr));
+    user_sprite.COLR=0;
+    user_sprite.SIZE=0x840;
+	user_sprite.XA=(xcenter-centerx);
+	user_sprite.YA=0;
+	user_sprite.XB=pixheight;
+	user_sprite.YB=user_sprite.XB;
+    user_sprite.GRDA=0;
+//	slSetSprite(&user_sprite, toFIXED(300));	
+//--------------------------------------------------------------------------------------------	
+#else
+    unsigned starty,endy;
+    word *cmdptr;
+    byte *cline;
+    byte *line;
+    byte *vmem;
+    unsigned j;
+    byte col;
+    int actx,i,upperedge;
+    short newstart;
+    int scrstarty,screndy,lpix,rpix,pixcnt,ycnt;
+	
     actx=xcenter-scale;
     upperedge=viewheight/2-scale;
 
     cmdptr=(word *) shape->dataofs;
-
+	
     for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
     {
         lpix=rpix;
@@ -893,6 +876,7 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
             }
         }
     }
+#endif	
 }
 
 void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
@@ -919,6 +903,9 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
 
     cmdptr=shape->dataofs;
 
+#if 0
+
+#else // vbt on affiche l'arme en bitmap
     for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
     {
         lpix=rpix;
@@ -967,6 +954,7 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
             }
         }
     }
+#endif	
 }
 
 /*
@@ -993,6 +981,7 @@ typedef struct
 #endif
 } visobj_t;
 
+
 visobj_t vislist[MAXVISABLE];
 visobj_t *visptr,*visstep,*farthest;
 
@@ -1007,6 +996,8 @@ void DrawScaleds (void)
 
     visptr = &vislist[0];
 
+
+
 //
 // place static objects
 //
@@ -1018,7 +1009,7 @@ void DrawScaleds (void)
         if (!*statptr->visspot)
             continue;                                               // not visable
 
-        if (TransformTile (statptr->tilex,statptr->tiley,
+        if (TransformTile (statptr->tilex,statptr->tiley,statptr->shapenum,
             &visptr->viewx,&visptr->viewheight) && statptr->flags & FL_BONUS)
         {
             GetBonus (statptr);
@@ -1042,7 +1033,6 @@ void DrawScaleds (void)
             visptr++;
         }
     }
-
 //
 // place active objects
 //
@@ -1123,10 +1113,12 @@ void DrawScaleds (void)
             Scale3DShape(vbuf, vbufPitch, farthest->transsprite);
         else
 #endif
-            ScaleShape(farthest->viewx, farthest->shapenum, farthest->viewheight, farthest->flags);
-
+// affiche la version bitmap
+		ScaleShape(farthest->viewx, farthest->shapenum, farthest->viewheight, farthest->flags);
         farthest->viewheight = 32000;
     }
+
+
 }
 
 //==========================================================================
@@ -1276,6 +1268,7 @@ void AsmRefresh()
                     else
                         xintercept = (focaltx << TILESHIFT) - TILEGLOBAL + ((64 - pwallpos) << 10);
                     yintercept = yintbuf;
+                    ytile = (short) (yintercept >> TILESHIFT);
                     tilehit = pwalltile;
                     HitVertWall();
                     continue;
@@ -1684,7 +1677,9 @@ void    ThreeDRefresh (void)
     spotvis[player->tilex][player->tiley] = 1;       // Detect all sprites over player fix
 
     vbuf = VL_LockSurface(screenBuffer);
-    vbuf+=screenofs;
+    if(vbuf == NULL) return;
+
+    vbuf += screenofs;
     vbufPitch = bufferPitch;
 
     CalcViewVariables();
@@ -1697,9 +1692,8 @@ void    ThreeDRefresh (void)
     if(GetFeatureFlags() & FF_STARSKY)
         DrawStarSky(vbuf, vbufPitch);
 #endif
-
     WallRefresh ();
-
+//vbt=0;
 #if defined(USE_FEATUREFLAGS) && defined(USE_PARALLAX)
     if(GetFeatureFlags() & FF_PARALLAXSKY)
         DrawParallax(vbuf, vbufPitch);
@@ -1711,12 +1705,10 @@ void    ThreeDRefresh (void)
 #ifdef USE_FLOORCEILINGTEX
     DrawFloorAndCeiling(vbuf, vbufPitch, min_wallheight);
 #endif
-
 //
 // draw all the scaled images
 //
     DrawScaleds();                  // draw scaled stuff
-
 #if defined(USE_FEATUREFLAGS) && defined(USE_RAIN)
     if(GetFeatureFlags() & FF_RAIN)
         DrawRain(vbuf, vbufPitch);
@@ -1748,13 +1740,14 @@ void    ThreeDRefresh (void)
     }
     else
     {
-
 #ifndef REMDEBUG
         if (fpscounter)
         {
 			char buffer[8];
 			slPrint((char*)"fps   ",slLocate(1,0));
 			slPrint((char*)ltoa(fps,buffer,8),slLocate(4,0));
+			
+			//heapWalk();
             //fontnumber = 0;
             //SETFONTCOLOR(7,127);
             //PrintX=4; PrintY=1;
@@ -1763,7 +1756,6 @@ void    ThreeDRefresh (void)
             //US_Print(" fps");
         }
 #endif
-
         SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
         SDL_UpdateRect(screen, 0, 0, 0, 0);
     }

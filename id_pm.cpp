@@ -1,8 +1,11 @@
 #include "wl_def.h"
 
+void set_sprite(PICTURE *pcptr);
+
 int ChunksInFile;
 int PMSpriteStart;
 int PMSoundStart;
+int currentPage;
 
 bool PMSoundInfoPagePadded = false;
 
@@ -113,6 +116,9 @@ void PM_Startup()
     CHECKMALLOCRESULT(PMPages);
     // Load pages and initialize PMPages pointers
     uint8_t *ptr = (uint8_t *) PMPageData;
+////////////
+unsigned int position=0;
+	
     for(i = 0; i < ChunksInFile; i++)
     {
         if(i >= PMSpriteStart && i < PMSoundStart || i == ChunksInFile - 1)
@@ -143,11 +149,29 @@ void PM_Startup()
         else size = pageOffsets[i + 1] - pageOffsets[i];
 		delta = (uint16_t)(pageOffsets[i]/2048);
 		delta2 = pageOffsets[i] - delta*2048; 
-		//slPrintHex(delta,slLocate(10,8));
 		GFS_Load(fileId, delta, (void *)x, 4096*2);
-        //fseek(file, pageOffsets[i], SEEK_SET);
-        //fread(ptr, 1, size, file);
-		memcpy(ptr,&x[delta2],size);
+		
+		if(i >= PMSpriteStart && i < PMSoundStart || i == ChunksInFile - 1)
+			memcpy(ptr,&x[delta2],size);
+		else
+		{
+			extern TEXTURE tex_spr[];			
+			memcpy(ptr,&x[delta2],size);
+			
+			PICTURE pic_spr;
+			pic_spr.texno = i;
+			pic_spr.cmode = COL_256;
+			pic_spr.pcsrc = &ptr[0];
+		
+			tex_spr[pic_spr.texno] = TEXDEF(64, 64, position);
+			if (i<128)
+			{
+				set_sprite(&pic_spr);
+				position+=0x800;
+			}
+			//vbt :  contient les muurs !!!!
+		}
+	
 		free(x);
 		x = NULL;		
         ptr += size;

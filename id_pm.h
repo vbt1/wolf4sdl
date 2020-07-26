@@ -10,7 +10,8 @@
 extern int ChunksInFile;
 extern int PMSpriteStart;
 extern int PMSoundStart;
-
+extern int currentPage;
+extern int currentTex;
 extern bool PMSoundInfoPagePadded;
 
 // ChunksInFile+1 pointers to page starts.
@@ -27,10 +28,13 @@ static inline uint32_t PM_GetPageSize(int page)
     return (uint32_t) (PMPages[page + 1] - PMPages[page]);
 }
 
+#define	PM_GetSpritePage(v)	PM_GetPage(PMSpriteStart + (v))
+
 static inline uint8_t *PM_GetPage(int page)
 {
     if(page < 0 || page >= ChunksInFile)
         Quit("PM_GetPage: Tried to access illegal                                   page: %i", page);
+	currentPage = page;
     return PMPages[page];
 }
 

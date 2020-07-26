@@ -44,7 +44,7 @@ CCFLAGS += -c -I$(SGLIDR)
 DFLAGS =
 include $(OBJECTS)
 
-LDFLAGS = -O2 -m2 -Xlinker -n -Xlinker -flto -Xlinker -T$(LDFILE) -Xlinker -Map \
+LDFLAGS = -O2 -m2  -fuse-linker-plugin  -Xlinker -n -Xlinker -flto -Xlinker -T$(LDFILE) -Xlinker -Map \
           -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -nostartfiles 
 #          -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -nostartfiles -LL:/GNUSHV12/sh-elf/sh-elf/lib/m2/libc.a -LC:/SaturnOrbit/SGL_302j/LIB_ELF/LIBSGL.A 
 

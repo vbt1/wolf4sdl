@@ -26,6 +26,7 @@ loaded into the data segment
 #include <stdlib.h>
 #pragma hdrstop
 #define THREEBYTEGRSTARTS
+#define HEAP_WALK 1
 
 #ifdef HEAP_WALK
 extern Uint32  end;
@@ -47,9 +48,10 @@ void heapWalk(void)
     
 //    printf("Heap Size: %lu\n", heapEnd - chunkCurr);
     char toto[200];
-//	sprintf (toto,"Heap Size: %d  e%08x s%08x                     \n", heapEnd - chunkCurr,heapEnd, chunkCurr) ;
+	sprintf (toto,"Heap Size: %d  e%08x s%08x                     \n", heapEnd - chunkCurr,heapEnd, chunkCurr) ;
 //	FNT_Print256_2bpp((volatile Uint8 *)SS_FONT,(Uint8 *)toto,12,216);
-
+	slPrint((char *)toto,slLocate(1,2));
+	
     // Walk through the chunks until we hit the end of the heap.
     while (chunkCurr < heapEnd)
     {
@@ -81,18 +83,49 @@ void heapWalk(void)
 //        printf("Chunk: %lu  Address: 0xlX  Size: %lu  %s\n", chunkNumber, chunkCurr, chunkSize, isChunkFree ? "CHUNK FREE" : "");
         
 	sprintf (toto,"%d A%04x  S%04d %s", chunkNumber, chunkCurr, chunkSize, isChunkFree ? "CHUNK FREE" : "") ;
-	if(chunkNumber>=200)
-	slPrint((char *)toto,slLocate(0,chunkNumber-200));
-	if(chunkNumber>=230)
-	slPrint((char *)toto,slLocate(20,chunkNumber-230));
+	if(chunkNumber<20)	
+		slPrint((char *)toto,slLocate(0,chunkNumber*10+10));
+//	if(chunkNumber>=200)
+//	slPrint((char *)toto,slLocate(0,chunkNumber-200));
+//	if(chunkNumber>=230)
+//	slPrint((char *)toto,slLocate(20,chunkNumber-230));
 
 		chunkCurr = chunkNext;
         chunkNumber++;
     }
+
+	
 //	FNT_Print256_2bpp((volatile Uint8 *)SS_FONT,(Uint8 *)"done",12,131);
 }
 #endif
 
+	TEXTURE tex_spr[NUMPICS+128];
+/*	
+	FIXED pos[][XYZS] =
+	{	
+	{toFIXED( 70),toFIXED( 12),toFIXED(170),toFIXED(1.0)},	// A  
+	{toFIXED( 98),toFIXED(  2),toFIXED(170),toFIXED(1.0)},	// B  
+	{toFIXED( 52),toFIXED(  2),toFIXED(170),toFIXED(1.0)},	// C  
+	{toFIXED( 34),toFIXED(  2),toFIXED(170),toFIXED(1.0)}	// D  	
+	};
+
+	SPR_ATTR attr[] =
+	{
+		SPR_ATTRIBUTE(0, 0, No_Gouraud, CL256Bnk | ECdis | SPdis, sprNoflip | FUNC_Sprite),
+		SPR_ATTRIBUTE(1, 0, No_Gouraud, CL256Bnk | ECdis | SPdis, sprNoflip | FUNC_Sprite),
+		SPR_ATTRIBUTE(2, 0, No_Gouraud, CL256Bnk | ECdis | SPdis, sprNoflip | FUNC_Sprite),
+		SPR_ATTRIBUTE(3, 0, No_Gouraud, CL256Bnk | ECdis | SPdis, sprNoflip | FUNC_Sprite)
+	};
+*/
+void set_sprite(PICTURE *pcptr)
+{
+	TEXTURE *txptr = tex_spr + pcptr->texno;
+/*	slDMACopy((void *)pcptr->pcsrc,
+		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),
+		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
+*/		
+	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)pcptr->pcsrc,(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
+}
 
 /*
 =============================================================================
@@ -222,7 +255,6 @@ void CAL_GetGrChunkLength (int chunk)
 	GFS_Load(grhandle, delta, (void *)Chunks, sizeof(chunkexplen));
 
 	memcpy(&chunkexplen,&Chunks[delta2],sizeof(chunkexplen));
-//	free(Chunks);
 	Chunks = NULL;
 	chunkexplen = SWAP_BYTES_32(chunkexplen);
     chunkcomplen = GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
@@ -615,14 +647,59 @@ void CAL_SetupGrFile (void)
 	CHECKMALLOCRESULT(compseg);
 	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen+4));
     CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
+// 
+	unsigned int position=0x800*128;
 
-	for(long xxx=0;xxx<NUMPICS;xxx++)
+	for(unsigned long j=0;j<NUMPICS;j++)
 	{
-		pictable[xxx].height=SWAP_BYTES_16(pictable[xxx].height);
-		pictable[xxx].width=SWAP_BYTES_16(pictable[xxx].width);
-	}
+		pictable[j].height=SWAP_BYTES_16(pictable[j].height);
+		pictable[j].width=SWAP_BYTES_16(pictable[j].width);
+		
+/*		vbt à remettre decodage pour chargement en sprite
+// VBT : decode des sprites		
+//--------------------------------------------------------------------------------------------------------------		
+//		if(j>=0 && j < 0 + 100)
+		{
+			t_compshape   *shape = (t_compshape   *)PM_GetSprite(j); //PMPages[PMSpriteStart+j];
+			int idx;
+			byte bmpbuff[64*64];
+			unsigned short linecmds, *cmdptr, *sprdata;
+			unsigned char  *sprite = (unsigned char  *)shape;
+			// set the texel index to the first texel
+			i = ((((shape->rightpix-shape->leftpix)+1)*2)+4);
+			// clear the buffers
+			memset(bmpbuff,0,64*64);
+			// setup a pointer to the column offsets	
+			cmdptr = shape->dataofs;
 
-//	free(compseg);
+			for (int x = shape->leftpix; x <= shape->rightpix; x++)
+			{
+				linecmds = *cmdptr;
+				sprdata = (unsigned short *)(sprite+linecmds);
+				idx = 0;
+				while ((SWAP_BYTES_16(sprdata[idx])) != 0)
+				{
+					for (int y = ((SWAP_BYTES_16(sprdata[idx+2]))/2); y < (SWAP_BYTES_16(sprdata[idx])/2); y++)
+					{
+						bmpbuff[((y)*64)+x] = sprite[i];
+						i++;
+					}
+					idx += 3;
+				}
+				cmdptr++;
+			}
+			PICTURE pic_spr;
+			pic_spr.texno = 128+j;
+			pic_spr.cmode = COL_256;
+			pic_spr.pcsrc = &bmpbuff[0];
+		
+			tex_spr[pic_spr.texno] = TEXDEF(64, 64, position);
+//			set_sprite(&pic_spr);
+			position+=0x800;		
+		}
+*/		
+//--------------------------------------------------------------------------------------------------------------
+	}
 	compseg = NULL;
 	// VBT correct
 }
@@ -1209,7 +1286,6 @@ void CA_CacheGrChunk (int chunk)
 
 	GFS_Load(grhandle, delta, (void *)Chunks, 0x4000);
 	///memset(Chunks,0,sizeof(Chunks));
-    //slSynch();
     if (compressed<=BUFFERSIZE)
     {
 //	slPrint("h",slLocate(2,16));
@@ -1262,7 +1338,6 @@ void CA_CacheGrChunk (int chunk)
         free(source);
 		source = NULL;
 	}
-	//slSynch();
 }
 
 
@@ -1314,7 +1389,7 @@ void CA_CacheScreen (int chunk)
 //	Chunks=(uint8_t*)malloc(8192*2+compressed);
 	Chunks=(uint8_t*)0x002C0000;
 #ifdef HEAP_WALK	
-heapWalk();
+//heapWalk();
 #endif
 	CHECKMALLOCRESULT(Chunks);
 //slPrint((char*)"GFS_Load",slLocate(10,22));		
@@ -1462,8 +1537,8 @@ slPrintHex(compressed,slLocate(10,21));
 #endif
 
         if (compressed>BUFFERSIZE)
-//            free(bigbufferseg);
-			bigbufferseg = NULL;
+            free(bigbufferseg);
+//			bigbufferseg = NULL;
     }
 }
 

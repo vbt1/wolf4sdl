@@ -247,7 +247,7 @@ typedef enum
     FL_AMBUSH           = 0x00000040,
     FL_NONMARK          = 0x00000080,
     FL_FULLBRIGHT       = 0x00000100,
-#ifdef USE_DIR3DSPR
+//#ifdef USE_DIR3DSPR
     // you can choose one of the following values in wl_act1.cpp
     // to make a static sprite a directional 3d sprite
     // (see example at the end of the statinfo array)
@@ -266,7 +266,7 @@ typedef enum
     FL_DIR_POS_MASK     = 0x00000600,
     FL_DIR_VERT_FLAG    = 0x00000800,
     FL_DIR_MASK         = 0x00000e00,
-#endif
+//#endif
     // next free bit is   0x00001000
 } objflag_t;
 
@@ -593,11 +593,11 @@ enum
     SPR_MACHINEGUNATK4,
 
     SPR_CHAINREADY,SPR_CHAINATK1,SPR_CHAINATK2,SPR_CHAINATK3,
-    SPR_CHAINATK4,
-
+    SPR_CHAINATK4, SPR_NULLSPRITE, SPR_TOTAL
+// vbt ajout, vient de wolf32x
 };
-
-
+// vbt ajout, vient de wolf32x
+//static byte *spritegfx[SPR_TOTAL];
 /*
 =============================================================================
 
@@ -941,7 +941,7 @@ extern  boolean  param_ignorenumchunks;
 
 
 void            NewGame (int difficulty,int episode);
-void            CalcProjection (int32_t focal);
+inline void     CalcProjection (int32_t focal);
 void            NewViewSize (int width);
 boolean         SetViewSize (unsigned width, unsigned height);
 boolean         LoadTheGame(FILE *file,int x,int y);

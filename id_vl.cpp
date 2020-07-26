@@ -6,7 +6,7 @@
 
 // Uncomment the following line, if you get destination out of bounds
 // assertion errors and want to ignore them during debugging
-//#define IGNORE_BAD_DEST
+#define IGNORE_BAD_DEST
 
 #ifdef IGNORE_BAD_DEST
 #undef assert
@@ -437,7 +437,7 @@ byte VL_GetPixel (int x, int y)
 
     VL_LockSurface(curSurface);
 	byte col = ((byte *) curSurface->pixels)[y * curPitch + x];
-    VL_UnlockSurface(curSurface);
+//    VL_UnlockSurface(curSurface);
 	return col;
 }
 
@@ -573,9 +573,9 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
 
     VL_LockSurface(curSurface);
     byte *vbuf = (byte *)curSurface->pixels;
-    for(int j=0,scj=0; j<height; j++, scj+=scaleFactor)
+    for(unsigned int j=0,scj=0; j<height; j++, scj+=scaleFactor)
     {
-        for(int i=0,sci=0; i<width; i++, sci+=scaleFactor)
+        for(unsigned int i=0,sci=0; i<width; i++, sci+=scaleFactor)
         {
             byte col = source[(j*(width>>2)+(i>>2))+(i&3)*(width>>2)*height];
             for(unsigned m=0; m<scaleFactor; m++)
@@ -672,7 +672,7 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
                 }
             }
             VL_UnlockSurface(curSurface);
-            VL_UnlockSurface(source);
+ //           VL_UnlockSurface(source);
         }
         else
         {
@@ -707,7 +707,7 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
             }
         }
         VL_UnlockSurface(curSurface);
-        VL_UnlockSurface(source);
+ //       VL_UnlockSurface(source);
     }				
 }
 

@@ -143,6 +143,7 @@ void VW_MeasurePropString (const char *string, word *width, word *height)
 
 void VH_UpdateScreen()
 {
+#ifndef USE_SPRITE	
 ////slPrint("SDL_BlitSurface         ",slLocate(10,22));	
 	SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 ////slPrint("SDL_UpdateRect        ",slLocate(10,22));	
@@ -150,7 +151,7 @@ void VH_UpdateScreen()
 ////slPrint("slSndFlush             ",slLocate(10,22));	
 	//slSndFlush() ;
 ////slPrint("VH_UpdateScreen end ",slLocate(10,22));	
-	//slSynch();
+#endif	
 }
 
 
@@ -166,7 +167,7 @@ void VWB_DrawTile8M (int x, int y, int tile)
 
 void VWB_DrawPic (int x, int y, int chunknum)
 {
-	int	picnum = chunknum - STARTPICS;
+/*	int	picnum = chunknum - STARTPICS;
 	unsigned width,height;
 
 	x &= ~7;
@@ -175,10 +176,12 @@ void VWB_DrawPic (int x, int y, int chunknum)
 	height = pictable[picnum].height;
 
 	VL_MemToScreen (grsegs[chunknum],width,height,x,y);
+*/	
 }
 
 void VWB_DrawPicScaledCoord (int scx, int scy, int chunknum)
 {
+/*	
 	int	picnum = chunknum - STARTPICS;
 	unsigned width,height;
 
@@ -186,6 +189,7 @@ void VWB_DrawPicScaledCoord (int scx, int scy, int chunknum)
 	height = pictable[picnum].height;
 
     VL_MemToScreenScaledCoord (grsegs[chunknum],width,height,scx,scy);
+*/	
 }
 
 
@@ -260,22 +264,22 @@ void LoadLatchMem (void)
 {
 	int	i,width,height,start,end;
 	byte *src;
-	SDL_Surface *surf;
+	SDL_Surface *surf,*surf1;
 
 //
 // tile 8s
 //
 	////slPrint("LoadLatchMem",slLocate(10,15));
-    surf = SDL_CreateRGBSurface(SDL_HWSURFACE, 8*8,
+    surf1 = SDL_CreateRGBSurface(SDL_HWSURFACE, 8*8,
         ((NUMTILE8 + 7) / 8) * 8, 8, 0, 0, 0, 0);
-    if(surf == NULL)
+    if(surf1 == NULL)
     {
 		////slPrint("LoadLatchMem bad",slLocate(10,15));
         Quit("Unable to create surface for tiles!");
     }
-    SDL_SetColors(surf, gamepal, 0, 256);
+    SDL_SetColors(surf1, gamepal, 0, 256);
 
-	latchpics[0] = surf;
+	latchpics[0] = surf1;
 	////slPrint("LoadLatchMem cache",slLocate(10,16));
 	CA_CacheGrChunk (STARTTILE8);
 	////slPrint("LoadLatchMem cache2",slLocate(10,17));
@@ -289,7 +293,7 @@ void LoadLatchMem (void)
 	}	
 	////slPrint("LoadLatchMem cache2",slLocate(10,19));
 	UNCACHEGRCHUNK (STARTTILE8);
-	//free(surf);
+//	free(surf);
 	////slPrint("LoadLatchMem cache2b",slLocate(10,17));
 //
 // pics
@@ -319,9 +323,11 @@ void LoadLatchMem (void)
 		UNCACHEGRCHUNK(i);
 		////slPrintHex(i,slLocate(10,20));
 		////slPrintHex(end,slLocate(10,21));
-		//free(surf);
+// vbt 26/07/2020 free remis		
+		free(surf);
 	}	
-//free(surf);
+// vbt 26/07/2020 free remis	
+free(surf1);
 
 	//VL_LatchToScreen (latchpics[2], 10*8, 10);
 
@@ -409,7 +415,7 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 	{
 		if (abortable && IN_CheckAck ())
 		{
-		    VL_UnlockSurface(source);
+//		    VL_UnlockSurface(source);
             SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
             SDL_UpdateRect(screen, 0, 0, 0, 0);
 			return true;
@@ -467,7 +473,7 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 	} while (1);
 
 finished:
-    VL_UnlockSurface(source);
+//    VL_UnlockSurface(source);
     VL_UnlockSurface(dest);
     SDL_UpdateRect(dest, 0, 0, 0, 0);
 	return false;

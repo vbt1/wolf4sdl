@@ -105,6 +105,7 @@ boolean param_ignorenumchunks = false;
 
 //#ifndef REMDEBUG
 extern int fps_frames, fps_time, fps;
+/*
 void VblIn(void);
 
 void VblIn(void)
@@ -112,7 +113,7 @@ void VblIn(void)
 
 //        if (fpscounter)
         {
-			char buffer[8];
+//			char buffer[8];
 			//slPrint((char*)"fps     ",slLocate(1,10));
 			//slPrint((char*)ltoa(fps,buffer,8),slLocate(14,0));
             //fontnumber = 0;
@@ -124,6 +125,7 @@ void VblIn(void)
         }
 
 }
+*/
 //#endif
 
 /*
@@ -629,14 +631,15 @@ void BuildTables (void)
 ====================
 */
 
-void CalcProjection (int32_t focal)
+inline void CalcProjection (int32_t focal)
 {
     int     i;
     int    intang;
-    float   angle;
-    double  tang;
+    //float   angle;
+    //double  tang;
     int     halfview;
-    double  facedist;
+    //double  facedist;
+	float  angle, tang, facedist;
 
     focallength = focal;
     facedist = focal+MINDIST;
@@ -665,7 +668,7 @@ void CalcProjection (int32_t focal)
 // vbt
 //
 
-		angle = (float) atan(tang);
+		angle = /*(float)*/ atan(tang);
 //        angle = (float) MTH_Atan(tang);
         intang = (int) (angle*radtoint);
         pixelangle[halfview-1-i] = intang;
@@ -1102,7 +1105,7 @@ static void InitGame()
 	SDL_SetVideoMode  (screenWidth, screenHeight, screenBits, NULL);
 
 #ifndef REMDEBUG
-	slIntFunction(VblIn) ;
+//	slIntFunction(VblIn) ;
 #endif
     atexit(SDL_Quit);
     SignonScreen ();
@@ -1190,7 +1193,7 @@ static void InitGame()
     SetupWalls ();
     NewViewSize (viewsize);
 		slTVOn();
-		slSynch();
+//		slSynch();
 //	slPrint("C4 - 2008-2009     www.rockin-b.de",slLocate(2,29));
 //
 // initialize variables
@@ -1311,7 +1314,7 @@ void Quit (const char *errorStr, ...)
     else error[0] = 0;
  	slPrint((char *)error,slLocate(1,3));
 	
-	while(1);
+//	while(1);
 	
     if (!pictable)  // don't try to display the red box before it's loaded
     {
@@ -1583,7 +1586,7 @@ int main (int argc, char *argv[])
 		return(FALSE);
 	}
 #ifndef REMDEBUG
-	slIntFunction(VblIn) ;
+//	slIntFunction(VblIn) ;
 #endif	
     //CheckParameters(argc, argv);
 #endif

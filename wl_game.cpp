@@ -13,6 +13,8 @@ extern "C"{
 extern fixed MTH_Atan(fixed y, fixed x);
 }
 
+void disp_sprite();
+
 #undef atan2
 //#define atan2(a,b) slAtan(a,b)
 #define atan2(a,b) MTH_Atan(a,b)
@@ -900,8 +902,12 @@ void DrawPlayBorder (void)
             statusborderw+px*8, px*STATUSLINES, bordercol);
     }
 
-    if((unsigned) viewheight == screenHeight) return;
-
+    if((unsigned) viewheight == screenHeight) 
+	{
+		slWindow(0 , 0, 319 , 239 , 300 , screenWidth/2, screenHeight/2);
+		return;
+	}
+	
     VWB_BarScaledCoord (0,0,screenWidth,screenHeight-px*STATUSLINES,bordercol);
 
     const int xl = screenWidth/2-viewwidth/2;
@@ -910,6 +916,7 @@ void DrawPlayBorder (void)
 
     if(xl != 0)
     {
+		slWindow(viewwidth+px , px, (xl+viewwidth)-1 , (yl+viewheight)-1, 300 , screenWidth/2, (yl*2+viewheight)/2);		
         // Paint game view border lines
         VWB_BarScaledCoord(xl-px, yl-px, viewwidth+px, px, 0);                      // upper border
         VWB_BarScaledCoord(xl, yl+viewheight, viewwidth+px, px, bordercol-2);       // lower border
@@ -935,6 +942,7 @@ void DrawPlayBorder (void)
 
 void DrawPlayScreen (void)
 {
+/*	//vbt à remettre
   	//		slPrint("VWB_DrawPicScaledCoord",slLocate(10,10));
 			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*320)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
@@ -956,6 +964,7 @@ void DrawPlayScreen (void)
   	//		slPrint("DrawScore",slLocate(10,19));
     DrawScore ();
   	//		slPrint("DrawScore",slLocate(10,30));
+*/	
 }
 
 // Uses LatchDrawPic instead of StatusDrawPic
@@ -1380,12 +1389,12 @@ void Died (void)
 =
 ===================
 */
+void heapWalk();
 
 void GameLoop (void)
 {
 // vbt dernier niveau
-gamestate.mapon = 8;	
-//gamestate.bestweapon = wp_chaingun-1;
+//gamestate.mapon = 8;	
 GiveWeapon (gamestate.bestweapon+1);
 gamestate.ammo = 99;	
 // vbt dernier niveau

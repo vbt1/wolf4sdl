@@ -1515,7 +1515,7 @@ SD_SoundPlaying(void)
 	{
 		if(slPCMStat(&m_dat[i]))
 		{
-			slSynch(); // vbt remis 26/05
+//			slSynch(); // vbt remis 26/05
 			return true;
 		}
 	}

@@ -18,6 +18,7 @@ extern "C" {
 //#define VBT
 
 //
+extern TEXTURE tex_spr[];
 
 #ifdef VBT
 int CdUnlock();
@@ -148,7 +149,9 @@ static const Sint8	logtbl[] = {
 		if(height==240) tv_mode = TV_640x240; 
 	}
  
-	slInitSystem(tv_mode, (TEXTURE*)NULL, 1);
+	slInitSystem(tv_mode, (TEXTURE*)tex_spr, 1);
+// vbt 26/07/2020
+//	slDynamicFrame(ON);
 
 	if(bpp==8)
 	{
@@ -182,20 +185,15 @@ static const Sint8	logtbl[] = {
 int SDL_SetColors(SDL_Surface *surface, 	SDL_Color *colors, int firstcolor, int ncolors)
 {
 	Uint16	palo[256];
-
-	//palo = (Uint16*)malloc(sizeof(Uint16)*256);
 	CHECKMALLOCRESULT(palo);
-	unsigned int i;
 
-	for(i=0;i<ncolors;i++)
+	for(unsigned int i=0;i<ncolors;i++)
 	{
 		palo[i] = RGB(colors[i].r>>3,colors[i].g>>3,colors[i].b>>3);
 	}
 	Pal2CRAM(palo , (void *)NBG1_COL_ADR , ncolors);
-//	Pal2CRAM(palo , (void *)NBG0_COL_ADR , ncolors);
-	//free(palo);
+	Pal2CRAM(palo , (void *)TEX_COL_ADR , ncolors);
 	return 1;
-	//return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_SetColorKey	(SDL_Surface *surface, Uint32 flag, Uint32 key)
@@ -233,14 +231,11 @@ int SDL_InitSubSystem(Uint32 flags)
 #define	SDDRV_NAME	"SDDRVS.TSK"
 #define	SDDRV_SIZE	26610 //0x7000
 #define	SDDRV_ADDR	0x00202000//0x6080000
-unsigned char *tutu;
-		tutu = (unsigned char *)SDDRV_ADDR;
-//		tutu = (unsigned char *)malloc(SDDRV_SIZE);
-		GFS_Load(GFS_NameToId((Sint8*)SDDRV_NAME),0,(void *) tutu,SDDRV_SIZE);
-		slInitSound(tutu , SDDRV_SIZE , (Uint8 *)sound_map , sizeof(sound_map)) ;
-//		free(tutu);		
-		tutu = NULL;		
-  		//slInitSound(sddrvstsk , sizeof(sddrvstsk) , (Uint8 *)sound_map , sizeof(sound_map)) ;
+unsigned char *sndDrvAddr;
+		sndDrvAddr = (unsigned char *)SDDRV_ADDR;
+		GFS_Load(GFS_NameToId((Sint8*)SDDRV_NAME),0,(void *) sndDrvAddr,SDDRV_SIZE);
+		slInitSound(sndDrvAddr , SDDRV_SIZE , (Uint8 *)sound_map , sizeof(sound_map)) ;
+		sndDrvAddr = NULL;		
 	//slPrint("                                    ",slLocate(2,21));
 #endif
 	}
@@ -372,6 +367,7 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 //		DMA_ScuMemCopy((unsigned char*)(NBG1_CEL_ADR + (i<<9)), (unsigned char*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt 20-22fps
 //		SCU_DMAWait();
 //		memcpyl((unsigned long*)(NBG1_CEL_ADR + (i<<9)), (unsigned long*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt : 22-24fps
+// vbt : remttre la copie dma		
 		slDMACopy((unsigned long*)(surface->pixels + (i * screenWidth)),(void *)(NBG1_CEL_ADR + (i<<9)),screenWidth);
 	}
 }
@@ -603,10 +599,10 @@ SDL_Surface * SDL_CreateRGBSurface(Uint32 flags, int width, int height, int dept
 	screen = (SDL_Surface*)malloc(sizeof(SDL_Surface));
 	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	CHECKMALLOCRESULT(screen->pixels);
-	//screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	screen->pitch = width;
 	screen->w     =	width;
 	screen->h     =	height;
+	
 	return screen;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -868,8 +864,6 @@ int SDL_PollEvent(SDL_Event *event)
 				event->key.keysym.sym = SDLK_LAST;//SDLK_FIRST;	  
 				break;
 		}
-	//slSynch();
-	//while(1);
 		return 1;
 	}
 	//else
@@ -894,7 +888,6 @@ int SDL_PollEvent(SDL_Event *event)
 	//LastScan=0;
 	//event->type = SDL_KEYUP;
 	//event->key.keysym.sym = SDLK_LAST;	  
-	//slSynch();
 //slPrint("SDL_PollEvent end       ",slLocate(3,22));		
 	return 0;
 }
@@ -1035,9 +1028,6 @@ int SDL_WaitEvent(SDL_Event *event)
 			event->type = SDL_KEYUP;
 			return 1;
 		}
-
-		//slSynch();
-		
 	} while(event->type == SDL_NOEVENT);
 #endif
 	return 0;
@@ -1065,7 +1055,6 @@ int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 	////slPrintHex(chunk->alen,slLocate(2,11));
 //	slPCMOn(sounds[chunk].pcm, sounds[chunk].data, sounds[chunk].size);
 	//slPCMOff(&m_dat[0]);
-	//slSynch();
 	if(chunk->alen>0 && chunk->alen <100000)
 	for(i=0;i<4;i++)
 	{
@@ -1074,16 +1063,11 @@ int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 			//slPCMOff(&m_dat[i]);
 			//slPCMParmChange(&m_dat[i]);
 			//slSndFlush() ;
-			//slSynch();
-			slPCMOn(&m_dat[i],chunk->abuf,chunk->alen);
-//			slSynch();
+// vbt 26/07/2020 : à remettre			
+//			slPCMOn(&m_dat[i],chunk->abuf,chunk->alen);
 				break;
 		}		 
 	}
-/*
-		slPCMOn(&m_dat[0],chunk->abuf,chunk->alen);
-	*/
-//	slSynch();	
 	return 1;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
