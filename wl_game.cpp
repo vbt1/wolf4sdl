@@ -13,7 +13,9 @@ extern "C"{
 extern fixed MTH_Atan(fixed y, fixed x);
 }
 
-void disp_sprite();
+unsigned int position_vram=0;
+unsigned int start_wall=0;
+void set_sprite(PICTURE *pcptr);
 
 #undef atan2
 //#define atan2(a,b) slAtan(a,b)
@@ -220,6 +222,62 @@ void UpdateSoundLoc(void)
 **      JAB End
 */
 
+static void loadWallTexture(unsigned char texture,unsigned int start_wall)
+{
+	extern TEXTURE tex_spr[];
+	PICTURE pic_spr;
+/*
+	pic_spr.texno = texture+start_wall;
+	pic_spr.cmode = COL_256;
+	pic_spr.pcsrc = (byte *) PM_GetPage(texture);
+	tex_spr[texture+start_wall] = TEXDEF(64, 64, position_vram);
+	set_sprite(&pic_spr);					
+	position_vram+=0x800;
+*/	
+}
+
+static void loadActorTexture(unsigned char texture)
+{
+	extern TEXTURE tex_spr[];
+	byte bmpbuff[64*64];
+	PICTURE pic_spr;
+		
+	t_compshape   *shape = (t_compshape   *)PM_GetSprite(texture);
+	int idx;
+	unsigned short linecmds, *cmdptr, *sprdata;
+	unsigned char  *sprite = (unsigned char  *)shape;
+	// set the texel index to the first texel
+	unsigned int i = ((((shape->rightpix-shape->leftpix)+1)*2)+4);
+	// clear the buffers
+	memset(bmpbuff,0,64*64);
+	// setup a pointer to the column offsets	
+	cmdptr = shape->dataofs;
+
+	for (int x = shape->leftpix; x <= shape->rightpix; x++)
+	{
+		linecmds = *cmdptr;
+		sprdata = (unsigned short *)(sprite+linecmds);
+		idx = 0;
+		while ((SWAP_BYTES_16(sprdata[idx])) != 0)
+		{
+			for (int y = ((SWAP_BYTES_16(sprdata[idx+2]))/2); y < (SWAP_BYTES_16(sprdata[idx])/2); y++)
+			{
+				bmpbuff[((y)*64)+x] = sprite[i];
+				i++;
+			}
+			idx += 3;
+		}
+		cmdptr++;
+	}
+
+	pic_spr.texno = texture;
+	pic_spr.cmode = COL_256;
+	pic_spr.pcsrc = &bmpbuff[0];
+	tex_spr[texture] = TEXDEF(64, 64, position_vram);
+	set_sprite(&pic_spr);					
+	position_vram+=0x800;	
+}
+
 /*
 ==========================
 =
@@ -235,6 +293,8 @@ static void ScanInfoPlane(void)
     unsigned x,y;
     int      tile;
     word     *start;
+	unsigned char sprite_list[512];
+	memset(sprite_list,0,512);
 
     start = mapsegs[1];
     for (y=0;y<mapheight;y++)
@@ -624,8 +684,130 @@ static void ScanInfoPlane(void)
                     break;
 #endif
             }
+			
+//-----------------------------------------------------------------------------------	
+// VBT 01/08/2020 : chargement juste des murs nécessaires
+// ajouter peut etre les portes				
+			unsigned int texture = 0;
+
+			if(tile <23)
+				continue;
+
+			if(ISPOINTER(actorat[x][y]))
+			{
+				texture = actorat[x][y]->state->shapenum;
+				
+				if(sprite_list[texture]==0)
+				{				
+					switch(texture)
+					{
+						case SPR_GRD_S_1:
+							for (;texture<=SPR_GRD_SHOOT3;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_DOG_W1_1:
+							for (;texture<=SPR_DOG_JUMP3;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_SS_S_1:
+							for (;texture<=SPR_SS_SHOOT3;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_MUT_S_1:
+							for (;texture<=SPR_MUT_SHOOT4;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_OFC_S_1:
+							for (;texture<=SPR_OFC_SHOOT3;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_BLINKY_W1:
+							for (;texture<=SPR_INKY_W2;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+							
+						case SPR_BOSS_W1:
+							for (;texture<=SPR_BOSS_DIE3;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;							
+
+						case SPR_SCHABB_W1:
+							for (;texture<=SPR_HYPO4;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_FAKE_W1:
+							for (;texture<=SPR_FAKE_DEAD;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_MECHA_W1:
+							for (;texture<=SPR_MECHA_W1;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_GIFT_W1:
+							for (;texture<=SPR_GIFT_DEAD;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_ROCKET_1:
+							for (;texture<=SPR_BOOM_3;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						case SPR_GRETEL_W1:
+							for (;texture<=SPR_GRETEL_DIE3;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+							
+						case SPR_FAT_W1:
+							for (;texture<=SPR_FAT_DEAD;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+							
+						case SPR_BJ_W1:
+							for (;texture<=SPR_BJ_JUMP4;texture++)
+							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
+							break;
+
+						default:
+							if(sprite_list[texture]==0)
+							{						
+								loadActorTexture(texture);
+								sprite_list[texture]=1;
+							}
+					}
+				}
+
+	/*			if(sprite_list[texture]==0)
+				{
+					loadActorTexture(texture);
+					sprite_list[texture]=1;
+				}*/
+			}			
+//-----------------------------------------------------------------------------------				
         }
     }
+// on charge les statics :
+
+   statobj_t *statptr;
+
+    for (statptr = &statobjlist[0] ; statptr !=laststatobj ; statptr++)
+    {
+		unsigned char texture = statptr->shapenum;
+
+		if(sprite_list[texture]==0)
+		{
+			loadActorTexture(texture);
+			sprite_list[texture]=1;
+		}
+	}	
 }
 
 //==========================================================================
@@ -744,14 +926,77 @@ void SetupGameLevel (void)
                         SpawnDoor (x,y,0,(tile-91)/2);
                         break;
                 }
+				
             }
         }
     }
-
+// vbt : on recharge la vram
+position_vram=0;
 //
 // spawn actors
 //
-    ScanInfoPlane ();
+    ScanInfoPlane (); // on charge les persos
+
+// on charge ensuite les murs !!!
+//-----------------------------------------------------------------------------------
+// porte
+
+unsigned char wall_list[AREATILE];
+memset (wall_list,0,AREATILE);
+start_wall=position_vram/4096; 
+
+for(unsigned int i=0;i<AREATILE;i++)
+{
+	if(i>=90 && i <=106)
+	{
+		loadWallTexture(i,start_wall);		
+		wall_list[i]=1;
+	}
+/*	else
+	{
+		extern TEXTURE tex_spr[];		
+		PICTURE pic_spr;		
+		pic_spr.texno = i+start_wall;
+		pic_spr.cmode = COL_256;
+		pic_spr.pcsrc = (byte *) PM_GetPage(0);
+		tex_spr[i+start_wall] = TEXDEF(64, 64, 0);
+		set_sprite(&pic_spr);
+	}*/
+}
+
+// murs
+//-----------------------------------------------------------------------------------
+	map = mapsegs[0];
+    for (y=0;y<mapheight;y++)
+    {
+        for (x=0;x<mapwidth;x++)
+        {
+            tile = *map++;
+            if (tile<AREATILE && tilemap[x][y] != 0)
+            {
+                // solid wall
+//-----------------------------------------------------------------------------------	
+// VBT 01/08/2020 : chargement juste des murs nécessaires
+				unsigned char texture = horizwall[tile];//&0x80;
+					
+				if(wall_list[texture]==0)
+				{
+					loadWallTexture(texture,start_wall);
+					wall_list[texture]=1;
+				}
+				
+				texture = vertwall[tile];
+
+				if(wall_list[texture]==0)				
+				{
+					loadWallTexture(texture,start_wall);
+					wall_list[texture]=1;					
+				}
+//-----------------------------------------------------------------------------------
+            }
+        }
+    }
+//-----------------------------------------------------------------------------------
 
 
 //
@@ -779,11 +1024,31 @@ void SetupGameLevel (void)
                     tile = *(map-2);
 
                 *(map-1) = tile;
+//-----------------------------------------------------------------------------------	
+// VBT 01/08/2020 : chargement juste des murs nécessaires
+				unsigned char texture = horizwall[tile];
+					
+				if(wall_list[texture]==0)
+				{
+					loadWallTexture(texture,start_wall);
+					wall_list[texture]=1;
+				}
+				
+				texture = vertwall[tile];
+
+				if(wall_list[texture]==0)				
+				{
+					loadWallTexture(texture,start_wall);
+					wall_list[texture]=1;					
+				}
+//-----------------------------------------------------------------------------------				
             }
         }
     }
+char toto[100];
+sprintf(toto,"%04d %02d",position_vram,position_vram/0x800);
 
-
+slPrint(toto,slLocate(1,1));
 //
 // have the caching manager load and purge stuff to make sure all marks
 // are in memory
@@ -942,7 +1207,7 @@ void DrawPlayBorder (void)
 
 void DrawPlayScreen (void)
 {
-/*	//vbt à remettre
+	//vbt à remettre
   	//		slPrint("VWB_DrawPicScaledCoord",slLocate(10,10));
 			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*320)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
@@ -964,7 +1229,6 @@ void DrawPlayScreen (void)
   	//		slPrint("DrawScore",slLocate(10,19));
     DrawScore ();
   	//		slPrint("DrawScore",slLocate(10,30));
-*/	
 }
 
 // Uses LatchDrawPic instead of StatusDrawPic

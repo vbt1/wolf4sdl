@@ -28,6 +28,8 @@ loaded into the data segment
 #define THREEBYTEGRSTARTS
 #define HEAP_WALK 1
 
+extern unsigned int position_vram;
+
 #ifdef HEAP_WALK
 extern Uint32  end;
 extern Uint32  __malloc_free_list;
@@ -93,33 +95,14 @@ void heapWalk(void)
 		chunkCurr = chunkNext;
         chunkNumber++;
     }
-
-	
-//	FNT_Print256_2bpp((volatile Uint8 *)SS_FONT,(Uint8 *)"done",12,131);
 }
 #endif
 
-	TEXTURE tex_spr[NUMPICS+128];
-/*	
-	FIXED pos[][XYZS] =
-	{	
-	{toFIXED( 70),toFIXED( 12),toFIXED(170),toFIXED(1.0)},	// A  
-	{toFIXED( 98),toFIXED(  2),toFIXED(170),toFIXED(1.0)},	// B  
-	{toFIXED( 52),toFIXED(  2),toFIXED(170),toFIXED(1.0)},	// C  
-	{toFIXED( 34),toFIXED(  2),toFIXED(170),toFIXED(1.0)}	// D  	
-	};
+TEXTURE tex_spr[SPR_TOTAL+AREATILE];
 
-	SPR_ATTR attr[] =
-	{
-		SPR_ATTRIBUTE(0, 0, No_Gouraud, CL256Bnk | ECdis | SPdis, sprNoflip | FUNC_Sprite),
-		SPR_ATTRIBUTE(1, 0, No_Gouraud, CL256Bnk | ECdis | SPdis, sprNoflip | FUNC_Sprite),
-		SPR_ATTRIBUTE(2, 0, No_Gouraud, CL256Bnk | ECdis | SPdis, sprNoflip | FUNC_Sprite),
-		SPR_ATTRIBUTE(3, 0, No_Gouraud, CL256Bnk | ECdis | SPdis, sprNoflip | FUNC_Sprite)
-	};
-*/
 void set_sprite(PICTURE *pcptr)
 {
-	TEXTURE *txptr = tex_spr + pcptr->texno;
+	TEXTURE *txptr = &tex_spr[pcptr->texno];
 /*	slDMACopy((void *)pcptr->pcsrc,
 		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),
 		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
@@ -647,59 +630,12 @@ void CAL_SetupGrFile (void)
 	CHECKMALLOCRESULT(compseg);
 	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen+4));
     CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
-// 
-	unsigned int position=0x800*128;
 
 	for(unsigned long j=0;j<NUMPICS;j++)
 	{
 		pictable[j].height=SWAP_BYTES_16(pictable[j].height);
 		pictable[j].width=SWAP_BYTES_16(pictable[j].width);
-		
-/*		vbt à remettre decodage pour chargement en sprite
-// VBT : decode des sprites		
-//--------------------------------------------------------------------------------------------------------------		
-//		if(j>=0 && j < 0 + 100)
-		{
-			t_compshape   *shape = (t_compshape   *)PM_GetSprite(j); //PMPages[PMSpriteStart+j];
-			int idx;
-			byte bmpbuff[64*64];
-			unsigned short linecmds, *cmdptr, *sprdata;
-			unsigned char  *sprite = (unsigned char  *)shape;
-			// set the texel index to the first texel
-			i = ((((shape->rightpix-shape->leftpix)+1)*2)+4);
-			// clear the buffers
-			memset(bmpbuff,0,64*64);
-			// setup a pointer to the column offsets	
-			cmdptr = shape->dataofs;
-
-			for (int x = shape->leftpix; x <= shape->rightpix; x++)
-			{
-				linecmds = *cmdptr;
-				sprdata = (unsigned short *)(sprite+linecmds);
-				idx = 0;
-				while ((SWAP_BYTES_16(sprdata[idx])) != 0)
-				{
-					for (int y = ((SWAP_BYTES_16(sprdata[idx+2]))/2); y < (SWAP_BYTES_16(sprdata[idx])/2); y++)
-					{
-						bmpbuff[((y)*64)+x] = sprite[i];
-						i++;
-					}
-					idx += 3;
-				}
-				cmdptr++;
-			}
-			PICTURE pic_spr;
-			pic_spr.texno = 128+j;
-			pic_spr.cmode = COL_256;
-			pic_spr.pcsrc = &bmpbuff[0];
-		
-			tex_spr[pic_spr.texno] = TEXDEF(64, 64, position);
-//			set_sprite(&pic_spr);
-			position+=0x800;		
-		}
-*/		
-//--------------------------------------------------------------------------------------------------------------
-	}
+	} 
 	compseg = NULL;
 	// VBT correct
 }

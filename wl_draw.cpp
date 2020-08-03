@@ -307,27 +307,28 @@ void ScalePost()
 #if USE_SPRITES	
 //--------------------------------------------------------------------------------------------
 	extern 	TEXTURE tex_spr[];		
-	TEXTURE *txptr = &tex_spr[currentPage];
+	extern unsigned int start_wall;
+	TEXTURE *txptr = &tex_spr[currentPage+start_wall]; 
 //  a           b          c             d
 // top left, top right, bottom right, bottom left
-    SPRITE user_sprite;
-    user_sprite.CTRL = FUNC_Texture | _ZmCC;
-    user_sprite.PMOD=CL256Bnk | ECdis | SPdis;
-    user_sprite.SRCA=((txptr->CGadr)+(lasttexture/8));
-    user_sprite.COLR=0;
-    user_sprite.SIZE=0x801;
+    SPRITE user_wall;
+    user_wall.CTRL = FUNC_Texture | _ZmCC;
+    user_wall.PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
+    user_wall.SRCA=((txptr->CGadr)+(lasttexture/8));
+    user_wall.COLR=256;
+    user_wall.SIZE=0x801;
 
-	user_sprite.XD=postx-(viewwidth/2);
-	user_sprite.YD=-(wallheight[postx] >> 3);
-	user_sprite.XC=user_sprite.XD;
-	user_sprite.YC=(wallheight[postx] >> 3);
-	user_sprite.XA=user_sprite.XD-1;
-	user_sprite.YA=user_sprite.YD;
-	user_sprite.XB=user_sprite.XA;
-	user_sprite.YB=user_sprite.YC;
+	user_wall.XD=postx-(viewwidth/2);
+	user_wall.YD=-(wallheight[postx] >> 3);
+	user_wall.XC=user_wall.XD;
+	user_wall.YC=(wallheight[postx] >> 3);
+	user_wall.XA=user_wall.XD-1;
+	user_wall.YA=user_wall.YD;
+	user_wall.XB=user_wall.XA;
+	user_wall.YB=user_wall.YC;
 	
-    user_sprite.GRDA=0;
-	slSetSprite(&user_sprite, toFIXED(300));	
+    user_wall.GRDA=0;
+	slSetSprite(&user_wall, toFIXED(300));	
 //--------------------------------------------------------------------------------------------
 #else
 	
@@ -712,7 +713,7 @@ byte vgaCeiling[]=
 
 void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
 {
-	/*
+	
     byte ceiling=vgaCeiling[gamestate.episode*10+mapon];
 
     int y;
@@ -728,7 +729,7 @@ void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
     for(; y < viewheight; y++, ptr += vbufPitch)
         memset(ptr, 0x19, viewwidth);
 #endif
-*/
+
 }
 
 //==========================================================================
@@ -786,14 +787,14 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
     if(!scale) return;   // too close or far away
 
     pixheight=scale*SPRITESCALEFACTOR;
-#if USE_SPRITES	
+#if USE_SPRITES
 //--------------------------------------------------------------------------------------------
 	extern 	TEXTURE tex_spr[];		
-	TEXTURE *txptr = tex_spr + shapenum + 128;
-		
+	TEXTURE *txptr = &tex_spr[shapenum]; 
+// correct on touche pas		
     SPRITE user_sprite;
     user_sprite.CTRL = FUNC_Sprite | _ZmCC;
-    user_sprite.PMOD=CL256Bnk | ECenb | SPdis;
+    user_sprite.PMOD=CL256Bnk| ECdis;// | ECenb | SPdis;  // pas besoin pour les sprites
     user_sprite.SRCA=((txptr->CGadr));
     user_sprite.COLR=0;
     user_sprite.SIZE=0x840;
@@ -802,7 +803,7 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 	user_sprite.XB=pixheight;
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
-//	slSetSprite(&user_sprite, toFIXED(300));	
+	slSetSprite(&user_sprite, toFIXED(300));	
 //--------------------------------------------------------------------------------------------	
 #else
     unsigned starty,endy;

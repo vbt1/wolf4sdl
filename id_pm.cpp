@@ -117,8 +117,10 @@ void PM_Startup()
     // Load pages and initialize PMPages pointers
     uint8_t *ptr = (uint8_t *) PMPageData;
 ////////////
-unsigned int position=0;
+//unsigned int position=0;
 	
+	
+
     for(i = 0; i < ChunksInFile; i++)
     {
         if(i >= PMSpriteStart && i < PMSoundStart || i == ChunksInFile - 1)
@@ -155,20 +157,7 @@ unsigned int position=0;
 			memcpy(ptr,&x[delta2],size);
 		else
 		{
-			extern TEXTURE tex_spr[];			
 			memcpy(ptr,&x[delta2],size);
-			
-			PICTURE pic_spr;
-			pic_spr.texno = i;
-			pic_spr.cmode = COL_256;
-			pic_spr.pcsrc = &ptr[0];
-		
-			tex_spr[pic_spr.texno] = TEXDEF(64, 64, position);
-			if (i<128)
-			{
-				set_sprite(&pic_spr);
-				position+=0x800;
-			}
 			//vbt :  contient les muurs !!!!
 		}
 	
