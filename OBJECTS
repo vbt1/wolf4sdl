@@ -23,12 +23,8 @@
 		wl_text.cpp \
 		wl_main.cpp 
 
-#src/workarea.c \
-#SYSOBJS = $(SGLLDR)/sglarea.o 
-#OBJS =  $(SRCS:.c=.o) $(SRCS:.cpp=.o)  
 OBJS = $(filter %.o, $(SRCS:.s=.o) $(SRCS:.c=.o) $(SRCS:.cpp=.o))
-#raze/raze.o
-LIBS = L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/libsgl3.a \
+LIBS = L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/libsgl_real_elf.a \
 L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_gfs.a \
 L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_dma.a \
 L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_mth.a \

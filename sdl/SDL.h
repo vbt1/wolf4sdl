@@ -60,7 +60,7 @@ extern "C" {
 //#define  ACTION_REPLAY
  
 #ifndef ACTION_REPLAY
-#define MAX_OPEN        24 //a ne pas modifier
+#define MAX_OPEN        20 //a ne pas modifier
 #define MAX_DIR         64//384
 #else
 #define MAX_OPEN        2

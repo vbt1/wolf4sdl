@@ -713,7 +713,7 @@ byte vgaCeiling[]=
 
 void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
 {
-	
+	/*
     byte ceiling=vgaCeiling[gamestate.episode*10+mapon];
 
     int y;
@@ -729,7 +729,7 @@ void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
     for(; y < viewheight; y++, ptr += vbufPitch)
         memset(ptr, 0x19, viewwidth);
 #endif
-
+*/
 }
 
 //==========================================================================

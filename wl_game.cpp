@@ -226,14 +226,14 @@ static void loadWallTexture(unsigned char texture,unsigned int start_wall)
 {
 	extern TEXTURE tex_spr[];
 	PICTURE pic_spr;
-/*
+
 	pic_spr.texno = texture+start_wall;
 	pic_spr.cmode = COL_256;
 	pic_spr.pcsrc = (byte *) PM_GetPage(texture);
 	tex_spr[texture+start_wall] = TEXDEF(64, 64, position_vram);
 	set_sprite(&pic_spr);					
 	position_vram+=0x800;
-*/	
+	
 }
 
 static void loadActorTexture(unsigned char texture)

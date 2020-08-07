@@ -151,7 +151,7 @@ static const Sint8	logtbl[] = {
  
 	slInitSystem(tv_mode, (TEXTURE*)tex_spr, 1);
 // vbt 26/07/2020
-//	slDynamicFrame(ON);
+	slDynamicFrame(ON);
 
 	if(bpp==8)
 	{
@@ -174,6 +174,9 @@ static const Sint8	logtbl[] = {
     // screen coordinates like in SDL
     slBitMapBase(0, 0);
     slScrAutoDisp(NBG0ON | NBG1ON);
+	slPriorityNbg0(7);
+	slPriorityNbg1(6);
+	slPrioritySpr0(5);
 	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	CHECKMALLOCRESULT(screen->pixels);
 	screen->pitch = width;
@@ -521,8 +524,8 @@ if((srcrect)!=NULL)
 //		Uint8*d = (Uint8*)dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
 //		memcpy(d,s,srcrect->w);
 // //slPrint("SDL_UpperBlit memcpyl       ",slLocate(3,22)); 
-		memcpyl((unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),(unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),srcrect->w);
-//		slDMACopy((unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),srcrect->w);
+//		memcpyl((unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),(unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),srcrect->w);
+		slDMACopy((unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),srcrect->w);
 
 //		Uint8*s = (Uint8*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x; 
 //		Uint8*d = (Uint8*)dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x; 

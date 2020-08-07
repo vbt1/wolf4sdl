@@ -11,7 +11,7 @@ bool PMSoundInfoPagePadded = false;
 
 // holds the whole VSWAP
 uint32_t *PMPageData;
-size_t PMPageDataSize;
+//size_t PMPageDataSize;
 
 // ChunksInFile+1 pointers to page starts.
 // The last pointer points one byte after the last page.
@@ -33,7 +33,6 @@ void PM_Startup()
 		fname[i]= toupper(fname[i]);
 		i++;
 	}	 
-
     if(stat(fname, NULL))
         CA_CannotOpen(fname);
 
@@ -47,7 +46,8 @@ void PM_Startup()
 
     ChunksInFile = 0;
 //    fread(&ChunksInFile, sizeof(word), 1, file);
-	Chunks=(Sint16*)malloc(8192);
+//	Chunks=(Sint16*)malloc(8192);
+	Chunks=(Sint16*)0x002C0000;
 	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(fileId, 0, (void *)Chunks, 8192);
 	ChunksInFile=Chunks[i];
@@ -70,7 +70,7 @@ void PM_Startup()
 	{
 		pageOffsets[j]=SWAP_BYTES_16(Chunks[i]) | (SWAP_BYTES_16(Chunks[i+1])<<16);
 		j++;
-	} 
+	}
     //fread(pageOffsets, sizeof(uint32_t), ChunksInFile, file);
     word *pageLengths = (word *) malloc(ChunksInFile * sizeof(word));
     CHECKMALLOCRESULT(pageLengths);
@@ -109,18 +109,16 @@ void PM_Startup()
     if((pageOffsets[ChunksInFile - 1] - dataStart + alignPadding) & 1)
         alignPadding++;
 
-    PMPageDataSize = (size_t) pageDataSize + alignPadding;
-    PMPageData = (uint32_t *) 0x00202000;//malloc(PMPageDataSize);
+    size_t PMPageDataSize = (size_t) pageDataSize + alignPadding;
+    PMPageData = (uint32_t *) 0x00202000;
+//	PMPageData = (uint32_t *) malloc(PMPageDataSize);
     CHECKMALLOCRESULT(PMPageData);
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
+//    PMPages = (uint8_t **) 0x00202000;
     CHECKMALLOCRESULT(PMPages);
     // Load pages and initialize PMPages pointers
     uint8_t *ptr = (uint8_t *) PMPageData;
-////////////
-//unsigned int position=0;
 	
-	
-
     for(i = 0; i < ChunksInFile; i++)
     {
         if(i >= PMSpriteStart && i < PMSoundStart || i == ChunksInFile - 1)
@@ -143,26 +141,27 @@ void PM_Startup()
         // Use specified page length, when next page is sparse page.
         // Otherwise, calculate size from the offset difference between this and the next page.
         uint32_t size;
-		uint16_t delta;
-		uint32_t delta2;
-		uint8_t *x;
-		x = (uint8_t *)malloc(4096*2);
+		uint16_t offset1;
+		uint32_t offset2;
+		uint8_t *pageData;
+//		pageData = (uint8_t *)malloc(4096*2);
+		pageData = (uint8_t *)(0x002C0000+8192);
         if(!pageOffsets[i + 1]) size = pageLengths[i];
         else size = pageOffsets[i + 1] - pageOffsets[i];
-		delta = (uint16_t)(pageOffsets[i]/2048);
-		delta2 = pageOffsets[i] - delta*2048; 
-		GFS_Load(fileId, delta, (void *)x, 4096*2);
+		offset1 = (uint16_t)(pageOffsets[i]/2048);
+		offset2 = pageOffsets[i] - offset1*2048; 
+		GFS_Load(fileId, offset1, (void *)pageData, 4096*2);
 		
-		if(i >= PMSpriteStart && i < PMSoundStart || i == ChunksInFile - 1)
-			memcpy(ptr,&x[delta2],size);
-		else
+//		if(i >= PMSpriteStart && i < PMSoundStart || i == ChunksInFile - 1)
+			memcpy(ptr,&pageData[offset2],size);
+/*		else
 		{
-			memcpy(ptr,&x[delta2],size);
+			memcpy(ptr,&pageData[offset2],size);
 			//vbt :  contient les muurs !!!!
 		}
-	
-		free(x);
-		x = NULL;		
+*/	
+//		free(pageData);
+		pageData = NULL;		
         ptr += size;
     }
 
@@ -181,12 +180,11 @@ void PM_Startup()
 			shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
 		}	  
 	}
-
 	free(pageLengths);
 	pageLengths = NULL;	
     free(pageOffsets);
 	pageOffsets = NULL;		
-	free(Chunks);
+//	free(Chunks);
 	Chunks = NULL;		
     //fclose(file);
 }

@@ -910,11 +910,8 @@ static int wolfdigimap[] =
 void InitDigiMap (void)
 {
     int *map;
-	 int tutu=0;
     for (map = wolfdigimap; *map != LASTSOUND; map += 3)
     {
-		//slPrintHex(tutu++,slLocate(5,5));
-		//slPrintHex(LASTSOUND,slLocate(9,5));
         DigiMap[map[0]] = map[1];
         DigiChannel[map[1]] = map[2];
         SD_PrepareSound(map[1]);
@@ -1154,7 +1151,6 @@ static void InitGame()
 
 //
 // build some tables
-
     InitDigiMap ();
 
     ReadConfig ();
@@ -1182,13 +1178,10 @@ static void InitGame()
 //
 // load in and lock down some basic chunks
 //
-
     CA_CacheGrChunk(STARTFONT);
-	//while(1);
     CA_CacheGrChunk(STATUSBARPIC);
 	slTVOff();
     LoadLatchMem ();	   
-//while(1);	
     BuildTables ();          // trig tables
     SetupWalls ();
     NewViewSize (viewsize);
@@ -1397,13 +1390,10 @@ static void DemoLoop()
 //
 // check for launch from ted
 //
-//slPrint((char*)"DemoLoop",slLocate(10,22));
     if (param_tedlevel != -1)
     {
         param_nowait = true;
-//slPrint((char*)"EnableEndGameMenuItem",slLocate(10,22));		
         EnableEndGameMenuItem();
-//slPrint((char*)"NewGame",slLocate(10,22));		
         NewGame(param_difficulty,0);
 
 #ifndef SPEAR
@@ -1413,7 +1403,6 @@ static void DemoLoop()
         gamestate.episode = 0;
         gamestate.mapon = param_tedlevel;
 #endif
-//slPrint((char*)"GameLoop",slLocate(10,22));	
         GameLoop();
         Quit (NULL);
     }
@@ -1501,27 +1490,18 @@ static void DemoLoop()
 //
 // credits page
 //
-//slPrint((char*)"CA_CacheScreen2",slLocate(10,22));
             CA_CacheScreen (CREDITSPIC);
-//slPrint((char*)"VW_UpdateScreen2",slLocate(10,22));			
             VW_UpdateScreen();
-//slPrint((char*)"VW_FadeIn2",slLocate(10,22));
             VW_FadeIn ();
-//slPrint((char*)"IN_UserInput2",slLocate(10,22));				
             if (IN_UserInput(TickBase*10))
                 break;
-//slPrint((char*)"VW_FadeOut2",slLocate(10,22));				
             VW_FadeOut ();
 //
 // high scores
 //
-//slPrint((char*)"DrawHighScores",slLocate(10,22));	
             DrawHighScores ();
-//slPrint((char*)"VW_UpdateScreen3",slLocate(10,22));				
             VW_UpdateScreen ();
-//slPrint((char*)"VW_FadeIn3",slLocate(10,22));			
             VW_FadeIn ();
-//slPrint((char*)"IN_UserInput3",slLocate(10,22));	
             if (IN_UserInput(TickBase*10))
                 break;
 #endif

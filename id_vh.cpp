@@ -66,8 +66,6 @@ void VWB_DrawPropString(const char* string)
 	}
 	
 	font->height=SWAP_BYTES_16(font->height);
-	
-////slPrintHex(height,slLocate(10,5));	
 
 	UNLOCK();
 		//while(1);
@@ -167,7 +165,7 @@ void VWB_DrawTile8M (int x, int y, int tile)
 
 void VWB_DrawPic (int x, int y, int chunknum)
 {
-/*	int	picnum = chunknum - STARTPICS;
+	int	picnum = chunknum - STARTPICS;
 	unsigned width,height;
 
 	x &= ~7;
@@ -176,12 +174,11 @@ void VWB_DrawPic (int x, int y, int chunknum)
 	height = pictable[picnum].height;
 
 	VL_MemToScreen (grsegs[chunknum],width,height,x,y);
-*/	
 }
 
 void VWB_DrawPicScaledCoord (int scx, int scy, int chunknum)
 {
-/*	
+	
 	int	picnum = chunknum - STARTPICS;
 	unsigned width,height;
 
@@ -189,7 +186,6 @@ void VWB_DrawPicScaledCoord (int scx, int scy, int chunknum)
 	height = pictable[picnum].height;
 
     VL_MemToScreenScaledCoord (grsegs[chunknum],width,height,scx,scy);
-*/	
 }
 
 
