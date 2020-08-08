@@ -26,7 +26,8 @@ OBJECTS = ./objects
 #CCFLAGS = -O2 -m2 -g -c -I$(SGLIDR)
 # -fomit-frame-pointer -fsort-data 
 #CCFLAGS = -O2 -m2 -Wno-narrowing -fuse-linker-plugin -fno-web -fno-gcse -fno-unit-at-a-time -fomit-frame-pointer -flto
-CCFLAGS = -Os -m2 -Wno-conversion-null -Wno-narrowing -fuse-linker-plugin -fno-unit-at-a-time -fomit-frame-pointer -flto
+#CCFLAGS = -Os -m2 -Wno-conversion-null -Wno-narrowing -fuse-linker-plugin -fno-unit-at-a-time -fomit-frame-pointer -flto
+CCFLAGS = -Os -m2 -Wno-conversion-null -Wno-narrowing -fpermissive
 #CCFLAGS = -O0 -m2 -Wno-write-strings -Wno-narrowing -fno-lto
 CCFLAGS += $(CFLAGS)
 #CCFLAGS += -std=gnu99
@@ -44,8 +45,10 @@ CCFLAGS += -c -I$(SGLIDR)
 DFLAGS =
 include $(OBJECTS)
 
-LDFLAGS = -O2 -m2  -fuse-linker-plugin  -Xlinker -n -Xlinker -flto -Xlinker -T$(LDFILE) -Xlinker -Map \
-          -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -nostartfiles 
+#LDFLAGS = -O2 -m2  -fuse-linker-plugin  -Xlinker -n -Xlinker -flto -Xlinker -T$(LDFILE) -Xlinker -Map \
+#          -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -Xlinker -S -nostartfiles 
+LDFLAGS = -O2 -m2  -Xlinker -T$(LDFILE) -Xlinker -Map \
+          -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -Xlinker -S -nostartfiles 
 #          -Xlinker $(MPFILE) -Xlinker -e -Xlinker ___Start -nostartfiles -LL:/GNUSHV12/sh-elf/sh-elf/lib/m2/libc.a -LC:/SaturnOrbit/SGL_302j/LIB_ELF/LIBSGL.A 
 
 TARGET   = root/sl.coff

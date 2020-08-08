@@ -40,10 +40,9 @@ extern "C" {
 void SCU_DMAWait(void);
 
 extern void CheckWeaponChange (void);
-extern void ShapeTest (void);
+//extern void ShapeTest (void);
 //#define ACTION_REPLAY 1
 #ifndef ACTION_REPLAY
-Sint32 file_max;
 GfsDirName dir_name[MAX_DIR];
 #endif
 
@@ -53,25 +52,19 @@ GfsDirName dir_name[MAX_DIR];
 	 */
 void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
 void InitCD();
-void	InitCDBlock(void);
+void InitCDBlock(void);
 void ChangeDir(char *dirname);
 int SDL_InitSubSystem(Uint32 flags);
-
- //#include <sddrvs.dat>
-//extern Uint8 control_status ;
-//extern volatile ScanCode	LastScan;
 Sint32 GetFileSize(int file_id);
 /*
  debug
 */
 //Uint32 frame = 0;
-//extern Image images[];
 static unsigned char vbt_event[13][2];
 static int current_event=0;
 //int nb_event=0;
-static Uint32 count=0;
+//static Uint32 count=0;
 Uint16 previouscount=0;
-Uint16 multip=0;
 PCM m_dat[4];
 
 static	CdcPly	playdata;
@@ -149,9 +142,9 @@ static const Sint8	logtbl[] = {
 		if(height==240) tv_mode = TV_640x240; 
 	}
  
-	slInitSystem(tv_mode, (TEXTURE*)tex_spr, 1);
+	slInitSystem(tv_mode, (TEXTURE*)tex_spr, -1);
 // vbt 26/07/2020
-	slDynamicFrame(ON);
+//	slDynamicFrame(ON);
 
 	if(bpp==8)
 	{
@@ -168,27 +161,29 @@ static const Sint8	logtbl[] = {
     slInitBitMap(bmNBG1, BM_512x256, (void *)NBG1_CEL_ADR);
     slBMPaletteNbg1(1);
 
-//	slScrPosNbg0(toFIXED(0) , toFIXED(0));
-//    slInitBitMap(bmNBG0, BM_512x256, (void *)NBG0_CEL_ADR);
-//    slBMPaletteNbg0(1);
     // screen coordinates like in SDL
     slBitMapBase(0, 0);
     slScrAutoDisp(NBG0ON | NBG1ON);
 	slPriorityNbg0(7);
 	slPriorityNbg1(6);
 	slPrioritySpr0(5);
+	
+	slZdspLevel(5);
+	slWindowClipLevel(50);
+/*--------------------------------------------------------------------------*/
+	slSetDepthLimit(0,10,5);	
+	
+//	screen->pixels = (unsigned char*)0x002c0000;//(unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	CHECKMALLOCRESULT(screen->pixels);
 	screen->pitch = width;
-	//slTVOn();
-//	memset((void *)NBG1_CEL_ADR,0x2222,0x20000);
 	return screen;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_SetColors(SDL_Surface *surface, 	SDL_Color *colors, int firstcolor, int ncolors)
 {
 	Uint16	palo[256];
-	CHECKMALLOCRESULT(palo);
+//	CHECKMALLOCRESULT(palo);
 
 	for(unsigned int i=0;i<ncolors;i++)
 	{
@@ -296,16 +291,16 @@ void SDL_JoystickClose(SDL_Joystick *joystick)
 }
 */
 //--------------------------------------------------------------------------------------------------------------------------------------
-SDLMod SDL_GetModState(void)
+/*SDLMod SDL_GetModState(void)
  {
 	//slPrint("SDL_GetModState empty" ,slLocate(2,22));	 
 	return KMOD_NONE;
-}
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
-SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode)
+/*SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode)
  {
 	return SDL_GRAB_OFF;
-}
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 /*
 Uint8 SDL_JoystickGetButton(SDL_Joystick *joystick, int button)
@@ -342,28 +337,6 @@ int SDL_LockSurface(SDL_Surface *surface)
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_UnlockSurface(SDL_Surface *surface)
 {
-// si on n'utilise pas de dma decommenter
-//	slBMPut(0, 0, screenWidth-1, screenHeight-1, (Sint8*)surface->pixels); // vbt : 16-18fps
-//memcpywh((char *)NBG1_CEL_ADR, (char *)surface->pixels, 320, 240, 512 - 320);//, 1, 0, 0); // vbt : 16-18fps
- // vbt : boucle lent 16-18fps
-/*	unsigned int i,j;
-	unsigned char *src = (unsigned char *)surface->pixels;
-	unsigned char *dst = (unsigned char *)NBG1_CEL_ADR;
-	unsigned int width = surface->w;
-	unsigned int height = surface->h;
-
-	for (i = 0;i < height ;i++ ) 
-	{
-		for (j = 0;j < width ;j++ ) 
-		{
-			*dst++ = *src;
-			src +=1;
-		}
-		dst += (512-width);
-	}
-*/
-
-
 	unsigned int i; // vbt : le plus rapide
 	for (i = 0; i < screenHeight; i++) 
 	{
@@ -515,36 +488,18 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
 {
-	//slBMPut((dest) == NULL ? 0 : ((SDL_Rect *)dest)->x, (dest) == NULL ? 0 : ((SDL_Rect *)dest)->y, ((dest) == NULL ? 0 : ((SDL_Rect *)dest)->x) + images[img].w - 1, ((dest) == NULL ? 0 : ((SDL_Rect *)dest)->y) + images[img].h - 1, images[img].data);
- //slPrint("SDL_UpperBlit start       ",slLocate(3,22)); 
 if((srcrect)!=NULL)
 	for( Sint16 i=0;i<srcrect->h;i++)
 	{
-//		Uint8*s = (Uint8*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x; 
-//		Uint8*d = (Uint8*)dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
-//		memcpy(d,s,srcrect->w);
-// //slPrint("SDL_UpperBlit memcpyl       ",slLocate(3,22)); 
 //		memcpyl((unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),(unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),srcrect->w);
 		slDMACopy((unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),srcrect->w);
-
-//		Uint8*s = (Uint8*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x; 
-//		Uint8*d = (Uint8*)dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
-//		memcpy(d,s,srcrect->w);
-////slPrint("SDL_UpperBlit memcpyl end       ",slLocate(3,22)); 
-		
-//		DMA_ScuMemCopy(d, s, srcrect->w);
-//		SCU_DMAWait();
 	}	
- //slPrint("SDL_UpperBlit end       ",slLocate(3,22));	
-	//srcrect->h=SWAP_BYTES_16(srcrect->h);
-	//srcrect->w=SWAP_BYTES_16(srcrect->w);
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_UpdateRects (SDL_Surface *screen, int numrects, SDL_Rect *rects)
 {
 //	slBMPut(0, 0, 320-1, 240-1, (Sint8*)screen->pixels);
-//	   xxxxx
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_UpdateRect (SDL_Surface *screen, Sint32 x, Sint32 y, Uint32 w, Uint32 h)
@@ -555,46 +510,30 @@ void SDL_UpdateRect (SDL_Surface *screen, Sint32 x, Sint32 y, Uint32 w, Uint32 h
 
 int SDL_FillRect (SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color)
 {
-/*
-if((dst)!=NULL)		
-	if((dstrect)!=NULL)
-	slBMBoxFill((dst)->x, (dst)->y, (dst)->x + (dstrect)->w - 1, (dst)->y + (dstrect)->h - 1, color);
-*/
-
-if((dst)!=NULL)		
-	if((dstrect)!=NULL)
-	{
-//		slBMBoxFill(dstrect->x, dstrect->y, dstrect->x + dstrect->w - 1, dstrect->y + dstrect->h - 1, color);
-
-	for( Sint16 i=0;i<dstrect->h;i++)
+	if((dst)!=NULL)		
+		if((dstrect)!=NULL)
 		{
-			//Uint8*s = (Uint8*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x; 
-			Uint8*d = (Uint8*)dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
-//			memset(d,color,dstrect->w);
-//
-//		Uint8*d = (Uint8*)VDP2_VRAM_B1 + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
-		memset(d,color,dstrect->w);
-//		DMA_ScuMemCopy(d, color, dstrect->w);
-//		DMA_ScuResult();
-//		SCU_DMAWait();
-		}
-	}
-	else
-	{
-//		slBMBoxFill(dstrect->x, dstrect->y, dstrect->x + dstrect->w - 1, dstrect->y + dstrect->h - 1, color);
+	//		slBMBoxFill(dstrect->x, dstrect->y, dstrect->x + dstrect->w - 1, dstrect->y + dstrect->h - 1, color);
 
-	   memset(dst->pixels,color,screenWidth*screenHeight);
-//		DMA_ScuMemCopy((Uint8*)VDP2_VRAM_B1, color, dstrect->w);
-//		DMA_ScuResult();
-//		SCU_DMAWait();
-	}
+		for( Sint16 i=0;i<dstrect->h;i++)
+			{
+				//Uint8*s = (Uint8*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x; 
+				Uint8*d = (Uint8*)dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
+	//			memset(d,color,dstrect->w);
+	//
+	//		Uint8*d = (Uint8*)VDP2_VRAM_B1 + ((i + dstrect->y) * dst->pitch) + dstrect->x; 
+				memset(d,color,dstrect->w);
+			}
+		}
+		else
+		{
+	//		slBMBoxFill(dstrect->x, dstrect->y, dstrect->x + dstrect->w - 1, dstrect->y + dstrect->h - 1, color);
+
+		   memset(dst->pixels,color,screenWidth*screenHeight);
+		}
 
 	return 0;
 }
-
-/*
-  slBMBoxFill((dest)->x, (dest)->y, (dest)->x + (dest)->w - 1, (dest)->y + (dest)->h - 1, 0)
-*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 SDL_Surface * SDL_CreateRGBSurface(Uint32 flags, int width, int height, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask)
 {
@@ -1330,6 +1269,23 @@ Uint32 SWAP_BYTES_32(Uint32 a) {
 
 
 }
+//-------------------------------------------------------------------------------------------------------------------------------------
+extern "C" {
+void CSH_Purge(void *adrs, Uint32 P_size)
+{
+	typedef Uint32 LineX[0x10/sizeof(Uint32)];	/* ラインは 0x10 バイト単位 */
+	LineX *ptr, *end;
+	Uint32 zero = 0;
+
+	ptr = (void*)(((Uint32)adrs & 0x1fffffff) | 0x40000000);	/* キャッシュパージ領域 */
+	end = (void*)((Uint32)ptr + P_size - 0x10);	/* 終了ポインタ（-0x10 はポストインクリメントの為） */
+	ptr = (void*)((Uint32)ptr & -sizeof(LineX));	/* ラインアライメントに整合 */
+	do {
+		(*ptr)[0] = zero;			/* キャッシュパージ */
+	} while (ptr++ < end);			/* ポストインクリメントはディレイスロット活用の為 */
+}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------
 
 #ifdef VBT
 

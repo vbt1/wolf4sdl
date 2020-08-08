@@ -68,7 +68,6 @@ extern "C" {
 #endif
 
 #ifndef ACTION_REPLAY
-extern Sint32 file_max;
 extern GfsDirName dir_name[MAX_DIR];
 #endif
 

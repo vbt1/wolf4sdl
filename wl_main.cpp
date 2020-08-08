@@ -11,7 +11,6 @@
 #include "wl_atmos.h"
 #include "sdl/SDL_syswm.h"
 
-
 /*
 =============================================================================
 
@@ -71,9 +70,9 @@ void    Quit (const char *error,...);
 
 boolean startgame;
 boolean loadedgame;
-int     mouseadjustment;
+//int     mouseadjustment;
 
-char    configname[13]="config.";
+//char    configname[13]="config.";
 
 //
 // Command line parameter variables
@@ -84,7 +83,7 @@ boolean param_nowait = true;
 int     param_difficulty = 1;           // default is "normal"
 int     param_tedlevel = -1;            // default is not to start a level
 //int     param_joystickindex = 0;
-
+/*
 #if defined(_arch_dreamcast)
 int     param_joystickhat = 0;
 int     param_samplerate = 11025;       // higher samplerates result in "out of memory"
@@ -98,7 +97,7 @@ int     param_audiobuffer = 128;
 int     param_samplerate = 44100;
 int     param_audiobuffer = 2048 / (44100 / param_samplerate);
 #endif
-
+*/
 int     param_mission = 1;
 boolean param_goodtimes = false;
 boolean param_ignorenumchunks = false;
@@ -155,12 +154,13 @@ void ReadConfig(void)
         // no config file, so select by hardware
         //
 noconfig:
-        if (SoundBlasterPresent || AdLibPresent)
+/*        if (SoundBlasterPresent) //|| AdLibPresent)
         {
             sd = sdm_AdLib;
             sm = smm_AdLib;
         }
         else
+*/			
         {
             sd = sdm_PC;
             sm = smm_Off;
@@ -171,7 +171,7 @@ noconfig:
         else
             sds = sds_Off;
         viewsize = 19;                          // start with a good size
-        mouseadjustment=5;
+//        mouseadjustment=5;
     }
     SD_SetMusicMode (sm);
     SD_SetSoundMode (sd);
@@ -205,7 +205,7 @@ void NewGame (int difficulty,int episode)
 }
 
 //===========================================================================
-
+#if 0
 void DiskFlopAnim(int x,int y)
 {
     static int8_t which=0;
@@ -216,7 +216,6 @@ void DiskFlopAnim(int x,int y)
     which^=1;
 }
 
-
 int32_t DoChecksum(byte *source,unsigned size,int32_t checksum)
 {
     unsigned i;
@@ -226,7 +225,6 @@ int32_t DoChecksum(byte *source,unsigned size,int32_t checksum)
 
     return checksum;
 }
-
 
 /*
 ==================
@@ -538,7 +536,7 @@ boolean LoadTheGame(FILE *file,int x,int y)
 
     return true;
 }
-
+#endif
 //===========================================================================
 
 /*
@@ -631,6 +629,11 @@ void BuildTables (void)
 ====================
 */
 
+double FastArcTan(double x)
+{
+    return M_PI_4*x - x*(fabs(x) - 1)*(0.2447 + 0.0663*fabs(x));
+}
+
 inline void CalcProjection (int32_t focal)
 {
     int     i;
@@ -668,8 +671,9 @@ inline void CalcProjection (int32_t focal)
 // vbt
 //
 
-		angle = /*(float)*/ atan(tang);
-//        angle = (float) MTH_Atan(tang);
+//		angle = /*(float)*/ atan(tang);
+
+        angle = (double) FastArcTan(tang);
         intang = (int) (angle*radtoint);
         pixelangle[halfview-1-i] = intang;
         pixelangle[halfview+i] = -intang;
@@ -1001,8 +1005,8 @@ void DoJukebox(void)
         };
 
     IN_ClearKeysDown();
-    if (!AdLibPresent && !SoundBlasterPresent)
-        return;
+//    if (!AdLibPresent && !SoundBlasterPresent)
+//        return;
 
     MenuFadeOut();
 
@@ -1152,7 +1156,6 @@ static void InitGame()
 //
 // build some tables
     InitDigiMap ();
-
     ReadConfig ();
 
 //    SetupSaveGames();

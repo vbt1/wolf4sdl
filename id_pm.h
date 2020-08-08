@@ -11,8 +11,7 @@ extern int ChunksInFile;
 extern int PMSpriteStart;
 extern int PMSoundStart;
 extern int currentPage;
-extern int currentTex;
-extern bool PMSoundInfoPagePadded;
+//extern bool PMSoundInfoPagePadded;
 
 // ChunksInFile+1 pointers to page starts.
 // The last pointer points one byte after the last page.

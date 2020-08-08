@@ -36,7 +36,7 @@ objtype objlist[MAXACTORS];
 objtype *newobj, *obj, *player, *lastobj, *objfreelist, *killerobj;
 
 boolean noclip, ammocheat;
-int godmode, singlestep, extravbls = 1; // to remove flicker (gray stuff at the bottom)
+int godmode;//, singlestep, extravbls = 1; // to remove flicker (gray stuff at the bottom)
 
 byte tilemap[MAPSIZE][MAPSIZE]; // wall values only
 byte spotvis[MAPSIZE][MAPSIZE];
@@ -1163,7 +1163,7 @@ void PlayLoop (void)
 
     playstate = ex_stillplaying;
     lasttimecount = GetTimeCount();
-    frameon = 0;
+//    frameon = 0;
     anglefrac = 0;
     facecount = 0;
     funnyticount = 0;
@@ -1216,14 +1216,15 @@ void PlayLoop (void)
 //
 // debug aids
 //
+/*
         if (singlestep)
         {
             VW_WaitVBL (singlestep);
             lasttimecount = GetTimeCount();
         }
-        if (extravbls)
+       if (extravbls)
             VW_WaitVBL (extravbls);
-
+*/
         if (demoplayback)
         {
             if (IN_CheckAck ())
@@ -1232,7 +1233,7 @@ void PlayLoop (void)
                 playstate = ex_abort;
             }
         }
-		slSynch(); // vbt ajout 26/05
+		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
     }
     while (!playstate && !startgame);
 

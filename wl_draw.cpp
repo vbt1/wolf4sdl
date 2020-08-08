@@ -31,10 +31,10 @@ void heapWalk();
 */
 
 static byte *vbuf = NULL;
-unsigned vbufPitch = 0;
+//unsigned vbufPitch = 0;
 
 int32_t    lasttimecount;
-int32_t    frameon;
+//int32_t    frameon;
 boolean fpscounter=1;
 //boolean fpscounter=0;
 
@@ -80,14 +80,13 @@ int     lasttexture;
 // ray tracing variables
 //
 short    focaltx,focalty,viewtx,viewty;
-longword xpartialup,xpartialdown,ypartialup,ypartialdown;
+//longword xpartialup,xpartialdown,ypartialup,ypartialdown;
 
-short   midangle,angle;
+short   midangle; //,angle;
 
-word    tilehit;
-int     pixx;
+//word    tilehit;
+//int     pixx;
 
-short   xtile,ytile;
 short   xtilestep,ytilestep;
 int32_t    xintercept,yintercept;
 word    xstep,ystep;
@@ -230,28 +229,6 @@ boolean TransformTile (int tx, int ty, short shapenum, short *dispx, short *disp
     {
         *dispx = (short)(centerx + ny*scale/nx);
         *dispheight = (short)(heightnumerator/(nx>>8));
-#if 0	
-/*	
-//--------------------------------------------------------------------------------------------
-	extern 	TEXTURE tex_spr[];		
-	TEXTURE *txptr = tex_spr + shapenum;
-		
-    SPRITE user_sprite;
-    user_sprite.CTRL = FUNC_Sprite | _ZmCC;
-    user_sprite.PMOD=CL256Bnk | ECenb | SPdis;
-    user_sprite.SRCA=((txptr->CGadr));
-    user_sprite.COLR=0;
-    user_sprite.SIZE=0x840;
-	user_sprite.XA=(short)(*dispx - centerx);//(ny*scale/nx);
-	user_sprite.YA=0;
-	user_sprite.XB=(short)((*dispheight)>>3)<<1; // vbt : * SPRITESCALEFACTOR à la place ?
-	user_sprite.YB=user_sprite.XB;
-
-    user_sprite.GRDA=0;
-	slSetSprite(&user_sprite, toFIXED(100));	
-*/	
-//--------------------------------------------------------------------------------------------
-#endif
     }
 
 //
@@ -329,6 +306,7 @@ void ScalePost()
 	
     user_wall.GRDA=0;
 	slSetSprite(&user_wall, toFIXED(300));	
+	
 //--------------------------------------------------------------------------------------------
 #else
 	
@@ -392,13 +370,14 @@ void ScalePost()
 #endif	
 }
 
+/*
 void GlobalScalePost(byte *vidbuf, unsigned pitch)
 {
     vbuf = vidbuf;
     vbufPitch = pitch;
     ScalePost();
 }
-
+*/
 /*
 ====================
 =
@@ -410,7 +389,7 @@ void GlobalScalePost(byte *vidbuf, unsigned pitch)
 ====================
 */
 
-void HitVertWall (void)
+void HitVertWall (int pixx,word tilehit,short xtile,short ytile)
 {
     int wallpic;
     int texture;
@@ -482,7 +461,7 @@ void HitVertWall (void)
 ====================
 */
 
-void HitHorizWall (void)
+void HitHorizWall (int pixx,word tilehit,short xtile,short ytile)
 {
     int wallpic;
     int texture;
@@ -550,7 +529,7 @@ void HitHorizWall (void)
 ====================
 */
 
-void HitHorizDoor (void)
+void HitHorizDoor (int pixx,word tilehit)
 {
     int doorpage;
     int doornum;
@@ -620,7 +599,7 @@ void HitHorizDoor (void)
 ====================
 */
 
-void HitVertDoor (void)
+void HitVertDoor (int pixx,word tilehit)
 {
     int doorpage;
     int doornum;
@@ -880,7 +859,7 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 #endif	
 }
 
-void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
+void SimpleScaleShape (int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
 {
     t_compshape   *shape;
     unsigned scale,pixheight;
@@ -1137,7 +1116,7 @@ void DrawScaleds (void)
 int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
     SPR_MACHINEGUNREADY, SPR_CHAINREADY};
 
-void DrawPlayerWeapon (void)
+void DrawPlayerWeapon (unsigned vbufPitch)
 {
     int shapenum;
 
@@ -1146,7 +1125,7 @@ void DrawPlayerWeapon (void)
     {
 #ifndef APOGEE_1_0
         if (player->state == &s_deathcam && (GetTimeCount()&32) )
-            SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1);
+            SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1,vbufPitch);
 #endif
         return;
     }
@@ -1155,11 +1134,11 @@ void DrawPlayerWeapon (void)
     if (gamestate.weapon != -1)
     {
         shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
-        SimpleScaleShape(viewwidth/2,shapenum,viewheight+1);
+        SimpleScaleShape(viewwidth/2,shapenum,viewheight+1,vbufPitch);
     }
 
     if (demorecord || demoplayback)
-        SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1);
+        SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1,vbufPitch);
 }
 
 
@@ -1202,11 +1181,20 @@ void CalcTics (void)
 
 void AsmRefresh()
 {
+// vbt :moins de variable globale
+	longword xpartialup,xpartialdown,ypartialup,ypartialdown;
+	word tilehit;
+	short xtile,ytile;
+    xpartialdown = viewx&(TILEGLOBAL-1);
+    xpartialup = TILEGLOBAL-xpartialdown;
+    ypartialdown = viewy&(TILEGLOBAL-1);
+    ypartialup = TILEGLOBAL-ypartialdown;	
+	
     int32_t xstep,ystep;
     longword xpartial,ypartial;
     boolean playerInPushwallBackTile = tilemap[focaltx][focalty] == 64;
 
-    for(pixx=0;pixx<viewwidth;pixx++)
+    for(int pixx=0;pixx<viewwidth;pixx++)
     {
         short angl=midangle+pixelangle[pixx];
         if(angl<0) angl+=FINEANGLES;
@@ -1271,7 +1259,7 @@ void AsmRefresh()
                     yintercept = yintbuf;
                     ytile = (short) (yintercept >> TILESHIFT);
                     tilehit = pwalltile;
-                    HitVertWall();
+                    HitVertWall(pixx,tilehit,xtile,ytile);
                     continue;
                 }
             }
@@ -1289,7 +1277,7 @@ void AsmRefresh()
 // vbt new
                     xtile = (short) (xintercept >> TILESHIFT);
                     tilehit = pwalltile;
-                    HitHorizWall();
+                    HitHorizWall(pixx,tilehit,xtile,ytile);
                     continue;
                 }
             }
@@ -1309,7 +1297,7 @@ vertentry:
                 else if(yintercept>=(mapheight<<TILESHIFT)) yintercept=mapheight<<TILESHIFT, ytile=mapheight-1;
                 yspot=0xffff;
                 tilehit=0;
-                HitHorizBorder();
+                HitHorizBorder(pixx,tilehit,xtile,ytile);
                 break;
             }
             if(xspot>=maparea) break;
@@ -1327,7 +1315,7 @@ vertentry:
                     xintercept=(xtile<<TILESHIFT)|0x8000;
 // vbt new
                     ytile = (short) (yintercept >> TILESHIFT);
-                    HitVertDoor();
+                    HitVertDoor(pixx,tilehit);
                 }
                 else
                 {
@@ -1360,7 +1348,7 @@ vertentry:
 // vbt new
                                 ytile = (short) (yintercept >> TILESHIFT);
                                 tilehit=pwalltile;
-                                HitVertWall();
+                                HitVertWall(pixx,tilehit,xtile,ytile);
                             }
                             else
                             {
@@ -1373,7 +1361,7 @@ vertentry:
 // vbt new
                                 ytile = (short) (yintercept >> TILESHIFT);
                                 tilehit=pwalltile;
-                                HitVertWall();
+                                HitVertWall(pixx,tilehit,xtile,ytile);
                             }
                         }
                         else
@@ -1397,7 +1385,7 @@ vertentry:
 // vbt new
                                     xtile = (short) (xintercept >> TILESHIFT);
                                     tilehit=pwalltile;
-                                    HitHorizWall();
+                                    HitHorizWall(pixx,tilehit,xtile,ytile);
                                 }
                                 else
                                 {
@@ -1406,7 +1394,7 @@ vertentry:
 // vbt new
                                     ytile = (short) (yintercept >> TILESHIFT);
                                     tilehit=pwalltile;
-                                    HitVertWall();
+                                    HitVertWall(pixx,tilehit,xtile,ytile);
                                 }
                             }
                             else
@@ -1418,7 +1406,7 @@ vertentry:
 // vbt new
                                     ytile = (short) (yintercept >> TILESHIFT);
                                     tilehit=pwalltile;
-                                    HitVertWall();
+                                    HitVertWall(pixx,tilehit,xtile,ytile);
                                 }
                                 else
                                 {
@@ -1434,7 +1422,7 @@ vertentry:
 // vbt new
                                     xtile = (short) (xintercept >> TILESHIFT);
                                     tilehit=pwalltile;
-                                    HitHorizWall();
+                                    HitHorizWall(pixx,tilehit,xtile,ytile);
                                 }
                             }
                         }
@@ -1444,7 +1432,7 @@ vertentry:
                         xintercept=xtile<<TILESHIFT;
 // vbt new
                         ytile = (short) (yintercept >> TILESHIFT);
-                        HitVertWall();
+                        HitVertWall(pixx,tilehit,xtile,ytile);
                     }
                 }
                 break;
@@ -1472,7 +1460,7 @@ horizentry:
                 else if(xintercept>=(mapwidth<<TILESHIFT)) xintercept=mapwidth<<TILESHIFT, xtile=mapwidth-1;
                 xspot=0xffff;
                 tilehit=0;
-                HitVertBorder();
+                HitVertBorder(pixx,tilehit,xtile,ytile);
                 break;
             }
             if(yspot>=maparea) break;
@@ -1490,7 +1478,7 @@ horizentry:
                     yintercept=(ytile<<TILESHIFT)+0x8000;
 // vbt new
                     xtile = (short) (xintercept >> TILESHIFT);
-                    HitHorizDoor();
+                    HitHorizDoor(pixx,tilehit);
                 }
                 else
                 {
@@ -1523,7 +1511,7 @@ horizentry:
 // vbt new
                                 xtile = (short) (xintercept >> TILESHIFT);
                                 tilehit=pwalltile;
-                                HitHorizWall();
+                                HitHorizWall(pixx,tilehit,xtile,ytile);
                             }
                             else
                             {
@@ -1536,7 +1524,7 @@ horizentry:
 // vbt new
                                 xtile = (short) (xintercept >> TILESHIFT);
                                 tilehit=pwalltile;
-                                HitHorizWall();
+                                HitHorizWall(pixx,tilehit,xtile,ytile);
                             }
                         }
                         else
@@ -1560,7 +1548,7 @@ horizentry:
 // vbt new
                                     ytile = (short) (yintercept >> TILESHIFT);
                                     tilehit=pwalltile;
-                                    HitVertWall();
+                                    HitVertWall(pixx,tilehit,xtile,ytile);
                                 }
                                 else
                                 {
@@ -1569,7 +1557,7 @@ horizentry:
 // vbt new
                                     xtile = (short) (xintercept >> TILESHIFT);
                                     tilehit=pwalltile;
-                                    HitHorizWall();
+                                    HitHorizWall(pixx,tilehit,xtile,ytile);
                                 }
                             }
                             else
@@ -1581,7 +1569,7 @@ horizentry:
 // vbt new
                                     xtile = (short) (xintercept >> TILESHIFT);
                                     tilehit=pwalltile;
-                                    HitHorizWall();
+                                    HitHorizWall(pixx,tilehit,xtile,ytile);
                                 }
                                 else
                                 {
@@ -1597,7 +1585,7 @@ horizentry:
 // vbt new
                                     ytile = (short) (yintercept >> TILESHIFT);
                                     tilehit=pwalltile;
-                                    HitVertWall();
+                                    HitVertWall(pixx,tilehit,xtile,ytile);
                                 }
                             }
                         }
@@ -1607,7 +1595,7 @@ horizentry:
                         yintercept=ytile<<TILESHIFT;
 // vbt new
                         xtile = (short) (xintercept >> TILESHIFT);
-                        HitHorizWall();
+                        HitHorizWall(pixx,tilehit,xtile,ytile);
                     }
                 }
                 break;
@@ -1632,11 +1620,12 @@ passhoriz:
 
 void WallRefresh (void)
 {
+/*	
     xpartialdown = viewx&(TILEGLOBAL-1);
     xpartialup = TILEGLOBAL-xpartialdown;
     ypartialdown = viewy&(TILEGLOBAL-1);
     ypartialup = TILEGLOBAL-ypartialdown;
-
+*/
     min_wallheight = viewheight;
     lastside = -1;                  // the first pixel is on a new wall
     AsmRefresh ();
@@ -1681,7 +1670,7 @@ void    ThreeDRefresh (void)
     if(vbuf == NULL) return;
 
     vbuf += screenofs;
-    vbufPitch = bufferPitch;
+    unsigned vbufPitch = bufferPitch;
 
     CalcViewVariables();
 
@@ -1694,7 +1683,6 @@ void    ThreeDRefresh (void)
         DrawStarSky(vbuf, vbufPitch);
 #endif
     WallRefresh ();
-//vbt=0;
 #if defined(USE_FEATUREFLAGS) && defined(USE_PARALLAX)
     if(GetFeatureFlags() & FF_PARALLAXSKY)
         DrawParallax(vbuf, vbufPitch);
@@ -1719,7 +1707,7 @@ void    ThreeDRefresh (void)
         DrawSnow(vbuf, vbufPitch);
 #endif
 
-    DrawPlayerWeapon ();    // draw player's hands
+    DrawPlayerWeapon (vbufPitch);    // draw player's hands
 
     if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
         ShowActStatus();
@@ -1748,7 +1736,6 @@ void    ThreeDRefresh (void)
 			slPrint((char*)"fps   ",slLocate(1,0));
 			slPrint((char*)ltoa(fps,buffer,8),slLocate(4,0));
 			
-			//heapWalk();
             //fontnumber = 0;
             //SETFONTCOLOR(7,127);
             //PrintX=4; PrintY=1;
@@ -1760,7 +1747,6 @@ void    ThreeDRefresh (void)
         SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
         SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
-
 #ifndef REMDEBUG
     if (fpscounter)
     {
@@ -1772,6 +1758,7 @@ void    ThreeDRefresh (void)
             fps_time-=35;
             fps=fps_frames<<1;
             fps_frames=0;
+//			slSynch();			// vbt test
         }
     }
 #endif

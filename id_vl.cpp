@@ -45,7 +45,7 @@ unsigned scaleFactor;
 boolean	 screenfaded;
 unsigned bordercolor;
 
-SDL_Color palette1[256], palette2[256];
+//SDL_Color palette1[256], palette2[256];
 SDL_Color curpal[256];
 
 
@@ -289,6 +289,7 @@ void VL_GetPalette (SDL_Color *palette)
 void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 {
 	int		    i,j,orig,delta;
+	SDL_Color palette1[256], palette2[256];	
 	SDL_Color   *origptr, *newptr;
 
     red = red * 255 / 63;
@@ -344,6 +345,7 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 
 void VL_FadeIn (int start, int end, SDL_Color *palette, int steps)
 {
+	SDL_Color palette1[256], palette2[256];	
 	int i,j,delta;
 
 	VL_WaitVBL(1);

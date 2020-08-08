@@ -49,10 +49,10 @@ void heapWalk(void)
     Uint32 heapEnd = _sbrk(0);
     
 //    printf("Heap Size: %lu\n", heapEnd - chunkCurr);
-    char msg[200];
-	sprintf (msg,"Heap Size: %d  e%08x s%08x                     \n", heapEnd - chunkCurr,heapEnd, chunkCurr) ;
+    char msg[100];
+	sprintf (msg,"Heap Size: %d  e%08x s%08x                  ", heapEnd - chunkCurr,heapEnd, chunkCurr) ;
 //	FNT_Print256_2bpp((volatile Uint8 *)SS_FONT,(Uint8 *)toto,12,216);
-	slPrint((char *)msg,slLocate(1,2));
+	slPrint((char *)msg,slLocate(1,3));
 	
     // Walk through the chunks until we hit the end of the heap.
     while (chunkCurr < heapEnd)
@@ -780,7 +780,7 @@ void CAL_SetupMapFile (void)
 =
 ======================
 */
-
+/*
 void CAL_SetupAudioFile (void)
 {
 //#ifdef VBT
@@ -837,7 +837,7 @@ void CAL_SetupAudioFile (void)
 	if(stat(fname, NULL))
         CA_CannotOpen(fname);
 }
-
+*/
 //==========================================================================
 
 
@@ -1299,10 +1299,8 @@ void CA_CacheScreen (int chunk)
 	delta2 = (pos - delta*2048); 
 //	Chunks=(uint8_t*)malloc(8192*2+compressed);
 	Chunks=(uint8_t*)0x002C0000;
-#ifdef HEAP_WALK	
-//heapWalk();
-#endif
-	CHECKMALLOCRESULT(Chunks);
+//	CHECKMALLOCRESULT(Chunks);
+
 	GFS_Load(grhandle, delta, (void *)Chunks, 8192*2+compressed);
 	memcpy(bigbufferseg,&Chunks[delta2],compressed);
 //	free(Chunks);
@@ -1319,7 +1317,7 @@ void CA_CacheScreen (int chunk)
 //
 //    byte *pic = (byte *) malloc(64000);
 	byte *pic = (byte *)0x002C0000;
-    CHECKMALLOCRESULT(pic);
+//    CHECKMALLOCRESULT(pic);
     CAL_HuffExpand((byte *) source, pic, expanded, grhuffman);
 
     byte *vbuf = LOCK();
@@ -1338,6 +1336,10 @@ void CA_CacheScreen (int chunk)
 	pic = NULL;
     free(bigbufferseg);
 	bigbufferseg = NULL;
+	
+#ifdef HEAP_WALK	
+heapWalk();
+#endif	
 //#endif
 }
 

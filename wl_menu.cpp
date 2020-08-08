@@ -275,12 +275,12 @@ int color_norml[] = {
 int EpisodeSelect[6] = { 1 };
 
 
-static int SaveGamesAvail[10];
+//static int SaveGamesAvail[10];
 static int StartGame;
 static int SoundStatus = 1;
-static int pickquick;
-static char SaveGameNames[10][32];
-static char SaveName[13] = "savegam?.";
+//static int pickquick;
+//static char SaveGameNames[10][32];
+//static char SaveName[13] = "savegam?.";
 
 
 ////////////////////////////////////////////////////////////////////
@@ -288,63 +288,6 @@ static char SaveName[13] = "savegam?.";
 // INPUT MANAGER SCANCODE TABLES
 //
 ////////////////////////////////////////////////////////////////////
-
-#if 0
-static const char *ScanNames[] =      // Scan code names with single chars
-{
-    "?", "?", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "+", "?", "?",
-    "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "|", "?", "A", "S",
-    "D", "F", "G", "H", "J", "K", "L", ";", "\"", "?", "?", "?", "Z", "X", "C", "V",
-    "B", "N", "M", ",", ".", "/", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?",
-    "?", "?", "?", "?", "?", "?", "?", "?", "\xf", "?", "-", "\x15", "5", "\x11", "+", "?",
-    "\x13", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?",
-    "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?",
-    "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"
-};                              // DEBUG - consolidate these
-static ScanCode ExtScanCodes[] =        // Scan codes with >1 char names
-{
-    1, 0xe, 0xf, 0x1d, 0x2a, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e,
-    0x3f, 0x40, 0x41, 0x42, 0x43, 0x44, 0x57, 0x59, 0x46, 0x1c, 0x36,
-    0x37, 0x38, 0x47, 0x49, 0x4f, 0x51, 0x52, 0x53, 0x45, 0x48,
-    0x50, 0x4b, 0x4d, 0x00
-};
-static const char *ExtScanNames[] =   // Names corresponding to ExtScanCodes
-{
-    "Esc", "BkSp", "Tab", "Ctrl", "LShft", "Space", "CapsLk", "F1", "F2", "F3", "F4",
-    "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "ScrlLk", "Enter", "RShft",
-    "PrtSc", "Alt", "Home", "PgUp", "End", "PgDn", "Ins", "Del", "NumLk", "Up",
-    "Down", "Left", "Right", ""
-};
-
-/*#pragma warning 737 9
-static byte
-                                        *ScanNames[] =          // Scan code names with single chars
-                                        {
-        "?","?","1","2","3","4","5","6","7","8","9","0","-","+","?","?",
-        "Q","W","E","R","T","Y","U","I","O","P","[","]","|","?","A","S",
-        "D","F","G","H","J","K","L",";","\"","?","?","?","Z","X","C","V",
-        "B","N","M",",",".","/","?","?","?","?","?","?","?","?","?","?",
-        "?","?","?","?","?","?","?","?","\xf","?","-","\x15","5","\x11","+","?",
-        "\x13","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?",
-        "?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?",
-        "?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?"
-                                        };      // DEBUG - consolidate these
-static byte ExtScanCodes[] =    // Scan codes with >1 char names
-                                        {
-        1,0xe,0xf,0x1d,0x2a,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,
-        0x3f,0x40,0x41,0x42,0x43,0x44,0x57,0x59,0x46,0x1c,0x36,
-        0x37,0x38,0x47,0x49,0x4f,0x51,0x52,0x53,0x45,0x48,
-        0x50,0x4b,0x4d,0x00
-                                        };
-static byte *ExtScanNames[] =   // Names corresponding to ExtScanCodes
-                                        {
-        "Esc","BkSp","Tab","Ctrl","LShft","Space","CapsLk","F1","F2","F3","F4",
-        "F5","F6","F7","F8","F9","F10","F11","F12","ScrlLk","Enter","RShft",
-        "PrtSc","Alt","Home","PgUp","End","PgDn","Ins","Del","NumLk","Up",
-        "Down","Left","Right",""
-                                        };*/
-
-#else
 static const char* const ScanNames[SDLK_LAST] =
     {
         "?","?","?","?","?","?","?","?",                                //   0
@@ -389,8 +332,6 @@ static const char* const ScanNames[SDLK_LAST] =
         "?","?","?","?","PrtSc","?","?","?",                            // 312
         "?","?"                                                         // 320
     };
-
-#endif
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -767,7 +708,7 @@ CP_CheckQuick (ScanCode scancode)
             {
                 playstate = ex_died;
                 killerobj = NULL;
-                pickquick = gamestate.lives = 0;
+                /*pickquick =*/ gamestate.lives = 0;
             }
 
             WindowH = 200;
@@ -828,7 +769,7 @@ CP_EndGame (int)
     DrawMainMenu();
     if(!res) return 0;
 
-    pickquick = gamestate.lives = 0;
+    /*pickquick =*/ gamestate.lives = 0;
     playstate = ex_died;
     killerobj = NULL;
 
@@ -1000,7 +941,7 @@ CP_NewGame (int)
 #endif
 #endif
 
-    pickquick = 0;
+//    pickquick = 0;
 
 #ifdef SPEAR
     UnCacheLump (NEWGAME_LUMP_START, NEWGAME_LUMP_END);
@@ -1239,98 +1180,6 @@ CP_Quit (int)
     DrawMainMenu ();
     return 0;
 }
-
-
-////////////////////////////////////////////////////////////////////
-//
-// HANDLE INTRO SCREEN (SYSTEM CONFIG)
-//
-////////////////////////////////////////////////////////////////////
-void
-IntroScreen (void)
-{
-#ifdef SPEAR
-
-#define MAINCOLOR       0x4f
-#define EMSCOLOR        0x4f
-#define XMSCOLOR        0x4f
-
-#else
-
-#define MAINCOLOR       0x6c
-#define EMSCOLOR        0x6c    // 0x4f
-#define XMSCOLOR        0x6c    // 0x7f
-
-#endif
-#define FILLCOLOR       14
-
-//      long memory;
-//      long emshere,xmshere;
-    int i;
-/*      int ems[10]={100,200,300,400,500,600,700,800,900,1000},
-                xms[10]={100,200,300,400,500,600,700,800,900,1000};
-        int main[10]={32,64,96,128,160,192,224,256,288,320};*/
-
-
-    //
-    // DRAW MAIN MEMORY
-    //
-#ifdef ABCAUS
-    memory = (1023l + mminfo.nearheap + mminfo.farheap) / 1024l;
-    for (i = 0; i < 10; i++)
-        if (memory >= main[i])
-            VWB_Bar (49, 163 - 8 * i, 6, 5, MAINCOLOR - i);
-
-    //
-    // DRAW EMS MEMORY
-    //
-    if (EMSPresent)
-    {
-        emshere = 4l * EMSPagesAvail;
-        for (i = 0; i < 10; i++)
-            if (emshere >= ems[i])
-                VWB_Bar (89, 163 - 8 * i, 6, 5, EMSCOLOR - i);
-    }
-
-    //
-    // DRAW XMS MEMORY
-    //
-    if (XMSPresent)
-    {
-        xmshere = 4l * XMSPagesAvail;
-        for (i = 0; i < 10; i++)
-            if (xmshere >= xms[i])
-                VWB_Bar (129, 163 - 8 * i, 6, 5, XMSCOLOR - i);
-    }
-#else
-    for (i = 0; i < 10; i++)
-        VWB_Bar (49, 163 - 8 * i, 6, 5, MAINCOLOR - i);
-    for (i = 0; i < 10; i++)
-        VWB_Bar (89, 163 - 8 * i, 6, 5, EMSCOLOR - i);
-    for (i = 0; i < 10; i++)
-        VWB_Bar (129, 163 - 8 * i, 6, 5, XMSCOLOR - i);
-#endif
-
-
-    //
-    // FILL BOXES
-    //
-//    if (MousePresent)
-//        VWB_Bar (164, 82, 12, 2, FILLCOLOR);
-
-//    if (IN_JoyPresent())
-//        VWB_Bar (164, 105, 12, 2, FILLCOLOR);
-
-    if (AdLibPresent && !SoundBlasterPresent)
-        VWB_Bar (164, 128, 12, 2, FILLCOLOR);
-
-    if (SoundBlasterPresent)
-        VWB_Bar (164, 151, 12, 2, FILLCOLOR);
-
-//    if (SoundSourcePresent)
-//        VWB_Bar (164, 174, 12, 2, FILLCOLOR);
-}
-
 
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -2065,27 +1914,6 @@ FreeMusic (void)
     //UNCACHEAUDIOCHUNK (STARTMUSIC + lastmusic);
 }
 
-
-///////////////////////////////////////////////////////////////////////////
-//
-//      IN_GetScanName() - Returns a string containing the name of the
-//              specified scan code
-//
-///////////////////////////////////////////////////////////////////////////
-const char *
-IN_GetScanName (ScanCode scan)
-{
-/*    const char **p;
-    ScanCode *s;
-
-    for (s = ExtScanCodes, p = ExtScanNames; *s; p++, s++)
-        if (*s == scan)
-            return (*p);*/
-
-    return (ScanNames[scan]);
-}
-
-
 ///////////////////////////////////////////////////////////////////////////
 //
 // CHECK FOR PAUSE KEY (FOR MUSIC ONLY)
@@ -2198,8 +2026,8 @@ CheckForEpisodes (void)
     {
         strcpy (extension, "wj6");
 #endif
-        strcat (configname, extension);
-        strcat (SaveName, extension);
+//        strcat (configname, extension);
+//        strcat (SaveName, extension);
         strcat (demoname, extension);
         EpisodeSelect[1] =
             EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;
@@ -2297,15 +2125,15 @@ CheckForEpisodes (void)
     strcpy (audioext, extension);
 #endif
 
-    strcat (configname, extension);
-    strcat (SaveName, extension);
+//    strcat (configname, extension);
+//    strcat (SaveName, extension);
     strcat (demoname, extension);
 
 #ifndef SPEAR
 #ifndef GOODTIMES
-    strcat (helpfilename, extension);
+//    strcat (helpfilename, extension);
 #endif
-    strcat (endfilename, extension);
+//    strcat (endfilename, extension);
 #endif
 #endif
 }

@@ -189,7 +189,8 @@ void PlaySoundLocGlobal(word s,fixed gx,fixed gy)
     //SetSoundLoc(gx, gy);
     //SD_PositionSound(leftchannel, rightchannel);
 
-    int channel = SD_PlaySound((soundnames) s);
+//    int channel = 
+	SD_PlaySound((soundnames) s);
 	/*
     if(channel)
     {
@@ -1045,6 +1046,9 @@ for(unsigned int i=0;i<AREATILE;i++)
             }
         }
     }
+	
+//slSynch();
+	
 char toto[100];
 sprintf(toto,"%04d %02d",position_vram,position_vram/0x800);
 
@@ -1514,6 +1518,7 @@ void PlayDemo (int demonumber)
 void Died (void)
 {
     float   fangle;
+//    int   fangle;
     int32_t dx,dy;
     int     iangle,curangle,clockwise,counter,change;
 
@@ -1535,8 +1540,11 @@ void Died (void)
         dy = player->y - killerobj->y;
 
         fangle = (float) atan2((float) dy, (float) dx);     // returns -pi to pi
+//		fangle = slAtan ((dy<<16), (dx<<16));
+		
         if (fangle<0)
             fangle = (float) (M_PI*2+fangle);
+//            fangle = (int) (M_PI*2+fangle);
 
         iangle = (int) (fangle/(M_PI*2)*ANGLES);
     }
@@ -1898,6 +1906,6 @@ startplayloop:
                 ClearMemory ();
                 break;
         }
-		slSynch(); // vbt ajout 26/05
+	//	slSynch(); // vbt ajout 26/05 à remettre
     } while (1);
 }

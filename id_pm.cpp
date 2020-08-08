@@ -7,7 +7,7 @@ int PMSpriteStart;
 int PMSoundStart;
 int currentPage;
 
-bool PMSoundInfoPagePadded = false;
+//bool PMSoundInfoPagePadded = false;
 
 // holds the whole VSWAP
 uint32_t *PMPageData;
@@ -111,6 +111,11 @@ void PM_Startup()
 
     size_t PMPageDataSize = (size_t) pageDataSize + alignPadding;
     PMPageData = (uint32_t *) 0x00202000;
+
+char toto[50];
+sprintf(toto,"pmpsize %d ",PMPageDataSize);
+slPrint((char*)toto,slLocate(1,2));	
+	
 //	PMPageData = (uint32_t *) malloc(PMPageDataSize);
     CHECKMALLOCRESULT(PMPageData);
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
@@ -129,7 +134,10 @@ void PM_Startup()
             if(offs & 1)
             {
                 *ptr++ = 0;
-                if(i == ChunksInFile - 1) PMSoundInfoPagePadded = true;
+                /*if(i == ChunksInFile - 1) 
+				{
+					PMSoundInfoPagePadded = true;
+				}*/
             }
         }
 
@@ -146,25 +154,20 @@ void PM_Startup()
 		uint8_t *pageData;
 //		pageData = (uint8_t *)malloc(4096*2);
 		pageData = (uint8_t *)(0x002C0000+8192);
+		
         if(!pageOffsets[i + 1]) size = pageLengths[i];
         else size = pageOffsets[i + 1] - pageOffsets[i];
+		
 		offset1 = (uint16_t)(pageOffsets[i]/2048);
 		offset2 = pageOffsets[i] - offset1*2048; 
 		GFS_Load(fileId, offset1, (void *)pageData, 4096*2);
 		
-//		if(i >= PMSpriteStart && i < PMSoundStart || i == ChunksInFile - 1)
-			memcpy(ptr,&pageData[offset2],size);
-/*		else
-		{
-			memcpy(ptr,&pageData[offset2],size);
-			//vbt :  contient les muurs !!!!
-		}
-*/	
+		memcpy(ptr,&pageData[offset2],size);
+
 //		free(pageData);
 		pageData = NULL;		
         ptr += size;
     }
-
 
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr;

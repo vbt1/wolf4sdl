@@ -120,7 +120,7 @@ static void processEvent(SDL_Event *event)
         case SDL_KEYDOWN:
         {
             LastScan = event->key.keysym.sym;
-            SDLMod mod = SDL_GetModState();
+//            SDLMod mod = SDL_GetModState();
             if(Keyboard[sc_Alt])
             {
                 if(LastScan==SDLK_F4)
@@ -133,7 +133,7 @@ static void processEvent(SDL_Event *event)
             else if(LastScan == SDLK_RCTRL) LastScan = SDLK_LCTRL;
             else
             {
-                if((mod & KMOD_NUM) == 0)
+//                if((mod & KMOD_NUM) == 0)
                 {
                     switch(LastScan)
                     {
@@ -150,12 +150,12 @@ static void processEvent(SDL_Event *event)
            /* if(sym >= 'a' && sym <= 'z')
                 sym -= 32;  // convert to uppercase
 		  */
-            if(mod & (KMOD_SHIFT | KMOD_CAPS))
+  /*          if(mod & (KMOD_SHIFT | KMOD_CAPS))
             {
                 if(sym < lengthof(ShiftNames) && ShiftNames[sym])
                     LastASCII = ShiftNames[sym];
             }
-            else
+            else*/
             {
                 if(sym < lengthof(ASCIINames) && ASCIINames[sym])
                     LastASCII = ASCIINames[sym];
@@ -176,7 +176,7 @@ static void processEvent(SDL_Event *event)
             else if(key == SDLK_RCTRL) key = SDLK_LCTRL;			   
             else
             {
-                if((SDL_GetModState() & KMOD_NUM) == 0)
+//                if((SDL_GetModState() & KMOD_NUM) == 0)
                 {
                     switch(key)
                     {

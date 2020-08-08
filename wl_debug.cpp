@@ -40,7 +40,7 @@ int DebugKeys (void);
 // from WL_DRAW.C
 
 void ScalePost();
-void SimpleScaleShape (int xcenter, int shapenum, unsigned height);
+void SimpleScaleShape (int xcenter, int shapenum, unsigned height,unsigned vbufPitch);
 
 /*
 =============================================================================
@@ -646,8 +646,8 @@ again:
         if (!esc)
         {
             level = atoi (str);
-            if (level>=0 && level<=50)
-                singlestep = level;
+ //           if (level>=0 && level<=50)
+ //               singlestep = level;
         }
         return 1;
     }

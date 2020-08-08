@@ -321,9 +321,11 @@ void LoadLatchMem (void)
 		////slPrintHex(end,slLocate(10,21));
 // vbt 26/07/2020 free remis		
 		free(surf);
+		surf=NULL;
 	}	
 // vbt 26/07/2020 free remis	
 free(surf1);
+surf1=NULL;
 
 	//VL_LatchToScreen (latchpics[2], 10*8, 10);
 

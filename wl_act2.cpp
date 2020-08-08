@@ -5,6 +5,13 @@
 #include "wl_def.h"
 #pragma hdrstop
 
+extern "C"{
+//extern fixed slAtan(fixed y, fixed x);
+extern fixed MTH_Atan(fixed y, fixed x);
+}
+#undef atan2
+//#define atan2(a,b) slAtan(a,b)
+#define atan2(a,b) MTH_Atan(a,b)
 /*
 =============================================================================
 
@@ -1633,14 +1640,17 @@ void SpawnDeath (int tilex, int tiley)
 void T_Launch (objtype *ob)
 {
     int32_t deltax,deltay;
+//	  FIXED deltax,deltay;
     float   angle;
-    int     iangle;
+//    int     iangle;
 
     deltax = player->x - ob->x;
     deltay = ob->y - player->y;
     angle = (float) atan2 ((float) deltay, (float) deltax);
+//	angle = slAtan ((deltay<<16), (deltax<<16));
     if (angle<0)
-        angle = (float) (M_PI*2+angle);
+//        angle = (float) (M_PI*2+angle);
+        angle = (int) (M_PI*2+angle);
     iangle = (int) (angle/(M_PI*2)*ANGLES);
     if (ob->obclass == deathobj)
     {
@@ -2296,14 +2306,19 @@ void SpawnFat (int tilex, int tiley)
 void T_SchabbThrow (objtype *ob)
 {
     int32_t deltax,deltay;
+//	  FIXED deltax,deltay;
     float   angle;
+//    int   angle;
     int     iangle;
 
     deltax = player->x - ob->x;
     deltay = ob->y - player->y;
     angle = (float) atan2((float) deltay, (float) deltax);
+//	angle = slAtan ((deltay<<16), (deltax<<16));
+	
     if (angle<0)
-        angle = (float) (M_PI*2+angle);
+//        angle = (float) (M_PI*2+angle);
+        angle = (int) (M_PI*2+angle);
     iangle = (int) (angle/(M_PI*2)*ANGLES);
 
     GetNewActor ();
@@ -2336,14 +2351,19 @@ void T_SchabbThrow (objtype *ob)
 void T_GiftThrow (objtype *ob)
 {
     int32_t deltax,deltay;
+//	  FIXED deltax,deltay;
     float   angle;
+//    int   angle;
     int     iangle;
 
     deltax = player->x - ob->x;
     deltay = ob->y - player->y;
     angle = (float) atan2((float) deltay, (float) deltax);
+//	angle = slAtan ((deltay<<16), (deltax<<16));
+
     if (angle<0)
-        angle = (float) (M_PI*2+angle);
+//        angle = (float) (M_PI*2+angle);
+        angle = (int) (M_PI*2+angle);
     iangle = (int) (angle/(M_PI*2)*ANGLES);
 
     GetNewActor ();
@@ -2925,7 +2945,9 @@ void A_Slurpie (objtype *)
 void T_FakeFire (objtype *ob)
 {
     int32_t deltax,deltay;
+//	  FIXED deltax,deltay;
     float   angle;
+//    int   angle;
     int     iangle;
 
     if (!objfreelist)       // stop shooting if over MAXACTORS
@@ -2937,8 +2959,11 @@ void T_FakeFire (objtype *ob)
     deltax = player->x - ob->x;
     deltay = ob->y - player->y;
     angle = (float) atan2((float) deltay, (float) deltax);
+//	angle = slAtan ((deltay<<16), (deltax<<16));
+	
     if (angle<0)
-        angle = (float)(M_PI*2+angle);
+//        angle = (float)(M_PI*2+angle);
+        angle = (int)(M_PI*2+angle);
     iangle = (int) (angle/(M_PI*2)*ANGLES);
 
     GetNewActor ();
@@ -3787,6 +3812,7 @@ void    A_StartDeathCam (objtype *ob)
 {
     int32_t dx,dy;
     float   fangle;
+//    int   fangle;
     int32_t xmove,ymove;
     int32_t dist;
 
@@ -3842,8 +3868,10 @@ void    A_StartDeathCam (objtype *ob)
     dy = player->y - ob->y;
 
     fangle = (float) atan2((float) dy, (float) dx);          // returns -pi to pi
+//	fangle = slAtan ((dy<<16), (dx<<16));
     if (fangle<0)
         fangle = (float) (M_PI*2+fangle);
+//        fangle = (int) (M_PI*2+fangle);
 
     player->angle = (short) (fangle/(M_PI*2)*ANGLES);
 

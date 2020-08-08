@@ -110,7 +110,7 @@ typedef struct
 extern globalsoundpos channelSoundPos[];
 
 // Global variables
-extern  boolean         AdLibPresent,
+extern  boolean         //AdLibPresent,
                         SoundBlasterPresent,
                         SoundPositioned;
 extern  SDMode          SoundMode;
