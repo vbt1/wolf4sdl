@@ -24,7 +24,7 @@
 #include <stdlib.h>
 //#include <string.h>
 #pragma	hdrstop
-//char 	*strdup (const char *) __malloc_like __result_use_check;
+char 	*strdup (const char *) __malloc_like __result_use_check;
 #if _MSC_VER == 1200            // Visual C++ 6
 	#define vsnprintf _vsnprintf
 #endif

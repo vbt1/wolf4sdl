@@ -1,6 +1,11 @@
 #ifndef WL_DEF_H
 #define WL_DEF_H
 
+extern "C" {
+#include <malloc.h>
+#include "C:\vbt\saturn\vbtsh4\toolchain\sh-elf\include\string.h"
+#include "C:\vbt\saturn\vbtsh4\toolchain\sh-elf\include\stdlib.h"
+}
 // Defines which version shall be built and configures supported extra features
 #include "version.h"
 

@@ -167,7 +167,7 @@ static const Sint8	logtbl[] = {
 	slPriorityNbg0(7);
 	slPriorityNbg1(6);
 	slPrioritySpr0(5);
-	
+	slInitSynch();
 	slZdspLevel(5);
 	slWindowClipLevel(50);
 /*--------------------------------------------------------------------------*/

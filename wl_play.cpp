@@ -84,6 +84,9 @@ boolean buttonstate[NUMBUTTONS];
 int lastgamemusicoffset = 0;
 
 
+extern unsigned int start_wall;
+extern unsigned int position_vram;
+extern unsigned int static_items;
 //===========================================================================
 
 
@@ -1234,6 +1237,8 @@ void PlayLoop (void)
             }
         }
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
+//		position_vram = (start_wall*32);
+		position_vram = 320*32+static_items*0x800;
     }
     while (!playstate && !startgame);
 

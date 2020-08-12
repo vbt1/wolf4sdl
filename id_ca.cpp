@@ -23,7 +23,7 @@ loaded into the data segment
 #endif
  */
 #include "wl_def.h"
-#include <stdlib.h>
+
 #pragma hdrstop
 #define THREEBYTEGRSTARTS
 #define HEAP_WALK 1
@@ -98,7 +98,7 @@ void heapWalk(void)
 }
 #endif
 
-TEXTURE tex_spr[SPR_TOTAL+AREATILE];
+TEXTURE tex_spr[SPR_TOTAL+320];
 
 void set_sprite(PICTURE *pcptr)
 {

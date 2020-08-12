@@ -642,7 +642,7 @@ inline void CalcProjection (int32_t focal)
     //double  tang;
     int     halfview;
     //double  facedist;
-	float  angle, tang, facedist;
+	double  angle, tang, facedist;
 
     focallength = focal;
     facedist = focal+MINDIST;
@@ -722,8 +722,8 @@ void SignonScreen (void)                        // VGA version
 {
     VL_SetVGAPlaneMode ();
 
-    VL_MungePic (signon,320,200);
-    VL_MemToScreen (signon,320,200,0,0);
+//    VL_MungePic (signon,320,200);
+//    VL_MemToScreen (signon,320,200,0,0);
 }
 
 

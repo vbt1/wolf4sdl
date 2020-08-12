@@ -270,16 +270,107 @@ int CalcHeight()
 */
 
 int postx;
-#if USE_SPRITES	
-
-#else
 byte *postsource;
-#endif
 int postwidth;
-//int vbt=0;
-
+void loadWallLineTexture(byte * postsource, unsigned int postx);
+void loadActorTexture(unsigned char texture);
 
 void ScalePost()
+{
+#if USE_SPRITES	
+//--------------------------------------------------------------------------------------------
+	extern 	TEXTURE tex_spr[];		
+//	extern unsigned int start_wall;
+	
+	loadWallLineTexture(postsource,postx);
+	
+	TEXTURE *txptr = &tex_spr[postx]; 
+//  a           b          c             d
+// top left, top right, bottom right, bottom left
+    SPRITE user_wall;
+    user_wall.CTRL = FUNC_Texture | _ZmCC;
+    user_wall.PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
+    user_wall.SRCA=(txptr->CGadr);//+(lasttexture/8));
+    user_wall.COLR=256;
+    user_wall.SIZE=0x801;
+
+	user_wall.XD=postx-(viewwidth/2);
+	user_wall.YD=-(wallheight[postx] >> 3);
+	user_wall.XC=user_wall.XD;
+	user_wall.YC=(wallheight[postx] >> 3);
+	user_wall.XA=user_wall.XD-1;
+	user_wall.YA=user_wall.YD;
+	user_wall.XB=user_wall.XA;
+	user_wall.YB=user_wall.YC;
+	
+    user_wall.GRDA=0;
+	slSetSprite(&user_wall, toFIXED(300));	
+	
+//--------------------------------------------------------------------------------------------
+#else
+	
+    int ywcount, yoffs, yw, yd, yendoffs;
+    byte col;
+
+#ifdef USE_SHADING
+    byte *curshades = shadetable[GetShade(wallheight[postx])];
+#endif
+
+    ywcount = yd = wallheight[postx] >> 3;
+    if(yd <= 0) yd = 100;
+
+    yoffs = (viewheight / 2 - ywcount) * vbufPitch;
+    if(yoffs < 0) yoffs = 0;
+    yoffs += postx;
+
+    yendoffs = viewheight / 2 + ywcount - 1;
+    yw=TEXTURESIZE-1;
+
+    while(yendoffs >= viewheight)
+    {
+        ywcount -= TEXTURESIZE/2;
+        while(ywcount <= 0)
+        {
+            ywcount += yd;
+            yw--;
+        }
+        yendoffs--;
+    }
+    if(yw < 0) return;	
+
+#ifdef USE_SHADING
+    col = curshades[postsource[yw]];
+#else
+    col = postsource[yw];
+#endif	
+
+    yendoffs = yendoffs * vbufPitch + postx;
+    while(yoffs <= yendoffs)
+    {
+        vbuf[yendoffs] = col;
+        ywcount -= TEXTURESIZE/2;
+        if(ywcount <= 0)
+        {
+            do
+            {
+                ywcount += yd;
+                yw--;
+            }
+            while(ywcount <= 0);
+            if(yw < 0) break;
+#ifdef USE_SHADING
+            col = curshades[postsource[yw]];
+#else
+            col = postsource[yw];
+#endif
+        }
+        yendoffs -= vbufPitch;
+    }
+#endif	
+}
+
+
+void ScalePostV1()
 {
 #if USE_SPRITES	
 //--------------------------------------------------------------------------------------------
@@ -412,9 +503,7 @@ void HitVertWall (int pixx,word tilehit,short xtile,short ytile)
         }
         ScalePost();
         wallheight[pixx] = CalcHeight();
-#ifndef USE_SPRITES		
         postsource+=texture-lasttexture;
-#endif		
         postwidth=1;
         postx=pixx;
         lasttexture=texture;
@@ -442,11 +531,8 @@ void HitVertWall (int pixx,word tilehit,short xtile,short ytile)
     else
         wallpic = vertwall[tilehit];
 
-#ifndef USE_SPRITES	
     postsource = PM_GetTexture(wallpic) + texture;
-#else	
 	currentPage = wallpic;
-#endif
 }
 
 
@@ -483,9 +569,7 @@ void HitHorizWall (int pixx,word tilehit,short xtile,short ytile)
         }
         ScalePost();
         wallheight[pixx] = CalcHeight();
-#ifndef USE_SPRITES			
         postsource+=texture-lasttexture;
-#endif		
         postwidth=1;
         postx=pixx;
         lasttexture=texture;
@@ -512,11 +596,8 @@ void HitHorizWall (int pixx,word tilehit,short xtile,short ytile)
     }
     else
         wallpic = horizwall[tilehit];
-#ifndef USE_SPRITES	
     postsource = PM_GetTexture(wallpic) + texture;
-#else	
 	currentPage = wallpic;
-#endif
 }
 
 //==========================================================================
@@ -549,9 +630,7 @@ void HitHorizDoor (int pixx,word tilehit)
         }
         ScalePost();
         wallheight[pixx] = CalcHeight();
-#ifndef USE_SPRITES			
         postsource+=texture-lasttexture;
-#endif		
         postwidth=1;
         postx=pixx;
         lasttexture=texture;
@@ -582,11 +661,8 @@ void HitHorizDoor (int pixx,word tilehit)
             doorpage = DOORWALL+4;
             break;
     }
-#ifndef USE_SPRITES	
     postsource = PM_GetTexture(doorpage) + texture;
-#else	
 	currentPage = doorpage;
-#endif
 }
 
 //==========================================================================
@@ -619,9 +695,7 @@ void HitVertDoor (int pixx,word tilehit)
         }
         ScalePost();
         wallheight[pixx] = CalcHeight();
-#ifndef USE_SPRITES			
         postsource+=texture-lasttexture;
-#endif		
         postwidth=1;
         postx=pixx;
         lasttexture=texture;
@@ -652,11 +726,8 @@ void HitVertDoor (int pixx,word tilehit)
             doorpage = DOORWALL+5;
             break;
     }
-#ifndef USE_SPRITES	
     postsource = PM_GetTexture(doorpage) + texture;
-#else	
 	currentPage = doorpage;
-#endif
 }
 
 //==========================================================================
@@ -749,7 +820,6 @@ int CalcRotate (objtype *ob)
 
 void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 {
-    t_compshape *shape;
     unsigned scale,pixheight;
 
 #ifdef USE_SHADING
@@ -759,17 +829,16 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
     else
         curshades = shadetable[GetShade(height)];
 #endif
-
-    shape = (t_compshape *) PM_GetSprite(shapenum);
-
-    scale=height>>3;                 // low three bits are fractional
+    scale=height/8;                 // low three bits are fractional
     if(!scale) return;   // too close or far away
-
     pixheight=scale*SPRITESCALEFACTOR;
+
 #if USE_SPRITES
+
+	loadActorTexture(shapenum);
 //--------------------------------------------------------------------------------------------
 	extern 	TEXTURE tex_spr[];		
-	TEXTURE *txptr = &tex_spr[shapenum]; 
+	TEXTURE *txptr = &tex_spr[320+shapenum]; 
 // correct on touche pas		
     SPRITE user_sprite;
     user_sprite.CTRL = FUNC_Sprite | _ZmCC;
@@ -785,6 +854,8 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 	slSetSprite(&user_sprite, toFIXED(300));	
 //--------------------------------------------------------------------------------------------	
 #else
+    t_compshape *shape;
+
     unsigned starty,endy;
     word *cmdptr;
     byte *cline;
@@ -799,6 +870,8 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
     actx=xcenter-scale;
     upperedge=viewheight/2-scale;
 
+    shape = (t_compshape *) PM_GetSprite(shapenum);
+	
     cmdptr=(word *) shape->dataofs;
 	
     for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)

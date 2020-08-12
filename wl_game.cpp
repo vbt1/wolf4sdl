@@ -13,8 +13,9 @@ extern "C"{
 extern fixed MTH_Atan(fixed y, fixed x);
 }
 
-unsigned int position_vram=0;
+unsigned int position_vram=320*32;
 unsigned int start_wall=0;
+unsigned int static_items=0;
 void set_sprite(PICTURE *pcptr);
 
 #undef atan2
@@ -237,7 +238,19 @@ static void loadWallTexture(unsigned char texture,unsigned int start_wall)
 	
 }
 
-static void loadActorTexture(unsigned char texture)
+void loadWallLineTexture(byte *postsource,unsigned int postx)
+{
+	extern TEXTURE tex_spr[];
+	PICTURE pic_spr;
+
+	pic_spr.texno = postx;
+	pic_spr.cmode = COL_256;
+	pic_spr.pcsrc = (byte *) postsource;
+	tex_spr[postx] = TEXDEF(64, 1, postx*32);
+	set_sprite(&pic_spr);					
+}
+
+void loadActorTexture(unsigned char texture)
 {
 	extern TEXTURE tex_spr[];
 	byte bmpbuff[64*64];
@@ -271,10 +284,10 @@ static void loadActorTexture(unsigned char texture)
 		cmdptr++;
 	}
 
-	pic_spr.texno = texture;
+	pic_spr.texno = 320+texture;
 	pic_spr.cmode = COL_256;
 	pic_spr.pcsrc = &bmpbuff[0];
-	tex_spr[texture] = TEXDEF(64, 64, position_vram);
+	tex_spr[320+texture] = TEXDEF(64, 64, position_vram);
 	set_sprite(&pic_spr);					
 	position_vram+=0x800;	
 }
@@ -689,7 +702,7 @@ static void ScanInfoPlane(void)
 //-----------------------------------------------------------------------------------	
 // VBT 01/08/2020 : chargement juste des murs nécessaires
 // ajouter peut etre les portes				
-			unsigned int texture = 0;
+/*			unsigned int texture = 0;
 
 			if(tile <23)
 				continue;
@@ -785,30 +798,28 @@ static void ScanInfoPlane(void)
 							}
 					}
 				}
-
-	/*			if(sprite_list[texture]==0)
-				{
-					loadActorTexture(texture);
-					sprite_list[texture]=1;
-				}*/
-			}			
+			}	
+*/			
 //-----------------------------------------------------------------------------------				
         }
     }
 // on charge les statics :
 
-   statobj_t *statptr;
-
+	statobj_t *statptr;
+	static_items=0;
+	
     for (statptr = &statobjlist[0] ; statptr !=laststatobj ; statptr++)
     {
 		unsigned char texture = statptr->shapenum;
 
 		if(sprite_list[texture]==0)
 		{
+			static_items++;
 			loadActorTexture(texture);
 			sprite_list[texture]=1;
 		}
 	}	
+	
 }
 
 //==========================================================================
@@ -932,7 +943,7 @@ void SetupGameLevel (void)
         }
     }
 // vbt : on recharge la vram
-position_vram=0;
+position_vram=320*32;
 //
 // spawn actors
 //
@@ -941,10 +952,10 @@ position_vram=0;
 // on charge ensuite les murs !!!
 //-----------------------------------------------------------------------------------
 // porte
-
+/*
 unsigned char wall_list[AREATILE];
 memset (wall_list,0,AREATILE);
-start_wall=position_vram/4096; 
+start_wall=position_vram/0x800; 
 
 for(unsigned int i=0;i<AREATILE;i++)
 {
@@ -953,50 +964,41 @@ for(unsigned int i=0;i<AREATILE;i++)
 		loadWallTexture(i,start_wall);		
 		wall_list[i]=1;
 	}
-/*	else
-	{
-		extern TEXTURE tex_spr[];		
-		PICTURE pic_spr;		
-		pic_spr.texno = i+start_wall;
-		pic_spr.cmode = COL_256;
-		pic_spr.pcsrc = (byte *) PM_GetPage(0);
-		tex_spr[i+start_wall] = TEXDEF(64, 64, 0);
-		set_sprite(&pic_spr);
-	}*/
 }
-
+*/
 // murs
 //-----------------------------------------------------------------------------------
-	map = mapsegs[0];
+/*	map = mapsegs[0];
     for (y=0;y<mapheight;y++)
     {
         for (x=0;x<mapwidth;x++)
         {
             tile = *map++;
-            if (tile<AREATILE && tilemap[x][y] != 0)
+//            if (tile<AREATILE && tilemap[x][y] != 0)
+            if (tilemap[x][y] != 0)
             {
                 // solid wall
 //-----------------------------------------------------------------------------------	
 // VBT 01/08/2020 : chargement juste des murs nécessaires
-				unsigned char texture = horizwall[tile];//&0x80;
+				unsigned char texture = horizwall[tile]; //&0x80;
 					
-				if(wall_list[texture]==0)
+				if(wall_list[texture]==0 && texture <AREATILE)
 				{
-					loadWallTexture(texture,start_wall);
-					wall_list[texture]=1;
+//					loadWallTexture(texture,start_wall);
+//					wall_list[texture]=1;
 				}
 				
-				texture = vertwall[tile];
+				texture = vertwall[tile]&0x80;
 
 				if(wall_list[texture]==0)				
 				{
-					loadWallTexture(texture,start_wall);
-					wall_list[texture]=1;					
+//					loadWallTexture(texture,start_wall);
+//					wall_list[texture]=1;					
 				}
 //-----------------------------------------------------------------------------------
             }
         }
-    }
+    } */
 //-----------------------------------------------------------------------------------
 
 
@@ -1027,21 +1029,21 @@ for(unsigned int i=0;i<AREATILE;i++)
                 *(map-1) = tile;
 //-----------------------------------------------------------------------------------	
 // VBT 01/08/2020 : chargement juste des murs nécessaires
-				unsigned char texture = horizwall[tile];
+/*				unsigned char texture = horizwall[tile]&0x80;
 					
 				if(wall_list[texture]==0)
 				{
-					loadWallTexture(texture,start_wall);
+//					loadWallTexture(texture,start_wall);
 					wall_list[texture]=1;
 				}
 				
-				texture = vertwall[tile];
+				texture = vertwall[tile]&0x80;
 
 				if(wall_list[texture]==0)				
 				{
-					loadWallTexture(texture,start_wall);
+//					loadWallTexture(texture,start_wall);
 					wall_list[texture]=1;					
-				}
+				} */
 //-----------------------------------------------------------------------------------				
             }
         }
@@ -1050,7 +1052,7 @@ for(unsigned int i=0;i<AREATILE;i++)
 //slSynch();
 	
 char toto[100];
-sprintf(toto,"%04d %02d",position_vram,position_vram/0x800);
+sprintf(toto,"%04d %02d",position_vram*2,position_vram/0x800);
 
 slPrint(toto,slLocate(1,1));
 //
