@@ -26,7 +26,7 @@ loaded into the data segment
 
 #pragma hdrstop
 #define THREEBYTEGRSTARTS
-#define HEAP_WALK 1
+//#define HEAP_WALK 1
 
 extern unsigned int position_vram;
 
@@ -97,18 +97,6 @@ void heapWalk(void)
     }
 }
 #endif
-
-TEXTURE tex_spr[SPR_TOTAL+320];
-
-void set_sprite(PICTURE *pcptr)
-{
-	TEXTURE *txptr = &tex_spr[pcptr->texno];
-/*	slDMACopy((void *)pcptr->pcsrc,
-		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),
-		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
-*/		
-	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)pcptr->pcsrc,(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
-}
 
 /*
 =============================================================================

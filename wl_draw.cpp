@@ -9,6 +9,8 @@
 
 void heapWalk();
 unsigned char wall_buffer[320*64];
+//unsigned char spr_buffer[30*64*64];
+
 /*
 =============================================================================
 
@@ -272,28 +274,19 @@ int CalcHeight()
 int postx;
 byte *postsource;
 int postwidth;
-void loadWallLineTexture(byte * postsource, unsigned int postx);
 void loadActorTexture(unsigned char texture);
 
 void ScalePost()
 {
 #if USE_SPRITES	
 //--------------------------------------------------------------------------------------------
-	extern 	TEXTURE tex_spr[];		
-//	extern unsigned int start_wall;
-	
 //	loadWallLineTexture(postsource,postx);
 	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
-	tex_spr[postx] = TEXDEF(64, 1, postx*32);
-
-//	TEXTURE *txptr = &tex_spr[postx]; 
 //  a           b          c             d
 // top left, top right, bottom right, bottom left
     SPRITE user_wall;
     user_wall.CTRL=FUNC_Texture | _ZmCC;
     user_wall.PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
-	
-//    user_wall.SRCA=(txptr->CGadr);
 
     user_wall.SRCA=(void *)(0x2000|(postx*8));
     user_wall.COLR=256;
@@ -310,7 +303,6 @@ void ScalePost()
 	
     user_wall.GRDA=0;
 	slSetSprite(&user_wall, toFIXED(0+(240-wallheight[postx]/8)));	
-	
 //--------------------------------------------------------------------------------------------
 #else
 	
@@ -381,7 +373,7 @@ void ScalePostV1()
 //--------------------------------------------------------------------------------------------
 	extern 	TEXTURE tex_spr[];		
 	extern unsigned int start_wall;
-	TEXTURE *txptr = &tex_spr[currentPage+start_wall]; 
+	TEXTURE *txptr = &tex_spr[start_wall]; 
 //  a           b          c             d
 // top left, top right, bottom right, bottom left
     SPRITE user_wall;
@@ -537,7 +529,6 @@ void HitVertWall (int pixx,word tilehit,short xtile,short ytile)
         wallpic = vertwall[tilehit];
 
     postsource = PM_GetTexture(wallpic) + texture;
-	currentPage = wallpic;
 }
 
 
@@ -602,7 +593,6 @@ void HitHorizWall (int pixx,word tilehit,short xtile,short ytile)
     else
         wallpic = horizwall[tilehit];
     postsource = PM_GetTexture(wallpic) + texture;
-	currentPage = wallpic;
 }
 
 //==========================================================================
@@ -667,7 +657,6 @@ void HitHorizDoor (int pixx,word tilehit)
             break;
     }
     postsource = PM_GetTexture(doorpage) + texture;
-	currentPage = doorpage;
 }
 
 //==========================================================================
@@ -732,7 +721,6 @@ void HitVertDoor (int pixx,word tilehit)
             break;
     }
     postsource = PM_GetTexture(doorpage) + texture;
-	currentPage = doorpage;
 }
 
 //==========================================================================
@@ -839,7 +827,8 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
     pixheight=scale*SPRITESCALEFACTOR;
 
 #if USE_SPRITES
-
+//xxxxxxxxxxxxxxxxx
+	if(shapenum>SPR_STAT_47)
 	loadActorTexture(shapenum);
 //--------------------------------------------------------------------------------------------
 	extern 	TEXTURE tex_spr[];		
@@ -1257,7 +1246,7 @@ void CalcTics (void)
 
 //==========================================================================
 
-void AsmRefresh()
+inline void AsmRefresh()
 {
 // vbt :moins de variable globale
 	longword xpartialup,xpartialdown,ypartialup,ypartialdown;
@@ -1741,7 +1730,7 @@ void    ThreeDRefresh (void)
 //
 // clear out the traced array
 //
-    memset(spotvis,0,maparea);
+    memset4_fast(spotvis,0,maparea);
     spotvis[player->tilex][player->tiley] = 1;       // Detect all sprites over player fix
 
     vbuf = VL_LockSurface(screenBuffer);

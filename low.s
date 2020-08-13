@@ -9,7 +9,7 @@
    .global  _memcpywh
    .global  _memclrwh
    .global  _MTH_Mul2
-
+   .global  _memset4_fast
 
 _MTH_Mul2:
 	DMULS.L R4,R5
@@ -102,6 +102,39 @@ lcwh_2:
    bra    lcwh_end
    nop
 
+ ! void memsetl_fast(uint32_t *ptr, uint32_t value, uint32_t len);
+! ptr must be 32-bit aligned. value must be non-zero. len is in bytes and must
+! be a multiple of 4. None of these are checked in the function itself
+! (although, it will throw an exception if the ptr isn't aligned, since the CPU
+! won't do that access).
+
+_memset4_fast:
+    add     r4, r6
+    add     #4, r4
+.loop2:
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    mov.l   r5, @-r6
+    cmp/eq  r4, r6
+    bf/s    .loop2
+    mov.l   r5, @-r6
+
+    rts
+
+    nop
+  
 
 !lcwh_3:
 !   mov    r6,r8

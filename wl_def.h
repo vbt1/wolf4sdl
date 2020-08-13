@@ -1531,4 +1531,5 @@ extern Uint32 SWAP_BYTES_32(Uint32 a);
 
 extern "C"{
 extern void memcpyl(void *dst, void *src, int size);
+void *memset4_fast(void *, long, size_t);
 }

@@ -16,7 +16,6 @@ extern fixed MTH_Atan(fixed y, fixed x);
 unsigned int position_vram=320*32;
 unsigned int start_wall=0;
 unsigned int static_items=0;
-void set_sprite(PICTURE *pcptr);
 
 #undef atan2
 //#define atan2(a,b) slAtan(a,b)
@@ -223,6 +222,19 @@ void UpdateSoundLoc(void)
 /*
 **      JAB End
 */
+
+TEXTURE tex_spr[SPR_TOTAL+320];
+
+void set_sprite(PICTURE *pcptr)
+{
+	TEXTURE *txptr = &tex_spr[pcptr->texno];
+	slDMACopy((void *)pcptr->pcsrc,
+		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),
+		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
+		
+//	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)pcptr->pcsrc,(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
+}
+
 /*
 static void loadWallTexture(unsigned char texture,unsigned int start_wall)
 {
@@ -237,7 +249,9 @@ static void loadWallTexture(unsigned char texture,unsigned int start_wall)
 	position_vram+=0x800;
 	
 }
-*/
+
+
+
 void loadWallLineTexture(byte *postsource,unsigned int postx)
 {
 	extern TEXTURE tex_spr[];
@@ -249,7 +263,7 @@ void loadWallLineTexture(byte *postsource,unsigned int postx)
 	tex_spr[postx] = TEXDEF(64, 1, postx*32);
 	set_sprite(&pic_spr);					
 }
-
+*/
 void loadActorTexture(unsigned char texture)
 {
 	extern TEXTURE tex_spr[];
@@ -284,6 +298,7 @@ void loadActorTexture(unsigned char texture)
 		cmdptr++;
 	}
 
+	
 	pic_spr.texno = 320+texture;
 	pic_spr.cmode = COL_256;
 	pic_spr.pcsrc = &bmpbuff[0];
@@ -1050,11 +1065,12 @@ for(unsigned int i=0;i<AREATILE;i++)
     }
 	
 //slSynch();
-	
+	/*
 char toto[100];
 sprintf(toto,"%04d %02d",position_vram*2,position_vram/0x800);
 
 slPrint(toto,slLocate(1,1));
+*/
 //
 // have the caching manager load and purge stuff to make sure all marks
 // are in memory

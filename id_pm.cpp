@@ -1,11 +1,8 @@
 #include "wl_def.h"
 
-void set_sprite(PICTURE *pcptr);
-
 int ChunksInFile;
 int PMSpriteStart;
 int PMSoundStart;
-int currentPage;
 
 //bool PMSoundInfoPagePadded = false;
 
@@ -111,11 +108,11 @@ void PM_Startup()
 
     size_t PMPageDataSize = (size_t) pageDataSize + alignPadding;
     PMPageData = (uint32_t *) 0x00202000;
-
+/*
 char toto[50];
 sprintf(toto,"pmpsize %d ",PMPageDataSize);
 slPrint((char*)toto,slLocate(1,2));	
-	
+	*/
 //	PMPageData = (uint32_t *) malloc(PMPageDataSize);
     CHECKMALLOCRESULT(PMPageData);
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));

@@ -16,7 +16,7 @@ extern "C" {
 #define		MAX_EVENTS		 8	/* number of events that can be used   */
 #define		MAX_WORKS		 8	/* number of works that can be used    */
 
-#define		WORK_AREA		0x060DA000			/* SGL Work Area           */
+#define		WORK_AREA		0x060DE000			/* SGL Work Area           */
 
 #define		trans_list		0x060fb800			/* DMA Transfer Table      */
 #define		pcmbuf			SoundRAM+0x78000	/* PCM Stream Address      */
