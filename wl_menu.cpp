@@ -1302,6 +1302,12 @@ CleanupControlPanel (void)
 #endif
 
     fontnumber = 0;
+// vbt 13/08/2020 : ajout	
+		byte *vbuf = (byte *)curSurface->pixels;
+		byte *ptr = vbuf;
+
+		for(int y = 0; y < screenHeight; y++, ptr += bufferPitch)
+			memset(ptr, 0x00, screenWidth);	
 }
 
 

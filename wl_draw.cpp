@@ -8,7 +8,7 @@
 #include "wl_shade.h"
 
 void heapWalk();
-
+unsigned char wall_buffer[320*64];
 /*
 =============================================================================
 
@@ -282,29 +282,34 @@ void ScalePost()
 	extern 	TEXTURE tex_spr[];		
 //	extern unsigned int start_wall;
 	
-	loadWallLineTexture(postsource,postx);
-	
-	TEXTURE *txptr = &tex_spr[postx]; 
+//	loadWallLineTexture(postsource,postx);
+	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
+	tex_spr[postx] = TEXDEF(64, 1, postx*32);
+
+//	TEXTURE *txptr = &tex_spr[postx]; 
 //  a           b          c             d
 // top left, top right, bottom right, bottom left
     SPRITE user_wall;
-    user_wall.CTRL = FUNC_Texture | _ZmCC;
+    user_wall.CTRL=FUNC_Texture | _ZmCC;
     user_wall.PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
-    user_wall.SRCA=(txptr->CGadr);//+(lasttexture/8));
+	
+//    user_wall.SRCA=(txptr->CGadr);
+
+    user_wall.SRCA=(void *)(0x2000|(postx*8));
     user_wall.COLR=256;
     user_wall.SIZE=0x801;
 
 	user_wall.XD=postx-(viewwidth/2);
-	user_wall.YD=-(wallheight[postx] >> 3);
+	user_wall.YD=-(wallheight[postx] / 8);
 	user_wall.XC=user_wall.XD;
-	user_wall.YC=(wallheight[postx] >> 3);
-	user_wall.XA=user_wall.XD-1;
+	user_wall.YC=(wallheight[postx] / 8);
+	user_wall.XA=user_wall.XD;
 	user_wall.YA=user_wall.YD;
 	user_wall.XB=user_wall.XA;
 	user_wall.YB=user_wall.YC;
 	
     user_wall.GRDA=0;
-	slSetSprite(&user_wall, toFIXED(300));	
+	slSetSprite(&user_wall, toFIXED(0+(240-wallheight[postx]/8)));	
 	
 //--------------------------------------------------------------------------------------------
 #else
@@ -316,7 +321,7 @@ void ScalePost()
     byte *curshades = shadetable[GetShade(wallheight[postx])];
 #endif
 
-    ywcount = yd = wallheight[postx] >> 3;
+    ywcount = yd = wallheight[postx] / 8;
     if(yd <= 0) yd = 100;
 
     yoffs = (viewheight / 2 - ywcount) * vbufPitch;
@@ -387,9 +392,9 @@ void ScalePostV1()
     user_wall.SIZE=0x801;
 
 	user_wall.XD=postx-(viewwidth/2);
-	user_wall.YD=-(wallheight[postx] >> 3);
+	user_wall.YD=-(wallheight[postx] / 8);
 	user_wall.XC=user_wall.XD;
-	user_wall.YC=(wallheight[postx] >> 3);
+	user_wall.YC=(wallheight[postx] / 8);
 	user_wall.XA=user_wall.XD-1;
 	user_wall.YA=user_wall.YD;
 	user_wall.XB=user_wall.XA;
@@ -408,7 +413,7 @@ void ScalePostV1()
     byte *curshades = shadetable[GetShade(wallheight[postx])];
 #endif
 
-    ywcount = yd = wallheight[postx] >> 3;
+    ywcount = yd = wallheight[postx] / 8;
     if(yd <= 0) yd = 100;
 
     yoffs = (viewheight / 2 - ywcount) * vbufPitch;
@@ -851,7 +856,7 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 	user_sprite.XB=pixheight;
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
-	slSetSprite(&user_sprite, toFIXED(300));	
+	slSetSprite(&user_sprite, toFIXED(0+(240-pixheight/2)));	
 //--------------------------------------------------------------------------------------------	
 #else
     t_compshape *shape;

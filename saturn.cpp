@@ -143,6 +143,7 @@ static const Sint8	logtbl[] = {
 	}
  
 	slInitSystem(tv_mode, (TEXTURE*)tex_spr, -1);
+	slZdspLevel(8);
 // vbt 26/07/2020
 //	slDynamicFrame(ON);
 
