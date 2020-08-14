@@ -17,7 +17,7 @@ uint8_t **PMPages;
 void PM_Startup()
 {
     char fname[13] = "vswap.";
-	Uint32 i,j=0;
+	Uint32 i=0,j=0;
 	Sint16 *Chunks;
 	long fileSize;
     strcat(fname,extension);

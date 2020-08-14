@@ -26,7 +26,7 @@ unsigned screenWidth = 320;
 unsigned screenHeight = 240;
 unsigned screenBits = 8;
 #else
-unsigned screenWidth = 320;
+unsigned screenWidth = SATURN_WIDTH;
 unsigned screenHeight = 240;
 unsigned screenBits = 8;      // use "best" color depth according to libSDL
 #endif

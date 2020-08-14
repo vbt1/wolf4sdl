@@ -8,7 +8,7 @@
 #include "wl_shade.h"
 
 void heapWalk();
-unsigned char wall_buffer[320*64];
+unsigned char wall_buffer[SATURN_WIDTH*64];
 //unsigned char spr_buffer[30*64*64];
 
 /*
@@ -302,99 +302,8 @@ void ScalePost()
 	user_wall.YB=user_wall.YC;
 	
     user_wall.GRDA=0;
-	slSetSprite(&user_wall, toFIXED(0+(240-wallheight[postx]/8)));	
-//--------------------------------------------------------------------------------------------
-#else
-	
-    int ywcount, yoffs, yw, yd, yendoffs;
-    byte col;
-
-#ifdef USE_SHADING
-    byte *curshades = shadetable[GetShade(wallheight[postx])];
-#endif
-
-    ywcount = yd = wallheight[postx] / 8;
-    if(yd <= 0) yd = 100;
-
-    yoffs = (viewheight / 2 - ywcount) * vbufPitch;
-    if(yoffs < 0) yoffs = 0;
-    yoffs += postx;
-
-    yendoffs = viewheight / 2 + ywcount - 1;
-    yw=TEXTURESIZE-1;
-
-    while(yendoffs >= viewheight)
-    {
-        ywcount -= TEXTURESIZE/2;
-        while(ywcount <= 0)
-        {
-            ywcount += yd;
-            yw--;
-        }
-        yendoffs--;
-    }
-    if(yw < 0) return;	
-
-#ifdef USE_SHADING
-    col = curshades[postsource[yw]];
-#else
-    col = postsource[yw];
-#endif	
-
-    yendoffs = yendoffs * vbufPitch + postx;
-    while(yoffs <= yendoffs)
-    {
-        vbuf[yendoffs] = col;
-        ywcount -= TEXTURESIZE/2;
-        if(ywcount <= 0)
-        {
-            do
-            {
-                ywcount += yd;
-                yw--;
-            }
-            while(ywcount <= 0);
-            if(yw < 0) break;
-#ifdef USE_SHADING
-            col = curshades[postsource[yw]];
-#else
-            col = postsource[yw];
-#endif
-        }
-        yendoffs -= vbufPitch;
-    }
-#endif	
-}
-
-
-void ScalePostV1()
-{
-#if USE_SPRITES	
-//--------------------------------------------------------------------------------------------
-	extern 	TEXTURE tex_spr[];		
-	extern unsigned int start_wall;
-	TEXTURE *txptr = &tex_spr[start_wall]; 
-//  a           b          c             d
-// top left, top right, bottom right, bottom left
-    SPRITE user_wall;
-    user_wall.CTRL = FUNC_Texture | _ZmCC;
-    user_wall.PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
-    user_wall.SRCA=((txptr->CGadr)+(lasttexture/8));
-    user_wall.COLR=256;
-    user_wall.SIZE=0x801;
-
-	user_wall.XD=postx-(viewwidth/2);
-	user_wall.YD=-(wallheight[postx] / 8);
-	user_wall.XC=user_wall.XD;
-	user_wall.YC=(wallheight[postx] / 8);
-	user_wall.XA=user_wall.XD-1;
-	user_wall.YA=user_wall.YD;
-	user_wall.XB=user_wall.XA;
-	user_wall.YB=user_wall.YC;
-	
-    user_wall.GRDA=0;
-	slSetSprite(&user_wall, toFIXED(300));	
-	
+	// 240 pour du 320, 264 pour du 352
+	slSetSprite(&user_wall, toFIXED(0+(SATURN_SORT_VALUE-wallheight[postx]/8)));	
 //--------------------------------------------------------------------------------------------
 #else
 	
@@ -832,7 +741,7 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 	loadActorTexture(shapenum);
 //--------------------------------------------------------------------------------------------
 	extern 	TEXTURE tex_spr[];		
-	TEXTURE *txptr = &tex_spr[320+shapenum]; 
+	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+shapenum]; 
 // correct on touche pas		
     SPRITE user_sprite;
     user_sprite.CTRL = FUNC_Sprite | _ZmCC;
@@ -845,7 +754,7 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 	user_sprite.XB=pixheight;
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
-	slSetSprite(&user_sprite, toFIXED(0+(240-pixheight/2)));	
+	slSetSprite(&user_sprite, toFIXED(0+(SATURN_SORT_VALUE-pixheight/2)));	
 //--------------------------------------------------------------------------------------------	
 #else
     t_compshape *shape;
@@ -953,6 +862,13 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height,unsigned vbufP
 #if 0
 
 #else // vbt on affiche l'arme en bitmap
+// vbt : ajout nettoyage bitmap vdp2
+	for( Sint16 i=0;i<height;i++)
+	{
+		Uint8*d = (Uint8*)vbuf + ((pixheight-i-1) * vbufPitch) + (xcenter-scale); 
+		memset(d,0x0,height);
+	}
+
     for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
     {
         lpix=rpix;
@@ -1183,7 +1099,7 @@ void DrawScaleds (void)
 int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
     SPR_MACHINEGUNREADY, SPR_CHAINREADY};
 
-void DrawPlayerWeapon (unsigned vbufPitch)
+void DrawPlayerWeapon ()
 {
     int shapenum;
 
@@ -1192,7 +1108,7 @@ void DrawPlayerWeapon (unsigned vbufPitch)
     {
 #ifndef APOGEE_1_0
         if (player->state == &s_deathcam && (GetTimeCount()&32) )
-            SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1,vbufPitch);
+            SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1,bufferPitch);
 #endif
         return;
     }
@@ -1201,11 +1117,11 @@ void DrawPlayerWeapon (unsigned vbufPitch)
     if (gamestate.weapon != -1)
     {
         shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
-        SimpleScaleShape(viewwidth/2,shapenum,viewheight+1,vbufPitch);
+        SimpleScaleShape(viewwidth/2,shapenum,viewheight+1,bufferPitch);
     }
 
     if (demorecord || demoplayback)
-        SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1,vbufPitch);
+        SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1,bufferPitch);
 }
 
 
@@ -1257,8 +1173,8 @@ inline void AsmRefresh()
     ypartialdown = viewy&(TILEGLOBAL-1);
     ypartialup = TILEGLOBAL-ypartialdown;	
 	
-    int32_t xstep,ystep;
-    longword xpartial,ypartial;
+    int32_t xstep=0,ystep=0;
+    longword xpartial=0,ypartial=0;
     boolean playerInPushwallBackTile = tilemap[focaltx][focalty] == 64;
 
     for(int pixx=0;pixx<viewwidth;pixx++)
@@ -1737,7 +1653,6 @@ void    ThreeDRefresh (void)
     if(vbuf == NULL) return;
 
     vbuf += screenofs;
-    unsigned vbufPitch = bufferPitch;
 
     CalcViewVariables();
 
@@ -1774,7 +1689,7 @@ void    ThreeDRefresh (void)
         DrawSnow(vbuf, vbufPitch);
 #endif
 
-    DrawPlayerWeapon (vbufPitch);    // draw player's hands
+    DrawPlayerWeapon ();    // draw player's hands
 
     if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
         ShowActStatus();

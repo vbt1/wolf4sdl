@@ -13,8 +13,7 @@ extern "C"{
 extern fixed MTH_Atan(fixed y, fixed x);
 }
 
-unsigned int position_vram=320*32;
-unsigned int start_wall=0;
+unsigned int position_vram=SATURN_WIDTH*32;
 unsigned int static_items=0;
 
 #undef atan2
@@ -223,7 +222,7 @@ void UpdateSoundLoc(void)
 **      JAB End
 */
 
-TEXTURE tex_spr[SPR_TOTAL+320];
+TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 
 void set_sprite(PICTURE *pcptr)
 {
@@ -234,36 +233,6 @@ void set_sprite(PICTURE *pcptr)
 		
 //	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)pcptr->pcsrc,(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
 }
-
-/*
-static void loadWallTexture(unsigned char texture,unsigned int start_wall)
-{
-	extern TEXTURE tex_spr[];
-	PICTURE pic_spr;
-
-	pic_spr.texno = texture+start_wall;
-	pic_spr.cmode = COL_256;
-	pic_spr.pcsrc = (byte *) PM_GetPage(texture);
-	tex_spr[texture+start_wall] = TEXDEF(64, 64, position_vram);
-//	set_sprite(&pic_spr);					
-	position_vram+=0x800;
-	
-}
-
-
-
-void loadWallLineTexture(byte *postsource,unsigned int postx)
-{
-	extern TEXTURE tex_spr[];
-	PICTURE pic_spr;
-
-	pic_spr.texno = postx;
-	pic_spr.cmode = COL_256;
-	pic_spr.pcsrc = (byte *) postsource;
-	tex_spr[postx] = TEXDEF(64, 1, postx*32);
-	set_sprite(&pic_spr);					
-}
-*/
 void loadActorTexture(unsigned char texture)
 {
 	extern TEXTURE tex_spr[];
@@ -299,10 +268,10 @@ void loadActorTexture(unsigned char texture)
 	}
 
 	
-	pic_spr.texno = 320+texture;
+	pic_spr.texno = SATURN_WIDTH+texture;
 	pic_spr.cmode = COL_256;
 	pic_spr.pcsrc = &bmpbuff[0];
-	tex_spr[320+texture] = TEXDEF(64, 64, position_vram);
+	tex_spr[SATURN_WIDTH+texture] = TEXDEF(64, 64, position_vram);
 	set_sprite(&pic_spr);					
 	position_vram+=0x800;	
 }
@@ -322,8 +291,6 @@ static void ScanInfoPlane(void)
     unsigned x,y;
     int      tile;
     word     *start;
-	unsigned char sprite_list[512];
-	memset(sprite_list,0,512);
 
     start = mapsegs[1];
     for (y=0;y<mapheight;y++)
@@ -713,113 +680,12 @@ static void ScanInfoPlane(void)
                     break;
 #endif
             }
-			
-//-----------------------------------------------------------------------------------	
-// VBT 01/08/2020 : chargement juste des murs nécessaires
-// ajouter peut etre les portes				
-/*			unsigned int texture = 0;
-
-			if(tile <23)
-				continue;
-
-			if(ISPOINTER(actorat[x][y]))
-			{
-				texture = actorat[x][y]->state->shapenum;
-				
-				if(sprite_list[texture]==0)
-				{				
-					switch(texture)
-					{
-						case SPR_GRD_S_1:
-							for (;texture<=SPR_GRD_SHOOT3;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_DOG_W1_1:
-							for (;texture<=SPR_DOG_JUMP3;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_SS_S_1:
-							for (;texture<=SPR_SS_SHOOT3;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_MUT_S_1:
-							for (;texture<=SPR_MUT_SHOOT4;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_OFC_S_1:
-							for (;texture<=SPR_OFC_SHOOT3;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_BLINKY_W1:
-							for (;texture<=SPR_INKY_W2;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-							
-						case SPR_BOSS_W1:
-							for (;texture<=SPR_BOSS_DIE3;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;							
-
-						case SPR_SCHABB_W1:
-							for (;texture<=SPR_HYPO4;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_FAKE_W1:
-							for (;texture<=SPR_FAKE_DEAD;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_MECHA_W1:
-							for (;texture<=SPR_MECHA_W1;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_GIFT_W1:
-							for (;texture<=SPR_GIFT_DEAD;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_ROCKET_1:
-							for (;texture<=SPR_BOOM_3;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						case SPR_GRETEL_W1:
-							for (;texture<=SPR_GRETEL_DIE3;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-							
-						case SPR_FAT_W1:
-							for (;texture<=SPR_FAT_DEAD;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-							
-						case SPR_BJ_W1:
-							for (;texture<=SPR_BJ_JUMP4;texture++)
-							{if(sprite_list[texture]==0){loadActorTexture(texture);sprite_list[texture]=1;}}
-							break;
-
-						default:
-							if(sprite_list[texture]==0)
-							{						
-								loadActorTexture(texture);
-								sprite_list[texture]=1;
-							}
-					}
-				}
-			}	
-*/			
-//-----------------------------------------------------------------------------------				
         }
     }
 // on charge les statics :
-
+	unsigned char sprite_list[SPR_STAT_47+1];
+	memset(sprite_list,0,SPR_STAT_47+1);
+	
 	statobj_t *statptr;
 	static_items=0;
 	
@@ -829,12 +695,11 @@ static void ScanInfoPlane(void)
 
 		if(sprite_list[texture]==0)
 		{
-			static_items++;
 			loadActorTexture(texture);
 			sprite_list[texture]=1;
+			static_items++;
 		}
 	}	
-	
 }
 
 //==========================================================================
@@ -958,64 +823,11 @@ void SetupGameLevel (void)
         }
     }
 // vbt : on recharge la vram
-position_vram=320*32;
+position_vram=SATURN_WIDTH*32;
 //
 // spawn actors
 //
     ScanInfoPlane (); // on charge les persos
-
-// on charge ensuite les murs !!!
-//-----------------------------------------------------------------------------------
-// porte
-/*
-unsigned char wall_list[AREATILE];
-memset (wall_list,0,AREATILE);
-start_wall=position_vram/0x800; 
-
-for(unsigned int i=0;i<AREATILE;i++)
-{
-	if(i>=90 && i <=106)
-	{
-		loadWallTexture(i,start_wall);		
-		wall_list[i]=1;
-	}
-}
-*/
-// murs
-//-----------------------------------------------------------------------------------
-/*	map = mapsegs[0];
-    for (y=0;y<mapheight;y++)
-    {
-        for (x=0;x<mapwidth;x++)
-        {
-            tile = *map++;
-//            if (tile<AREATILE && tilemap[x][y] != 0)
-            if (tilemap[x][y] != 0)
-            {
-                // solid wall
-//-----------------------------------------------------------------------------------	
-// VBT 01/08/2020 : chargement juste des murs nécessaires
-				unsigned char texture = horizwall[tile]; //&0x80;
-					
-				if(wall_list[texture]==0 && texture <AREATILE)
-				{
-//					loadWallTexture(texture,start_wall);
-//					wall_list[texture]=1;
-				}
-				
-				texture = vertwall[tile]&0x80;
-
-				if(wall_list[texture]==0)				
-				{
-//					loadWallTexture(texture,start_wall);
-//					wall_list[texture]=1;					
-				}
-//-----------------------------------------------------------------------------------
-            }
-        }
-    } */
-//-----------------------------------------------------------------------------------
-
 
 //
 // take out the ambush markers
@@ -1042,29 +854,10 @@ for(unsigned int i=0;i<AREATILE;i++)
                     tile = *(map-2);
 
                 *(map-1) = tile;
-//-----------------------------------------------------------------------------------	
-// VBT 01/08/2020 : chargement juste des murs nécessaires
-/*				unsigned char texture = horizwall[tile]&0x80;
-					
-				if(wall_list[texture]==0)
-				{
-//					loadWallTexture(texture,start_wall);
-					wall_list[texture]=1;
-				}
-				
-				texture = vertwall[tile]&0x80;
-
-				if(wall_list[texture]==0)				
-				{
-//					loadWallTexture(texture,start_wall);
-					wall_list[texture]=1;					
-				} */
-//-----------------------------------------------------------------------------------				
             }
         }
     }
-	
-//slSynch();
+
 	/*
 char toto[100];
 sprintf(toto,"%04d %02d",position_vram*2,position_vram/0x800);
@@ -1189,12 +982,6 @@ void DrawPlayBorder (void)
             statusborderw+px*8, px*STATUSLINES, bordercol);
     }
 
-    if((unsigned) viewheight == screenHeight) 
-	{
-		slWindow(0 , 0, 319 , 239 , 300 , screenWidth/2, screenHeight/2);
-		return;
-	}
-	
     VWB_BarScaledCoord (0,0,screenWidth,screenHeight-px*STATUSLINES,bordercol);
 
     const int xl = screenWidth/2-viewwidth/2;
@@ -1203,7 +990,15 @@ void DrawPlayBorder (void)
 
     if(xl != 0)
     {
-		slWindow(viewwidth+px , px, (xl+viewwidth)-1 , (yl+viewheight)-1, 300 , screenWidth/2, (yl*2+viewheight)/2);		
+		SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
+		(*sys_clip).XC = (xl+viewwidth)-1;
+		(*sys_clip).YC = (yl+viewheight)-1;
+	
+		slWindow(xl , yl, (xl+viewwidth)-1 , (yl+viewheight)-1, 300 , screenWidth/2, (yl*2+viewheight)/2);
+//viewwidth+px =321	
+//xl=16	
+//xl-px=15
+//yl=9
         // Paint game view border lines
         VWB_BarScaledCoord(xl-px, yl-px, viewwidth+px, px, 0);                      // upper border
         VWB_BarScaledCoord(xl, yl+viewheight, viewwidth+px, px, bordercol-2);       // lower border
@@ -1213,6 +1008,11 @@ void DrawPlayBorder (void)
     }
     else
     {
+		SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = 239;
+
+		slWindow(0 , 0, SATURN_WIDTH-1 , 239 , 300 , screenWidth/2, screenHeight/2);		
         // Just paint a lower border line
         VWB_BarScaledCoord(0, yl+viewheight, viewwidth, px, bordercol-2);       // lower border
     }
@@ -1247,7 +1047,7 @@ void DrawPlayScreen (void)
   	//		slPrint("DrawKeys",slLocate(10,17));
     DrawKeys ();
   	//		slPrint("DrawWeapon",slLocate(10,18));
-    DrawWeapon ();
+ //   DrawWeapon ();
   	//		slPrint("DrawScore",slLocate(10,19));
     DrawScore ();
   	//		slPrint("DrawScore",slLocate(10,30));

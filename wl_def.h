@@ -1,6 +1,10 @@
 #ifndef WL_DEF_H
 #define WL_DEF_H
 
+#define SATURN_WIDTH 352
+#define SATURN_SORT_VALUE 264
+// 240 pour du 320, 264 pour du 352
+
 extern "C" {
 #include <malloc.h>
 #include "C:\vbt\saturn\vbtsh4\toolchain\sh-elf\include\string.h"

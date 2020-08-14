@@ -1,4 +1,3 @@
-
 #include "wl_def.h"
 #include "sdl/SDL.h"
 #include "sdl/SDL_mixer.h"
@@ -64,7 +63,8 @@ static unsigned char vbt_event[13][2];
 static int current_event=0;
 //int nb_event=0;
 //static Uint32 count=0;
-Uint16 previouscount=0;
+Uint32 previouscount=0;
+Uint16 previousmillis=0;
 PCM m_dat[4];
 
 static	CdcPly	playdata;
@@ -143,7 +143,7 @@ static const Sint8	logtbl[] = {
 	}
  
 	slInitSystem(tv_mode, (TEXTURE*)tex_spr, -1);
-	slZdspLevel(8);
+//	slZdspLevel(8);
 // vbt 26/07/2020
 //	slDynamicFrame(ON);
 
@@ -168,11 +168,11 @@ static const Sint8	logtbl[] = {
 	slPriorityNbg0(7);
 	slPriorityNbg1(6);
 	slPrioritySpr0(5);
-	slInitSynch();
-	slZdspLevel(5);
-	slWindowClipLevel(50);
+//	slInitSynch();
+	slZdspLevel(7);
+//	slWindowClipLevel(50);
 /*--------------------------------------------------------------------------*/
-	slSetDepthLimit(0,10,5);	
+//	slSetDepthLimit(0,10,5);	
 	
 //	screen->pixels = (unsigned char*)0x002c0000;//(unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
@@ -420,7 +420,7 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
 #ifndef ACTION_REPLAY
 	Uint8 i, fileId;
 	long fileSize;
-    char directory[15];
+    char directory[64];
 	char filename[15];
 	unsigned char *mem_buf;
 	//slPrint("                                    ",slLocate(2,21));
@@ -463,7 +463,7 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
 
 	 if (fileSize<80000)
 		mem_buf = (unsigned char*)malloc(fileSize)	;
-	else if (fileSize<90000 && fileSize>=80000)
+	else if (fileSize<90000)
 		mem_buf =  (Uint8 *)(0x00202000)	;
 	else
 		   mem_buf = (Uint8 *)(0x00232000);
@@ -540,6 +540,7 @@ SDL_Surface * SDL_CreateRGBSurface(Uint32 flags, int width, int height, int dept
 {
 	SDL_Surface *screen;
 	screen = (SDL_Surface*)malloc(sizeof(SDL_Surface));
+	CHECKMALLOCRESULT(screen);
 	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	CHECKMALLOCRESULT(screen->pixels);
 	screen->pitch = width;
@@ -568,7 +569,9 @@ const SDL_VideoInfo * SDL_GetVideoInfo(void)
 {
 		 SDL_VideoInfo *vidInfo;
 		 vidInfo = (SDL_VideoInfo *)malloc(sizeof(SDL_VideoInfo));
+         CHECKMALLOCRESULT(vidInfo);
 		 vidInfo->vfmt = (SDL_PixelFormat*)malloc(sizeof(SDL_PixelFormat));
+         CHECKMALLOCRESULT(vidInfo->vfmt);
 		 vidInfo->vfmt->BitsPerPixel = 8;
 		 return vidInfo;
 }
@@ -704,20 +707,22 @@ int SDL_PollEvent(SDL_Event *event)
 
 	
 	if(data & pad_asign[0])
+    {
 		if(! (data & pad_asign[2]))
 		Keyboard[sc_RightArrow]=0;//vbt_event[2][1]=0;
 
-	if(data & pad_asign[0])
 		if(! (data & pad_asign[3]))
 		Keyboard[sc_LeftArrow]=0;//vbt_event[3][1]=0;
+    }
 
 	if(data & pad_asign[1])
+    {
 		if(! (data & pad_asign[2]))
 		Keyboard[sc_RightArrow]=0;//vbt_event[2][1]=0;
 
-	if(data & pad_asign[1])
 		if(! (data & pad_asign[3]))
 		Keyboard[sc_LeftArrow]=0;//vbt_event[3][1]=0;
+    }
 
 	if(data & pad_asign[2])
 		Keyboard[sc_RightArrow]=1;
@@ -750,6 +755,7 @@ int SDL_PollEvent(SDL_Event *event)
 			break;	
 			
 			case 6:/*PER_DGT_TC: */
+			case 10:/*PER_DGT_TZ: */
 			event->key.keysym.sym = SDLK_RCTRL;
 			break;	
 
@@ -759,10 +765,6 @@ int SDL_PollEvent(SDL_Event *event)
 			
 			case 9:/*PER_DGT_TY: */
 			event->key.keysym.sym = SDLK_RSHIFT;
-			break;	
-
-			case 10:/*PER_DGT_TZ: */
-			event->key.keysym.sym = SDLK_RCTRL;
 			break;	
 
 			case 11:/*PER_DGT_TL: */

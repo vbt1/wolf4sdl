@@ -83,8 +83,6 @@ boolean buttonstate[NUMBUTTONS];
 
 int lastgamemusicoffset = 0;
 
-
-extern unsigned int start_wall;
 extern unsigned int position_vram;
 extern unsigned int static_items;
 extern unsigned char wall_buffer[];
@@ -1238,8 +1236,8 @@ void PlayLoop (void)
             }
         }
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
-		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(320 * 64) );
-		position_vram = 320*32+static_items*0x800;
+		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH * 64) );
+		position_vram = SATURN_WIDTH*32+static_items*0x800;
     }
     while (!playstate && !startgame);
 
