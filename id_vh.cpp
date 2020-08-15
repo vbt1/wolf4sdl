@@ -266,6 +266,7 @@ void LoadLatchMem (void)
 // tile 8s
 //
 	////slPrint("LoadLatchMem",slLocate(10,15));
+/*
     surf1 = SDL_CreateRGBSurface(SDL_HWSURFACE, 8*8,
         ((NUMTILE8 + 7) / 8) * 8, 8, 0, 0, 0, 0);
     if(surf1 == NULL)
@@ -273,24 +274,19 @@ void LoadLatchMem (void)
 		////slPrint("LoadLatchMem bad",slLocate(10,15));
         Quit("Unable to create surface for tiles!");
     }
+*/	
+	surf1 = (SDL_Surface *)0x002C0000;
     SDL_SetColors(surf1, gamepal, 0, 256);
 
 	latchpics[0] = surf1;
-	////slPrint("LoadLatchMem cache",slLocate(10,16));
 	CA_CacheGrChunk (STARTTILE8);
-	////slPrint("LoadLatchMem cache2",slLocate(10,17));
 	src = grsegs[STARTTILE8];
-	////slPrint("LoadLatchMem cache3",slLocate(10,18));
 	for (i=0;i<NUMTILE8;i++)
 	{
-	////slPrint("looping!",slLocate(10,18));
 		VL_MemToLatch (src, 8, 8, surf, (i & 7) * 8, (i >> 3) * 8);
 		src += 64;
 	}	
-	////slPrint("LoadLatchMem cache2",slLocate(10,19));
 	UNCACHEGRCHUNK (STARTTILE8);
-//	free(surf);
-	////slPrint("LoadLatchMem cache2b",slLocate(10,17));
 //
 // pics
 //
@@ -301,36 +297,25 @@ void LoadLatchMem (void)
 	{
 		width = pictable[i-STARTPICS].width;
 		height = pictable[i-STARTPICS].height;
-	////slPrint("LoadLatchMem cache2c",slLocate(10,17));
 		surf = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, 8, 0, 0, 0, 0);
-	////slPrint("LoadLatchMem cache2d",slLocate(10,17));
         if(surf == NULL)
         {
             Quit("Unable to create surface for picture!");
         }			  
         SDL_SetColors(surf, gamepal, 0, 256);
 		latchpics[2+i-start] = surf;
-	////slPrint("LoadLatchMem cache3",slLocate(10,18));
 		CA_CacheGrChunk (i);
-	////slPrint("LoadLatchMem cache2",slLocate(10,19));
 		VL_MemToLatch (grsegs[i], width, height, surf, 0, 0);
-   //while(1);
-		//VL_LatchToScreen (latchpics[2+i-start], 10*8, 10);
 		UNCACHEGRCHUNK(i);
-		////slPrintHex(i,slLocate(10,20));
-		////slPrintHex(end,slLocate(10,21));
-// vbt 26/07/2020 free remis		
-		free(surf);
-		surf=NULL;
+// vbt 26/07/2020 free remis	
+// vbt 15/08/2020 pas de free c'est les images de la barre de statut	
+//		free(surf);
+//		surf=NULL;
 	}	
 // vbt 26/07/2020 free remis	
-free(surf1);
+// vbt 15/08/2020 utilisation de lowworkram
+//free(surf1);
 surf1=NULL;
-
-	//VL_LatchToScreen (latchpics[2], 10*8, 10);
-
-	//while(1);
-	////slPrint("LoadLatchMem end",slLocate(10,20));	
 }
 
 //==========================================================================

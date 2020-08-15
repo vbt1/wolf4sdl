@@ -188,7 +188,7 @@ int SDL_SetColors(SDL_Surface *surface, 	SDL_Color *colors, int firstcolor, int 
 
 	for(unsigned int i=0;i<ncolors;i++)
 	{
-		palo[i] = RGB(colors[i].r>>3,colors[i].g>>3,colors[i].b>>3);
+		palo[i] = 0x8000 | RGB(colors[i].r>>3,colors[i].g>>3,colors[i].b>>3);
 	}
 	Pal2CRAM(palo , (void *)NBG1_COL_ADR , ncolors);
 	Pal2CRAM(palo , (void *)TEX_COL_ADR , ncolors);
