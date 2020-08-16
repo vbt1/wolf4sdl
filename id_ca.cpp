@@ -26,7 +26,7 @@ loaded into the data segment
 
 #pragma hdrstop
 #define THREEBYTEGRSTARTS
-//#define HEAP_WALK 1
+#define HEAP_WALK 1
 
 extern unsigned int position_vram;
 

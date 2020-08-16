@@ -25,8 +25,8 @@ extern "C" {
 #define     BACK_COL_ADR    (VDP2_VRAM_A1 + 0x1fffe)
 #define     NBG1_CEL_ADR    (VDP2_VRAM_B0 + 0x00000)
 #define     NBG1_COL_ADR    (VDP2_COLRAM  + 0x00200)
-#define		TEX_COL_ADR		(VDP2_COLRAM  + 0x00000)
-#define		NBG0_COL_ADR    (VDP2_COLRAM + 0x00000 )
+#define		TEX_COL_ADR		(VDP2_COLRAM  + 0x00200)
+#define		NBG0_COL_ADR    (VDP2_COLRAM  + 0x00000)
 #define     NBG0_CEL_ADR    (VDP2_VRAM_A0 + 0x00000)
 
 #define PCM_MSK4(a)				((a)&0x000F)
