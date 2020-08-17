@@ -141,7 +141,7 @@ void VW_MeasurePropString (const char *string, word *width, word *height)
 
 void VH_UpdateScreen()
 {
-#ifndef USE_SPRITE	
+#ifndef USE_SPRITES	
 ////slPrint("SDL_BlitSurface         ",slLocate(10,22));	
 	SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 ////slPrint("SDL_UpdateRect        ",slLocate(10,22));	

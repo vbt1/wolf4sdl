@@ -16,7 +16,7 @@
 #define assert_ret(x) assert(x)
 #endif
 
-boolean fullscreen = true;
+//boolean fullscreen = true;
 #if defined(_arch_dreamcast)
 unsigned screenWidth = 320;
 unsigned screenHeight = 200;
@@ -32,10 +32,10 @@ unsigned screenBits = 8;      // use "best" color depth according to libSDL
 #endif
 
 SDL_Surface *screen = NULL;
-unsigned screenPitch;
+//unsigned screenPitch;
 
 SDL_Surface *screenBuffer = NULL;
-unsigned bufferPitch;
+//unsigned bufferPitch;
 
 SDL_Surface *curSurface = NULL;
 unsigned curPitch;
@@ -43,7 +43,7 @@ unsigned curPitch;
 unsigned scaleFactor;
 
 boolean	 screenfaded;
-unsigned bordercolor;
+//unsigned bordercolor;
 
 SDL_Color curpal[256];
 
@@ -101,7 +101,7 @@ void	VL_SetVGAPlaneMode (void)
         screenBits = vidInfo->vfmt->BitsPerPixel;
     }
     screen = SDL_SetVideoMode(screenWidth, screenHeight, screenBits,
-        SDL_SWSURFACE | (screenBits == 8 ? SDL_HWPALETTE : 0) | (fullscreen ? SDL_FULLSCREEN : 0));
+        SDL_SWSURFACE | (screenBits == 8 ? SDL_HWPALETTE : 0) );
     if(!screen)
     {
         printf("Unable to set %ix%ix%i video mode: %s\n", screenWidth,
@@ -123,11 +123,11 @@ void	VL_SetVGAPlaneMode (void)
     }
     SDL_SetColors(screenBuffer, gamepal, 0, 256);
 
-   screenPitch = screen->pitch;
-   bufferPitch = screenBuffer->pitch;
+//   screenPitch = screen->pitch;
+//   bufferPitch = screenBuffer->pitch;
 
     curSurface = screenBuffer;
-    curPitch = bufferPitch;
+    curPitch = screenBuffer->pitch;
 
     scaleFactor = screenWidth/320;
     if(screenHeight/200 < scaleFactor) scaleFactor = screenHeight/200;

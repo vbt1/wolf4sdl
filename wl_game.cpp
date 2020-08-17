@@ -1,5 +1,5 @@
 // WL_GAME.C
-
+#define USE_SPRITES 1
 #include <math.h>
 #include "wl_def.h"
 //#include <SDL_mixer.h>
@@ -12,9 +12,10 @@ extern "C"{
 //extern fixed slAtan(fixed y, fixed x);
 extern fixed MTH_Atan(fixed y, fixed x);
 }
-
+#ifdef USE_SPRITES
 unsigned int position_vram=SATURN_WIDTH*32;
 unsigned int static_items=0;
+#endif
 
 #undef atan2
 //#define atan2(a,b) slAtan(a,b)
@@ -222,6 +223,7 @@ void UpdateSoundLoc(void)
 **      JAB End
 */
 
+#ifdef USE_SPRITES
 TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 
 void set_sprite(PICTURE *pcptr)
@@ -233,18 +235,22 @@ void set_sprite(PICTURE *pcptr)
 		
 //	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)pcptr->pcsrc,(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
 }
-void loadActorTexture(unsigned char texture)
+void loadActorTexture(int texture)
 {
 	extern TEXTURE tex_spr[];
 	byte bmpbuff[64*64];
 	PICTURE pic_spr;
-		
 	t_compshape   *shape = (t_compshape   *)PM_GetSprite(texture);
-	int idx;
-	unsigned short linecmds, *cmdptr, *sprdata;
-	unsigned char  *sprite = (unsigned char  *)shape;
+	
+//    char msg[100];
+//	sprintf (msg,"%06x %d          ", &shape[0],texture) ;
+//	slPrint((char *)msg,slLocate(1,6));	
+	
+	unsigned short  *cmdptr, *sprdata;
 	// set the texel index to the first texel
-	unsigned int i = ((((shape->rightpix-shape->leftpix)+1)*2)+4);
+	unsigned char  *sprite = (unsigned char  *)shape;
+	unsigned char  *sprptr = (unsigned char  *)shape+((((shape->rightpix-shape->leftpix)+1)*2)+4);
+	
 	// clear the buffers
 	memset(bmpbuff,0,64*64);
 	// setup a pointer to the column offsets	
@@ -252,17 +258,16 @@ void loadActorTexture(unsigned char texture)
 
 	for (int x = shape->leftpix; x <= shape->rightpix; x++)
 	{
-		linecmds = *cmdptr;
-		sprdata = (unsigned short *)(sprite+linecmds);
-		idx = 0;
-		while ((SWAP_BYTES_16(sprdata[idx])) != 0)
+		sprdata = (unsigned short *)(sprite+*cmdptr);
+
+		while ((SWAP_BYTES_16(*sprdata)) != 0)
 		{
-			for (int y = ((SWAP_BYTES_16(sprdata[idx+2]))/2); y < (SWAP_BYTES_16(sprdata[idx])/2); y++)
+//			int y = ((SWAP_BYTES_16(sprdata[2]))/2);
+			for (int y = ((SWAP_BYTES_16(sprdata[2]))/2); y < (SWAP_BYTES_16(*sprdata)/2); y++)
 			{
-				bmpbuff[((y)*64)+x] = sprite[i];
-				i++;
+				bmpbuff[(y<<6)+x] = *sprptr++;
 			}
-			idx += 3;
+			sprdata += 3;
 		}
 		cmdptr++;
 	}
@@ -274,8 +279,15 @@ void loadActorTexture(unsigned char texture)
 	tex_spr[SATURN_WIDTH+texture] = TEXDEF(64, 64, position_vram);
 	set_sprite(&pic_spr);					
 	position_vram+=0x800;	
-}
+	
+//char toto[100];
+//sprintf(toto,"x%d x%d y%d y%d",shape->leftpix,shape->rightpix,((SWAP_BYTES_16(sprdata[2]))/2),(SWAP_BYTES_16(*sprdata)/2));
+//sprintf(toto,"%04d %02d t %d y%d y%d",position_vram*2,position_vram/0x800,SATURN_WIDTH+texture,((SWAP_BYTES_16(sprdata[2]))/2),(SWAP_BYTES_16(*sprdata)/2));
+//sprintf(toto,"%06d %06d t %d %d %d",shape->leftpix,shape->rightpix,SATURN_WIDTH+texture,(SWAP_BYTES_16(sprdata[2]))/2,(SWAP_BYTES_16(*sprdata)/2));
 
+//slPrint(toto,slLocate(1,5));	
+}
+#endif
 /*
 ==========================
 =
@@ -687,6 +699,7 @@ static void ScanInfoPlane(void)
 	memset(sprite_list,0,SPR_STAT_47+1);
 	
 	statobj_t *statptr;
+#ifdef USE_SPRITES
 	static_items=0;
 	
     for (statptr = &statobjlist[0] ; statptr !=laststatobj ; statptr++)
@@ -699,7 +712,8 @@ static void ScanInfoPlane(void)
 			sprite_list[texture]=1;
 			static_items++;
 		}
-	}	
+	}
+#endif	
 }
 
 //==========================================================================
@@ -823,7 +837,9 @@ void SetupGameLevel (void)
         }
     }
 // vbt : on recharge la vram
+#ifdef USE_SPRITES
 position_vram=SATURN_WIDTH*32;
+#endif
 //
 // spawn actors
 //

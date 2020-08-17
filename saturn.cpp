@@ -1,3 +1,4 @@
+#define USE_SPRITES 1
 #include "wl_def.h"
 #include "sdl/SDL.h"
 #include "sdl/SDL_mixer.h"
@@ -23,7 +24,9 @@ void /* slave SH Initialize (RUNS on main SH) */
 
 
 //
+#ifdef USE_SPRITES
 extern TEXTURE tex_spr[];
+#endif
 
 #ifdef VBT
 int CdUnlock();
@@ -147,8 +150,12 @@ static const Sint8	logtbl[] = {
 		tv_mode = TV_640x224;
 		if(height==240) tv_mode = TV_640x240; 
 	}
- 
+#ifdef USE_SPRITES 
 	slInitSystem(tv_mode, (TEXTURE*)tex_spr, -1);
+	slZdspLevel(7);	
+#else
+	slInitSystem(tv_mode, NULL, -1);
+#endif	
 //	slZdspLevel(8);
 // vbt 26/07/2020
 //	slDynamicFrame(ON);
@@ -175,18 +182,8 @@ static const Sint8	logtbl[] = {
 	slPriorityNbg0(7);
 	slPriorityNbg1(6);
 	slPrioritySpr0(5);
-//	slInitSynch();
-	slZdspLevel(7);
-	
-//		slCharNbg0(COL_TYPE_256 , CHAR_SIZE_1x1);	
-//slPageNbg0((void *)NBG0_CEL_ADR , 1 , PNB_1WORD|CN_10BIT);	
-//slBMPaletteNbg0(1);
-//	SPR_InitSlaveSH();
-//	slWindowClipLevel(50);
-/*--------------------------------------------------------------------------*/
-//	slSetDepthLimit(0,10,5);	
-	
-//	screen->pixels = (unsigned char*)0x002c0000;//(unsigned char*)malloc(sizeof(unsigned char)*width*height);
+
+	//	screen->pixels = (unsigned char*)0x002c0000;//(unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	CHECKMALLOCRESULT(screen->pixels);
 	screen->pitch = width;
@@ -1201,21 +1198,9 @@ Sint32 GetFileSize(int file_id)
 {
 #ifndef ACTION_REPLAY	
 	GfsHn gfs;
-    //Sint32 sctsize, nsct; 
 	Sint32	lastsize;
-	//Sint32 lastsize;
     
     gfs = GFS_Open(file_id);
- 
-    //GFS_GetFileSize(gfs, &sctsize, &nsct, &lastsize);
-	/*
-    GFS_Close(gfs);
-//	return sctsize*nsct;
-	if(sctsize*(nsct-1)<0)
-		return lastsize;
-	else
-		return (sctsize*(nsct-1) + lastsize);
-	*/  
 	GFS_GetFileInfo(gfs,(Sint32*)&file_id,(Sint32*)NULL,&lastsize,NULL);
     GFS_Close(gfs);
 	return lastsize;	  
@@ -1335,6 +1320,7 @@ return (int) CDC_STAT_STATUS(&stat);
 
 #endif
 #endif
+ #if 0
 
 volatile void **SPR_SlaveSHEntry
 /*  = (void **)0x6000250; 			 95-7-27	*/
@@ -1423,4 +1409,4 @@ void /* slave SH Initialize (RUNS on main SH) */
     *SPR_SMPC_COM = SPR_SMPC_SSHON;       /* --- Slave SH ON SET */
     while((*SPR_SMPC_SF & 0x01) == 0x01);
 }
-
+#endif

@@ -1,5 +1,5 @@
 // WL_PLAY.C
-
+#define USE_SPRITES 1
 #include "wl_def.h"
 #pragma hdrstop
 
@@ -30,12 +30,12 @@ exit_t playstate;
 
 static musicnames lastmusicchunk = (musicnames) 0;
 
-static int DebugOk;
+//static int DebugOk;
 
 objtype objlist[MAXACTORS];
 objtype *newobj, *obj, *player, *lastobj, *objfreelist, *killerobj;
 
-boolean noclip, ammocheat;
+boolean /*noclip,*/ ammocheat;
 int godmode;//, singlestep, extravbls = 1; // to remove flicker (gray stuff at the bottom)
 
 byte tilemap[MAPSIZE][MAPSIZE]; // wall values only
@@ -82,10 +82,11 @@ int controlx, controly;         // range from -100 to 100 per tic
 boolean buttonstate[NUMBUTTONS];
 
 int lastgamemusicoffset = 0;
-
+#ifdef USE_SPRITES
 extern unsigned int position_vram;
 extern unsigned int static_items;
 extern unsigned char wall_buffer[];
+#endif
 //===========================================================================
 
 
@@ -1235,9 +1236,15 @@ void PlayLoop (void)
                 playstate = ex_abort;
             }
         }
+//
+
+//		memcpyl((void *)(SpriteVRAM + cgaddress),(void *)wall_buffer,(SATURN_WIDTH * 64) );
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
+#ifdef USE_SPRITES		
 		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH * 64) );
+
 		position_vram = SATURN_WIDTH*32+static_items*0x800;
+#endif		
     }
     while (!playstate && !startgame);
 

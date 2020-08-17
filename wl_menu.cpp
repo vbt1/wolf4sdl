@@ -1306,7 +1306,7 @@ CleanupControlPanel (void)
 		byte *vbuf = (byte *)curSurface->pixels;
 		byte *ptr = vbuf;
 
-		for(int y = 0; y < screenHeight; y++, ptr += bufferPitch)
+		for(int y = 0; y < screenHeight; y++, ptr += curPitch)
 			memset(ptr, 0x00, screenWidth);	
 }
 

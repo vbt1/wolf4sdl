@@ -224,30 +224,7 @@ void Scale3DShape(byte *vbuf, unsigned vbufPitch, statobj_t *ob)
 		{toFIXED( farthest->viewx-scale),toFIXED( (farthest->viewheight/2-scale)+30),toFIXED(65000),toFIXED(scale)},	
 	};
 */	
-/*
-	SPR_ATTR attr[] =
-	{
-		SPR_ATTRIBUTE(ob->shapenum+PMSpriteStart, 0, No_Gouraud, CL256Bnk | ECenb | SPdis, sprNoflip | FUNC_Sprite | _ZmLT),
-	};
-	
-	
-    SPRITE user_sprite;
-    user_sprite.CTRL = FUNC_Sprite | _ZmLT;
- //   user_sprite.LINK =0x3000;
-    user_sprite.PMOD=CL256Bnk | ECenb | SPdis;
-//    user_sprite.SRCA=cmdsrca;
-//    user_sprite.COLR=cmdcolr;
-//    user_sprite.SIZE=cmdsize;
-    user_sprite.XA=nx1;
-    user_sprite.YA=ny1;
-    user_sprite.XB=nx2;
-    user_sprite.YB=ny2;
-    user_sprite.GRDA=0;
-	
-//    slSetSprite(&user_sprite, toFIXED(3000));	
-	
-//	while(1);
-*/	
+
 	
 /*
     if(viewx2 < viewx1)

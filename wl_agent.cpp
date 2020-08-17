@@ -939,13 +939,13 @@ void ClipMove (objtype *ob, int32_t xmove, int32_t ymove)
     ob->y = basey+ymove;
     if (TryMove (ob))
         return;
-
+/*
 #ifndef REMDEBUG
     if (noclip && ob->x > 2*TILEGLOBAL && ob->y > 2*TILEGLOBAL
         && ob->x < (((int32_t)(mapwidth-1))<<TILESHIFT)
         && ob->y < (((int32_t)(mapheight-1))<<TILESHIFT) )
         return;         // walk through walls
-#endif
+#endif*/
 
     if (!SD_SoundPlaying())
         SD_PlaySound (HITWALLSND);

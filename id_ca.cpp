@@ -26,7 +26,7 @@ loaded into the data segment
 
 #pragma hdrstop
 #define THREEBYTEGRSTARTS
-#define HEAP_WALK 1
+//#define HEAP_WALK 1
 
 extern unsigned int position_vram;
 
@@ -210,26 +210,19 @@ void CAL_GetGrChunkLength (int chunk)
     //lseek(grhandle,GRFILEPOS(chunk),SEEK_SET);
     //read(grhandle,&chunkexplen,sizeof(chunkexplen));
 
-	//GFS_Load(grhandle, 0, (void *)&chunkexplen, sizeof(chunkexplen));
-
-
 	uint8_t *Chunks;
 	uint16_t delta;
 	uint32_t delta2;
-	Uint16 i,j=0;
 	delta = (uint16_t)(GRFILEPOS(chunk)/2048);
 	delta2 = (GRFILEPOS(chunk) - delta*2048); 
-//	Chunks=(uint8_t*)malloc(8192+sizeof(chunkexplen));
 	Chunks=(uint8_t*)0x002C0000;	
 	
 	CHECKMALLOCRESULT(Chunks);
-	GFS_Load(grhandle, delta, (void *)Chunks, sizeof(chunkexplen));
-
+	GFS_Load(grhandle, delta, (void *)Chunks, sizeof(chunkexplen)+delta2);
 	memcpy(&chunkexplen,&Chunks[delta2],sizeof(chunkexplen));
 	Chunks = NULL;
 	chunkexplen = SWAP_BYTES_32(chunkexplen);
     chunkcomplen = GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
-	// VBT correct
 }
 
 /*
@@ -519,7 +512,7 @@ void CAL_SetupGrFile (void)
         CA_CannotOpen(fname);
 
 	fileId = GFS_NameToId((Sint8*)fname);
-	fileSize = GetFileSize(fileId);
+//	fileSize = GetFileSize(fileId);
 
 	Uint8 *vbtHuff;
 //	vbtHuff=(Uint8 *)malloc(sizeof(grhuffman));
@@ -606,17 +599,17 @@ void CAL_SetupGrFile (void)
         CA_CannotOpen(fname);
 
 	grhandle = GFS_NameToId((Sint8*)fname);
-	fileSize = GetFileSize(grhandle);
+//	fileSize = GetFileSize(grhandle);
 //
 // load the pic and sprite headers into the arrays in the data segment
 //
     pictable=(pictabletype *) malloc(NUMPICS*sizeof(pictabletype));
     CHECKMALLOCRESULT(pictable);
     CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
-//	compseg =(byte*)malloc((chunkcomplen+4));
+//	compseg =(byte*)malloc((chunkcomplen));
 	compseg =(byte*)0x002C0000;
 	CHECKMALLOCRESULT(compseg);
-	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen+4));
+	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen));
     CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
 
 	for(unsigned long j=0;j<NUMPICS;j++)
@@ -662,7 +655,7 @@ void CAL_SetupMapFile (void)
 	}	 
 	i=0;
 	fileId = GFS_NameToId((Sint8*)fname);
-	fileSize = GetFileSize(fileId);
+	fileSize = GetFileSize(fileId); // utile
     //handle = open(fname, O_RDONLY | O_BINARY);
     if(stat(fname, NULL))
         CA_CannotOpen(fname);
@@ -915,34 +908,15 @@ int32_t CA_CacheAudioChunk (int chunk)
 #ifdef VBT
     int32_t pos = audiostarts[chunk];
     int32_t size = audiostarts[chunk+1]-pos;
-	uint8_t *Chunks; 
 
     if (audiosegs[chunk])
         return size;                        // already in memory
 
     audiosegs[chunk]=(byte *) malloc(size);
     CHECKMALLOCRESULT(audiosegs[chunk]);
-//hello
     //lseek(audiohandle,pos,SEEK_SET);
     //read(audiohandle,audiosegs[chunk],size);
-
-	uint16_t delta;
-	uint32_t delta2;
-
-	delta = (uint16_t)(pos/2048);
-	delta2 = (pos - delta*2048); 
-//	Chunks=(uint8_t*)malloc(0x4000);
-	Chunks=(uint8_t*)0x002C0000;
-
-	GFS_Load(audiohandle, delta, (void *)Chunks, size);
-
-	Chunks=(uint8_t*)malloc(2048+size);
-	CHECKMALLOCRESULT(Chunks);
-	GFS_Load(grhandle, delta, (void *)Chunks, 2048+size);
-
-	memcpy(audiosegs[chunk],&Chunks[delta2],size);
-//	free(Chunks);
-	Chunks = NULL;
+	GFS_Load(grhandle, pos, (void *)audiosegs[chunk], size);
 	
     return size;
 #endif
@@ -1195,23 +1169,20 @@ void CA_CacheGrChunk (int chunk)
 		Uint16 i,j=0;
 		delta = (uint16_t)(pos/2048);
 		delta2 = (pos - delta*2048); 
-//	Chunks=(uint8_t*)malloc(0x4000);
+
 	Chunks=(uint8_t*)0x002C0000;
 	CHECKMALLOCRESULT(Chunks);
+	GFS_Load(grhandle, delta, (void *)Chunks, compressed+delta2);
+	Chunks+=delta2;
 
-	GFS_Load(grhandle, delta, (void *)Chunks, 0x4000);
-	///memset(Chunks,0,sizeof(Chunks));
     if (compressed<=BUFFERSIZE)
     {
         //read(grhandle,bufferseg,compressed);
-		//memcpy((byte*)bufferseg,&Chunks[delta2],compressed);
+		
 		for(i=0;i<compressed;i+=4)
 		{
-			//bufferseg[j]=Chunks[i+3+delta2] | (Chunks[i+2+delta2]<<8)|(Chunks[i+1+delta2]<<16) | (Chunks[i+0+delta2]<<24);//SWAP_BYTES_16(Chunks[i+delta2+1]);
-			//bufferseg[j]=Chunks[i+delta2] | (Chunks[i+1+delta2]<<8)|(Chunks[i+2+delta2]<<16) | (Chunks[i+3+delta2]<<24);//SWAP_BYTES_16(Chunks[i+delta2+1]);
-			//bufferseg[j]=SWAP_BYTES_32(bufferseg[j]);
-			bufferseg[j]=Chunks[i+3+delta2] | (Chunks[i+2+delta2]<<8)|(Chunks[i+1+delta2]<<16) | (Chunks[i+0+delta2]<<24);//SWAP_BYTES_16(Chunks[i+delta2+1]);
-			j++;
+			bufferseg[j++]=Chunks[3] | (Chunks[2]<<8)|(Chunks[1]<<16) | (Chunks[0]<<24);
+			Chunks+=4;
 		}
         source = bufferseg;
     }
@@ -1220,18 +1191,14 @@ void CA_CacheGrChunk (int chunk)
         source = (int32_t *) malloc(compressed);
         CHECKMALLOCRESULT(source);
         //read(grhandle,source,compressed);
-		//memcpy((byte*)source,&Chunks[delta2],compressed);
 	   
 		for(i=0;i<compressed;i+=4)
 		{
-			//source[j]=Chunks[i+delta2] | (Chunks[i+1+delta2]<<8)|(Chunks[i+2+delta2]<<16) | (Chunks[i+3+delta2]<<24);//SWAP_BYTES_16(Chunks[i+delta2+1]);
-			//source[j]=SWAP_BYTES_32(source[j]);
-			source[j]=Chunks[i+3+delta2] | (Chunks[i+2+delta2]<<8)|(Chunks[i+1+delta2]<<16) | (Chunks[i+0+delta2]<<24);//SWAP_BYTES_16(Chunks[i+delta2+1]);
-			j++;
+			source[j++]=Chunks[3] | (Chunks[2]<<8)|(Chunks[1]<<16) | (Chunks[0]<<24);
+			Chunks+=4;
 		}	  
 		  
     }
-//	free(Chunks);
 	Chunks = NULL;
     CAL_ExpandGrChunk (chunk,source);
 
@@ -1274,24 +1241,20 @@ void CA_CacheScreen (int chunk)
  //#ifdef VBT
 
     //lseek(grhandle,pos,SEEK_SET);
-    bigbufferseg=malloc(compressed);
-//	bigbufferseg=(memptr)0x002C0000;
-    CHECKMALLOCRESULT(bigbufferseg);
+//    bigbufferseg=malloc(compressed);
+//    CHECKMALLOCRESULT(bigbufferseg);
     //read(grhandle,bigbufferseg,compressed);
 
 	uint8_t *Chunks;
 	uint16_t delta;
 	uint32_t delta2;
-	Uint16 i,j=0;
 	delta = (uint16_t)(pos/2048);
 	delta2 = (pos - delta*2048); 
-//	Chunks=(uint8_t*)malloc(8192*2+compressed);
 	Chunks=(uint8_t*)0x002C0000;
-//	CHECKMALLOCRESULT(Chunks);
+	bigbufferseg=(uint8_t*)0x002C0000+64000;
 
-	GFS_Load(grhandle, delta, (void *)Chunks, 8192*2+compressed);
+	GFS_Load(grhandle, delta, (void *)Chunks, compressed+delta2);
 	memcpy(bigbufferseg,&Chunks[delta2],compressed);
-//	free(Chunks);
 	Chunks = NULL;
 	
     source = (int32_t *) bigbufferseg;
@@ -1305,7 +1268,6 @@ void CA_CacheScreen (int chunk)
 //
 //    byte *pic = (byte *) malloc(64000);
 	byte *pic = (byte *)0x002C0000;
-//    CHECKMALLOCRESULT(pic);
     CAL_HuffExpand((byte *) source, pic, expanded, grhuffman);
 
     byte *vbuf = LOCK();
@@ -1320,9 +1282,7 @@ void CA_CacheScreen (int chunk)
         }
     }
     UNLOCK();
-//    free(pic);
 	pic = NULL;
-    free(bigbufferseg);
 	bigbufferseg = NULL;
 	
 #ifdef HEAP_WALK	
