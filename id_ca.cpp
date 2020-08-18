@@ -134,7 +134,7 @@ int     mapon;
 
 word    *mapsegs[MAPPLANES];
 static maptype* mapheaderseg[NUMMAPS];
-byte    *audiosegs[NUMSNDCHUNKS];
+//byte    *audiosegs[NUMSNDCHUNKS];
 byte    *grsegs[NUMCHUNKS];
 
 word    RLEWtag;
@@ -151,19 +151,19 @@ int     numEpisodesMissing = 0;
 
 char extension[5]; // Need a string, not constant to change cache files
 char graphext[5];
-char audioext[5];
+//char audioext[5];
 static const char gheadname[] = "vgahead.";
 static const char gfilename[] = "vgagraph.";
 static const char gdictname[] = "vgadict.";
 static const char mheadname[] = "maphead.";
 static const char mfilename[] = "maptemp.";
-static const char aheadname[] = "audiohed.";
-static const char afilename[] = "audiot.";
+//static const char aheadname[] = "audiohed.";
+//static const char afilename[] = "audiot.";
 
 void CA_CannotOpen(const char *string);
 
 static int32_t  grstarts[NUMCHUNKS + 1];
-static int32_t* audiostarts; // array of offsets in audio / audiot
+//static int32_t* audiostarts; // array of offsets in audio / audiot
 
 #ifdef GRHEADERLINKED
 huffnode *grhuffman;
@@ -173,11 +173,11 @@ huffnode grhuffman[255];
 
 int    grhandle = -1;               // handle to EGAGRAPH
 int    maphandle = -1;              // handle to MAPTEMP / GAMEMAPS
-int    audiohandle = -1;            // handle to AUDIOT / AUDIO
+//int    audiohandle = -1;            // handle to AUDIOT / AUDIO
 
 int32_t   chunkcomplen,chunkexplen;
 
-SDMode oldsoundmode;
+//SDMode oldsoundmode;
 
 
 static int32_t GRFILEPOS(const size_t idx)
@@ -916,6 +916,12 @@ int32_t CA_CacheAudioChunk (int chunk)
     CHECKMALLOCRESULT(audiosegs[chunk]);
     //lseek(audiohandle,pos,SEEK_SET);
     //read(audiohandle,audiosegs[chunk],size);
+
+		uint16_t offset1 = (uint16_t)(pos/2048);
+		uint32_t offset2 = pos - offset1*2048; 
+		GFS_Load(fileId, offset1, (void *)pageData, size+offset2);	
+	
+	
 	GFS_Load(grhandle, pos, (void *)audiosegs[chunk], size);
 	
     return size;

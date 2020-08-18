@@ -2115,7 +2115,7 @@ CheckForEpisodes (void)
     else
         Quit ("UNSUPPORTED MISSION!");
     strcpy (graphext, "sod");
-    strcpy (audioext, "sod");
+//    strcpy (audioext, "sod");
 #else
     if(!stat("vswap.sdm", &statbuf))
     {
@@ -2124,11 +2124,11 @@ CheckForEpisodes (void)
     else
         Quit ("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
     strcpy (graphext, "sdm");
-    strcpy (audioext, "sdm");
+//    strcpy (audioext, "sdm");
 #endif
 #else
     strcpy (graphext, extension);
-    strcpy (audioext, extension);
+//    strcpy (audioext, extension);
 #endif
 
 //    strcat (configname, extension);

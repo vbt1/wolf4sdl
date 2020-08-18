@@ -247,7 +247,7 @@ unsigned char *sndDrvAddr;
 		GFS_Load(GFS_NameToId((Sint8*)SDDRV_NAME),0,(void *) sndDrvAddr,SDDRV_SIZE);
 		slInitSound(sndDrvAddr , SDDRV_SIZE , (Uint8 *)sound_map , sizeof(sound_map)) ;
 		sndDrvAddr = NULL;		
-	//slPrint("                                    ",slLocate(2,21));
+	slPrint("                                    ",slLocate(2,21));
 #endif
 	}
 
@@ -435,8 +435,8 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
     char directory[64];
 	char filename[15];
 	unsigned char *mem_buf;
-	//slPrint("                                    ",slLocate(2,21));
-	//slPrint("loadwav                                    ",slLocate(2,21));	
+	slPrint("                                    ",slLocate(2,21));
+	slPrint("loadwav                                    ",slLocate(2,21));	
 	if(strlen(src->hidden.stdio.name)>5)
 	{
 		for(i=0;i<strlen(src->hidden.stdio.name);i++)
@@ -457,8 +457,8 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
 			}			 
 			ChangeDir(directory);
 
-			////slPrint(directory,slLocate(1,1));
-			////slPrint(filename,slLocate(1,2));
+			slPrint(directory,slLocate(1,18));
+			slPrint(filename,slLocate(1,19));
 		}
 	}
 	else
@@ -1008,8 +1008,8 @@ Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
 int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 {
 	unsigned int i = 0;
-	////slPrintHex(chunk->alen,slLocate(2,10));
-	////slPrintHex(chunk->alen,slLocate(2,11));
+	slPrintHex(chunk->alen,slLocate(2,10));
+	slPrintHex(&chunk->abuf[0],slLocate(2,11));
 //	slPCMOn(sounds[chunk].pcm, sounds[chunk].data, sounds[chunk].size);
 	//slPCMOff(&m_dat[0]);
 	if(chunk->alen>0 && chunk->alen <100000)
@@ -1021,7 +1021,7 @@ int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 			//slPCMParmChange(&m_dat[i]);
 			//slSndFlush() ;
 // vbt 26/07/2020 : à remettre			
-//			slPCMOn(&m_dat[i],chunk->abuf,chunk->alen);
+			slPCMOn(&m_dat[i],chunk->abuf,chunk->alen);
 				break;
 		}		 
 	}
@@ -1095,8 +1095,12 @@ int Mix_GroupOldest(int tag)
 //--------------------------------------------------------------------------------------------------------------------------------------
 Uint32 SDL_GetTicks(void)
 {
-	previouscount += TIM_FRT_CNT_TO_MCR(TIM_FRT_GET_16()) / 1000; 
-	TIM_FRT_SET_16(0); 
+	Uint32 tmp = TIM_FRT_CNT_TO_MCR(TIM_FRT_GET_16());
+	Uint32 tmp2 = tmp/ 1000;
+	
+	previouscount += (tmp+previousmillis) / 1000; 
+	TIM_FRT_SET_16(0);
+	previousmillis= (tmp-(tmp2*1000));
     //set_imask(imask);
 	//
 	return previouscount;

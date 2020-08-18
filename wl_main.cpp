@@ -104,27 +104,29 @@ boolean param_ignorenumchunks = false;
 
 //#ifndef REMDEBUG
 extern int fps_frames, fps_time, fps;
-/*
+unsigned frame_x=0,frame_y=0;
+
 void VblIn(void);
 
 void VblIn(void)
 {
 
-//        if (fpscounter)
+        if (fpscounter)
         {
-//			char buffer[8];
-			//slPrint((char*)"fps     ",slLocate(1,10));
-			//slPrint((char*)ltoa(fps,buffer,8),slLocate(14,0));
-            //fontnumber = 0;
-            //SETFONTCOLOR(7,127);
-            //PrintX=4; PrintY=1;
-            //VWB_Bar(0,0,50,10,bordercol);
-            //US_PrintSigned(fps);
-            //US_Print(" fps");
+			char buffer[8];
+			
+			frame_y++;
+						 
+			if(frame_y==60)
+			{
+				slPrint((char*)"fps     ",slLocate(10,0));
+				slPrint((char*)ltoa(frame_x,buffer,8),slLocate(14,0));			
+				frame_y=frame_x=0;
+			}		   
         }
 
 }
-*/
+
 //#endif
 
 /*
@@ -1105,9 +1107,9 @@ static void InitGame()
     }
 	SDL_SetVideoMode  (screenWidth, screenHeight, screenBits, NULL);
 
-#ifndef REMDEBUG
-//	slIntFunction(VblIn) ;
-#endif
+//#ifndef REMDEBUG
+	slIntFunction(VblIn) ;
+//#endif
     atexit(SDL_Quit);
     SignonScreen ();
 

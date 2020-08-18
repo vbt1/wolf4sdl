@@ -1239,7 +1239,10 @@ void PlayLoop (void)
 //
 
 //		memcpyl((void *)(SpriteVRAM + cgaddress),(void *)wall_buffer,(SATURN_WIDTH * 64) );
-		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
+extern int frame_x,frame_y;
+	frame_x++;
+//if(frame_y+1>=60)
+	slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
 #ifdef USE_SPRITES		
 		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH * 64) );
 

@@ -1192,7 +1192,7 @@ void AsmRefresh()
     short focalty = (short)(viewy>>TILESHIFT);	
     boolean playerInPushwallBackTile = tilemap[focaltx][focalty] == 64;
 
-    for(int pixx=0;pixx<viewwidth>>1;pixx++)
+    for(int pixx=0;pixx<viewwidth;pixx++)
     {
         short angl=midangle+pixelangle[pixx];
         if(angl<0) angl+=FINEANGLES;
@@ -1607,7 +1607,7 @@ passhoriz:
         while(1);
     }
 // vbt : uniquement à la fin de tous les strips	
-//	    ScalePost(my_ray.postx,my_ray.postsource);                   // no more optimization on last post
+	    ScalePost(my_ray.postx,my_ray.postsource);                   // no more optimization on last post
 }
 
 
@@ -2065,7 +2065,7 @@ inline void WallRefresh (void)
 {
 //	slCashPurge();
     min_wallheight = viewheight;
-	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
+//	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
 //	AsmRefreshSlave();
     AsmRefresh ();
 #ifdef USE_SPRITES

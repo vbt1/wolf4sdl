@@ -725,13 +725,14 @@ static void ScanInfoPlane(void)
 =
 ==================
 */
+void VblIn(void);
 
 void SetupGameLevel (void)
 {
     int  x,y;
     word *map;
     word tile;
-
+slIntFunction(VblIn) ;
 
     if (!loadedgame)
     {
@@ -1740,6 +1741,6 @@ startplayloop:
                 ClearMemory ();
                 break;
         }
-	//	slSynch(); // vbt ajout 26/05 à remettre
+		slSynch(); // vbt ajout 26/05 à remettre
     } while (1);
 }
