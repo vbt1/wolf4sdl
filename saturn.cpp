@@ -1,4 +1,4 @@
-#define USE_SPRITES 1
+//#define USE_SPRITES 1
 #include "wl_def.h"
 #include "sdl/SDL.h"
 #include "sdl/SDL_mixer.h"
@@ -152,7 +152,6 @@ static const Sint8	logtbl[] = {
 	}
 #ifdef USE_SPRITES 
 	slInitSystem(tv_mode, (TEXTURE*)tex_spr, -1);
-	slZdspLevel(7);	
 #else
 	slInitSystem(tv_mode, NULL, -1);
 #endif	
@@ -182,7 +181,9 @@ static const Sint8	logtbl[] = {
 	slPriorityNbg0(7);
 	slPriorityNbg1(6);
 	slPrioritySpr0(5);
-
+#ifdef USE_SPRITES 	
+	slZdspLevel(7); // vbt : ne pas déplacer !!!
+#endif	
 	//	screen->pixels = (unsigned char*)0x002c0000;//(unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	CHECKMALLOCRESULT(screen->pixels);

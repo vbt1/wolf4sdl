@@ -1,5 +1,5 @@
 // WL_GAME.C
-#define USE_SPRITES 1
+//#define USE_SPRITES 1
 #include <math.h>
 #include "wl_def.h"
 //#include <SDL_mixer.h>
