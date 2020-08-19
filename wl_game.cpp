@@ -69,108 +69,6 @@ void GameLoop (void);
 =============================================================================
 */
 
-
-
-//===========================================================================
-//===========================================================================
-
-
-/*
-==========================
-=
-= SetSoundLoc - Given the location of an object (in terms of global
-=       coordinates, held in globalsoundx and globalsoundy), munges the values
-=       for an approximate distance from the left and right ear, and puts
-=       those values into leftchannel and rightchannel.
-=
-= JAB
-=
-==========================
-*/
-
-int leftchannel, rightchannel;
-#define ATABLEMAX 15
-byte righttable[ATABLEMAX][ATABLEMAX * 2] = {
-{ 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 6, 0, 0, 0, 0, 0, 1, 3, 5, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 6, 4, 0, 0, 0, 0, 0, 2, 4, 6, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 4, 1, 0, 0, 0, 1, 2, 4, 6, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 6, 5, 4, 2, 1, 0, 1, 2, 3, 5, 7, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 6, 5, 4, 3, 2, 2, 3, 3, 5, 6, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 6, 6, 5, 4, 4, 4, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 6, 6, 5, 5, 5, 6, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 6, 6, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}
-};
-byte lefttable[ATABLEMAX][ATABLEMAX * 2] = {
-{ 8, 8, 8, 8, 8, 8, 8, 8, 5, 3, 1, 0, 0, 0, 0, 0, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 6, 4, 2, 0, 0, 0, 0, 0, 4, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 6, 4, 2, 1, 0, 0, 0, 1, 4, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 7, 5, 3, 2, 1, 0, 1, 2, 4, 5, 6, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 6, 5, 3, 3, 2, 2, 3, 4, 5, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6, 5, 4, 4, 4, 4, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6, 6, 5, 5, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-{ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}
-};
-
-void
-SetSoundLoc(fixed gx,fixed gy)
-{
-    fixed   xt,yt;
-    int     x,y;
-
-//
-// translate point to view centered coordinates
-//
-    gx -= viewx;
-    gy -= viewy;
-
-//
-// calculate newx
-//
-    xt = FixedMul(gx,viewcos);
-    yt = FixedMul(gy,viewsin);
-    x = (xt - yt) >> TILESHIFT;
-
-//
-// calculate newy
-//
-    xt = FixedMul(gx,viewsin);
-    yt = FixedMul(gy,viewcos);
-    y = (yt + xt) >> TILESHIFT;
-
-    if (y >= ATABLEMAX)
-        y = ATABLEMAX - 1;
-    else if (y <= -ATABLEMAX)
-        y = -ATABLEMAX;
-    if (x < 0)
-        x = -x;
-    if (x >= ATABLEMAX)
-        x = ATABLEMAX - 1;
-    leftchannel  =  lefttable[x][y + ATABLEMAX];
-    rightchannel = righttable[x][y + ATABLEMAX];
-
-#if 0
-    CenterWindow(8,1);
-    US_PrintSigned(leftchannel);
-    US_Print(",");
-    US_PrintSigned(rightchannel);
-    VW_UpdateScreen();
-#endif
-}
-
 /*
 ==========================
 =
@@ -198,25 +96,6 @@ void PlaySoundLocGlobal(word s,fixed gx,fixed gy)
         channelSoundPos[channel - 1].globalsoundy = gy;
         channelSoundPos[channel - 1].valid = 1;
     }		*/
-}
-
-void UpdateSoundLoc(void)
-{
-/*    if (SoundPositioned)
-    {
-        SetSoundLoc(globalsoundx,globalsoundy);
-        SD_SetPosition(leftchannel,rightchannel);
-    }*/
-
-    for(int i = 0; i < MIX_CHANNELS; i++)
-    {
-        if(channelSoundPos[i].valid)
-        {
-            SetSoundLoc(channelSoundPos[i].globalsoundx,
-                channelSoundPos[i].globalsoundy);
-            SD_SetPosition(i, leftchannel, rightchannel);
-        }
-    }
 }
 
 /*
@@ -272,7 +151,6 @@ void loadActorTexture(int texture)
 		cmdptr++;
 	}
 
-	
 	pic_spr.texno = SATURN_WIDTH+texture;
 	pic_spr.cmode = COL_256;
 	pic_spr.pcsrc = &bmpbuff[0];
@@ -1551,9 +1429,10 @@ restartgame:
         }
         else StartMusic ();
 
-        if (!died)
-            PreloadGraphics ();             // TODO: Let this do something useful!
-        else
+//        if (!died)
+//            PreloadGraphics ();             // TODO: Let this do something useful!
+//        else
+		  if(died)
             died = false;
 
         fizzlein = true;

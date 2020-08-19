@@ -18,7 +18,7 @@ extern "C" {
 
 #define		WORK_AREA		0x060DE000			/* SGL Work Area           */
 
-#define		trans_list		0x060fb800			/* DMA Transfer Table      */
+#define		trans_list		SystemWork-0x100			/* DMA Transfer Table      */
 #define		pcmbuf			SoundRAM+0x78000	/* PCM Stream Address      */
 #define		PCM_SIZE		0x8000				/* PCM Stream Size         */
 

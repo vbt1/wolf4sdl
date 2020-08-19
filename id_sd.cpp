@@ -65,54 +65,13 @@ typedef struct
 } digiinfo;
 
 static Mix_Chunk *SoundChunks[ STARTMUSIC - STARTDIGISOUNDS];
-static byte      *SoundBuffers[STARTMUSIC - STARTDIGISOUNDS];
-
-globalsoundpos channelSoundPos[MIX_CHANNELS];
 
 //      Global variables
         boolean         //AdLibPresent,
                         SoundBlasterPresent,//SBProPresent,
                         SoundPositioned;
-        SDMode          SoundMode;
-        SMMode          MusicMode;
         SDSMode         DigiMode;
-static  byte          **SoundTable;
         int             DigiMap[LASTSOUND];
-        int             DigiChannel[STARTMUSIC - STARTDIGISOUNDS];
-
-//      Internal variables
-static  boolean                 SD_Started;
-static  boolean                 nextsoundpos;
-static  soundnames              SoundNumber;
-static  soundnames              DigiNumber;
-static  word                    SoundPriority;
-static  word                    DigiPriority;
-static  int                     LeftPosition;
-static  int                     RightPosition;
-
-        word                    NumDigi;
-static  digiinfo               *DigiList;
-static  boolean                 DigiPlaying;
-
-//      PC Sound variables
-static  volatile byte           pcLastSample;
-static  byte * volatile         pcSound;
-static  longword                pcLengthLeft;
-
-//      AdLib variables
-//static  byte * volatile         alSound;
-//static  byte                    alBlock;
-//static  longword                alLengthLeft;
-//static  longword                alTimeCount;
-//static  Instrument              alZeroInst;
-
-//      Sequencer variables
-//static  volatile boolean        sqActive;
-//static  word                   *sqHack;
-//static  word                   *sqHackPtr;
-//static  int                     sqHackLen;
-//static  int                     sqHackSeqLen;
-//static  longword                sqHackTime;
 
 extern void	satPlayMusic( Uint8 track );
 extern void	satStopMusic( void );
@@ -209,7 +168,7 @@ SD_Startup(void)
 
 //    alTimeCount = 0;
 
-    SD_SetSoundMode(sdm_PC);
+    //SD_SetSoundMode(sdm_PC);
     //SD_SetMusicMode(sdm_PC);
 
   SDL_AudioSpec desired, obtained;
@@ -260,19 +219,19 @@ SD_MusicOn(void)
 
 }
 
-boolean
-SD_SetMusicMode(SMMode mode)
-{
-//slPrint("SD_SetMusicMode empty",slLocate(10,18));
-return true;
-}
-
 void
 SD_ContinueMusic(int chunk, int startoffs)
 {
 	satPlayMusic(chunk);
 }
 
+void
+SD_WaitSoundDone(void)
+{
+
+}
+
+/*
 boolean
 SD_SetSoundMode(SDMode mode)
 {
@@ -320,10 +279,11 @@ SD_SetSoundMode(SDMode mode)
 
 }
 
-void
-SD_WaitSoundDone(void)
+boolean
+SD_SetMusicMode(SMMode mode)
 {
-
+//slPrint("SD_SetMusicMode empty",slLocate(10,18));
+return true;
 }
 
 void SD_SetPosition(int channel, int leftpos, int rightpos)
@@ -336,3 +296,4 @@ SD_PositionSound(int leftvol,int rightvol)
 {
 
 }
+*/

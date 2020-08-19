@@ -178,7 +178,7 @@ lswh_2:
    bf     lswh_1
    rts
    nop
-
+/*
    .global  _getvcount
 _getvcount:
    mov.l  lvdp2addr,r1
@@ -239,5 +239,5 @@ slodoit:
 
    .align 4
 slowaddr:  .long 0x24010000
-
+*/
    .end

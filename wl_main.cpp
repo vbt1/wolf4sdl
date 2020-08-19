@@ -175,8 +175,8 @@ noconfig:
         viewsize = 19;                          // start with a good size
 //        mouseadjustment=5;
     }
-    SD_SetMusicMode (sm);
-    SD_SetSoundMode (sd);
+ //   SD_SetMusicMode (sm);
+  //  SD_SetSoundMode (sd);
     SD_SetDigiDevice (sds);
 }
 //===========================================================================
@@ -919,7 +919,7 @@ void InitDigiMap (void)
     for (map = wolfdigimap; *map != LASTSOUND; map += 3)
     {
         DigiMap[map[0]] = map[1];
-        DigiChannel[map[1]] = map[2];
+//        DigiChannel[map[1]] = map[2];
         SD_PrepareSound(map[1]);
     }
 }

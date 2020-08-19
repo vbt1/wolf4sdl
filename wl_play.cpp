@@ -1210,7 +1210,7 @@ void PlayLoop (void)
 
         gamestate.TimeCount += tics;
 
-        UpdateSoundLoc ();      // JAB
+//        UpdateSoundLoc ();      // JAB
         if (screenfaded)
             VW_FadeIn ();
 
