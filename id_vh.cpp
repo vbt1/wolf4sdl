@@ -18,29 +18,17 @@ void VWB_DrawPropString(const char* string)
 	byte	    ch;
 
     byte *vbuf = LOCK();
-	////slPrint((char*)string,slLocate(5,5));
 
 	font = (fontstruct *) grsegs[STARTFONT+fontnumber];
 	font->height=SWAP_BYTES_16(font->height);
 	height =font->height;//SWAP_BYTES_16(font->height);//font->height;//font->height;//font->height;//SWAP_BYTES_16(font->height);
 
-////slPrintHex(height,slLocate(5,5));	
-////slPrintHex(fontnumber,slLocate(5,7));	
- 	
-	for (int vbt=0; vbt<256;vbt++ )
-	{
-		font->location[vbt]=SWAP_BYTES_16(font->location[vbt]);
-	}
-	  
 	dest = vbuf + scaleFactor * (py * curPitch + px);
 
 	while ((ch = (byte)*string++)!=0)
 	{
 		width = step = font->width[ch];
-		source = ((byte *)font)+font->location[ch];
-//					////slPrintHex(width,slLocate(10,vbt++));	
-
-			/*  while(1);	   	   */
+		source = ((byte *)font)+SWAP_BYTES_16(font->location[ch]);
 
 		while (width--)
 		{
@@ -59,16 +47,10 @@ void VWB_DrawPropString(const char* string)
 			dest+=scaleFactor;
 		}
 	}
-	
-	for (int vbt=0; vbt<256;vbt++ )
-	{
-		font->location[vbt]=SWAP_BYTES_16(font->location[vbt]);
-	}
-	
+
 	font->height=SWAP_BYTES_16(font->height);
 
 	UNLOCK();
-		//while(1);
 }
 
 /*
@@ -149,7 +131,10 @@ void VH_UpdateScreen()
 ////slPrint("slSndFlush             ",slLocate(10,22));	
 	//slSndFlush() ;
 ////slPrint("VH_UpdateScreen end ",slLocate(10,22));	
+//	slSynch();
 #endif	
+//if(gamestate.victoryflag)
+//	slSynch();
 }
 
 

@@ -1243,11 +1243,13 @@ extern int frame_x,frame_y;
 	frame_x++;
 //if(frame_y+1>=60)
 	slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
+
 #ifdef USE_SPRITES		
 		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH * 64) );
 
 		position_vram = SATURN_WIDTH*32+static_items*0x800;
-#endif		
+#endif
+		
     }
     while (!playstate && !startgame);
 

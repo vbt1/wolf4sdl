@@ -280,7 +280,7 @@ void loadActorTexture(int texture);
 
 void ScalePost(int postx,byte *postsource)
 {
-#if USE_SPRITES	
+#ifdef USE_SPRITES	
 //--------------------------------------------------------------------------------------------
 	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
 //  a           b          c             d
@@ -737,14 +737,14 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
     if(!scale) return;   // too close or far away
     pixheight=scale*SPRITESCALEFACTOR;
 
-//shapenum=298;	
+//shapenum=190;	
 	
-#if USE_SPRITES
+#ifdef USE_SPRITES
 //    char msg[100];
 //	sprintf (msg,"shape %d %d max %d h %d         ", shapenum, SPR_TOTAL, SPR_TOTAL+SATURN_WIDTH,height) ;
 //	slPrint((char *)msg,slLocate(1,4));
 
-	if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
+if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 //	if(shapenum==296) //||shapenum==298||shapenum==299||shapenum==300||shapenum==301||shapenum==302)	
 	loadActorTexture(shapenum);
 //--------------------------------------------------------------------------------------------
@@ -2175,12 +2175,13 @@ void    ThreeDRefresh (void)
     }
     else
     {
+		
 #ifndef REMDEBUG
         if (fpscounter)
         {
 			char buffer[8];
-			slPrint((char*)"fps   ",slLocate(1,0));
-			slPrint((char*)ltoa(fps,buffer,8),slLocate(4,0));
+			slPrint((char*)"fps   ",slLocate(1,1));
+			slPrint((char*)ltoa(fps,buffer,8),slLocate(4,1));
 			
             //fontnumber = 0;
             //SETFONTCOLOR(7,127);
@@ -2190,9 +2191,11 @@ void    ThreeDRefresh (void)
             //US_Print(" fps");
         }
 #endif
+
         SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
         SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
+	
 #ifndef REMDEBUG
     if (fpscounter)
     {
@@ -2208,4 +2211,5 @@ void    ThreeDRefresh (void)
         }
     }
 #endif
+
 }

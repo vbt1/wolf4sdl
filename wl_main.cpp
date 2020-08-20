@@ -119,8 +119,8 @@ void VblIn(void)
 						 
 			if(frame_y==60)
 			{
-				slPrint((char*)"fps     ",slLocate(10,0));
-				slPrint((char*)ltoa(frame_x,buffer,8),slLocate(14,0));			
+				slPrint((char*)"fps     ",slLocate(10,1));
+				slPrint((char*)ltoa(frame_x,buffer,8),slLocate(14,1));			
 				frame_y=frame_x=0;
 			}		   
         }
@@ -1028,7 +1028,6 @@ void DoJukebox(void)
 #else
     CacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
 #endif
-    CA_LoadAllSounds ();
 
     fontnumber=1;
     ClearMScreen ();
@@ -1130,34 +1129,23 @@ static void InitGame()
 #endif
 	//ajout VBT
 //param_nowait = true;
+slPrint((char *)"VH_Startup     ",slLocate(10,12));
     VH_Startup ();
 //    IN_Startup (); // VBT à remettre
+slPrint((char *)"PM_Startup     ",slLocate(10,12));
     PM_Startup ();
+slPrint((char *)"SD_Startup     ",slLocate(10,12));
     SD_Startup ();
+slPrint((char *)"CA_Startup     ",slLocate(10,12));
     CA_Startup ();
+slPrint((char *)"US_Startup     ",slLocate(10,12));
     US_Startup ();
     // TODO: Will any memory checking be needed someday??
-#ifdef NOTYET
-#ifndef SPEAR
-    if (mminfo.mainmem < 235000L)
-#else
-    if (mminfo.mainmem < 257000L && !MS_CheckParm("debugmode"))
-#endif
-    {
-        byte *screen;
-
-        CA_CacheGrChunk (ERRORSCREEN);
-        screen = grsegs[ERRORSCREEN];
-        ShutdownId();
-/*        memcpy((byte *)0xb8000,screen+7+7*160,17*160);
-        gotoxy (1,23);*/
-        exit(1);
-    }
-#endif
-
 //
 // build some tables
+slPrint((char *)"InitDigiMap     ",slLocate(10,12));
     InitDigiMap ();
+slPrint((char *)"ReadConfig     ",slLocate(10,12));
     ReadConfig ();
 
 //    SetupSaveGames();
@@ -1183,9 +1171,13 @@ static void InitGame()
 //
 // load in and lock down some basic chunks
 //
+slPrint((char *)"CA_CacheGrChunk     ",slLocate(10,12));
+
     CA_CacheGrChunk(STARTFONT);
+slPrint((char *)"CA_CacheGrChunk     ",slLocate(10,12));
+
     CA_CacheGrChunk(STATUSBARPIC);
-	slTVOff();
+//	slTVOff();
     LoadLatchMem ();	   
     BuildTables ();          // trig tables
     SetupWalls ();

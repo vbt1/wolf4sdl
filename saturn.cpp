@@ -74,7 +74,7 @@ static int current_event=0;
 //static Uint32 count=0;
 Uint32 previouscount=0;
 Uint16 previousmillis=0;
-PCM m_dat[4];
+PCM m_dat[8];
 
 static	CdcPly	playdata;
 static	CdcPos	posdata;
@@ -123,8 +123,6 @@ static const Sint8	logtbl[] = {
 /*
  dummy
  */
-//SDL_Screen scr;
-//SDL_Screen *screen = &scr;
 
 //--------------------------------------------------------------------------------------------------------------------------------------
  SDL_Surface * SDL_SetVideoMode  (int width, int height, int bpp, Uint32 flags)
@@ -151,10 +149,11 @@ static const Sint8	logtbl[] = {
 		if(height==240) tv_mode = TV_640x240; 
 	}
 #ifdef USE_SPRITES 
-	slInitSystem(tv_mode, (TEXTURE*)tex_spr, -1);
+	slInitSystem(tv_mode, (TEXTURE*)tex_spr, 1);
 #else
-	slInitSystem(tv_mode, NULL, -1);
+	slInitSystem(tv_mode, NULL, 1);
 #endif	
+
 //	slZdspLevel(8);
 // vbt 26/07/2020
 //	slDynamicFrame(ON);
@@ -368,7 +367,7 @@ int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
 	Sint8 err=0;
 	memcpy(obtained,desired,sizeof(SDL_AudioSpec));
 
-	for (i=0; i<4; i++)
+	for (i=0; i<8; i++)
 	{
 		m_dat[i].mode = 0;
 
@@ -395,16 +394,6 @@ int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
 	return err;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-int SDL_mutexP(SDL_mutex *mutex)
-{
-	return 0;
-}
-//--------------------------------------------------------------------------------------------------------------------------------------
-int SDL_mutexV(SDL_mutex *mutex)
-{
-	return 0;
-}
-//--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_CloseAudio(void)
 {
 //	slPCMOff(&m_dat);
@@ -413,8 +402,19 @@ void SDL_CloseAudio(void)
 void SDL_PauseAudio(int pause_on)
 {
 	Uint8 i;
-	for (i=0;i<4;i++)
+	for (i=0;i<8;i++)
 		slPCMOff(&m_dat[i]);
+}
+/*
+//--------------------------------------------------------------------------------------------------------------------------------------
+int SDL_mutexP(SDL_mutex *mutex)
+{
+	return 0;
+}
+//--------------------------------------------------------------------------------------------------------------------------------------
+int SDL_mutexV(SDL_mutex *mutex)
+{
+	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 SDL_mutex * SDL_CreateMutex(void)
@@ -427,6 +427,7 @@ void SDL_FreeWAV(Uint8 *audio_buf)
 	//free(audio_buf);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
+
 SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len)
 {
 #ifndef ACTION_REPLAY
@@ -435,8 +436,6 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
     char directory[64];
 	char filename[15];
 	unsigned char *mem_buf;
-	slPrint("                                    ",slLocate(2,21));
-	slPrint("loadwav                                    ",slLocate(2,21));	
 	if(strlen(src->hidden.stdio.name)>5)
 	{
 		for(i=0;i<strlen(src->hidden.stdio.name);i++)
@@ -498,6 +497,7 @@ SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec,
   	//slPrint("                                    ",slLocate(2,21));
 	return spec;
 }
+*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
 {
@@ -989,6 +989,7 @@ int SDL_WaitEvent(SDL_Event *event)
 #endif
 	return 0;
 }
+/*
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_DestroyMutex(SDL_mutex *mutex)
 {
@@ -1003,7 +1004,7 @@ void Mix_FreeChunk(Mix_Chunk *chunk)
 Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
 {
 	return NULL;
-}
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 {
@@ -1013,7 +1014,7 @@ int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 //	slPCMOn(sounds[chunk].pcm, sounds[chunk].data, sounds[chunk].size);
 	//slPCMOff(&m_dat[0]);
 	if(chunk->alen>0 && chunk->alen <100000)
-	for(i=0;i<4;i++)
+	for(i=0;i<8;i++)
 	{
 		if(!slPCMStat(&m_dat[i]))
 		{
@@ -1100,7 +1101,7 @@ Uint32 SDL_GetTicks(void)
 	
 	previouscount += (tmp+previousmillis) / 1000; 
 	TIM_FRT_SET_16(0);
-	previousmillis= (tmp-(tmp2*1000));
+//	previousmillis= (tmp-(tmp2*1000));
     //set_imask(imask);
 	//
 	return previouscount;

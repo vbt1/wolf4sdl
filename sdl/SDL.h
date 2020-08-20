@@ -291,55 +291,15 @@ typedef struct {
 	void (*callback)(void *userdata, Uint8 *stream, int len);
 	void  *userdata;
 } SDL_AudioSpec;
-
+/*
 struct SDL_mutex;
 typedef struct SDL_mutex SDL_mutex;
 struct _SDL_Joystick;
 typedef struct _SDL_Joystick SDL_Joystick;
-
-typedef struct SDL_RWops {
-	/* Seek to 'offset' relative to whence, one of stdio's whence values:
-		SEEK_SET, SEEK_CUR, SEEK_END
-	   Returns the final offset in the data source.
-	 */
-	//int (*seek)(struct SDL_RWops *context, int offset, int whence);
-
-	/* Read up to 'num' objects each of size 'objsize' from the data
-	   source to the area pointed at by 'ptr'.
-	   Returns the number of objects read, or -1 if the read failed.
-	 */
-	//int (*read)(struct SDL_RWops *context, void *ptr, int size, int maxnum);
-
-	/* Write exactly 'num' objects each of size 'objsize' from the area
-	   pointed at by 'ptr' to data source.
-	   Returns 'num', or -1 if the write failed.
-	 */
-	//int (*write)(struct SDL_RWops *context, const void *ptr, int size, int num);
-
-	/* Close and free an allocated SDL_FSops structure */
-	//int (*close)(struct SDL_RWops *context);
-
-	Uint32 type;
-	union {
-	    struct {
-		//int autoclose;
-	 	//void *fp;
-		char name[64];
-	    } stdio;
-	   /* struct {
-		Uint8 *base;
-	 	Uint8 *here;
-		Uint8 *stop;
-	    } mem;			*/
-	/*    struct {
-		void *data1;
-	    } unknown;		*/
-	} hidden;
-
-} SDL_RWops;
-
+*/
 /* Useful for determining the video hardware capabilities */
 typedef struct {
+#if 0	
 	Uint32 hw_available :1;	/* Flag: Can you create hardware surfaces? */
 	Uint32 wm_available :1;	/* Flag: Can you talk to a window manager? */
 	Uint32 UnusedBits1  :6;
@@ -353,14 +313,15 @@ typedef struct {
 	Uint32 blit_fill    :1;	/* Flag: Accelerated color fill */
 	Uint32 UnusedBits3  :16;
 	Uint32 video_mem;	/* The total amount of video memory (in K) */
+#endif	
 	SDL_PixelFormat *vfmt;	/* Value: The format of the video surface */
 } SDL_VideoInfo;
 
  typedef struct Mix_Chunk {
-    int allocated;
+//    int allocated;
     Uint8 *abuf;
     Uint32 alen;
-    Uint8 volume;     /* Per-sample volume, 0-128 */
+//    Uint8 volume;     /* Per-sample volume, 0-128 */
 } Mix_Chunk;
 
 //#define	SDL_Flip(arg)	\
@@ -397,11 +358,12 @@ extern void SDL_Quit(void);
 extern int SDL_NumJoysticks(void);
 extern int SDL_FillRect (SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color);
 extern Uint32 SDL_MapRGB (SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b);
-extern int SDL_SaveBMP_RW (SDL_Surface *surface, SDL_RWops *dst, int freedst);
+//extern int SDL_SaveBMP_RW (SDL_Surface *surface, SDL_RWops *dst, int freedst);
 
 /* Convenience macro -- save a surface to a file */
 #define SDL_SaveBMP(surface, file) \
 		SDL_SaveBMP_RW(surface, SDL_RWFromFile(file, "wb"), 1)
+/*
 extern Uint8 SDL_GetMouseState(int *x, int *y);
 extern void SDL_JoystickUpdate(void);
 extern Sint16 SDL_JoystickGetAxis(SDL_Joystick *joystick, int axis);
@@ -414,9 +376,10 @@ extern void SDL_JoystickClose(SDL_Joystick *joystick);
 extern void SDL_WarpMouse(Uint16 x, Uint16 y);
 extern SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode);
 extern SDLMod SDL_GetModState(void);
+*/
 extern Uint8 SDL_EventState(Uint8 type, int state);
 extern void Mix_FreeChunk(Mix_Chunk *chunk);
-extern Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc);
+//extern Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc);
 extern int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops);
 extern int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize);
 extern void Mix_ChannelFinished(void (*channel_finished)(int channel));
@@ -428,8 +391,8 @@ extern int Mix_GroupChannels(int from, int to, int tag);
 extern void Mix_HookMusic(void (*mix_func)(void *udata, Uint8 *stream, int len),void *arg);
 extern char *Mix_GetError();
 extern int Mix_HaltChannel(int channel);
-extern SDL_RWops *SDL_RWFromMem(void *mem, int size);
-extern SDL_RWops *SDL_RWFromFile(const char *file, const char *mode);
+//extern SDL_RWops *SDL_RWFromMem(void *mem, int size);
+//extern SDL_RWops *SDL_RWFromFile(const char *file, const char *mode);
 
 
 extern GfsHn GFS_Open(Sint32 fid);

@@ -415,6 +415,7 @@ BJ_Breathe (void)
         lastBreathTime = GetTimeCount();
         max = 35;
     }
+	slSynch();	// vbt 19/08/20 ajout pour eviter plantage ecran fin niveau
 }
 
 
@@ -559,24 +560,28 @@ LevelCompleted (void)
 #endif
     };
 
-   //slPrint("End Level",slLocate(10,10));
-	//slPrintHex(LEVELEND_LUMP_START,slLocate(10,10));
-	//slPrintHex(LEVELEND_LUMP_END,slLocate(20,10));
+//   slPrint("End Level",slLocate(10,10));
+   slPrint("CacheLump",slLocate(10,11));
+
     CacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
-   //slPrint("CacheLump",slLocate(10,11));
+//   slPrint("ClearSplitVWB",slLocate(10,12));
+
     ClearSplitVWB ();           // set up for double buffering in split screen
-   //slPrint("ClearSplitVWB",slLocate(10,12));
+//   slPrint("VWB_Bar",slLocate(10,13));
     VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
-   //slPrint("VWB_Bar",slLocate(10,13));
     if (bordercol != VIEWCOLOR)
         DrawStatusBorder (VIEWCOLOR);
-   //slPrint("DrawStatusBorder",slLocate(10,14));
+//   slPrint("StartCPMusic",slLocate(10,14));
     StartCPMusic (ENDLEVEL_MUS);
    //slPrint("StartCPMusic",slLocate(10,14));
 //
 // do the intermission
 //
+//   slPrint("IN_ClearKeysDown",slLocate(10,14));
+
     IN_ClearKeysDown ();
+//   slPrint("IN_StartAck",slLocate(10,14));
+
     IN_StartAck ();
 
 #ifdef JAPAN
@@ -584,6 +589,8 @@ LevelCompleted (void)
     VWB_DrawPic (0, 0, C_INTERMISSIONPIC);
     UNCACHEGRCHUNK (C_INTERMISSIONPIC);
 #endif
+//   slPrint("VWB_DrawPic",slLocate(10,14));
+
     VWB_DrawPic (0, 16, L_GUYPIC);
 
 #ifndef SPEAR
@@ -798,6 +805,7 @@ LevelCompleted (void)
             VW_UpdateScreen ();
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
+
             if (IN_CheckAck ())
                 goto done;
         }

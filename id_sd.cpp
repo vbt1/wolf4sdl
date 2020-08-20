@@ -36,33 +36,7 @@
 
 #define ORIGSAMPLERATE 7042
 extern int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained);
-extern PCM m_dat[4];
-typedef struct
-{
-	char RIFF[4];
-	longword filelenminus8;
-	char WAVE[4];
-	char fmt_[4];
-	longword formatlen;
-	word val0x0001;
-	word channels;
-	longword samplerate;
-	longword bytespersec;
-	word bytespersample;
-	word bitspersample;
-} headchunk;
-
-typedef struct
-{
-	char chunkid[4];
-	longword chunklength;
-} wavechunk;
-
-typedef struct
-{
-    uint32_t startpage;
-    uint32_t length;
-} digiinfo;
+extern PCM m_dat[8];
 
 static Mix_Chunk *SoundChunks[ STARTMUSIC - STARTDIGISOUNDS];
 
@@ -76,52 +50,50 @@ static Mix_Chunk *SoundChunks[ STARTMUSIC - STARTDIGISOUNDS];
 extern void	satPlayMusic( Uint8 track );
 extern void	satStopMusic( void );
 
-Uint8 *lowsound = (Uint8 *)0x002C0000;
+uintptr_t lowsound = (uintptr_t)0x002C0000;
 
 void SD_PrepareSound(int which)
 {
 //	slPrint("SD_PrepareSound",slLocate(10,14));
 //	slPrintHex(which,slLocate(1,15));
 
-	Sint32 i, fileId;
+	Sint32 fileId;
 	long fileSize;
 	char filename[15];
 	unsigned char *mem_buf;
 	sprintf(filename,"%03d.PCM",which);
-//	slPrint("                                    ",slLocate(2,21));
-//	slPrint(filename,slLocate(10,21));
-	
  	fileId = GFS_NameToId((Sint8*)filename);
 
 	if(fileId>0)
 	{
 		fileSize = GetFileSize(fileId);
 
-		if(which <16)
+		if(which <23)
 		{
 			mem_buf = (unsigned char *)malloc(fileSize);
+			CHECKMALLOCRESULT(mem_buf);
 		}
 		else
 		{
-			mem_buf = (unsigned char *)(lowsound);
-			*lowsound = (*lowsound + fileSize);
-		} 
+			mem_buf = (unsigned char *)lowsound;
+			lowsound += (size_t)fileSize;
+			
+			if (lowsound % 4 != 0)
+				lowsound = (lowsound + (4 - 1)) & -4;			
+		}
 		GFS_Load(fileId, 0, mem_buf, fileSize);
 		SoundChunks[which] = (Mix_Chunk*)malloc(sizeof(Mix_Chunk));
+		
 		SoundChunks[which]->abuf = mem_buf;
 		SoundChunks[which]->alen = fileSize;
+		
 		if (fileSize<0x900)
-		SoundChunks[which]->alen = 0x900;  
-	//slPrint("size std",slLocate(50,21));	
+			SoundChunks[which]->alen = 0x900;  
 	}
 	else
 	{
-		   SoundChunks[which]->alen = 0;
-		   	//slPrint("size zero",slLocate(50,21));
+	   SoundChunks[which]->alen = 0;
 	}
-	//while(1);
-	
-	//slPrint("                                    ",slLocate(2,21));	
 }
 
 
@@ -143,11 +115,12 @@ word
 SD_SoundPlaying(void)
 {
 	unsigned int i;
-	for(i=0;i<4;i++)
+	for(i=0;i<8;i++)
 	{
 		if(slPCMStat(&m_dat[i]))
 		{
-		//	slSynch(); // vbt remis 26/05
+			slSndFlush() ;
+			//slSynch(); // vbt remis 26/05 // necessaire sinon reste planré à la fin du niveau
 			return true;
 		}
 	}

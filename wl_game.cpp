@@ -141,7 +141,6 @@ void loadActorTexture(int texture)
 
 		while ((SWAP_BYTES_16(*sprdata)) != 0)
 		{
-//			int y = ((SWAP_BYTES_16(sprdata[2]))/2);
 			for (int y = ((SWAP_BYTES_16(sprdata[2]))/2); y < (SWAP_BYTES_16(*sprdata)/2); y++)
 			{
 				bmpbuff[(y<<6)+x] = *sprptr++;
@@ -159,7 +158,7 @@ void loadActorTexture(int texture)
 	position_vram+=0x800;	
 	
 //char toto[100];
-//sprintf(toto,"x%d x%d y%d y%d",shape->leftpix,shape->rightpix,((SWAP_BYTES_16(sprdata[2]))/2),(SWAP_BYTES_16(*sprdata)/2));
+//sprintf(toto,"%d x%d x%d y%d y%d           ",texture, shape->leftpix,shape->rightpix,((SWAP_BYTES_16(sprdata[2]))/2),(SWAP_BYTES_16(*sprdata)/2));
 //sprintf(toto,"%04d %02d t %d y%d y%d",position_vram*2,position_vram/0x800,SATURN_WIDTH+texture,((SWAP_BYTES_16(sprdata[2]))/2),(SWAP_BYTES_16(*sprdata)/2));
 //sprintf(toto,"%06d %06d t %d %d %d",shape->leftpix,shape->rightpix,SATURN_WIDTH+texture,(SWAP_BYTES_16(sprdata[2]))/2,(SWAP_BYTES_16(*sprdata)/2));
 
@@ -752,18 +751,6 @@ position_vram=SATURN_WIDTH*32;
             }
         }
     }
-
-	/*
-char toto[100];
-sprintf(toto,"%04d %02d",position_vram*2,position_vram/0x800);
-
-slPrint(toto,slLocate(1,1));
-*/
-//
-// have the caching manager load and purge stuff to make sure all marks
-// are in memory
-//
-    CA_LoadAllSounds ();
 }
 
 
@@ -1485,11 +1472,15 @@ startplayloop:
             case ex_secretlevel:
                 if(viewsize == 21) DrawPlayScreen();
                 gamestate.keys = 0;
+//   slPrint((char *)"DrawKeys    ",slLocate(10,9));				
                 DrawKeys ();
+//   slPrint((char *)"VW_FadeOut    ",slLocate(10,9));				
+
                 VW_FadeOut ();
+//   slPrint((char *)"ClearMemory    ",slLocate(10,9));				
 
                 ClearMemory ();
-
+//   slPrint((char *)"LevelCompleted ",slLocate(10,9));
                 LevelCompleted ();              // do the intermission
                 if(viewsize == 21) DrawPlayScreen();
 
@@ -1620,6 +1611,6 @@ startplayloop:
                 ClearMemory ();
                 break;
         }
-		slSynch(); // vbt ajout 26/05 à remettre
+//		slSynch(); // vbt ajout 26/05 à remettre
     } while (1);
 }

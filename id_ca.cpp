@@ -127,7 +127,7 @@ typedef struct
 =============================================================================
 */
 
-#define BUFFERSIZE 0x1000
+#define BUFFERSIZE 0x800
 static int32_t bufferseg[BUFFERSIZE/4];
 
 int     mapon;
@@ -211,13 +211,11 @@ void CAL_GetGrChunkLength (int chunk)
     //read(grhandle,&chunkexplen,sizeof(chunkexplen));
 
 	uint8_t *Chunks;
-	uint16_t delta;
-	uint32_t delta2;
-	delta = (uint16_t)(GRFILEPOS(chunk)/2048);
-	delta2 = (GRFILEPOS(chunk) - delta*2048); 
+	uint16_t delta = (uint16_t)(GRFILEPOS(chunk)/2048);
+	uint32_t delta2 = (GRFILEPOS(chunk) - delta*2048); 
 	Chunks=(uint8_t*)0x002C0000;	
 	
-	CHECKMALLOCRESULT(Chunks);
+//	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(grhandle, delta, (void *)Chunks, sizeof(chunkexplen)+delta2);
 	memcpy(&chunkexplen,&Chunks[delta2],sizeof(chunkexplen));
 	Chunks = NULL;
@@ -517,7 +515,7 @@ void CAL_SetupGrFile (void)
 	Uint8 *vbtHuff;
 //	vbtHuff=(Uint8 *)malloc(sizeof(grhuffman));
 	vbtHuff=(Uint8 *)0x002C0000;;
-	CHECKMALLOCRESULT(vbtHuff);
+//	CHECKMALLOCRESULT(vbtHuff);
 
 	GFS_Load(fileId, 0, (void *)vbtHuff, sizeof(grhuffman));
 
@@ -608,7 +606,7 @@ void CAL_SetupGrFile (void)
     CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
 //	compseg =(byte*)malloc((chunkcomplen));
 	compseg =(byte*)0x002C0000;
-	CHECKMALLOCRESULT(compseg);
+//	CHECKMALLOCRESULT(compseg);
 	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen));
     CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
 
@@ -662,7 +660,7 @@ void CAL_SetupMapFile (void)
     length = NUMMAPS*4+2; // used to be "filelength(handle);"
 //    mapfiletype *tinf=(mapfiletype *) malloc(sizeof(mapfiletype));
 	mapfiletype *tinf=(mapfiletype *)0x002C0000;
-    CHECKMALLOCRESULT(tinf);
+//    CHECKMALLOCRESULT(tinf);
 	GFS_Load(fileId, 0, (void *)tinf, length);
     //read(handle, tinf, length);
     //close(handle);
@@ -712,7 +710,7 @@ void CAL_SetupMapFile (void)
 //	maphandleptr = (Uint8*)malloc(fileSize);
 //	maphandleptr = (uint8_t*)(0x002C0000+sizeof(mapfiletype));
 	maphandleptr = (uint8_t*)(0x002D0000);
-	CHECKMALLOCRESULT(maphandleptr);
+//	CHECKMALLOCRESULT(maphandleptr);
 	GFS_Load(maphandle, 0, (void *)maphandleptr, fileSize);
 
     for (i=0;i<NUMMAPS;i++)
@@ -752,75 +750,6 @@ void CAL_SetupMapFile (void)
 
 
 //==========================================================================
-
-
-/*
-======================
-=
-= CAL_SetupAudioFile
-=
-======================
-*/
-/*
-void CAL_SetupAudioFile (void)
-{
-//#ifdef VBT
-	char fname[13];
-	Sint32 fileId;
-	long fileSize;
-	unsigned int i=0;
-
-//
-// load audiohed.ext (offsets for audio file)
-//
-    strcpy(fname,aheadname);
-    strcat(fname,audioext);
-
-	while (fname[i])
-	{
-		fname[i]= toupper(fname[i]);
-		i++;
-	}	 
-	i=0;
-	fileId = GFS_NameToId((Sint8*)fname);
-	fileSize = GetFileSize(fileId);
-
-    //handle = open(fname, O_RDONLY | O_BINARY);
-
-    int32_t* ptr;
-    //if (!CA_LoadFile(fname, &ptr))
-    if(stat(fname, NULL))
-        CA_CannotOpen(fname);
-	ptr=(int32_t*)malloc(fileSize);
-	GFS_Load(fileId, 0, (void *)ptr, fileSize);
-
-	for(i=0;i<fileSize/4;i++)
-	{
-		ptr[i]=SWAP_BYTES_32(ptr[i]);
-	}
-    audiostarts = (int32_t*)ptr;
-//
-// open the data file
-//
-    strcpy(fname,afilename);
-    strcat(fname,audioext);
-
-	while (fname[i])
-	{
-		fname[i]= toupper(fname[i]);
-		i++;
-	}	 
-	i=0;
-
-	audiohandle = GFS_NameToId((Sint8*)fname);
-    //audiohandle = open(fname, O_RDONLY | O_BINARY);
-    //if (audiohandle == -1)
-	if(stat(fname, NULL))
-        CA_CannotOpen(fname);
-}
-*/
-//==========================================================================
-
 
 /*
 ======================
@@ -897,183 +826,6 @@ void CA_Shutdown (void)
 /*
 ======================
 =
-= CA_CacheAudioChunk
-=
-======================
-*/
-
-int32_t CA_CacheAudioChunk (int chunk)
-{
-
-#ifdef VBT
-    int32_t pos = audiostarts[chunk];
-    int32_t size = audiostarts[chunk+1]-pos;
-
-    if (audiosegs[chunk])
-        return size;                        // already in memory
-
-    audiosegs[chunk]=(byte *) malloc(size);
-    CHECKMALLOCRESULT(audiosegs[chunk]);
-    //lseek(audiohandle,pos,SEEK_SET);
-    //read(audiohandle,audiosegs[chunk],size);
-
-		uint16_t offset1 = (uint16_t)(pos/2048);
-		uint32_t offset2 = pos - offset1*2048; 
-		GFS_Load(fileId, offset1, (void *)pageData, size+offset2);	
-	
-	
-	GFS_Load(grhandle, pos, (void *)audiosegs[chunk], size);
-	
-    return size;
-#endif
-	return 0;
-}
-
-void CA_CacheAdlibSoundChunk (int chunk)
-{
-	//c'est la fonction utilisée
-#ifdef VBT
-    int32_t pos = audiostarts[chunk];
-    int32_t size = audiostarts[chunk+1]-pos;
-	uint8_t *Chunks; 
-
-    if (audiosegs[chunk])
-        return size;                        // already in memory
-
-    audiosegs[chunk]=(byte *) malloc(size);
-    CHECKMALLOCRESULT(audiosegs[chunk]);
-
-	uint16_t delta;
-	uint32_t delta2;
-
-	delta = (uint16_t)(pos/2048);
-	delta2 = (pos - delta*2048); 
-	Chunks=(uint8_t*)malloc(2048+ORIG_ADLIBSOUND_SIZE - 1);
-
-	GFS_Load(audiohandle, delta, (void *)Chunks, 2048+ORIG_ADLIBSOUND_SIZE - 1);
-
-//	Chunks=(uint8_t*)malloc(2048+size);
-	Chunks=(uint8_t*)0x002C0000;
-	CHECKMALLOCRESULT(Chunks);
-	GFS_Load(audiohandle, delta, (void *)Chunks, 2048+ORIG_ADLIBSOUND_SIZE - 1);
-//    read(audiohandle, bufferseg, ORIG_ADLIBSOUND_SIZE - 1);   // without data[1]
-
-	memcpy(audiosegs[chunk],&Chunks[delta2],size);
-//	free(Chunks);
-	Chunks = NULL;
-#endif
-
-
-
-#ifdef VBT
-    int32_t pos = audiostarts[chunk];
-    int32_t size = audiostarts[chunk+1]-pos;
-
-    if (audiosegs[chunk])
-        return;                        // already in memory
-    lseek(audiohandle, pos, SEEK_SET);
-    read(audiohandle, bufferseg, ORIG_ADLIBSOUND_SIZE - 1);   // without data[1]
-
-    AdLibSound *sound = (AdLibSound *) malloc(size + sizeof(AdLibSound) - ORIG_ADLIBSOUND_SIZE);
-    CHECKMALLOCRESULT(sound);
-
-    byte *ptr = (byte *) bufferseg;
-    sound->common.length = READLONGWORD(ptr);
-    sound->common.priority = READWORD(ptr);
-    sound->inst.mChar = *ptr++;
-    sound->inst.cChar = *ptr++;
-    sound->inst.mScale = *ptr++;
-    sound->inst.cScale = *ptr++;
-    sound->inst.mAttack = *ptr++;
-    sound->inst.cAttack = *ptr++;
-    sound->inst.mSus = *ptr++;
-    sound->inst.cSus = *ptr++;
-    sound->inst.mWave = *ptr++;
-    sound->inst.cWave = *ptr++;
-    sound->inst.nConn = *ptr++;
-    sound->inst.voice = *ptr++;
-    sound->inst.mode = *ptr++;
-    sound->inst.unused[0] = *ptr++;
-    sound->inst.unused[1] = *ptr++;
-    sound->inst.unused[2] = *ptr++;
-    sound->block = *ptr++;
-
-    read(audiohandle, sound->data, size - ORIG_ADLIBSOUND_SIZE + 1);  // + 1 because of byte data[1]
-
-    audiosegs[chunk]=(byte *) sound;
-#endif
-}
-
-//===========================================================================
-
-/*
-======================
-=
-= CA_LoadAllSounds
-=
-= Purges all sounds, then loads all new ones (mode switch)
-=
-======================
-*/
-
-void CA_LoadAllSounds (void)
-{
-#ifdef VBT
-    unsigned start,i;
-
-    switch (oldsoundmode)
-    {
-        case sdm_Off:
-            goto cachein;
-        case sdm_PC:
-            start = STARTPCSOUNDS;
-            break;
-        case sdm_AdLib:
-            start = STARTADLIBSOUNDS;
-            break;
-    }
-
-    for (i=0;i<NUMSOUNDS;i++,start++)
-        UNCACHEAUDIOCHUNK(start);
-
-cachein:
-
-    oldsoundmode = SoundMode;
-
-    switch (SoundMode)
-    {
-        case sdm_Off:
-            start = STARTADLIBSOUNDS;   // needed for priorities...
-            break;
-        case sdm_PC:
-            start = STARTPCSOUNDS;
-            break;
-        case sdm_AdLib:
-            start = STARTADLIBSOUNDS;
-            break;
-		default:
-			break;
-    }
-
-    if(start == STARTADLIBSOUNDS)
-    {
-        for (i=0;i<NUMSOUNDS;i++,start++)
-            CA_CacheAdlibSoundChunk(start);
-    }
-    else
-    {
-        for (i=0;i<NUMSOUNDS;i++,start++)
-            CA_CacheAudioChunk(start);
-    }
-#endif
-}
-
-//===========================================================================
-
-
-/*
-======================
-=
 = CAL_ExpandGrChunk
 =
 = Does whatever is needed with a pointer to a compressed chunk
@@ -1121,19 +873,6 @@ void CAL_ExpandGrChunk (int chunk, int32_t *source)
     CHECKMALLOCRESULT(grsegs[chunk]);
 	 
     CAL_HuffExpand((byte *) source, grsegs[chunk], expanded, grhuffman);
- /*   fontstruct *font;
-		for (int x=0; x<2;x++ )
-	{
- 		font = (fontstruct *) grsegs[STARTFONT+x];
-		//font->height = SWAP_BYTES_16(font->height);
-
-		for (int vbt=0; vbt<256;vbt++ )
-		{
-			font->location[vbt]=SWAP_BYTES_16(font->location[vbt]);
-		}
-
-	}
-   */
 }
 
 
@@ -1154,8 +893,10 @@ void CA_CacheGrChunk (int chunk)
     int  next;
 
     if (grsegs[chunk])
+	{
+		slPrint((char *)"already in memory",slLocate(10,11));
         return;                             // already in memory
-
+	}
 //
 // load the chunk into a buffer, either the miscbuffer if it fits, or allocate
 // a larger buffer
@@ -1176,19 +917,22 @@ void CA_CacheGrChunk (int chunk)
 		delta = (uint16_t)(pos/2048);
 		delta2 = (pos - delta*2048); 
 
-	Chunks=(uint8_t*)0x002C0000;
-	CHECKMALLOCRESULT(Chunks);
+	Chunks=(uint8_t*)0x002F9400;  // déplacé pour pas écraser de son
+//	CHECKMALLOCRESULT(Chunks);
+//slPrint((char *)"GFS_Load           ",slLocate(10,12));
+//slPrintHex(compressed+delta2,slLocate(20,13));
+//slPrintHex(&Chunks[0],slLocate(20,14));
 	GFS_Load(grhandle, delta, (void *)Chunks, compressed+delta2);
-	Chunks+=delta2;
+//slPrint((char *)"GFS_Loaded1           ",slLocate(10,12));
+	
+//	Chunks+=delta2;
 
     if (compressed<=BUFFERSIZE)
     {
-        //read(grhandle,bufferseg,compressed);
-		
 		for(i=0;i<compressed;i+=4)
 		{
-			bufferseg[j++]=Chunks[3] | (Chunks[2]<<8)|(Chunks[1]<<16) | (Chunks[0]<<24);
-			Chunks+=4;
+// evite des erreurs d'alignement de pointeur ?			
+			bufferseg[j++]=Chunks[3+delta2+i] | (Chunks[2+delta2+i]<<8)|(Chunks[1+delta2+i]<<16) | (Chunks[0+delta2+i]<<24);
 		}
         source = bufferseg;
     }
@@ -1200,8 +944,8 @@ void CA_CacheGrChunk (int chunk)
 	   
 		for(i=0;i<compressed;i+=4)
 		{
-			source[j++]=Chunks[3] | (Chunks[2]<<8)|(Chunks[1]<<16) | (Chunks[0]<<24);
-			Chunks+=4;
+// evite des erreurs d'alignement de pointeur ?				
+			source[j++]=Chunks[3+delta2+i] | (Chunks[2+delta2+i]<<8)|(Chunks[1+delta2+i]<<16) | (Chunks[0+delta2+i]<<24);
 		}	  
 		  
     }
@@ -1328,10 +1072,17 @@ void CA_CacheMap (int mapnum)
 // load the planes into the allready allocated buffers
 //
     size = maparea*2;
+	long fileSize = GetFileSize(maphandle);
+	uint8_t *Chunks=(uint8_t*)0x002F9400;   // écrase les sons
 
+	GFS_Load(maphandle, 0, (void *)Chunks, fileSize);
+	
     for (plane = 0; plane<MAPPLANES; plane++)
     {
         pos = mapheaderseg[mapnum]->planestart[plane];
+		uint16_t delta = (uint16_t)(pos/2048);
+		uint32_t delta2 = (pos - delta*2048); 
+		
         compressed = mapheaderseg[mapnum]->planelength[plane];
         dest = mapsegs[plane];
 
@@ -1346,19 +1097,7 @@ void CA_CacheMap (int mapnum)
             CHECKMALLOCRESULT(bigbufferseg);
             source = (byte *) bigbufferseg;
         }
-
-
-	Uint8 *Chunks;
-	int32_t i;
-	long fileSize = GetFileSize(maphandle);
-//	Chunks = (Uint8*)malloc(fileSize);
-	Chunks=(uint8_t*)0x002C0000;
-	CHECKMALLOCRESULT(Chunks);
-	GFS_Load(maphandle, 0, (void *)Chunks, fileSize);
-
-	memcpy(source,&Chunks[pos],compressed);
-//	free(Chunks);
-	Chunks = NULL;
+		memcpy(source,&Chunks[pos],compressed);
         //read(maphandle,source,compressed);
 #ifdef CARMACIZED
 
@@ -1374,9 +1113,8 @@ void CA_CacheMap (int mapnum)
         source++;
 		source++;
         buffer2seg = (word *) malloc(expanded);
-//		buffer2seg = (word *)0x00200000+fileSize;
-        CHECKMALLOCRESULT(buffer2seg);
 
+        CHECKMALLOCRESULT(buffer2seg);
         CAL_CarmackExpand((byte *) source, buffer2seg,expanded);
 		// VBT valeur perdue ?????
 //	   RLEWtag=0xabcd;
@@ -1394,6 +1132,7 @@ void CA_CacheMap (int mapnum)
             free(bigbufferseg);
 //			bigbufferseg = NULL;
     }
+	Chunks = NULL;
 }
 
 //===========================================================================
