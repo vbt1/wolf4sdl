@@ -1998,6 +1998,7 @@ ShootSnd (void)
 #define stat (a,statbuf) GFS_NameToId((unsigned char*)a)
 	   */
 	   /*struct stat*/
+
 int stat(const char *_path, struct stat *_sbuf)
 {
 	char path[15];
@@ -2032,7 +2033,7 @@ CheckForEpisodes (void)
 #endif
 //        strcat (configname, extension);
 //        strcat (SaveName, extension);
-        strcat (demoname, extension);
+//        strcat (demoname, extension);
         EpisodeSelect[1] =
             EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;
     }
@@ -2131,7 +2132,7 @@ CheckForEpisodes (void)
 
 //    strcat (configname, extension);
 //    strcat (SaveName, extension);
-    strcat (demoname, extension);
+//    strcat (demoname, extension);
 
 #ifndef SPEAR
 #ifndef GOODTIMES

@@ -110,23 +110,6 @@ US_Shutdown(void)
 	US_Started = false;
 }
 
-//	Window/Printing routines
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_SetPrintRoutines() - Sets the routines used to measure and print
-//		from within the User Mgr. Primarily provided to allow switching
-//		between masked and non-masked fonts
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_SetPrintRoutines(void (*measure)(const char *,word *,word *),
-    void (*print)(const char *))
-{
-	USL_MeasureString = measure;
-	USL_DrawString = print;
-}
-
 ///////////////////////////////////////////////////////////////////////////
 //
 //	US_Print() - Prints a string in the current window. Newlines are
@@ -170,71 +153,6 @@ US_Print(const char *sorg)
 	free(sstart);
 	sstart = NULL;	
 //#endif
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_PrintUnsigned() - Prints an unsigned long
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_PrintUnsigned(longword n)
-{
-	char	buffer[32];
-	sprintf(buffer, "%lu", n);
-
-	US_Print(buffer);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_PrintSigned() - Prints a signed long
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_PrintSigned(int32_t n)
-{
-	char	buffer[32];
-//slPrint(ltoa(n,buffer,10),slLocate(2,12));
-	US_Print(ltoa(n,buffer,10));
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	USL_PrintInCenter() - Prints a string in the center of the given rect
-//
-///////////////////////////////////////////////////////////////////////////
-void
-USL_PrintInCenter(const char *s,Rect r)
-{
-	word	w,h,
-			rw,rh;
-
-	USL_MeasureString(s,&w,&h);
-	rw = r.lr.x - r.ul.x;
-	rh = r.lr.y - r.ul.y;
-
-	px = r.ul.x + ((rw - w) / 2);
-	py = r.ul.y + ((rh - h) / 2);
-	USL_DrawString(s);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_PrintCentered() - Prints a string centered in the current window.
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_PrintCentered(const char *s)
-{
-	Rect	r;
-
-	r.ul.x = WindowX;
-	r.ul.y = WindowY;
-	r.lr.x = r.ul.x + WindowW;
-	r.lr.y = r.ul.y + WindowH;
-
-	USL_PrintInCenter(s,r);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -294,44 +212,6 @@ US_CPrint(const char *sorg)
 
 ///////////////////////////////////////////////////////////////////////////
 //
-//  US_Printf() - Prints a formatted string in the current window.
-//      Newlines are supported.
-//
-///////////////////////////////////////////////////////////////////////////
-
-void US_Printf(const char *formatStr, ...)
-{
-    char strbuf[256];
-    va_list vlist;
-    va_start(vlist, formatStr);
-    int len = vsnprintf(strbuf, sizeof(strbuf), formatStr, vlist);
-    va_end(vlist);
-    if(len <= -1 || len >= sizeof(strbuf))
-        strbuf[sizeof(strbuf) - 1] = 0;
-    US_Print(strbuf);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//  US_CPrintf() - Prints a formatted string centered in the current window.
-//      Newlines are supported.
-//
-///////////////////////////////////////////////////////////////////////////
-
-void US_CPrintf(const char *formatStr, ...)
-{
-    char strbuf[256];
-    va_list vlist;
-    va_start(vlist, formatStr);
-    int len = vsnprintf(strbuf, sizeof(strbuf), formatStr, vlist);
-    va_end(vlist);
-    if(len <= -1 || len >= sizeof(strbuf))
-        strbuf[sizeof(strbuf) - 1] = 0;
-    US_CPrint(strbuf);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
 //	US_ClearWindow() - Clears the current window to white and homes the
 //		cursor
 //
@@ -377,54 +257,6 @@ US_DrawWindow(word x,word y,word w,word h)
 
 	for (i = sy + 8;i <= sy + sh - 8;i += 8)
 		VWB_DrawTile8(sx,i,3),VWB_DrawTile8(sx + sw,i,4);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_CenterWindow() - Generates a window of a given width & height in the
-//		middle of the screen
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_CenterWindow(word w,word h)
-{
-	US_DrawWindow(((MaxX / 8) - w) / 2,((MaxY / 8) - h) / 2,w,h);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_SaveWindow() - Saves the current window parms into a record for
-//		later restoration
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_SaveWindow(WindowRec *win)
-{
-	win->x = WindowX;
-	win->y = WindowY;
-	win->w = WindowW;
-	win->h = WindowH;
-
-	win->px = PrintX;
-	win->py = PrintY;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_RestoreWindow() - Sets the current window parms to those held in the
-//		record
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_RestoreWindow(WindowRec *win)
-{
-	WindowX = win->x;
-	WindowY = win->y;
-	WindowW = win->w;
-	WindowH = win->h;
-
-	PrintX = win->px;
-	PrintY = win->py;
 }
 
 //	Input routines

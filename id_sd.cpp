@@ -68,7 +68,8 @@ void SD_PrepareSound(int which)
 	{
 		fileSize = GetFileSize(fileId);
 
-		if(which <23)
+		if(which <24)
+//		if(fileSize>8192 && fileSize<20000)
 		{
 			mem_buf = (unsigned char *)malloc(fileSize);
 			CHECKMALLOCRESULT(mem_buf);
@@ -78,8 +79,8 @@ void SD_PrepareSound(int which)
 			mem_buf = (unsigned char *)lowsound;
 			lowsound += (size_t)fileSize;
 			
-			if (lowsound % 4 != 0)
-				lowsound = (lowsound + (4 - 1)) & -4;			
+			if (lowsound % 2 != 0)
+				lowsound = (lowsound + (2 - 1)) & -2;			
 		}
 		GFS_Load(fileId, 0, mem_buf, fileSize);
 		SoundChunks[which] = (Mix_Chunk*)malloc(sizeof(Mix_Chunk));
@@ -100,8 +101,8 @@ void SD_PrepareSound(int which)
 boolean
 SD_PlaySound(soundnames sound)
 {
-//slPrint("SD_PlaySound",slLocate(10,16));
-//	slPrintHex(DigiMap[sound],slLocate(23,16));
+slPrint("SD_PlaySound",slLocate(10,16));
+	slPrintHex(DigiMap[sound],slLocate(23,16));
     //Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
 	Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
     if(Mix_PlayChannel(0, sample, 0) == -1)

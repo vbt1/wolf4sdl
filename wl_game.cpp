@@ -140,10 +140,14 @@ void loadActorTexture(int texture)
 		sprdata = (unsigned short *)(sprite+*cmdptr);
 
 		while ((SWAP_BYTES_16(*sprdata)) != 0)
+//		while (*sprdata != 0)
 		{
 			for (int y = ((SWAP_BYTES_16(sprdata[2]))/2); y < (SWAP_BYTES_16(*sprdata)/2); y++)
+//			for (int y = (sprdata[2]/2); y < (*sprdata/2); y++)
 			{
 				bmpbuff[(y<<6)+x] = *sprptr++;
+				if(bmpbuff[(y<<6)+x]==0)
+					bmpbuff[(y<<6)+x]=0xa0;
 			}
 			sprdata += 3;
 		}
@@ -625,7 +629,7 @@ slIntFunction(VblIn) ;
         killerobj = NULL;
     }
 
-    if (demoplayback || demorecord)
+    if (demoplayback)
         US_InitRndT (false);
     else
         US_InitRndT (true);
@@ -985,161 +989,6 @@ void ShowActStatus()
     ingame = true;
 }
 
-
-//==========================================================================
-
-/*
-==================
-=
-= StartDemoRecord
-=
-==================
-*/
-
-char    demoname[13] = "DEMO?.";
-
-#ifndef REMDEBUG
-#define MAXDEMOSIZE     8192
-
-void StartDemoRecord (int levelnumber)
-{
-    demobuffer=malloc(MAXDEMOSIZE);
-    CHECKMALLOCRESULT(demobuffer);
-    demoptr = (int8_t *) demobuffer;
-    lastdemoptr = demoptr+MAXDEMOSIZE;
-
-    *demoptr = levelnumber;
-    demoptr += 4;                           // leave space for length
-    demorecord = true;
-}
-
-
-/*
-==================
-=
-= FinishDemoRecord
-=
-==================
-*/
-
-void FinishDemoRecord (void)
-{
-    int32_t    length,level;
-
-    demorecord = false;
-
-    length = (int32_t) (demoptr - (int8_t *)demobuffer);
-
-    demoptr = ((int8_t *)demobuffer)+1;
-    demoptr[0] = (int8_t) length;
-    demoptr[1] = (int8_t) (length >> 8);
-    demoptr[2] = 0;
-
-    VW_FadeIn();
-    CenterWindow(24,3);
-    PrintY+=6;
-    fontnumber=0;
-    SETFONTCOLOR(0,15);
-    US_Print(" Demo number (0-9): ");
-    VW_UpdateScreen();
-
-    if (US_LineInput (px,py,str,NULL,true,1,0))
-    {
-        level = atoi (str);
-        if (level>=0 && level<=9)
-        {
-            demoname[4] = (char)('0'+level);
-        }
-    }
-
-    free(demobuffer);
-	demobuffer = NULL;
-}
-
-//==========================================================================
-
-/*
-==================
-=
-= RecordDemo
-=
-= Fades the screen out, then starts a demo.  Exits with the screen faded
-=
-==================
-*/
-
-void RecordDemo (void)
-{
-    int level,esc,maps;
-
-    CenterWindow(26,3);
-    PrintY+=6;
-    CA_CacheGrChunk(STARTFONT);
-    fontnumber=0;
-    SETFONTCOLOR(0,15);
-#ifndef SPEAR
-#ifdef UPLOAD
-    US_Print("  Demo which level(1-10): "); maps = 10;
-#else
-    US_Print("  Demo which level(1-60): "); maps = 60;
-#endif
-#else
-    US_Print("  Demo which level(1-21): "); maps = 21;
-#endif
-    VW_UpdateScreen();
-    VW_FadeIn ();
-    esc = !US_LineInput (px,py,str,NULL,true,2,0);
-    if (esc)
-        return;
-
-    level = atoi (str);
-    level--;
-
-    if (level >= maps || level < 0)
-        return;
-
-    VW_FadeOut ();
-
-#ifndef SPEAR
-    NewGame (gd_hard,level/10);
-    gamestate.mapon = level%10;
-#else
-    NewGame (gd_hard,0);
-    gamestate.mapon = level;
-#endif
-
-    StartDemoRecord (level);
-
-    DrawPlayScreen ();
-    VW_FadeIn ();
-
-    startgame = false;
-    demorecord = true;
-
-    SetupGameLevel ();
-    StartMusic ();
-
-    fizzlein = true;
-
-    PlayLoop ();
-
-    demoplayback = false;
-
-    StopMusic ();
-    VW_FadeOut ();
-    ClearMemory ();
-
-    FinishDemoRecord ();
-}
-#else
-void FinishDemoRecord (void) {return;}
-void RecordDemo (void) {return;}
-#endif
-
-
-
-//==========================================================================
-
 /*
 ==================
 =
@@ -1366,8 +1215,8 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
-//gamestate.mapon = 8;	
-GiveWeapon (gamestate.bestweapon+1);
+// gamestate.mapon = 8;	
+GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	
 // vbt dernier niveau
 		   
@@ -1459,9 +1308,6 @@ startplayloop:
 
         StopMusic ();
         ingame = false;
-
-        if (demorecord && playstate != ex_warped)
-            FinishDemoRecord ();
 
         if (startgame || loadedgame)
             goto restartgame;

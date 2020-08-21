@@ -30,8 +30,8 @@ void PM_Startup()
 		i++;
 	}	 
 
-    if(stat(fname, NULL))
-        CA_CannotOpen(fname);
+//    if(stat(fname, NULL))
+//        CA_CannotOpen(fname);
 
 	i=0;
 	fileId = GFS_NameToId((Sint8*)fname);
@@ -160,13 +160,39 @@ void PM_Startup()
 			shape->leftpix=SWAP_BYTES_16(shape->leftpix);
 			shape->rightpix=SWAP_BYTES_16(shape->rightpix);
 	   
+//			for (int x=0;x<shape->rightpix ;x++ )
 			for (int x=0;x<shape->rightpix ;x++ )
 			{
 				shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
-			}	  
+			}
+
+
+		}	
+	
+//		}
+/*		
+#ifdef USE_SPRITES
+		unsigned short  *cmdptr, *sprdata;
+		cmdptr = shape->dataofs;
+
+		for (int x = shape->leftpix; x <= shape->rightpix; x++)
+		{
+			sprdata = (unsigned short *)(shape+*cmdptr);
+
+			while ((SWAP_BYTES_16(*sprdata)) != 0)
+			{
+				sprdata[2]=SWAP_BYTES_16(sprdata[2]);
+				*sprdata=SWAP_BYTES_16(*sprdata);
+				sprdata += 3;
+			}
+			cmdptr++;
 		}
+#endif	*/		
 	}
 
+	
+	
+	
 	free(pageLengths);
 	pageLengths = NULL;	
     free(pageOffsets);

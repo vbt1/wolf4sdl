@@ -3455,6 +3455,7 @@ void T_Path (objtype *ob)
 
         if (ob->tilex>MAPSIZE || ob->tiley>MAPSIZE)
         {
+			char    str[80];
             sprintf (str, "T_Path hit a wall at %u,%u, dir %u",
                 ob->tilex,ob->tiley,ob->dir);
             Quit (str);

@@ -335,7 +335,7 @@ int facetimes = 0;
 void UpdateFace (void)
 {
     // don't make demo depend on sound playback
-    if(demoplayback || demorecord)
+    if(demoplayback)
     {
         if(facetimes > 0)
         {

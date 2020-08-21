@@ -414,6 +414,7 @@ void HandleWord (void)
 
 void PageLayout (boolean shownumber)
 {
+	char    str[80];
     int     i,oldfontcolor;
     char    ch;
 

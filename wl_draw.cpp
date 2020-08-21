@@ -1128,7 +1128,7 @@ void DrawPlayerWeapon ()
         SimpleScaleShape(viewwidth/2,shapenum,viewheight+1,curPitch);
     }
 
-    if (demorecord || demoplayback)
+    if (demoplayback)
         SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1,curPitch);
 }
 
@@ -1191,8 +1191,11 @@ void AsmRefresh()
     short focaltx = (short)(viewx>>TILESHIFT);
     short focalty = (short)(viewy>>TILESHIFT);	
     boolean playerInPushwallBackTile = tilemap[focaltx][focalty] == 64;
-
+#ifdef USE_SLAVE
+    for(int pixx=0;pixx<viewwidth/2;pixx++)
+#else
     for(int pixx=0;pixx<viewwidth;pixx++)
+#endif		
     {
         short angl=midangle+pixelangle[pixx];
         if(angl<0) angl+=FINEANGLES;
@@ -1607,10 +1610,12 @@ passhoriz:
         while(1);
     }
 // vbt : uniquement à la fin de tous les strips	
+#ifndef USE_SLAVE
 	    ScalePost(my_ray.postx,my_ray.postsource);                   // no more optimization on last post
+#endif		
 }
 
-
+#ifdef USE_SLAVE
 //==========================================================================
 
 void AsmRefreshSlave()
@@ -2052,7 +2057,7 @@ passhoriz:
 	
 	ScalePost(my_ray.postx,my_ray.postsource);                   // no more optimization on last post
 }
-
+#endif
 /*
 ====================
 =
@@ -2065,7 +2070,9 @@ inline void WallRefresh (void)
 {
 //	slCashPurge();
     min_wallheight = viewheight;
-//	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
+#ifdef USE_SLAVE	
+	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
+#endif	
 //	AsmRefreshSlave();
     AsmRefresh ();
 #ifdef USE_SPRITES

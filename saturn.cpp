@@ -183,7 +183,6 @@ static const Sint8	logtbl[] = {
 #ifdef USE_SPRITES 	
 	slZdspLevel(7); // vbt : ne pas déplacer !!!
 #endif	
-	//	screen->pixels = (unsigned char*)0x002c0000;//(unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	CHECKMALLOCRESULT(screen->pixels);
 	screen->pitch = width;

@@ -260,10 +260,10 @@ void LoadLatchMem (void)
         Quit("Unable to create surface for tiles!");
     }
 */	
-	surf1 = (SDL_Surface *)0x002C0000;
-    SDL_SetColors(surf1, gamepal, 0, 256);
+//	surf1 = (SDL_Surface *)0x002C0000;
+//    SDL_SetColors(surf1, gamepal, 0, 256);
 
-	latchpics[0] = surf1;
+//	latchpics[0] = surf1;
 	CA_CacheGrChunk (STARTTILE8);
 	src = grsegs[STARTTILE8];
 	for (i=0;i<NUMTILE8;i++)

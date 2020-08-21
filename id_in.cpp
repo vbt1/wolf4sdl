@@ -345,23 +345,6 @@ IN_WaitForKey(void)
 
 ///////////////////////////////////////////////////////////////////////////
 //
-//	IN_WaitForASCII() - Waits for an ASCII char, then clears LastASCII and
-//		returns the ASCII value
-//
-///////////////////////////////////////////////////////////////////////////
-char
-IN_WaitForASCII(void)
-{
-	char		result;
-
-	while ((result = LastASCII)==0)
-		IN_WaitAndProcessEvents();
-	LastASCII = '\0';
-	return(result);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
 //	IN_Ack() - waits for a button or key press.  If a button is down, upon
 // calling, it must be released for it to be recognized
 //

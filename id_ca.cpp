@@ -156,11 +156,11 @@ static const char gheadname[] = "vgahead.";
 static const char gfilename[] = "vgagraph.";
 static const char gdictname[] = "vgadict.";
 static const char mheadname[] = "maphead.";
-static const char mfilename[] = "maptemp.";
+//static const char mfilename[] = "maptemp.";
 //static const char aheadname[] = "audiohed.";
 //static const char afilename[] = "audiot.";
 
-void CA_CannotOpen(const char *string);
+//void CA_CannotOpen(const char *string);
 
 static int32_t  grstarts[NUMCHUNKS + 1];
 //static int32_t* audiostarts; // array of offsets in audio / audiot
@@ -213,7 +213,7 @@ void CAL_GetGrChunkLength (int chunk)
 	uint8_t *Chunks;
 	uint16_t delta = (uint16_t)(GRFILEPOS(chunk)/2048);
 	uint32_t delta2 = (GRFILEPOS(chunk) - delta*2048); 
-	Chunks=(uint8_t*)0x002C0000;	
+	Chunks=(uint8_t*)0x002F9400;	
 	
 //	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(grhandle, delta, (void *)Chunks, sizeof(chunkexplen)+delta2);
@@ -506,8 +506,8 @@ void CAL_SetupGrFile (void)
 
     //handle = open(fname, O_RDONLY | O_BINARY);
     //if (handle == -1)
-	if(stat(fname, NULL))
-        CA_CannotOpen(fname);
+//	if(stat(fname, NULL))
+//        CA_CannotOpen(fname);
 
 	fileId = GFS_NameToId((Sint8*)fname);
 //	fileSize = GetFileSize(fileId);
@@ -547,8 +547,8 @@ void CAL_SetupGrFile (void)
 
     //handle = open(fname, O_RDONLY | O_BINARY);
     //if (handle == -1)
-	if(stat(fname, NULL))
-        CA_CannotOpen(fname);
+//	if(stat(fname, NULL))
+//        CA_CannotOpen(fname);
 
 	fileId = GFS_NameToId((Sint8*)fname);
 	fileSize = GetFileSize(fileId);
@@ -593,8 +593,8 @@ void CAL_SetupGrFile (void)
 
     //grhandle = open(fname, O_RDONLY | O_BINARY);
     //if (grhandle == -1)
-	if(stat(fname, NULL))
-        CA_CannotOpen(fname);
+//	if(stat(fname, NULL))
+//        CA_CannotOpen(fname);
 
 	grhandle = GFS_NameToId((Sint8*)fname);
 //	fileSize = GetFileSize(grhandle);
@@ -655,8 +655,8 @@ void CAL_SetupMapFile (void)
 	fileId = GFS_NameToId((Sint8*)fname);
 	fileSize = GetFileSize(fileId); // utile
     //handle = open(fname, O_RDONLY | O_BINARY);
-    if(stat(fname, NULL))
-        CA_CannotOpen(fname);
+//    if(stat(fname, NULL))
+//        CA_CannotOpen(fname);
     length = NUMMAPS*4+2; // used to be "filelength(handle);"
 //    mapfiletype *tinf=(mapfiletype *) malloc(sizeof(mapfiletype));
 	mapfiletype *tinf=(mapfiletype *)0x002C0000;
@@ -692,8 +692,8 @@ void CAL_SetupMapFile (void)
 
     //maphandle = open(fname, O_RDONLY | O_BINARY);
     //if (maphandle == -1)
-	if(stat(fname, NULL))
-        CA_CannotOpen(fname);
+//	if(stat(fname, NULL))
+//        CA_CannotOpen(fname);
 #else
     strcpy(fname,mfilename);
     strcat(fname,extension);
@@ -708,7 +708,6 @@ void CAL_SetupMapFile (void)
 //
 	uint8_t *maphandleptr;
 //	maphandleptr = (Uint8*)malloc(fileSize);
-//	maphandleptr = (uint8_t*)(0x002C0000+sizeof(mapfiletype));
 	maphandleptr = (uint8_t*)(0x002D0000);
 //	CHECKMALLOCRESULT(maphandleptr);
 	GFS_Load(maphandle, 0, (void *)maphandleptr, fileSize);
@@ -1000,8 +999,8 @@ void CA_CacheScreen (int chunk)
 	uint32_t delta2;
 	delta = (uint16_t)(pos/2048);
 	delta2 = (pos - delta*2048); 
-	Chunks=(uint8_t*)0x002C0000;
-	bigbufferseg=(uint8_t*)0x002C0000+64000;
+	Chunks=(uint8_t*)0x002F0000;
+	bigbufferseg=(uint8_t*)0x002E0000;
 
 	GFS_Load(grhandle, delta, (void *)Chunks, compressed+delta2);
 	memcpy(bigbufferseg,&Chunks[delta2],compressed);
@@ -1017,7 +1016,7 @@ void CA_CacheScreen (int chunk)
 // Sprites need to have shifts made and various other junk
 //
 //    byte *pic = (byte *) malloc(64000);
-	byte *pic = (byte *)0x002C0000;
+	byte *pic = (byte *)0x002F0000;
     CAL_HuffExpand((byte *) source, pic, expanded, grhuffman);
 
     byte *vbuf = LOCK();
@@ -1136,7 +1135,7 @@ void CA_CacheMap (int mapnum)
 }
 
 //===========================================================================
-
+/*
 void CA_CannotOpen(const char *string)
 {
     char str[30];
@@ -1146,3 +1145,4 @@ void CA_CannotOpen(const char *string)
     strcat(str,"!\n");
     Quit (str);
 }
+*/

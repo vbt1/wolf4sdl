@@ -71,7 +71,7 @@ int viewsize;
 
 boolean buttonheld[NUMBUTTONS];
 
-boolean demorecord, demoplayback;
+boolean demoplayback;
 int8_t *demoptr, *lastdemoptr;
 memptr demobuffer;
 
@@ -312,7 +312,7 @@ void PollControls (void)
 //
 // get timing info for last frame
 //
-    if (demoplayback || demorecord)   // demo recording and playback needs to be constant
+    if (demoplayback)   // demo recording and playback needs to be constant
     {
         // wait up to DEMOTICS Wolf tics
         uint32_t curtime = SDL_GetTicks();
@@ -382,36 +382,6 @@ void PollControls (void)
     else if (controly < min)
         controly = min;
 
-    if (demorecord)
-    {
-        //
-        // save info out to demo buffer
-        //
-        controlx /= (int) tics;
-        controly /= (int) tics;
-
-        buttonbits = 0;
-
-        // TODO: Support 32-bit buttonbits
-        for (i = NUMBUTTONS - 1; i >= 0; i--)
-        {
-            buttonbits <<= 1;
-            if (buttonstate[i])
-                buttonbits |= 1;
-        }
-
-        *demoptr++ = buttonbits;
-        *demoptr++ = controlx;
-        *demoptr++ = controly;
-
-        if (demoptr >= lastdemoptr - 8)
-            playstate = ex_completed;
-        else
-        {
-            controlx *= (int) tics;
-            controly *= (int) tics;
-        }
-    }
 }
 
 

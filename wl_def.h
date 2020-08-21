@@ -2,6 +2,7 @@
 #define WL_DEF_H
 
 #define USE_SPRITES 1
+//#define USE_SLAVE 1
 #define SATURN_WIDTH 320
 #define SATURN_SORT_VALUE 240
 // 240 pour du 320, 264 pour du 352
@@ -1044,7 +1045,7 @@ extern  doorobj_t   doorobjlist[MAXDOORS];
 extern  doorobj_t   *lastdoorobj;
 extern  int         godmode;
 
-extern  boolean     demorecord,demoplayback;
+extern  boolean     demoplayback;
 extern  int8_t      *demoptr, *lastdemoptr;
 extern  memptr      demobuffer;
 
@@ -1426,8 +1427,8 @@ inline static fixed FixedMul(fixed a, fixed b)
 }
 
 #ifdef PLAYDEMOLIKEORIGINAL
-    #define DEMOCHOOSE_ORIG_SDL(orig, sdl) ((demorecord || demoplayback) ? (orig) : (sdl))
-    #define DEMOCOND_ORIG                  (demorecord || demoplayback)
+    #define DEMOCHOOSE_ORIG_SDL(orig, sdl) ((demoplayback) ? (orig) : (sdl))
+    #define DEMOCOND_ORIG                  (demoplayback)
     #define DEMOIF_SDL                     if(DEMOCOND_SDL)
 #else
     #define DEMOCHOOSE_ORIG_SDL(orig, sdl) (sdl)

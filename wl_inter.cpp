@@ -561,7 +561,7 @@ LevelCompleted (void)
     };
 
 //   slPrint("End Level",slLocate(10,10));
-   slPrint("CacheLump",slLocate(10,11));
+//   slPrint("CacheLump",slLocate(10,11));
 
     CacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
 //   slPrint("ClearSplitVWB",slLocate(10,12));
