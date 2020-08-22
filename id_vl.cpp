@@ -87,14 +87,6 @@ void	VL_Shutdown (void)
 
 void	VL_SetVGAPlaneMode (void)
 {
-#ifndef _arch_dreamcast
-#ifdef SPEAR
-    SDL_WM_SetCaption("Spear of Destiny", NULL);
-#else
-    SDL_WM_SetCaption("Wolfenstein 3D", NULL);
-#endif
-#endif
-
     if(screenBits == -1)
     {
         const SDL_VideoInfo *vidInfo = SDL_GetVideoInfo();
@@ -175,7 +167,7 @@ void VL_ConvertPalette(byte *srcpal, SDL_Color *destpal, int numColors)
 
 void VL_FillPalette (int red, int green, int blue)
 {
-	int	i;
+	unsigned short i;
 	SDL_Color palo[256];
 
 	for(i=0; i<256; i++)
@@ -197,7 +189,7 @@ void VL_FillPalette (int red, int green, int blue)
 =
 =================
 */
-
+/*
 void VL_SetColor	(int color, int red, int green, int blue)
 {
     SDL_Color col = { red, green, blue };
@@ -212,7 +204,7 @@ void VL_SetColor	(int color, int red, int green, int blue)
         SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
 }
-
+*/
 //===========================================================================
 
 /*
@@ -222,7 +214,7 @@ void VL_SetColor	(int color, int red, int green, int blue)
 =
 =================
 */
-
+/*
 void VL_GetColor	(int color, int *red, int *green, int *blue)
 {
     SDL_Color *col = &curpal[color];
@@ -230,7 +222,7 @@ void VL_GetColor	(int color, int *red, int *green, int *blue)
     *green = col->g;
     *blue = col->b;
 }
-
+*/
 //===========================================================================
 
 /*
@@ -386,11 +378,11 @@ void VL_FadeIn (int start, int end, SDL_Color *palette, int steps)
 
 byte *VL_LockSurface(SDL_Surface *surface)
 {
-    if(SDL_MUSTLOCK(surface))
+/*    if(SDL_MUSTLOCK(surface))
     {
         if(SDL_LockSurface(surface) < 0)
             return NULL;
-    }
+    }*/
     return (byte *) surface->pixels;
 }
 
@@ -409,7 +401,7 @@ void VL_UnlockSurface(SDL_Surface *surface)
 =
 =================
 */
-
+/*
 void VL_Plot (int x, int y, int color)
 {
     assert(x >= 0 && (unsigned) x < screenWidth
@@ -420,7 +412,7 @@ void VL_Plot (int x, int y, int color)
 	((byte *) curSurface->pixels)[y * curPitch + x] = color;
     VL_UnlockSurface(curSurface);
 }
-
+*/
 /*
 =================
 =

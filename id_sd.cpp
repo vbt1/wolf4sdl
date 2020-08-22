@@ -36,7 +36,7 @@
 
 #define ORIGSAMPLERATE 7042
 extern int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained);
-extern PCM m_dat[8];
+extern PCM m_dat[];
 
 static Mix_Chunk *SoundChunks[ STARTMUSIC - STARTDIGISOUNDS];
 
@@ -56,6 +56,7 @@ void SD_PrepareSound(int which)
 {
 //	slPrint("SD_PrepareSound",slLocate(10,14));
 //	slPrintHex(which,slLocate(1,15));
+
 
 	Sint32 fileId;
 	long fileSize;
@@ -79,8 +80,8 @@ void SD_PrepareSound(int which)
 			mem_buf = (unsigned char *)lowsound;
 			lowsound += (size_t)fileSize;
 			
-			if (lowsound % 2 != 0)
-				lowsound = (lowsound + (2 - 1)) & -2;			
+			if (lowsound % 4 != 0)
+				lowsound = (lowsound + (4 - 1)) & -4;			
 		}
 		GFS_Load(fileId, 0, mem_buf, fileSize);
 		SoundChunks[which] = (Mix_Chunk*)malloc(sizeof(Mix_Chunk));
@@ -101,8 +102,8 @@ void SD_PrepareSound(int which)
 boolean
 SD_PlaySound(soundnames sound)
 {
-slPrint("SD_PlaySound",slLocate(10,16));
-	slPrintHex(DigiMap[sound],slLocate(23,16));
+//slPrint("SD_PlaySound",slLocate(10,16));
+//	slPrintHex(DigiMap[sound],slLocate(23,16));
     //Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
 	Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
     if(Mix_PlayChannel(0, sample, 0) == -1)
@@ -115,23 +116,18 @@ slPrint("SD_PlaySound",slLocate(10,16));
 word
 SD_SoundPlaying(void)
 {
-	unsigned int i;
-	for(i=0;i<8;i++)
+/*	unsigned char i;
+	for(i=0;i<4;i++)
 	{
 		if(slPCMStat(&m_dat[i]))
 		{
-			slSndFlush() ;
+//			slSndFlush() ;
 			//slSynch(); // vbt remis 26/05 // necessaire sinon reste planré à la fin du niveau
 			return true;
 		}
-	}
+	}*/
 	////slPrintHex(SoundMode,slLocate(10,3));
 	return false;
-}
-void
-SD_SetDigiDevice(SDSMode mode)
-{
-	//slPrint("SD_SetDigiDevice empty",slLocate(2,19));	
 }
 
 void
@@ -173,13 +169,13 @@ SD_StopSound(void)
 {
 
 }
-
+/*
 void
 SD_StopDigitized(void)
 {
 
 }
-
+*/
 void
 SD_StartMusic(int chunk)
 {
@@ -206,6 +202,12 @@ SD_WaitSoundDone(void)
 }
 
 /*
+void
+SD_SetDigiDevice(SDSMode mode)
+{
+	//slPrint("SD_SetDigiDevice empty",slLocate(2,19));	
+}
+
 boolean
 SD_SetSoundMode(SDMode mode)
 {

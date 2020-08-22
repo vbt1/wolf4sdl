@@ -1658,7 +1658,7 @@ CopyProtection (void)
         }
     }
 
-    ClearMemory ();
+    
     ShutdownId ();
 
     printf ("%s\n", DosMessages[US_RndT () % 9]);

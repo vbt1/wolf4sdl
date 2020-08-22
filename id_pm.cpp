@@ -7,7 +7,7 @@ int PMSoundStart;
 //bool PMSoundInfoPagePadded = false;
 
 // holds the whole VSWAP
-uint16_t *PMPageData;
+//uint8_t *PMPageData;
 //size_t PMPageDataSize;
 
 // ChunksInFile+1 pointers to page starts.
@@ -40,18 +40,15 @@ void PM_Startup()
     ChunksInFile = 0;
 //    fread(&ChunksInFile, sizeof(word), 1, file);
 	Chunks=(Sint16*)0x00230000;
-	CHECKMALLOCRESULT(Chunks);
+//	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(fileId, 0, (void *)Chunks, fileSize); //(ChunksInFile*3)+3);
-	ChunksInFile=Chunks[0];
-	ChunksInFile = SWAP_BYTES_16(ChunksInFile);
+	ChunksInFile=SWAP_BYTES_16(Chunks[0]);
     PMSpriteStart = 0;
     //fread(&PMSpriteStart, sizeof(word), 1, file);
-	PMSpriteStart=Chunks[1];
-	PMSpriteStart = SWAP_BYTES_16(PMSpriteStart);
+	PMSpriteStart=SWAP_BYTES_16(Chunks[1]);
     PMSoundStart = 0;
     //fread(&PMSoundStart, sizeof(word), 1, file);
-	PMSoundStart=Chunks[2];
-	PMSoundStart = SWAP_BYTES_16(PMSoundStart);
+	PMSoundStart=SWAP_BYTES_16(Chunks[2]);
     uint32_t* pageOffsets = (uint32_t *) malloc((ChunksInFile + 1) * sizeof(int32_t));
     CHECKMALLOCRESULT(pageOffsets);
 //	GFS_Load(fileId, 0, (void *)Chunks,(ChunksInFile*3)+3);
@@ -87,68 +84,31 @@ void PM_Startup()
             Quit("Illegal page offset for page %i: %u (filesize: %u)",
                     i, pageOffsets[i], fileSize);
     }
-    // Calculate total amount of padding needed for sprites and sound info page
-    int alignPadding = 0;
-    for(i = PMSpriteStart; i < PMSoundStart; i++)
-    {
-        if(!pageOffsets[i]) continue;   // sparse page
-        uint32_t offs = pageOffsets[i] - dataStart + alignPadding;
-        if(offs & 1)
-            alignPadding++;
-    }
-    if((pageOffsets[ChunksInFile - 1] - dataStart + alignPadding) & 1)
-        alignPadding++;
 
-    size_t PMPageDataSize = (size_t) pageDataSize + alignPadding;
-    PMPageData = (uint16_t *) 0x00202000;
-    CHECKMALLOCRESULT(PMPageData);
+    uint8_t *PMPageData = (uint8_t *) 0x00202000;
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
     CHECKMALLOCRESULT(PMPages);
     // Load pages and initialize PMPages pointers
     uint8_t *ptr = (uint8_t *) PMPageData;
-//	uintptr_t ptr4 = (uintptr_t)PMPageData;
 	
     for(i = 0; i < ChunksInFile; i++)
     {
-        if(i >= PMSpriteStart && i < PMSoundStart || i == ChunksInFile - 1)
-        {
-#if 0
-	if (ptr4 % 2 != 0)
-			{
-				ptr4 = (ptr4 + (2 - 1)) & -2;
-			}			
-#else			
-            size_t offs = ptr - (uint8_t *) PMPageData;
-            // pad with zeros to make it 2-byte aligned
-            if(offs & 1)
-            {
-                *ptr++ = 0;
-//                if(i == ChunksInFile - 1) PMSoundInfoPagePadded = true;
-            }
-#endif			
-        }
-
-//        PMPages[i] = (uint8_t *)ptr4;
         PMPages[i] = ptr;
-		
-		uint8_t *x=(uint8_t*)0x00230000;
 	
         if(!pageOffsets[i])
             continue;               // sparse page
 
+		uint8_t *x=(uint8_t*)0x00230000;		
         // Use specified page length, when next page is sparse page.
         // Otherwise, calculate size from the offset difference between this and the next page.
         uint32_t size;
         if(!pageOffsets[i + 1]) size = pageLengths[i];
         else size = pageOffsets[i + 1] - pageOffsets[i];
-//		memcpy((uint8_t *)ptr4,&x[pageOffsets[i]],size);
 		memcpy(ptr,&x[pageOffsets[i]],size);
-//        ptr4 += size;
         ptr += size;
     }
 
     // last page points after page buffer
-//    PMPages[ChunksInFile] = (uint8_t *)ptr4;
     PMPages[ChunksInFile] = ptr;
 
     for (i = PMSpriteStart;i < PMSoundStart;i++)
@@ -205,5 +165,5 @@ void PM_Shutdown()
     free(PMPages);
 	PMPages = NULL;	
 //    free(PMPageData);
-	PMPageData = NULL;	
+//	PMPageData = NULL;	
 }

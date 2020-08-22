@@ -813,7 +813,7 @@ void EndText (void)
     memptr  layout;
 #endif
 
-    ClearMemory ();
+    
 
 #ifdef JAPAN
     ShowArticle(gamestate.episode + 1);

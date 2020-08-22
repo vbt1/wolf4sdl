@@ -69,62 +69,37 @@ int32_t  heightnumerator;
 void    Quit (const char *error,...);
 
 boolean startgame;
-boolean loadedgame;
-//int     mouseadjustment;
-
-//char    configname[13]="config.";
+//boolean loadedgame;
 
 //
 // Command line parameter variables
 //
-//boolean param_debugmode = false;
-//boolean param_nowait = false;
+
 boolean param_nowait = true;
 int     param_difficulty = 1;           // default is "normal"
 int     param_tedlevel = -1;            // default is not to start a level
-//int     param_joystickindex = 0;
-/*
-#if defined(_arch_dreamcast)
-int     param_joystickhat = 0;
-int     param_samplerate = 11025;       // higher samplerates result in "out of memory"
-int     param_audiobuffer = 4096 / (44100 / param_samplerate);
-#elif defined(GP2X)
-int     param_joystickhat = -1;
-int     param_samplerate = 11025;       // higher samplerates result in "out of memory"
-int     param_audiobuffer = 128;
-#else
-//int     param_joystickhat = -1;
-int     param_samplerate = 44100;
-int     param_audiobuffer = 2048 / (44100 / param_samplerate);
-#endif
-*/
+
 int     param_mission = 1;
 boolean param_goodtimes = false;
 boolean param_ignorenumchunks = false;
 
 //#ifndef REMDEBUG
-extern int fps_frames, fps_time, fps;
 unsigned frame_x=0,frame_y=0;
 
 void VblIn(void);
 
 void VblIn(void)
 {
-
-        if (fpscounter)
-        {
-			char buffer[8];
-			
-			frame_y++;
-						 
-			if(frame_y==60)
-			{
-				slPrint((char*)"fps     ",slLocate(10,1));
-				slPrint((char*)ltoa(frame_x,buffer,8),slLocate(14,1));			
-				frame_y=frame_x=0;
-			}		   
-        }
-
+	char buffer[8];
+	
+	frame_y++;
+				 
+	if(frame_y==60)
+	{
+		slPrint((char*)"fps     ",slLocate(10,1));
+		slPrint((char*)ltoa(frame_x,buffer,8),slLocate(14,1));			
+		frame_y=frame_x=0;
+	}		   
 }
 
 //#endif
@@ -136,50 +111,6 @@ void VblIn(void)
 
 =============================================================================
 */
-
-
-/*
-====================
-=
-= ReadConfig
-=
-====================
-*/
-
-void ReadConfig(void)
-{
-    SDMode  sd;
-    SMMode  sm;
-    SDSMode sds;
-    {
-        //
-        // no config file, so select by hardware
-        //
-noconfig:
-/*        if (SoundBlasterPresent) //|| AdLibPresent)
-        {
-            sd = sdm_AdLib;
-            sm = smm_AdLib;
-        }
-        else
-*/			
-        {
-            sd = sdm_PC;
-            sm = smm_Off;
-        }
-
-        if (SoundBlasterPresent)
-            sds = sds_SoundBlaster;
-        else
-            sds = sds_Off;
-        viewsize = 19;                          // start with a good size
-//        mouseadjustment=5;
-    }
- //   SD_SetMusicMode (sm);
-  //  SD_SetSoundMode (sd);
-    SD_SetDigiDevice (sds);
-}
-//===========================================================================
 
 /*
 =====================
@@ -1007,8 +938,6 @@ void DoJukebox(void)
         };
 
     IN_ClearKeysDown();
-//    if (!AdLibPresent && !SoundBlasterPresent)
-//        return;
 
     MenuFadeOut();
 
@@ -1146,7 +1075,8 @@ slPrint((char *)"US_Startup     ",slLocate(10,12));
 slPrint((char *)"InitDigiMap     ",slLocate(10,12));
     InitDigiMap ();
 slPrint((char *)"ReadConfig     ",slLocate(10,12));
-    ReadConfig ();
+//    ReadConfig ();
+	viewsize = 19;                          // start with a good size
 
 //    SetupSaveGames();
 
@@ -1530,7 +1460,7 @@ static void DemoLoop()
 #else
         US_ControlPanel (0);
 #endif
-        if (startgame || loadedgame)
+        if (startgame)
         {
             GameLoop ();
             if(!param_nowait)

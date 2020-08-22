@@ -213,7 +213,7 @@ void CAL_GetGrChunkLength (int chunk)
 	uint8_t *Chunks;
 	uint16_t delta = (uint16_t)(GRFILEPOS(chunk)/2048);
 	uint32_t delta2 = (GRFILEPOS(chunk) - delta*2048); 
-	Chunks=(uint8_t*)0x002F9400;	
+	Chunks=(uint8_t*)0x002F4000; //0x002F9400	
 	
 //	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(grhandle, delta, (void *)Chunks, sizeof(chunkexplen)+delta2);
@@ -370,7 +370,7 @@ void CAL_CarmackExpand (byte *source, word *dest, int length)
 =
 ======================
 */
-
+/*
 int32_t CA_RLEWCompress (word *source, int32_t length, word *dest, word rlewtag)
 {
     word value,count;
@@ -416,7 +416,7 @@ int32_t CA_RLEWCompress (word *source, int32_t length, word *dest, word rlewtag)
     return (int32_t)(2*(dest-start));
 }
 
-
+*/
 /*
 ======================
 =
@@ -916,7 +916,7 @@ void CA_CacheGrChunk (int chunk)
 		delta = (uint16_t)(pos/2048);
 		delta2 = (pos - delta*2048); 
 
-	Chunks=(uint8_t*)0x002F9400;  // déplacé pour pas écraser de son
+	Chunks=(uint8_t*)0x002F4000; //0x002F9400;  // déplacé pour pas écraser de son
 //	CHECKMALLOCRESULT(Chunks);
 //slPrint((char *)"GFS_Load           ",slLocate(10,12));
 //slPrintHex(compressed+delta2,slLocate(20,13));
@@ -1072,7 +1072,7 @@ void CA_CacheMap (int mapnum)
 //
     size = maparea*2;
 	long fileSize = GetFileSize(maphandle);
-	uint8_t *Chunks=(uint8_t*)0x002F9400;   // écrase les sons
+	uint8_t *Chunks=(uint8_t*)0x002F4000; //0x002F9400;   // écrase les sons
 
 	GFS_Load(maphandle, 0, (void *)Chunks, fileSize);
 	

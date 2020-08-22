@@ -56,15 +56,11 @@ ray_struc;
 =============================================================================
 */
 
-static byte *vbuf = NULL;
+//static byte *vbuf = NULL;
 //unsigned vbufPitch = 0;
 
 int32_t    lasttimecount;
 //int32_t    frameon;
-boolean fpscounter=1;
-//boolean fpscounter=0;
-
-int fps_frames=0, fps_time=0, fps=0;
 
 int *wallheight;
 int min_wallheight;
@@ -370,14 +366,6 @@ void ScalePost(int postx,byte *postsource)
 }
 
 /*
-void GlobalScalePost(byte *vidbuf, unsigned pitch)
-{
-    vbuf = vidbuf;
-    vbufPitch = pitch;
-    ScalePost(postx,postsource);
-}
-*/
-/*
 ====================
 =
 = HitVertWall
@@ -664,10 +652,10 @@ byte vgaCeiling[]=
 =
 =====================
 */
-
+#ifndef USE_SPRITES	
 void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
 {
-#ifndef USE_SPRITES	
+
     byte ceiling=vgaCeiling[gamestate.episode*10+mapon];
 
     int y;
@@ -683,9 +671,9 @@ void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
     for(; y < viewheight; y++, ptr += curPitch)
         memset(ptr, 0x19, viewwidth);
 #endif
-#endif
-}
 
+}
+#endif
 //==========================================================================
 
 /*
@@ -762,7 +750,7 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 	user_sprite.XB=pixheight;
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
-	slSetSprite(&user_sprite, toFIXED(0+(SATURN_SORT_VALUE-pixheight/2)));	
+	slSetSprite(&user_sprite, toFIXED(0+(SATURN_SORT_VALUE-pixheight/2)));	// à remettre
 //--------------------------------------------------------------------------------------------	
 #else
     t_compshape *shape;
@@ -843,10 +831,36 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 #endif	
 }
 
-void SimpleScaleShape (int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
+void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
 {
     t_compshape   *shape;
     unsigned scale,pixheight;
+
+    shape = (t_compshape *) PM_GetSprite(shapenum);
+
+    scale=height>>1;
+    pixheight=scale*SPRITESCALEFACTOR;
+#ifdef USE_SPRITES	
+	loadActorTexture(shapenum);
+//--------------------------------------------------------------------------------------------
+	extern 	TEXTURE tex_spr[];		
+	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+shapenum]; 
+// correct on touche pas		
+    SPRITE user_sprite;
+    user_sprite.CTRL = FUNC_Sprite | _ZmCC;
+    user_sprite.PMOD=CL256Bnk| ECenb;// | ECenb | SPdis;  // pas besoin pour les sprites
+    user_sprite.SRCA=((txptr->CGadr));
+    user_sprite.COLR=256;
+    user_sprite.SIZE=0x840;
+	user_sprite.XA=(xcenter-centerx);
+	user_sprite.YA=0;
+	user_sprite.XB=pixheight;
+	user_sprite.YB=user_sprite.XB;
+    user_sprite.GRDA=0;
+	slSetSprite(&user_sprite, toFIXED(10)); //+(SATURN_SORT_VALUE+1)));	// à remettre	
+//--------------------------------------------------------------------------------------------	
+#else
+
     unsigned starty,endy;
     word *cmdptr;
     byte *cline;
@@ -857,11 +871,7 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height,unsigned vbufP
     unsigned j;
     byte col;
     byte *vmem;
-
-    shape = (t_compshape *) PM_GetSprite(shapenum);
-
-    scale=height>>1;
-    pixheight=scale*SPRITESCALEFACTOR;
+	
     actx=xcenter-scale;
     upperedge=viewheight/2-scale;
 
@@ -872,10 +882,11 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height,unsigned vbufP
 #else // vbt on affiche l'arme en bitmap
 // vbt : ajout nettoyage bitmap vdp2
 #ifdef USE_SPRITES
+	Uint8*d = (Uint8*)vbuf + ((pixheight-height) * vbufPitch) + (xcenter-scale); 
 	for( Sint16 i=0;i<height;i++)
 	{
-		Uint8*d = (Uint8*)vbuf + ((pixheight-i-1) * vbufPitch) + (xcenter-scale); 
 		memset(d,0x0,height);
+		d+=(vbufPitch );
 	}
 #endif
     for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
@@ -927,6 +938,7 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height,unsigned vbufP
         }
     }
 #endif	
+#endif // end use sprites
 }
 
 /*
@@ -973,6 +985,7 @@ void DrawScaleds (void)
 //
 // place static objects
 //
+
     for (statptr = &statobjlist[0] ; statptr !=laststatobj ; statptr++)
     {
         if ((visptr->shapenum = statptr->shapenum) == -1)
@@ -1107,29 +1120,27 @@ void DrawScaleds (void)
 int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
     SPR_MACHINEGUNREADY, SPR_CHAINREADY};
 
-void DrawPlayerWeapon ()
+void DrawPlayerWeapon (byte *vbuf)
 {
-    int shapenum;
+    if (gamestate.weapon != -1)
+    {
+        int shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
+        SimpleScaleShape(vbuf,viewwidth/2,shapenum,viewheight+1,curPitch);
+    }
+
+    if (demoplayback)
+        SimpleScaleShape(vbuf,viewwidth/2,SPR_DEMO,viewheight+1,curPitch);
 
 #ifndef SPEAR
     if (gamestate.victoryflag)
     {
 #ifndef APOGEE_1_0
         if (player->state == &s_deathcam && (GetTimeCount()&32) )
-            SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1,curPitch);
+            SimpleScaleShape(vbuf,viewwidth/2,SPR_DEATHCAM,viewheight+1,curPitch);
 #endif
         return;
     }
-#endif
-
-    if (gamestate.weapon != -1)
-    {
-        shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
-        SimpleScaleShape(viewwidth/2,shapenum,viewheight+1,curPitch);
-    }
-
-    if (demoplayback)
-        SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1,curPitch);
+#endif	
 }
 
 
@@ -2080,7 +2091,7 @@ inline void WallRefresh (void)
 
 	for(int pixx=0;pixx<viewwidth;pixx++)
     {
-		slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));
+		slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre
 		user_wall++;
 	}
 #endif	
@@ -2120,22 +2131,25 @@ void    ThreeDRefresh (void)
     memset4_fast(spotvis,0,maparea);
     spotvis[player->tilex][player->tiley] = 1;       // Detect all sprites over player fix
 
-    vbuf = VL_LockSurface(screenBuffer);
-    if(vbuf == NULL) return;
+    byte *vbuf = VL_LockSurface(screenBuffer);
+//    if(vbuf == NULL) return;
 
     vbuf += screenofs;
-
+	
     CalcViewVariables();
 
 //
 // follow the walls from there to the right, drawing as we go
 //
+#ifndef USE_SPRITES	
     VGAClearScreen ();
+#endif	
 #if defined(USE_FEATUREFLAGS) && defined(USE_STARSKY)
     if(GetFeatureFlags() & FF_STARSKY)
         DrawStarSky(vbuf, vbufPitch);
 #endif
     WallRefresh ();
+	
 #if defined(USE_FEATUREFLAGS) && defined(USE_PARALLAX)
     if(GetFeatureFlags() & FF_PARALLAXSKY)
         DrawParallax(vbuf, vbufPitch);
@@ -2146,6 +2160,13 @@ void    ThreeDRefresh (void)
 #endif
 #ifdef USE_FLOORCEILINGTEX
     DrawFloorAndCeiling(vbuf, vbufPitch, min_wallheight);
+#endif
+
+//---------------------------------------------------------------------------	
+
+
+#ifdef USE_SPRITES
+    DrawPlayerWeapon (vbuf);    // draw player's hands
 #endif
 //
 // draw all the scaled images
@@ -2160,8 +2181,9 @@ void    ThreeDRefresh (void)
         DrawSnow(vbuf, vbufPitch);
 #endif
 
-    DrawPlayerWeapon ();    // draw player's hands
-
+#ifndef USE_SPRITES
+    DrawPlayerWeapon (vbuf);    // draw player's hands
+#endif
     if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
         ShowActStatus();
 
@@ -2180,43 +2202,11 @@ void    ThreeDRefresh (void)
 
         lasttimecount = GetTimeCount();          // don't make a big tic count
     }
+#ifndef USE_SPRITES	
     else
     {
-		
-#ifndef REMDEBUG
-        if (fpscounter)
-        {
-			char buffer[8];
-			slPrint((char*)"fps   ",slLocate(1,1));
-			slPrint((char*)ltoa(fps,buffer,8),slLocate(4,1));
-			
-            //fontnumber = 0;
-            //SETFONTCOLOR(7,127);
-            //PrintX=4; PrintY=1;
-            //VWB_Bar(0,0,50,10,bordercol);
-            //US_PrintSigned(fps);
-            //US_Print(" fps");
-        }
-#endif
-
         SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
         SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
-	
-#ifndef REMDEBUG
-    if (fpscounter)
-    {
-        fps_frames++;
-        fps_time+=tics;
-
-        if(fps_time>35)
-        {
-            fps_time-=35;
-            fps=fps_frames<<1;
-            fps_frames=0;
-//			slSynch();			// vbt test
-        }
-    }
-#endif
-
+#endif	
 }

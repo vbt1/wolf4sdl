@@ -2,7 +2,7 @@
 #define WL_DEF_H
 
 #define USE_SPRITES 1
-//#define USE_SLAVE 1
+#define USE_SLAVE 1
 #define SATURN_WIDTH 320
 #define SATURN_SORT_VALUE 240
 // 240 pour du 320, 264 pour du 352
@@ -916,7 +916,7 @@ extern int mapon;
 =============================================================================
 */
 
-extern  boolean  loadedgame;
+//extern  boolean  loadedgame;
 extern  fixed    focallength;
 extern  int      viewscreenx, viewscreeny;
 extern  int      viewwidth;
@@ -927,13 +927,13 @@ extern  fixed    scale;
 
 extern  int      dirangle[9];
 
-extern  int      mouseadjustment;
+//extern  int      mouseadjustment;
 extern  int      shootdelta;
 extern  unsigned screenofs;
 
 extern  boolean  startgame;
-extern  char     str[80];
-extern  char     configname[13];
+//extern  char     str[80];
+//extern  char     configname[13];
 
 //
 // Command line parameter variables
@@ -992,10 +992,6 @@ extern  unsigned        spearangle;
 extern  boolean         spearflag;
 #endif
 
-
-#define ClearMemory SD_StopDigitized
-
-
 // JAB
 #define PlaySoundLocTile(s,tx,ty)       PlaySoundLocGlobal(s,(((int32_t)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((int32_t)ty << TILESHIFT) + (1L << (TILESHIFT - 1))))
 #define PlaySoundLocActor(s,ob)         PlaySoundLocGlobal(s,(ob)->x,(ob)->y)
@@ -1027,7 +1023,7 @@ extern  objtype         *player;
 extern  unsigned        tics;
 extern  int             viewsize;
 
-extern  int             lastgamemusicoffset;
+//extern  int             lastgamemusicoffset;
 
 //
 // current user input

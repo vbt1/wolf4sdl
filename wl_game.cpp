@@ -271,7 +271,7 @@ static void ScanInfoPlane(void)
 // P wall
 //
                 case 98:
-                    if (!loadedgame)
+                ////    if (!loadedgame)
                         gamestate.secrettotal++;
                     break;
 
@@ -615,7 +615,7 @@ void SetupGameLevel (void)
     word tile;
 slIntFunction(VblIn) ;
 
-    if (!loadedgame)
+//    if (!loadedgame)
     {
         gamestate.TimeCount
             = gamestate.secrettotal
@@ -1049,7 +1049,7 @@ void PlayDemo (int demonumber)
     demoplayback = false;
 
     StopMusic ();
-    ClearMemory ();
+    
 }
 
 //==========================================================================
@@ -1174,7 +1174,6 @@ void Died (void)
 
     IN_UserInput(100);
     SD_WaitSoundDone ();
-    ClearMemory();
 
     gamestate.lives--;
 
@@ -1218,6 +1217,7 @@ void GameLoop (void)
 // gamestate.mapon = 8;	
 GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	
+gamestate.keys = 3;
 // vbt dernier niveau
 		   
     boolean died;
@@ -1226,7 +1226,7 @@ gamestate.ammo = 99;
 #endif
   			//slPrint("GameLoop",slLocate(10,7));
 restartgame:
-    ClearMemory ();
+    
     SETFONTCOLOR(0,15);
     VW_FadeOut();
   			//slPrint("DrawPlayScreen",slLocate(10,8));
@@ -1235,7 +1235,7 @@ restartgame:
     died = false;
     do
     {
-        if (!loadedgame)
+    //    if (!loadedgame)
             gamestate.score = gamestate.oldscore;
         if(!died || viewsize != 21) 
 		{
@@ -1244,7 +1244,7 @@ restartgame:
 		}
 
         startgame = false;
-        if (!loadedgame)
+    //    if (!loadedgame)
 		{
 			//slPrint("SetupGameLevel",slLocate(10,10));
             SetupGameLevel ();
@@ -1258,12 +1258,12 @@ restartgame:
 #endif
 
         ingame = true;
-        if(loadedgame)
+/*        if(loadedgame)
         {
             ContinueMusic(lastgamemusicoffset);
             loadedgame = false;
         }
-        else StartMusic ();
+        else*/ StartMusic ();
 
 //        if (!died)
 //            PreloadGraphics ();             // TODO: Let this do something useful!
@@ -1292,7 +1292,7 @@ startplayloop:
             else
                 SD_WaitSoundDone();
 
-            ClearMemory ();
+            
             gamestate.oldscore = gamestate.score;
             gamestate.mapon = 20;
             SetupGameLevel ();
@@ -1309,7 +1309,7 @@ startplayloop:
         StopMusic ();
         ingame = false;
 
-        if (startgame || loadedgame)
+        if (startgame)
             goto restartgame;
 
         switch (playstate)
@@ -1318,16 +1318,12 @@ startplayloop:
             case ex_secretlevel:
                 if(viewsize == 21) DrawPlayScreen();
                 gamestate.keys = 0;
-//   slPrint((char *)"DrawKeys    ",slLocate(10,9));				
                 DrawKeys ();
-//   slPrint((char *)"VW_FadeOut    ",slLocate(10,9));				
-
                 VW_FadeOut ();
-//   slPrint((char *)"ClearMemory    ",slLocate(10,9));				
-
-                ClearMemory ();
-//   slPrint((char *)"LevelCompleted ",slLocate(10,9));
+                
                 LevelCompleted ();              // do the intermission
+// vbt pour garder les clefs.
+gamestate.keys = 3;				
                 if(viewsize == 21) DrawPlayScreen();
 
 #ifdef SPEARDEMO
@@ -1337,7 +1333,7 @@ startplayloop:
 
                     VW_FadeOut ();
 
-                    ClearMemory ();
+                    
 
                     CheckHighScore (gamestate.score,gamestate.mapon+1);
 #ifndef JAPAN
@@ -1355,7 +1351,7 @@ startplayloop:
 
                     VW_FadeOut ();
 
-                    ClearMemory ();
+                    
 
                     CheckHighScore (gamestate.score,gamestate.mapon+1);
 #ifndef JAPAN
@@ -1423,7 +1419,7 @@ startplayloop:
                 if(screenHeight % 200 != 0)
                     VL_ClearScreen(0);
 
-                ClearMemory ();
+                
 
                 CheckHighScore (gamestate.score,gamestate.mapon+1);
 #ifndef JAPAN
@@ -1439,11 +1435,11 @@ startplayloop:
 #else
                 VL_FadeOut (0,255,0,17,17,300);
 #endif
-                ClearMemory ();
+                
 
                 Victory ();
 
-                ClearMemory ();
+                
 
                 CheckHighScore (gamestate.score,gamestate.mapon+1);
 #ifndef JAPAN
@@ -1454,7 +1450,7 @@ startplayloop:
 
             default:
                 if(viewsize == 21) DrawPlayScreen();
-                ClearMemory ();
+                
                 break;
         }
 //		slSynch(); // vbt ajout 26/05 à remettre

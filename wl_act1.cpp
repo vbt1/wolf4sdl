@@ -164,7 +164,7 @@ void SpawnStatic (int tilex, int tiley, int type)
         case    bo_bible:
         case    bo_crown:
         case    bo_fullheal:
-            if (!loadedgame)
+//            if (!loadedgame)
                 gamestate.treasuretotal++;
 
         case    bo_firstaid:

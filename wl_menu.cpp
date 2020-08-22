@@ -18,7 +18,7 @@
 
 extern void SYS_Exit(Sint32 code);
 
-extern int lastgamemusicoffset;
+//extern int lastgamemusicoffset;
 extern int numEpisodesMissing;
 
 //
@@ -347,7 +347,7 @@ US_ControlPanel (ScanCode scancode)
     {
         if (CP_CheckQuick (scancode))
             return;
-        lastgamemusicoffset = StartCPMusic (MENUSONG);
+        StartCPMusic (MENUSONG);
     }
     else
         StartCPMusic (MENUSONG);
@@ -427,7 +427,7 @@ US_ControlPanel (ScanCode scancode)
             StartCPMusic (XJAZNAZI_MUS);
             UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
             UnCacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-            ClearMemory ();
+            
 
 
             CA_CacheGrChunk (IDGUYS1PIC);
@@ -500,7 +500,8 @@ US_ControlPanel (ScanCode scancode)
         //
         // "EXIT OPTIONS" OR "NEW GAME" EXITS
         //
-//		slSynch(); // vbt ajout 26/05
+
+		slSynch(); // vbt ajout 26/05
     }
     while (!StartGame);
     //
@@ -511,7 +512,7 @@ US_ControlPanel (ScanCode scancode)
     //
     // CHANGE MAINMENU ITEM
     //
-    if (startgame || loadedgame)
+    if (startgame)
         EnableEndGameMenuItem();
 
     // RETURN/START GAME EXECUTION
