@@ -307,7 +307,7 @@ Victory (void)
 =
 ==================
 */
-
+/*
 void
 PG13 (void)
 {
@@ -327,6 +327,7 @@ PG13 (void)
 
     VW_FadeOut ();
 }
+*/
 #endif
 
 
@@ -1661,7 +1662,7 @@ CopyProtection (void)
     
     ShutdownId ();
 
-    printf ("%s\n", DosMessages[US_RndT () % 9]);
+//    printf ("%s\n", DosMessages[US_RndT () % 9]);
     exit (1);
 }
 

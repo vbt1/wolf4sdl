@@ -1310,13 +1310,13 @@ void FirstSighting (objtype *ob)
     switch (ob->obclass)
     {
         case guardobj:
-            PlaySoundLocActor(HALTSND,ob);
+            SD_PlaySound(HALTSND);
             NewState (ob,&s_grdchase1);
             ob->speed *= 3;                 // go faster when chasing player
             break;
 
         case officerobj:
-            PlaySoundLocActor(SPIONSND,ob);
+            SD_PlaySound(SPIONSND);
             NewState (ob,&s_ofcchase1);
             ob->speed *= 5;                 // go faster when chasing player
             break;
@@ -1327,13 +1327,13 @@ void FirstSighting (objtype *ob)
             break;
 
         case ssobj:
-            PlaySoundLocActor(SCHUTZADSND,ob);
+            SD_PlaySound(SCHUTZADSND);
             NewState (ob,&s_sschase1);
             ob->speed *= 4;                 // go faster when chasing player
             break;
 
         case dogobj:
-            PlaySoundLocActor(DOGBARKSND,ob);
+            SD_PlaySound(DOGBARKSND);
             NewState (ob,&s_dogchase1);
             ob->speed *= 2;                 // go faster when chasing player
             break;

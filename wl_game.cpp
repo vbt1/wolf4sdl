@@ -69,39 +69,6 @@ void GameLoop (void);
 =============================================================================
 */
 
-/*
-==========================
-=
-= SetSoundLocGlobal - Sets up globalsoundx & globalsoundy and then calls
-=       UpdateSoundLoc() to transform that into relative channel volumes. Those
-=       values are then passed to the Sound Manager so that they'll be used for
-=       the next sound played (if possible).
-=
-= JAB
-=
-==========================
-*/
-void PlaySoundLocGlobal(word s,fixed gx,fixed gy)
-{
-	//slPrint("PlaySoundLocGlobal",slLocate(10,19));
-    //SetSoundLoc(gx, gy);
-    //SD_PositionSound(leftchannel, rightchannel);
-
-//    int channel = 
-	SD_PlaySound((soundnames) s);
-	/*
-    if(channel)
-    {
-        channelSoundPos[channel - 1].globalsoundx = gx;
-        channelSoundPos[channel - 1].globalsoundy = gy;
-        channelSoundPos[channel - 1].valid = 1;
-    }		*/
-}
-
-/*
-**      JAB End
-*/
-
 #ifdef USE_SPRITES
 TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 
@@ -117,7 +84,7 @@ void set_sprite(PICTURE *pcptr)
 void loadActorTexture(int texture)
 {
 	extern TEXTURE tex_spr[];
-	byte bmpbuff[64*64];
+	unsigned char bmpbuff[64*64];
 	PICTURE pic_spr;
 	t_compshape   *shape = (t_compshape   *)PM_GetSprite(texture);
 	
@@ -126,6 +93,7 @@ void loadActorTexture(int texture)
 //	slPrint((char *)msg,slLocate(1,6));	
 	
 	unsigned short  *cmdptr, *sprdata;
+	unsigned char  *sprdata8;
 	// set the texel index to the first texel
 	unsigned char  *sprite = (unsigned char  *)shape;
 	unsigned char  *sprptr = (unsigned char  *)shape+((((shape->rightpix-shape->leftpix)+1)*2)+4);
@@ -134,25 +102,63 @@ void loadActorTexture(int texture)
 	memset(bmpbuff,0,64*64);
 	// setup a pointer to the column offsets	
 	cmdptr = shape->dataofs;
-
+	
 	for (int x = shape->leftpix; x <= shape->rightpix; x++)
 	{
 		sprdata = (unsigned short *)(sprite+*cmdptr);
 
-		while ((SWAP_BYTES_16(*sprdata)) != 0)
+		while (((*sprdata)) != 0)
 //		while (*sprdata != 0)
 		{
-			for (int y = ((SWAP_BYTES_16(sprdata[2]))/2); y < (SWAP_BYTES_16(*sprdata)/2); y++)
-//			for (int y = (sprdata[2]/2); y < (*sprdata/2); y++)
+			for (int y = (sprdata[2]/2); y < (*sprdata/2); y++)
 			{
-				bmpbuff[(y<<6)+x] = *sprptr++;
-				if(bmpbuff[(y<<6)+x]==0)
-					bmpbuff[(y<<6)+x]=0xa0;
+				bmpbuff[((y)<<6)+x] = (*sprptr++);
+//				if(bmpbuff[(y<<6)+x]==0)
+//					bmpbuff[(y<<6)+x]=0xa0;
 			}
 			sprdata += 3;
 		}
 		cmdptr++;
 	}
+/*
+		for(int y=0;y<64;y+=2)
+		{
+			unsigned char temp[64];
+			memcpy(temp,bmpbuff[y*64],64);
+			memcpy(bmpbuff[y*64],bmpbuff[(y+1)*64],64);
+			memcpy(bmpbuff[(y+1)*64],temp,64);
+
+		}
+	*/
+/*	const BYTE* data = (const BYTE*)lump.GetMem();
+
+	for(int x = 0;x < Width;x++)
+	{
+		BYTE* out = Pixels+(x*Height);
+		const BYTE* column = data+ReadLittleShort(&data[4+x*2]);
+		int start, end;
+		while((end = ReadLittleShort(column)) != 0)
+		{
+			end = (end>>1) - TopCrop;
+			const BYTE* in = data+int16_t(ReadLittleShort(column+2))+TopCrop;
+			start = (ReadLittleShort(column+4)>>1) - TopCrop;
+			column += 6;
+			for(int y = start;y < end;y++)
+				out[y] = GPalette.Remap[in[y]];
+		}
+*/
+
+
+	
+/*	
+		for (int y=0;y<64;y+=2)
+		{
+			Uint8 tmp1=bmpbuff[y];
+			Uint8 tmp2=bmpbuff[y+1];
+			bmpbuff[y]=tmp2;
+			bmpbuff[y+1]=tmp1;
+		}	
+*/	
 
 	pic_spr.texno = SATURN_WIDTH+texture;
 	pic_spr.cmode = COL_256;
@@ -938,7 +944,7 @@ void DrawPlayScreen (void)
     DrawScore ();
   	//		slPrint("DrawScore",slLocate(10,30));
 }
-
+/*
 // Uses LatchDrawPic instead of StatusDrawPic
 void LatchNumberHERE (int x, int y, unsigned width, int32_t number)
 {
@@ -965,7 +971,7 @@ void LatchNumberHERE (int x, int y, unsigned width, int32_t number)
         c++;
     }
 }
-
+*/
 void ShowActStatus()
 {
     // Draw status bar without borders

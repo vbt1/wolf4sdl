@@ -338,13 +338,13 @@ void T_Projectile (objtype *ob)
 #ifndef APOGEE_1_0          // actually the whole method is never reached in shareware 1.0
         if (ob->obclass == rocketobj)
         {
-            PlaySoundLocActor(MISSILEHITSND,ob);
+            SD_PlaySound(MISSILEHITSND);
             ob->state = &s_boom1;
         }
 #ifdef SPEAR
         else if (ob->obclass == hrocketobj)
         {
-            PlaySoundLocActor(MISSILEHITSND,ob);
+            SD_PlaySound(MISSILEHITSND,ob);
             ob->state = &s_hboom1;
         }
 #endif
@@ -1087,7 +1087,7 @@ void A_DeathScream (objtype *ob)
             case officerobj:
             case ssobj:
             case dogobj:
-                PlaySoundLocActor(DEATHSCREAM6SND,ob);
+                SD_PlaySound(DEATHSCREAM6SND);
                 return;
         }
     }
@@ -1096,7 +1096,7 @@ void A_DeathScream (objtype *ob)
     switch (ob->obclass)
     {
         case mutantobj:
-            PlaySoundLocActor(AHHHGSND,ob);
+            SD_PlaySound(AHHHGSND);
             break;
 
         case guardobj:
@@ -1114,20 +1114,20 @@ void A_DeathScream (objtype *ob)
             };
 
 #ifndef UPLOAD
-            PlaySoundLocActor(sounds[US_RndT()%8],ob);
+            SD_PlaySound(sounds[US_RndT()%8]);
 #else
-            PlaySoundLocActor(sounds[US_RndT()%2],ob);
+            SD_PlaySound(sounds[US_RndT()%2]);
 #endif
             break;
         }
         case officerobj:
-            PlaySoundLocActor(NEINSOVASSND,ob);
+            SD_PlaySound(NEINSOVASSND);
             break;
         case ssobj:
-            PlaySoundLocActor(LEBENSND,ob); // JAB
+            SD_PlaySound(LEBENSND); // JAB
             break;
         case dogobj:
-            PlaySoundLocActor(DOGDEATHSND,ob);      // JAB
+            SD_PlaySound(DOGDEATHSND);      // JAB
             break;
 #ifndef SPEAR
         case bossobj:
@@ -1683,15 +1683,15 @@ void T_Launch (objtype *ob)
         case deathobj:
             newobj->state = &s_hrocket;
             newobj->obclass = hrocketobj;
-            PlaySoundLocActor (KNIGHTMISSILESND,newobj);
+            SD_PlaySound (KNIGHTMISSILESND,newobj);
             break;
         case angelobj:
             newobj->state = &s_spark1;
             newobj->obclass = sparkobj;
-            PlaySoundLocActor (ANGELFIRESND,newobj);
+            SD_PlaySound (ANGELFIRESND,newobj);
             break;
         default:
-            PlaySoundLocActor (MISSILEFIRESND,newobj);
+            SD_PlaySound (MISSILEFIRESND,newobj);
     }
 
     newobj->dir = nodir;
@@ -2337,7 +2337,7 @@ void T_SchabbThrow (objtype *ob)
     newobj->flags = FL_NEVERMARK;
     newobj->active = ac_yes;
 
-    PlaySoundLocActor (SCHABBSTHROWSND,newobj);
+    SD_PlaySound (SCHABBSTHROWSND);
 }
 
 /*
@@ -2382,7 +2382,7 @@ void T_GiftThrow (objtype *ob)
     newobj->active = ac_yes;
 
 #ifndef APOGEE_1_0          // T_GiftThrow will never be called in shareware v1.0
-    PlaySoundLocActor (MISSILEFIRESND,newobj);
+    SD_PlaySound (MISSILEFIRESND);
 #endif
 }
 
@@ -2926,7 +2926,7 @@ void A_HitlerMorph (objtype *ob)
 void A_MechaSound (objtype *ob)
 {
     if (areabyplayer[ob->areanumber])
-        PlaySoundLocActor (MECHSTEPSND,ob);
+        SD_PlaySound (MECHSTEPSND);
 }
 
 void A_Slurpie (objtype *)
@@ -2944,7 +2944,7 @@ void A_Slurpie (objtype *)
 
 void T_FakeFire (objtype *ob)
 {
-    int32_t deltax,deltay;
+   int32_t deltax,deltay;
 //	  FIXED deltax,deltay;
     float   angle;
 //    int   angle;
@@ -2981,7 +2981,7 @@ void T_FakeFire (objtype *ob)
     newobj->flags = FL_NEVERMARK;
     newobj->active = ac_yes;
 
-    PlaySoundLocActor (FLAMETHROWERSND,newobj);
+    SD_PlaySound (FLAMETHROWERSND);
 }
 
 
@@ -3544,29 +3544,29 @@ void T_Shoot (objtype *ob)
     switch(ob->obclass)
     {
         case ssobj:
-            PlaySoundLocActor(SSFIRESND,ob);
+            SD_PlaySound(SSFIRESND);
             break;
 #ifndef SPEAR
 #ifndef APOGEE_1_0
         case giftobj:
         case fatobj:
-            PlaySoundLocActor(MISSILEFIRESND,ob);
+            SD_PlaySound(MISSILEFIRESND);
             break;
 #endif
         case mechahitlerobj:
         case realhitlerobj:
         case bossobj:
-            PlaySoundLocActor(BOSSFIRESND,ob);
+            SD_PlaySound(BOSSFIRESND);
             break;
         case schabbobj:
-            PlaySoundLocActor(SCHABBSTHROWSND,ob);
+            SD_PlaySound(SCHABBSTHROWSND);
             break;
         case fakeobj:
-            PlaySoundLocActor(FLAMETHROWERSND,ob);
+            SD_PlaySound(FLAMETHROWERSND);
             break;
 #endif
         default:
-            PlaySoundLocActor(NAZIFIRESND,ob);
+            SD_PlaySound(NAZIFIRESND);
     }
 }
 
@@ -3583,7 +3583,7 @@ void T_Bite (objtype *ob)
 {
     int32_t    dx,dy;
 
-    PlaySoundLocActor(DOGATTACKSND,ob);     // JAB
+    SD_PlaySound(DOGATTACKSND);     // JAB
 
     dx = player->x - ob->x;
     if (dx<0)
@@ -3743,7 +3743,7 @@ void T_BJJump (objtype *ob)
 
 void T_BJYell (objtype *ob)
 {
-    PlaySoundLocActor(YEAHSND,ob);  // JAB
+    SD_PlaySound(YEAHSND);  // JAB
 }
 
 

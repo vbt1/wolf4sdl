@@ -1030,7 +1030,7 @@ static void InitGame()
 #endif
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
     {
-        printf("Unable to init SDL: %s\n", SDL_GetError());
+//        printf("Unable to init SDL: %s\n", SDL_GetError());
         exit(1);
     }
 	SDL_SetVideoMode  (screenWidth, screenHeight, screenBits, NULL);
@@ -1364,9 +1364,9 @@ static void DemoLoop()
 #ifndef JAPAN
 //slPrint((char*)"PG13 or StartCPMusic",slLocate(10,22));	
 
-    if (!param_nowait)
-        PG13 ();
-    else
+//    if (!param_nowait)
+//        PG13 ();
+//    else
 		StartCPMusic(INTROSONG);
 #endif
 

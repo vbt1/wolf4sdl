@@ -28,7 +28,7 @@ OBJECTS = ./objects
 #CCFLAGS = -O2 -m2 -Wno-narrowing -fuse-linker-plugin -fno-web -fno-gcse -fno-unit-at-a-time -fomit-frame-pointer -flto
 #CCFLAGS = -O2 -m2 -Wno-narrowing -fno-web -fno-gcse -fno-unit-at-a-time -fomit-frame-pointer -fpermissive -fno-lto -fno-builtin
 #CCFLAGS = -Os -m2 -Wno-conversion-null -Wno-narrowing -fuse-linker-plugin -fno-unit-at-a-time -fomit-frame-pointer -flto -fpermissive -fno-builtin
-CCFLAGS = -Os -m2 -Wno-conversion-null -Wno-narrowing -fpermissive -fno-lto -fno-builtin
+CCFLAGS = -Os -m2 -Wno-conversion-null -Wno-narrowing -fpermissive -fno-lto -fno-builtin -funit-at-a-time
 #CCFLAGS = -O0 -m2 -Wno-write-strings -Wno-narrowing -fno-lto
 CCFLAGS += $(CFLAGS)
 #CCFLAGS += -std=gnu99

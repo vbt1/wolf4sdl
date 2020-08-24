@@ -96,8 +96,8 @@ void	VL_SetVGAPlaneMode (void)
         SDL_SWSURFACE | (screenBits == 8 ? SDL_HWPALETTE : 0) );
     if(!screen)
     {
-        printf("Unable to set %ix%ix%i video mode: %s\n", screenWidth,
-            screenHeight, screenBits, SDL_GetError());
+//        printf("Unable to set %ix%ix%i video mode: %s\n", screenWidth,
+//            screenHeight, screenBits, SDL_GetError());
         exit(1);
     }
 
@@ -110,7 +110,7 @@ void	VL_SetVGAPlaneMode (void)
         screenHeight, 8, 0, 0, 0, 0);
     if(!screenBuffer)
     {
-        printf("Unable to create screen buffer surface: %s\n", SDL_GetError());
+//        printf("Unable to create screen buffer surface: %s\n", SDL_GetError());
         exit(1);
     }
     SDL_SetColors(screenBuffer, gamepal, 0, 256);
