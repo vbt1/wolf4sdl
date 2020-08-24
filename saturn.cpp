@@ -258,7 +258,7 @@ unsigned char *sndDrvAddr;
 		GFS_Load(GFS_NameToId((Sint8*)SDDRV_NAME),0,(void *) sndDrvAddr,SDDRV_SIZE);
 		slInitSound(sndDrvAddr , SDDRV_SIZE , (Uint8 *)sound_map , sizeof(sound_map)) ;
 		sndDrvAddr = NULL;		
-	slPrint("                                    ",slLocate(2,21));
+//	slPrint("                                    ",slLocate(2,21));
 #endif
 	}
 

@@ -1058,24 +1058,22 @@ static void InitGame()
 #endif
 	//ajout VBT
 //param_nowait = true;
-slPrint((char *)"VH_Startup     ",slLocate(10,12));
+//slPrint((char *)"VH_Startup     ",slLocate(10,12));
     VH_Startup ();
 //    IN_Startup (); // VBT à remettre
-slPrint((char *)"PM_Startup     ",slLocate(10,12));
+//slPrint((char *)"PM_Startup     ",slLocate(10,12));
     PM_Startup ();
-slPrint((char *)"SD_Startup     ",slLocate(10,12));
+//slPrint((char *)"SD_Startup     ",slLocate(10,12));
     SD_Startup ();
-slPrint((char *)"CA_Startup     ",slLocate(10,12));
+//slPrint((char *)"CA_Startup     ",slLocate(10,12));
     CA_Startup ();
-slPrint((char *)"US_Startup     ",slLocate(10,12));
+//slPrint((char *)"US_Startup     ",slLocate(10,12));
     US_Startup ();
     // TODO: Will any memory checking be needed someday??
 //
 // build some tables
-slPrint((char *)"InitDigiMap     ",slLocate(10,12));
+//slPrint((char *)"InitDigiMap     ",slLocate(10,12));
     InitDigiMap ();
-slPrint((char *)"ReadConfig     ",slLocate(10,12));
-//    ReadConfig ();
 	viewsize = 19;                          // start with a good size
 
 //    SetupSaveGames();
@@ -1101,10 +1099,8 @@ slPrint((char *)"ReadConfig     ",slLocate(10,12));
 //
 // load in and lock down some basic chunks
 //
-slPrint((char *)"CA_CacheGrChunk     ",slLocate(10,12));
 
     CA_CacheGrChunk(STARTFONT);
-slPrint((char *)"CA_CacheGrChunk     ",slLocate(10,12));
 
     CA_CacheGrChunk(STATUSBARPIC);
 //	slTVOff();

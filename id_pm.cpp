@@ -127,13 +127,12 @@ void PM_Startup()
                     i, pageOffsets[i], fileSize);
     }	
 #endif
-	slPrintHex(ChunksInFile,slLocate(1,6));	
+/*	slPrintHex(ChunksInFile,slLocate(1,6));	
 	slPrintHex(PMSpriteStart,slLocate(1,7));		
 	slPrintHex(PMSoundStart,slLocate(1,8));		
 	slPrintHex(pageLengths[j-2],slLocate(1,9));		
 	slPrintHex(pageLengths[j-1],slLocate(1,10));
-
-//while(1);		
+*/		
 
     uint8_t *PMPageData = (uint8_t *) 0x00202000;
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
@@ -165,12 +164,13 @@ void PM_Startup()
 		
 		if(i >= PMSpriteStart && i < PMSoundStart)
         {
-			for (int y=0;y<end;y+=2)
+			t_compshape   *shape = (t_compshape   *)ptr;
+			shape->leftpix=SWAP_BYTES_16(shape->leftpix);
+			shape->rightpix=SWAP_BYTES_16(shape->rightpix);
+
+			for (int x=0;x<(shape->rightpix-shape->leftpix)+1;x++ )
 			{
-				Uint8 tmp1=ptr[y];
-				Uint8 tmp2=ptr[y+1];
-				ptr[y]=tmp2;
-				ptr[y+1]=tmp1;
+				shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
 			}
 		}
 		ptr+=end;

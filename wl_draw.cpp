@@ -841,7 +841,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     scale=height>>1;
     pixheight=scale*SPRITESCALEFACTOR;
 #ifdef USE_SPRITES	
-slPrintHex(shapenum,slLocate(10,4));
+//slPrintHex(shapenum,slLocate(10,4));
 	loadActorTexture(shapenum);
 //--------------------------------------------------------------------------------------------
 	extern 	TEXTURE tex_spr[];		
