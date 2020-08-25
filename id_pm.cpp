@@ -127,13 +127,6 @@ void PM_Startup()
                     i, pageOffsets[i], fileSize);
     }	
 #endif
-/*	slPrintHex(ChunksInFile,slLocate(1,6));	
-	slPrintHex(PMSpriteStart,slLocate(1,7));		
-	slPrintHex(PMSoundStart,slLocate(1,8));		
-	slPrintHex(pageLengths[j-2],slLocate(1,9));		
-	slPrintHex(pageLengths[j-1],slLocate(1,10));
-*/		
-
     uint8_t *PMPageData = (uint8_t *) 0x00202000;
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
     CHECKMALLOCRESULT(PMPages);

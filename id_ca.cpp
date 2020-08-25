@@ -26,7 +26,7 @@ loaded into the data segment
 
 #pragma hdrstop
 #define THREEBYTEGRSTARTS
-//#define HEAP_WALK 1
+#define HEAP_WALK 1
 
 extern unsigned int position_vram;
 
@@ -893,7 +893,7 @@ void CA_CacheGrChunk (int chunk)
 
     if (grsegs[chunk])
 	{
-		slPrint((char *)"already in memory",slLocate(10,11));
+//		slPrint((char *)"already in memory",slLocate(10,11));
         return;                             // already in memory
 	}
 //

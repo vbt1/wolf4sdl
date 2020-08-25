@@ -643,7 +643,7 @@ slIntFunction(VblIn) ;
     InitActorList ();                       // start spawning things with a clean slate
     InitDoorList ();
     InitStaticList ();
-
+	
     map = mapsegs[0];
     for (y=0;y<mapheight;y++)
     {
@@ -678,7 +678,11 @@ slIntFunction(VblIn) ;
     }
 // vbt : on recharge la vram
 #ifdef USE_SPRITES
-position_vram=SATURN_WIDTH*32;
+	position_vram=SATURN_WIDTH*32;
+
+	if(viewheight == screenHeight)
+		VL_ClearScreen(0);	
+	//	VGAClearScreen ();
 #endif
 //
 // spawn actors
@@ -713,6 +717,7 @@ position_vram=SATURN_WIDTH*32;
             }
         }
     }
+	slScrTransparent(NBG1OFF);
 }
 
 
@@ -1278,10 +1283,9 @@ startplayloop:
                 gamestate.keys = 0;
                 DrawKeys ();
                 VW_FadeOut ();
-                
                 LevelCompleted ();              // do the intermission
 // vbt pour garder les clefs.
-gamestate.keys = 3;				
+	gamestate.keys = 3;				
                 if(viewsize == 21) DrawPlayScreen();
 
 #ifdef SPEARDEMO

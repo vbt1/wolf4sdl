@@ -87,7 +87,7 @@ boolean param_ignorenumchunks = false;
 unsigned frame_x=0,frame_y=0;
 
 void VblIn(void);
-
+extern int vbt;
 void VblIn(void)
 {
 	char buffer[8];
@@ -96,9 +96,11 @@ void VblIn(void)
 				 
 	if(frame_y==60)
 	{
-		slPrint((char*)"fps     ",slLocate(10,1));
-		slPrint((char*)ltoa(frame_x,buffer,8),slLocate(14,1));			
+		slPrint((char*)"fps                                                   ",slLocate(10,1));
+		slPrint((char*)ltoa(frame_x,buffer,8),slLocate(14,1));
+slPrint((char*)ltoa(vbt,buffer,8),slLocate(22,1));		
 		frame_y=frame_x=0;
+		vbt=0;
 	}		   
 }
 
@@ -1040,7 +1042,8 @@ static void InitGame()
 //#endif
     atexit(SDL_Quit);
     SignonScreen ();
-
+	 slScrTransparent(NBG1ON);
+	 
 #if defined _WIN32
     if(!fullscreen)
     {
@@ -1149,12 +1152,12 @@ boolean SetViewSize (unsigned width, unsigned height)
         viewscreeny = (screenHeight-scaleFactor*STATUSLINES-viewheight)/2;
         screenofs = viewscreeny*screenWidth+viewscreenx;
     }
-
-//
 // calculate trace angles and projection constants
 //
     CalcProjection (FOCALLENGTH);
-
+#ifdef USE_SPRITES
+	VGAClearScreen ();
+#endif
     return true;
 }
 
@@ -1229,8 +1232,6 @@ void Quit (const char *errorStr, ...)
     }
     else error[0] = 0;
  	slPrint((char *)error,slLocate(1,3));
-	
-//	while(1);
 	
     if (!pictable)  // don't try to display the red box before it's loaded
     {

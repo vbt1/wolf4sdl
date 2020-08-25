@@ -1212,11 +1212,23 @@ void PlayLoop (void)
 extern int frame_x,frame_y;
 	frame_x++;
 //if(frame_y+1>=60)
+#ifdef USE_SPRITES
+	extern int vbt;
+	extern SPRITE user_walls[];
+	SPRITE *user_wall = user_walls;
+
+	for(int pixx=0;pixx<viewwidth;pixx++)
+    {
+		slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre
+		user_wall++;
+		vbt++;
+	}
+#endif		
+
 	slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
 
 #ifdef USE_SPRITES		
 		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH * 64) );
-
 		position_vram = SATURN_WIDTH*32+static_items*0x800;
 #endif
 		

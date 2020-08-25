@@ -652,10 +652,9 @@ byte vgaCeiling[]=
 =
 =====================
 */
-#ifndef USE_SPRITES	
 void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
 {
-
+#ifndef USE_SPRITES	
     byte ceiling=vgaCeiling[gamestate.episode*10+mapon];
 
     int y;
@@ -672,8 +671,45 @@ void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
         memset(ptr, 0x19, viewwidth);
 #endif
 
-}
+#else
+	extern byte vgaCeiling[];
+	extern SDL_Color curpal[256];
+	unsigned char y;
+	Uint16	*Line_Color_Pal0	=(Uint16 *)LINE_COLOR_TABLE;
+
+	SDL_Color *sdlCeilingColor = (SDL_Color *)&curpal[vgaCeiling[gamestate.episode*10+mapon]];
+	Uint16 ceilingColor = SDL_MapRGB(NULL,(*sdlCeilingColor).r,(*sdlCeilingColor).g,(*sdlCeilingColor).b);
+	int start=0,end=0;
+
+    if(viewsize == 21)
+	{
+		end=120;
+	}
+    else if(viewsize == 20)
+	{
+				end=screenHeight/2;
+//		end=(screenHeight + scaleFactor * STATUSLINES)/2;	
+	}
+    else
+	{	
+		start=viewscreeny;
+		end =(viewheight+start*2)/2;
+	}	
+
+	for(y = start; y < end; y++)
+		Line_Color_Pal0[y] = ceilingColor;
+	
+	for(; y < viewheight+viewscreeny; y++)
+		Line_Color_Pal0[y] = RGB(14,14,14);
+
+	for(; y < 240; y++)
+		Line_Color_Pal0[y] = RGB(0,0,0);
+	
+	slBackColTable((void *)LINE_COLOR_TABLE);
 #endif
+
+}
+
 //==========================================================================
 
 /*
@@ -709,7 +745,7 @@ int CalcRotate (objtype *ob)
 
     return angle/(ANGLES/8);
 }
-
+int vbt=0;
 void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 {
     unsigned scale,pixheight;
@@ -751,6 +787,7 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
 	slSetSprite(&user_sprite, toFIXED(0+(SATURN_SORT_VALUE-pixheight/2)));	// à remettre
+	vbt++;
 //--------------------------------------------------------------------------------------------	
 #else
     t_compshape *shape;
@@ -765,7 +802,7 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
     int actx,i,upperedge;
     short newstart;
     int scrstarty,screndy,lpix,rpix,pixcnt,ycnt;
-	
+
     actx=xcenter-scale;
     upperedge=viewheight/2-scale;
 
@@ -794,7 +831,7 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
                         endy >>= 1;
                         newstart = READWORD(line);
                         starty = READWORD(line) >> 1;
-                        j=starty;
+//                        j=starty;
                         ycnt=j*pixheight;
                         screndy=(ycnt>>6)+upperedge;
                         if(screndy<0) vmem=vbuf+lpix;
@@ -833,10 +870,7 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 
 void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
 {
-    t_compshape   *shape;
     unsigned scale,pixheight;
-
-    shape = (t_compshape *) PM_GetSprite(shapenum);
 
     scale=height>>1;
     pixheight=scale*SPRITESCALEFACTOR;
@@ -859,8 +893,11 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
 	slSetSprite(&user_sprite, toFIXED(10)); //+(SATURN_SORT_VALUE+1)));	// à remettre	
+	vbt++;
 //--------------------------------------------------------------------------------------------	
 #else
+    t_compshape   *shape;
+    shape = (t_compshape *) PM_GetSprite(shapenum);
 
     unsigned starty,endy;
     word *cmdptr;
@@ -2087,6 +2124,7 @@ inline void WallRefresh (void)
 #endif	
 //	AsmRefreshSlave();
     AsmRefresh ();
+	/*
 #ifdef USE_SPRITES
 	SPRITE *user_wall = user_walls;
 
@@ -2094,8 +2132,10 @@ inline void WallRefresh (void)
     {
 		slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre
 		user_wall++;
+		vbt++;
 	}
 #endif	
+*/
 }
 
 void CalcViewVariables()

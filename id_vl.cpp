@@ -260,7 +260,7 @@ void VL_SetPalette (SDL_Color *palette)
 
 void VL_GetPalette (SDL_Color *palette)
 {
-    memcpy(palette, curpal, sizeof(SDL_Color) * 256);
+    memcpyl(palette, curpal, sizeof(SDL_Color) * 256);
 }
 
 

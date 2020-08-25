@@ -468,6 +468,8 @@ US_ControlPanel (ScanCode scancode)
                 if (MainMenu[viewscores].routine == NULL)
                 {
                     if (CP_EndGame (0))
+	//slPrint("exit game 5!!!!",slLocate(10,11));	
+						
                         StartGame = 1;
                 }
                 else
@@ -486,6 +488,7 @@ US_ControlPanel (ScanCode scancode)
 
             case -1:
             case quit:
+				//slPrint("exit game !!!!",slLocate(10,11));
                 CP_Quit (0);
                 break;
 
@@ -504,19 +507,23 @@ US_ControlPanel (ScanCode scancode)
 		slSynch(); // vbt ajout 26/05
     }
     while (!StartGame);
+	//slPrint("exit game 6!!!!",slLocate(10,11));	
+
     //
     // DEALLOCATE EVERYTHING
     //
     CleanupControlPanel ();
+	//slPrint("exit game 7!!!!",slLocate(10,11));	
 
     //
     // CHANGE MAINMENU ITEM
     //
     if (startgame)
         EnableEndGameMenuItem();
-
+	//slPrint("exit game 8!!!!",slLocate(10,11));	
+	
     // RETURN/START GAME EXECUTION
-
+	slScrTransparent(NBG1OFF);
 #ifdef SPEAR
     UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
 #endif
@@ -537,7 +544,8 @@ void EnableEndGameMenuItem()
 void
 DrawMainMenu (void)
 {
-//	slPrint("DrawMainMenu",slLocate(10,15));
+	 slScrTransparent(NBG1ON);
+	slPrint("DrawMainMenu",slLocate(10,15));
 #ifdef JAPAN
     CA_CacheScreen (S_OPTIONSPIC);
 #else
@@ -767,8 +775,13 @@ CP_EndGame (int)
 #else
     res = Confirm (ENDGAMESTR);
 #endif
+	//slPrint("exit game !!!!",slLocate(10,11));	
+
     DrawMainMenu();
+	//slPrint("exit game 2!!!!",slLocate(10,11));	
+
     if(!res) return 0;
+	//slPrint("exit game 3!!!!",slLocate(10,11));	
 
     /*pickquick =*/ gamestate.lives = 0;
     playstate = ex_died;
@@ -779,6 +792,7 @@ CP_EndGame (int)
 #ifndef JAPAN
     strcpy (MainMenu[viewscores].string, STR_VS);
 #endif
+	//slPrint("exit game 4!!!!",slLocate(10,11));	
 
     return 1;
 }
@@ -1104,7 +1118,7 @@ CP_ChangeView (int)
         }
     }
     while (!exit);
-
+	
     if (oldview != newview)
     {
         SD_PlaySound (SHOOTSND);
@@ -1114,6 +1128,7 @@ CP_ChangeView (int)
 
     ShootSnd ();
     MenuFadeOut ();
+	
     if(screenHeight % 200 != 0)
         VL_ClearScreen(0);
 
@@ -1128,6 +1143,7 @@ CP_ChangeView (int)
 void
 DrawChangeView (int view)
 {
+	slScrTransparent(NBG1OFF);
     int rescaledHeight = screenHeight / scaleFactor;
     if(view != 21) VWB_Bar (0, rescaledHeight - 40, 320, 40, bordercol);
 
@@ -1159,6 +1175,7 @@ DrawChangeView (int view)
 int
 CP_Quit (int)
 {
+		//slPrint("exit game 1 !!!!",slLocate(10,11));
 #ifdef JAPAN
     if (GetYorN (7, 11, C_QUITMSGPIC))
 #else

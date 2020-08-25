@@ -560,31 +560,21 @@ LevelCompleted (void)
         {0, "??:??"},           // Secret level 2
 #endif
     };
-
-//   slPrint("End Level",slLocate(10,10));
-//   slPrint("CacheLump",slLocate(10,11));
-
     CacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
-//   slPrint("ClearSplitVWB",slLocate(10,12));
-
     ClearSplitVWB ();           // set up for double buffering in split screen
-//   slPrint("VWB_Bar",slLocate(10,13));
+	slBack1ColSet((void *)BACK_COL_ADR , 0);	
+	slScrTransparent(NBG1OFF);
+	slSynch();
     VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
     if (bordercol != VIEWCOLOR)
         DrawStatusBorder (VIEWCOLOR);
-//   slPrint("StartCPMusic",slLocate(10,14));
     StartCPMusic (ENDLEVEL_MUS);
-   //slPrint("StartCPMusic",slLocate(10,14));
 //
 // do the intermission
 //
-//   slPrint("IN_ClearKeysDown",slLocate(10,14));
-
     IN_ClearKeysDown ();
-//   slPrint("IN_StartAck",slLocate(10,14));
-
     IN_StartAck ();
-
+	
 #ifdef JAPAN
     CA_CacheGrChunk (C_INTERMISSIONPIC);
     VWB_DrawPic (0, 0, C_INTERMISSIONPIC);
@@ -661,7 +651,6 @@ LevelCompleted (void)
 
         VW_UpdateScreen ();
         VW_FadeIn ();
-
 
         //
         // FIGURE RATIOS OUT BEFOREHAND
@@ -950,6 +939,7 @@ done:   itoa (kr, tempstr, 10);
     DrawPlayBorder();
 
     UnCacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
+	slBackColTable((void *)LINE_COLOR_TABLE);
 }
 
 

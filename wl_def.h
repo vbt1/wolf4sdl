@@ -6,6 +6,7 @@
 #define SATURN_WIDTH 320
 #define SATURN_SORT_VALUE 240
 // 240 pour du 320, 264 pour du 352
+#define		LINE_COLOR_TABLE		(VDP2_VRAM_A0	+ 0x1f400)
 
 extern "C" {
 #include <malloc.h>
@@ -1412,7 +1413,7 @@ void GP2X_ButtonUp(int button);
 
 =============================================================================
 */
-
+void VGAClearScreen (void);
 extern "C" {
 extern fixed MTH_Mul2(fixed a, fixed b);
 }
