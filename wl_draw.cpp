@@ -14,7 +14,7 @@
 
 void heapWalk();
 #ifdef USE_SPRITES
-unsigned char wall_buffer[SATURN_WIDTH*64];
+unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 SPRITE user_walls[SATURN_WIDTH];
 #endif
 //unsigned char spr_buffer[30*64*64];
@@ -272,7 +272,7 @@ int CalcHeight(int xintercept, int yintercept)
 //int postx;
 //byte *postsource;
 //int postwidth;
-void loadActorTexture(int texture);
+void loadActorTexture(int texture,boolean direct);
 
 void ScalePost(int postx,byte *postsource)
 {
@@ -770,10 +770,10 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 
 if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 //	if(shapenum==296) //||shapenum==298||shapenum==299||shapenum==300||shapenum==301||shapenum==302)	
-	loadActorTexture(shapenum);
+	loadActorTexture(shapenum,true);
 //--------------------------------------------------------------------------------------------
 	extern 	TEXTURE tex_spr[];		
-	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+shapenum]; 
+	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+shapenum]; 
 // correct on touche pas		
     SPRITE user_sprite;
     user_sprite.CTRL = FUNC_Sprite | _ZmCC;
@@ -876,15 +876,15 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     pixheight=scale*SPRITESCALEFACTOR;
 #ifdef USE_SPRITES	
 //slPrintHex(shapenum,slLocate(10,4));
-	loadActorTexture(shapenum);
+	loadActorTexture(shapenum,false);
 //--------------------------------------------------------------------------------------------
 	extern 	TEXTURE tex_spr[];		
-	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+shapenum]; 
+	TEXTURE *txptr = &tex_spr[SATURN_WIDTH];
 // correct on touche pas		
     SPRITE user_sprite;
     user_sprite.CTRL = FUNC_Sprite | _ZmCC;
     user_sprite.PMOD=CL256Bnk| ECenb;// | ECenb | SPdis;  // pas besoin pour les sprites
-    user_sprite.SRCA=((txptr->CGadr));
+    user_sprite.SRCA=(void *)(0x2000|(SATURN_WIDTH*8));
     user_sprite.COLR=256;
     user_sprite.SIZE=0x840;
 	user_sprite.XA=(xcenter-centerx);

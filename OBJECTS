@@ -13,6 +13,7 @@
 		wl_agent.cpp \
 		wl_act1.cpp \
 		wl_act2.cpp \
+		wl_dir3dspr.cpp \
 		wl_draw.cpp \
 		wl_game.cpp \
 		wl_play.cpp \
@@ -23,11 +24,11 @@
 		wl_main.cpp 
 
 OBJS = $(filter %.o, $(SRCS:.s=.o) $(SRCS:.c=.o) $(SRCS:.cpp=.o))
-LIBS = C:/vbt/saturn/vbtsh4/toolchain/sh-elf/lib/libc.a C:/vbt/saturn/SBL6/SEGALIB/LIB/vbtelf2/libsgl_real_elf.a \
-C:/vbt/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_gfs.a \
-C:/vbt/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_dma.a \
-C:/vbt/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_mth.a \
-C:/vbt/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_int.a \
-C:/vbt/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_sys.a \
-C:/vbt/saturn/SBL6/SEGALIB/LIB/vbtelf2/cdcrep.a C:/vbt/saturn/vbtsh4/toolchain/sh-elf/lib/libc.a 
+LIBS = L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/libsgl_real_elf.a \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_gfs.a \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_dma.a \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_mth.a \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_int.a \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_sys.a \
+L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/cdcrep.a 
 

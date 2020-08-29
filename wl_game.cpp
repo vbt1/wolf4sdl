@@ -13,7 +13,7 @@ extern "C"{
 extern fixed MTH_Atan(fixed y, fixed x);
 }
 #ifdef USE_SPRITES
-unsigned int position_vram=SATURN_WIDTH*32;
+unsigned int position_vram=((SATURN_WIDTH+64)*32);
 unsigned int static_items=0;
 #endif
 
@@ -81,7 +81,7 @@ void set_sprite(PICTURE *pcptr)
 		
 //	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)pcptr->pcsrc,(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
 }
-void loadActorTexture(int texture)
+void loadActorTexture(int texture, boolean direct)
 {
 	extern TEXTURE tex_spr[];
 	byte bmpbuff[64*64];
@@ -112,11 +112,19 @@ void loadActorTexture(int texture)
 		cmdptr++;
 	}
 
-	pic_spr.texno = SATURN_WIDTH+texture;
-	pic_spr.cmode = COL_256;
-	pic_spr.pcsrc = &bmpbuff[0];
-	tex_spr[SATURN_WIDTH+texture] = TEXDEF(64, 64, position_vram);
-	set_sprite(&pic_spr);					
+	if(direct)
+	{
+		pic_spr.texno = SATURN_WIDTH+1+texture;
+		pic_spr.cmode = COL_256;
+		pic_spr.pcsrc = &bmpbuff[0];
+		tex_spr[SATURN_WIDTH+1+texture] = TEXDEF(64, 64, position_vram);
+		set_sprite(&pic_spr);
+	}
+	else
+	{
+		extern unsigned char wall_buffer[];
+		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)bmpbuff,64*64);
+	}
 	position_vram+=0x800;	
 	
 //char toto[100];
@@ -547,7 +555,7 @@ static void ScanInfoPlane(void)
 
 		if(sprite_list[texture]==0)
 		{
-			loadActorTexture(texture);
+			loadActorTexture(texture,true);
 			sprite_list[texture]=1;
 			static_items++;
 		}
@@ -678,7 +686,7 @@ slIntFunction(VblIn) ;
     }
 // vbt : on recharge la vram
 #ifdef USE_SPRITES
-	position_vram=SATURN_WIDTH*32;
+	position_vram=(SATURN_WIDTH+64)*32;
 
 	if(viewheight == screenHeight)
 		VL_ClearScreen(0);	
@@ -717,6 +725,7 @@ slIntFunction(VblIn) ;
             }
         }
     }
+	//VGAClearScreen ();
 	slScrTransparent(NBG1OFF);
 }
 

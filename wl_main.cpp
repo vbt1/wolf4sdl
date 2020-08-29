@@ -856,7 +856,7 @@ void InitDigiMap (void)
         SD_PrepareSound(map[1]);
     }
 }
-
+/*
 #ifndef SPEAR
 CP_iteminfo MusicItems={CTL_X,CTL_Y,6,0,32};
 CP_itemtype MusicMenu[]=
@@ -1009,7 +1009,7 @@ void DoJukebox(void)
 #endif
 }
 #endif
-
+*/
 /*
 ==========================
 =
@@ -1084,7 +1084,7 @@ static void InitGame()
 //
 // HOLDING DOWN 'M' KEY?
 //
-
+/*
 #ifndef SPEARDEMO
     if (Keyboard[sc_M])
     {
@@ -1093,7 +1093,7 @@ static void InitGame()
     }
     else
 #endif
-
+*/
 //
 // draw intro screen stuff
 //
@@ -1156,7 +1156,7 @@ boolean SetViewSize (unsigned width, unsigned height)
 //
     CalcProjection (FOCALLENGTH);
 #ifdef USE_SPRITES
-	VGAClearScreen ();
+//	VGAClearScreen ();
 #endif
     return true;
 }
@@ -1202,6 +1202,7 @@ void NewViewSize (int width)
         SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
     else
         SetViewSize(width*16*screenWidth/320, (unsigned) (width*16*HEIGHTRATIO*screenHeight/200));
+	VGAClearScreen ();
 }
 
 
