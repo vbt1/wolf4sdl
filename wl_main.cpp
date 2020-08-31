@@ -49,8 +49,6 @@ extern byte signon[];
 */
 
 //char    str[80];
-int     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8,
-                       5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
 
 //
 // proejection variables
@@ -689,9 +687,9 @@ void FinishSignon (void)
     #endif
 
     #endif
-	
+#ifndef USE_SPRITES	
     VH_UpdateScreen();
-	
+#endif	
     if (!param_nowait)
 	{
         IN_Ack ();
@@ -708,14 +706,16 @@ void FinishSignon (void)
     #else
     US_CPrint ("Working...");
     #endif
-
+#ifndef USE_SPRITES
     VH_UpdateScreen();
+#endif
     #endif
 
     SETFONTCOLOR(0,15);
 #else
+#ifndef USE_SPRITES	
     VH_UpdateScreen();
-
+#endif
     if (!param_nowait)
         VW_WaitVBL(3*70);
 #endif
@@ -1370,11 +1370,12 @@ static void DemoLoop()
 
 #endif
 	param_nowait = false;
-
+	
     while (1)
     {
         while (!param_nowait)
         {
+			slSynch(); // applique la non transparence
 //
 // title page
 //
@@ -1399,8 +1400,10 @@ static void DemoLoop()
 #else
 //slPrint((char*)"CA_CacheScreen1",slLocate(10,22));		
             CA_CacheScreen (TITLEPIC);
-//slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));			
+//slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
+#ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#endif
 //slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
             VW_FadeIn();
 #endif
@@ -1416,7 +1419,9 @@ static void DemoLoop()
 // credits page
 //
             CA_CacheScreen (CREDITSPIC);
+#ifndef USE_SPRITES			
             VW_UpdateScreen();
+#endif			
             VW_FadeIn ();
             if (IN_UserInput(TickBase*10))
                 break;
@@ -1425,7 +1430,9 @@ static void DemoLoop()
 // high scores
 //
             DrawHighScores ();
+#ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#endif			
             VW_FadeIn ();
             if (IN_UserInput(TickBase*10))
                 break;

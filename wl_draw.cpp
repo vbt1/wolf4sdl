@@ -55,8 +55,9 @@ ray_struc;
 
 =============================================================================
 */
-
+#ifndef USE_SPRITES
 //static byte *vbuf = NULL;
+#endif
 //unsigned vbufPitch = 0;
 
 int32_t    lasttimecount;
@@ -64,6 +65,7 @@ int32_t    lasttimecount;
 
 int *wallheight;
 int min_wallheight;
+//#define min_wallheight viewheight
 
 //
 // math tables
@@ -72,6 +74,9 @@ short *pixelangle;
 int32_t finetangent[FINEANGLES/4];
 fixed sintable[ANGLES+ANGLES/4];
 fixed *costable = sintable+(ANGLES/4);
+
+static int     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8,
+                       5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
 
 //
 // refresh variables
@@ -91,7 +96,6 @@ void    ThreeDRefresh (void);
 //
 // ray tracing variables
 //
-short   /*focaltx,focalty,*/viewtx,viewty;
 short   midangle;
 
 word horizwall[MAXWALLTILES],vertwall[MAXWALLTILES];
@@ -269,9 +273,6 @@ int CalcHeight(int xintercept, int yintercept)
 ===================
 */
 
-//int postx;
-//byte *postsource;
-//int postwidth;
 void loadActorTexture(int texture,boolean direct);
 
 void ScalePost(int postx,byte *postsource)
@@ -304,7 +305,7 @@ void ScalePost(int postx,byte *postsource)
 //	slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	
 //--------------------------------------------------------------------------------------------
 #else
-	
+    byte *vbuf = LOCK()+screenofs;	
     int ywcount, yoffs, yw, yd, yendoffs;
     byte col;
 
@@ -652,12 +653,13 @@ byte vgaCeiling[]=
 =
 =====================
 */
-void VGAClearScreen (void) // vbt : fond d'écran 2 barres grises
+void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 {
 #ifndef USE_SPRITES	
     byte ceiling=vgaCeiling[gamestate.episode*10+mapon];
 
     int y;
+	byte *vbuf = LOCK()+screenofs;
     byte *ptr = vbuf;
 #ifdef USE_SHADING
     for(y = 0; y < viewheight / 2; y++, ptr += curPitch)
@@ -790,6 +792,7 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 	vbt++;
 //--------------------------------------------------------------------------------------------	
 #else
+	byte *vbuf = LOCK()+screenofs;
     t_compshape *shape;
 
     unsigned starty,endy;
@@ -2150,8 +2153,8 @@ void CalcViewVariables()
 //    focaltx = (short)(viewx>>TILESHIFT);
 //    focalty = (short)(viewy>>TILESHIFT);
 
-    viewtx = (short)(player->x >> TILESHIFT);
-    viewty = (short)(player->y >> TILESHIFT);
+//    viewtx = (short)(player->x >> TILESHIFT);
+//    viewty = (short)(player->y >> TILESHIFT);
 }
 
 //==========================================================================
@@ -2172,9 +2175,7 @@ void    ThreeDRefresh (void)
     memset4_fast(spotvis,0,maparea);
     spotvis[player->tilex][player->tiley] = 1;       // Detect all sprites over player fix
 
-    byte *vbuf = VL_LockSurface(screenBuffer);
-//    if(vbuf == NULL) return;
-
+    byte *vbuf = (byte *)screenBuffer->pixels;
     vbuf += screenofs;
 	
     CalcViewVariables();
@@ -2207,7 +2208,7 @@ void    ThreeDRefresh (void)
 
 
 #ifdef USE_SPRITES
-    DrawPlayerWeapon (vbuf);    // draw player's hands
+//    DrawPlayerWeapon (vbuf);    // draw player's hands
 #endif
 //
 // draw all the scaled images
@@ -2222,23 +2223,28 @@ void    ThreeDRefresh (void)
         DrawSnow(vbuf, vbufPitch);
 #endif
 
-#ifndef USE_SPRITES
+//#ifndef USE_SPRITES
     DrawPlayerWeapon (vbuf);    // draw player's hands
-#endif
+//#endif
     if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
+	{
         ShowActStatus();
-
-    VL_UnlockSurface(screenBuffer);
-    vbuf = NULL;
+	}
+    VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
 
 //
 // show screen and time last cycle
 //
-
     if (fizzlein)
     {
+		memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
+//    FinishPaletteShifts ();
+
+//    VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
+	
         FizzleFade(screenBuffer, screen, 0, 0,
             screenWidth, screenHeight, 20, false);
+	
         fizzlein = false;
 
         lasttimecount = GetTimeCount();          // don't make a big tic count
@@ -2247,7 +2253,7 @@ void    ThreeDRefresh (void)
     else
     {
         SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-        SDL_UpdateRect(screen, 0, 0, 0, 0);
+//        SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
-#endif	
+#endif
 }

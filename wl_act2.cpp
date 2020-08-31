@@ -3852,9 +3852,9 @@ void    A_StartDeathCam (objtype *ob)
         Write(0,7,STR_SEEAGAIN);
 #endif
     }
-
+#ifndef USE_SPRITES
     VW_UpdateScreen ();
-
+#endif
     IN_UserInput(300);
 
     //

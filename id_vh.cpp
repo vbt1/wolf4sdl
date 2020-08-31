@@ -120,22 +120,14 @@ void VW_MeasurePropString (const char *string, word *width, word *height)
 
 =============================================================================
 */
-
+#ifndef USE_SPRITES
 void VH_UpdateScreen()
 {
-#ifndef USE_SPRITES	
-////slPrint("SDL_BlitSurface         ",slLocate(10,22));	
+	
 	SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-////slPrint("SDL_UpdateRect        ",slLocate(10,22));	
-	SDL_UpdateRect(screen, 0, 0, 0, 0);
-////slPrint("slSndFlush             ",slLocate(10,22));	
-	//slSndFlush() ;
-////slPrint("VH_UpdateScreen end ",slLocate(10,22));	
-//	slSynch();
-#endif	
-//if(gamestate.victoryflag)
-//	slSynch();
+//	SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
+#endif
 
 void VWB_DrawTile8 (int x, int y, int tile)
 {
@@ -377,18 +369,20 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 	IN_StartAck ();
 
 	frame = GetTimeCount();
-	byte *srcptr = VL_LockSurface(source);
+	byte *srcptr = (byte *)source->pixels;
 	do
 	{
 		if (abortable && IN_CheckAck ())
 		{
 //		    VL_UnlockSurface(source);
+#ifndef USE_SPRITES
             SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-            SDL_UpdateRect(screen, 0, 0, 0, 0);
+//            SDL_UpdateRect(screen, 0, 0, 0, 0);
+#endif			
 			return true;
 		}
 
-		byte *destptr = VL_LockSurface(dest);
+		byte *destptr = (byte *)dest->pixels;
 
 		for (p=0;p<pixperframe;p++)
 		{
@@ -417,31 +411,43 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 			// copy one pixel
 			//
 
-			if(screenBits == 8)
-			{
-				*(destptr + (y1 + y) * dest->pitch + x1 + x)
-					= *(srcptr + (y1 + y) * source->pitch + x1 + x);
-			}
-			else
-			{
-				byte col = *(srcptr + (y1 + y) * source->pitch + x1 + x);
-				uint32_t fullcol = SDL_MapRGB(dest->format, curpal[col].r, curpal[col].g, curpal[col].b);
-				memcpy(destptr + (y1 + y) * dest->pitch + (x1 + x) * dest->format->BytesPerPixel,
-						&fullcol, dest->format->BytesPerPixel);
-			}
+			*(destptr + (y1 + y) * dest->pitch + x1 + x) = *(srcptr + (y1 + y) * source->pitch + x1 + x);
+
 
 			if (rndval == 0)		// entire sequence has been completed
                 goto finished;
 		}
+
+	
+//slPrintHex(&source,slLocate(10,5));		
+//slPrintHex(&dest,slLocate(10,6));		
+slPrintHex(source->pixels,slLocate(10,7));			
+slPrintHex(dest->pixels,slLocate(10,8));	
+slPrintHex(source->pitch,slLocate(10,9));			
+slPrintHex(dest->pitch,slLocate(10,10));
+/*
+if (source->pixels==NULL)
+slPrint("source empty",slLocate(10,7));
+if (dest->pixels==NULL)
+slPrint("dest empty",slLocate(20,8));
+if (source->pitch==0)
+slPrint("src pitch",slLocate(20,9));
+if (dest->pitch==0)
+slPrint("dest pitch",slLocate(20,10));
+*/
+//		memset(dest->pixels,4,320*200);
         VL_UnlockSurface(dest);
-        SDL_UpdateRect(dest, 0, 0, 0, 0);
+    /*    SDL_UpdateRect(dest, 0, 0, 0, 0);
+		*/
 		frame++;
         Delay(frame-GetTimeCount());        // don't go too fast
+		slSynch();
 	} while (1);
 
 finished:
 //    VL_UnlockSurface(source);
-    VL_UnlockSurface(dest);
+/*    VL_UnlockSurface(dest);
     SDL_UpdateRect(dest, 0, 0, 0, 0);
+*/	
 	return false;
 }

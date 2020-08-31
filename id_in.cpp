@@ -121,12 +121,12 @@ static void processEvent(SDL_Event *event)
         {
             LastScan = event->key.keysym.sym;
 //            SDLMod mod = SDL_GetModState();
-            if(Keyboard[sc_Alt])
+/*            if(Keyboard[sc_Alt])
             {
                 if(LastScan==SDLK_F4)
                     Quit(NULL);
             }
-
+*/
             if(LastScan == SDLK_KP_ENTER) LastScan = SDLK_RETURN;
             else if(LastScan == SDLK_RSHIFT) LastScan = SDLK_LSHIFT;
             else if(LastScan == SDLK_RALT) LastScan = SDLK_LALT;

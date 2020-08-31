@@ -579,6 +579,7 @@ void SetupGameLevel (void)
     int  x,y;
     word *map;
     word tile;
+
 slIntFunction(VblIn) ;
 
 //    if (!loadedgame)
@@ -599,13 +600,13 @@ slIntFunction(VblIn) ;
         US_InitRndT (false);
     else
         US_InitRndT (true);
-
+//slPrintHex(screen->pixels,slLocate(10,14));
 //
 // load the level
 //
     CA_CacheMap (gamestate.mapon+10*gamestate.episode);
     mapon-=gamestate.episode*10;
-
+//slPrintHex(screen->pixels,slLocate(10,15));
 #ifdef USE_FEATUREFLAGS
     // Temporary definition to make things clearer
     #define MXX MAPSIZE - 1
@@ -618,12 +619,12 @@ slIntFunction(VblIn) ;
 
     #undef MXX
 #endif
-
 //
 // copy the wall data to a data segment array
 //
     memset (tilemap,0,sizeof(tilemap));
-    memset (actorat,0,sizeof(actorat));
+    memset (actorat,0,sizeof(objtype));
+slPrintHex(screen->pixels,slLocate(10,17));
     map = mapsegs[0];
     for (y=0;y<mapheight;y++)
     {
@@ -644,14 +645,14 @@ slIntFunction(VblIn) ;
             }
         }
     }
-
+slPrintHex(screen->pixels,slLocate(10,18));	
 //
 // spawn doors
 //
     InitActorList ();                       // start spawning things with a clean slate
     InitDoorList ();
     InitStaticList ();
-	
+
     map = mapsegs[0];
     for (y=0;y<mapheight;y++)
     {
@@ -1006,7 +1007,6 @@ void PlayDemo (int demonumber)
 
     startgame = false;
     demoplayback = true;
-
     SetupGameLevel ();
     StartMusic ();
 
@@ -1191,7 +1191,7 @@ GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	
 gamestate.keys = 3;
 // vbt dernier niveau
-		   
+   
     boolean died;
 #ifdef MYPROFILE
     clock_t start,end;
@@ -1214,7 +1214,6 @@ restartgame:
   			//slPrint("DrawScore",slLocate(10,9));
 			DrawScore();
 		}
-
         startgame = false;
     //    if (!loadedgame)
 		{
@@ -1228,7 +1227,6 @@ restartgame:
             DrawKeys ();
         }
 #endif
-
         ingame = true;
 /*        if(loadedgame)
         {
@@ -1246,7 +1244,7 @@ restartgame:
         fizzlein = true;
 
         DrawLevel ();
-
+	
 #ifdef SPEAR
 startplayloop:
 #endif

@@ -100,7 +100,7 @@ CP_itemtype MainMenu[] = {
     {0, STR_QT, 0}
 #endif
 };
-
+/*
 CP_itemtype SndMenu[] = {
 #ifdef JAPAN
     {1, "", 0},
@@ -130,7 +130,8 @@ CP_itemtype SndMenu[] = {
     {1, STR_ALSB, 0}
 #endif
 };
-
+*/
+/*
 enum { CTL_MOUSEENABLE, CTL_MOUSESENS, CTL_JOYENABLE, CTL_CUSTOMIZE };
 
 CP_itemtype CtlMenu[] = {
@@ -146,7 +147,7 @@ CP_itemtype CtlMenu[] = {
     {1, STR_CUSTOM, 0}
 #endif
 };
-
+*/
 #ifndef SPEAR
 CP_itemtype NewEmenu[] = {
 #ifdef JAPAN
@@ -221,7 +222,7 @@ CP_itemtype NewMenu[] = {
     {1, STR_DEATH, 0}
 #endif
 };
-
+/*
 CP_itemtype LSMenu[] = {
     {1, "", 0},
     {1, "", 0},
@@ -234,7 +235,7 @@ CP_itemtype LSMenu[] = {
     {1, "", 0},
     {1, "", 0}
 };
-
+*/
 CP_itemtype CusMenu[] = {
     {1, "", 0},
     {0, "", 0},
@@ -249,9 +250,9 @@ CP_itemtype CusMenu[] = {
 
 // CP_iteminfo struct format: short x, y, amount, curpos, indent;
 CP_iteminfo MainItems = { MENU_X, MENU_Y, lengthof(MainMenu), STARTITEM, 24 },
-            SndItems  = { SM_X, SM_Y1, lengthof(SndMenu), 0, 52 },
-            LSItems   = { LSM_X, LSM_Y, lengthof(LSMenu), 0, 24 },
-            CtlItems  = { CTL_X, CTL_Y, lengthof(CtlMenu), -1, 56 },
+//            SndItems  = { SM_X, SM_Y1, lengthof(SndMenu), 0, 52 },
+//            LSItems   = { LSM_X, LSM_Y, lengthof(LSMenu), 0, 24 },
+//            CtlItems  = { CTL_X, CTL_Y, lengthof(CtlMenu), -1, 56 },
             CusItems  = { 8, CST_Y + 13 * 2, lengthof(CusMenu), -1, 0},
 #ifndef SPEAR
             NewEitems = { NE_X, NE_Y, lengthof(NewEmenu), 0, 88 },
@@ -289,8 +290,8 @@ US_ControlPanel (ScanCode scancode)
 
     if (ingame)
     {
-        if (CP_CheckQuick (scancode))
-            return;
+//        if (CP_CheckQuick (scancode))
+//            return;
         StartCPMusic (MENUSONG);
     }
     else
@@ -301,9 +302,10 @@ US_ControlPanel (ScanCode scancode)
     //
     // F-KEYS FROM WITHIN GAME
     //
+/*
     switch (scancode)
     {
-/*
+
         case sc_F1:
 #ifdef SPEAR
             BossKey ();
@@ -327,15 +329,15 @@ US_ControlPanel (ScanCode scancode)
         case sc_F4:
             CP_Sound (0);
             goto finishup;
-		*/
+		
         case sc_F5:
             CP_ChangeView (0);
             goto finishup;
-		/*
+
         case sc_F6:
             CP_Control (0);
             goto finishup;
-		 */
+		 
         finishup:
             CleanupControlPanel ();
 #ifdef SPEAR
@@ -343,7 +345,7 @@ US_ControlPanel (ScanCode scancode)
 #endif
             return;
     }
-
+*/
 #ifdef SPEAR
     CacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
 #endif
@@ -381,9 +383,9 @@ US_ControlPanel (ScanCode scancode)
             CA_CacheGrChunk (IDGUYS2PIC);
             VWB_DrawPic (0, 80, IDGUYS2PIC);
             UNCACHEGRCHUNK (IDGUYS2PIC);
-
+#ifndef USE_SPRITES
             VW_UpdateScreen ();
-
+#endif
             SDL_Color pal[256];
             CA_CacheGrChunk (IDGUYSPALETTE);
             VL_ConvertPalette(grsegs[IDGUYSPALETTE], pal, 256);
@@ -488,8 +490,8 @@ void EnableEndGameMenuItem()
 void
 DrawMainMenu (void)
 {
-	 slScrTransparent(NBG1ON);
-	slPrint("DrawMainMenu",slLocate(10,15));
+	slScrTransparent(NBG1ON);
+//	slPrint("DrawMainMenu",slLocate(10,15));
 #ifdef JAPAN
     CA_CacheScreen (S_OPTIONSPIC);
 #else
@@ -549,7 +551,9 @@ DrawMainMenu (void)
     }
 
     DrawMenu (&MainItems, &MainMenu[0]);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
 }
 
 #ifndef GOODTIMES
@@ -635,7 +639,7 @@ BossKey (void)
 #endif
 #endif
 
-
+#if 0
 ////////////////////////////////////////////////////////////////////
 //
 // CHECK QUICK-KEYS & QUIT (WHILE IN A GAME)
@@ -687,7 +691,9 @@ CP_CheckQuick (ScanCode scancode)
 #endif
 #endif
             {
+#ifndef USE_SPRITES				
                 VW_UpdateScreen ();
+#endif				
                 SD_MusicOff ();
                 SD_StopSound ();
                 MenuFadeOut ();
@@ -703,7 +709,7 @@ CP_CheckQuick (ScanCode scancode)
 
     return 0;
 }
-
+#endif
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -760,7 +766,9 @@ CP_ViewScores (int)
 #endif
 
     DrawHighScores ();
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     MenuFadeIn ();
     fontnumber = 1;
 
@@ -943,8 +951,9 @@ DrawNewEpisode (void)
 
     for (i = 0; i < 6; i++)
         VWB_DrawPic (NE_X + 32, NE_Y + i * 26, C_EPISODE1PIC + i);
-
+#ifndef USE_SPRITES
     VW_UpdateScreen ();
+#endif	
     MenuFadeIn ();
     WaitKeyUp ();
 }
@@ -982,7 +991,9 @@ DrawNewGame (void)
 
     DrawMenu (&NewItems, &NewMenu[0]);
     DrawNewGameDiff (NewItems.curpos);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     MenuFadeIn ();
     WaitKeyUp ();
 }
@@ -1030,7 +1041,9 @@ CP_ChangeView (int)
                     newview = 4;
                 if(newview >= 19) DrawChangeView(newview);
                 else ShowViewSize (newview);
+#ifndef USE_SPRITES				
                 VW_UpdateScreen ();
+#endif				
                 SD_PlaySound (HITWALLSND);
                 TicDelay (10);
                 break;
@@ -1044,7 +1057,9 @@ CP_ChangeView (int)
                     DrawChangeView(newview);
                 }
                 else ShowViewSize (newview);
+#ifndef USE_SPRITES				
                 VW_UpdateScreen ();
+#endif				
                 SD_PlaySound (HITWALLSND);
                 TicDelay (10);
                 break;
@@ -1107,7 +1122,9 @@ DrawChangeView (int view)
     US_CPrint (STR_SIZE2 "\n");
     US_CPrint (STR_SIZE3);
 #endif
+#ifndef USE_SPRITES
     VW_UpdateScreen ();
+#endif	
 }
 
 
@@ -1132,7 +1149,9 @@ CP_Quit (int)
 
 #endif
     {
+#ifndef USE_SPRITES		
         VW_UpdateScreen ();
+#endif		
         SD_MusicOff ();
         SD_StopSound ();
         MenuFadeOut ();
@@ -1304,8 +1323,9 @@ HandleMenu (CP_iteminfo * item_i, CP_itemtype * items, void (*routine) (int w))
     //
     if (routine)
         routine (which);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
-
+#endif
     shape = C_CURSOR1PIC;
     timer = 8;
     exit = 0;
@@ -1334,7 +1354,9 @@ HandleMenu (CP_iteminfo * item_i, CP_itemtype * items, void (*routine) (int w))
             VWB_DrawPic (x, y, shape);
             if (routine)
                 routine (which);
+#ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#endif			
         }
         else SDL_Delay(5);
 
@@ -1483,8 +1505,9 @@ HandleMenu (CP_iteminfo * item_i, CP_itemtype * items, void (*routine) (int w))
 
     if (routine)
         routine (which);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
-
+#endif
     item_i->curpos = which;
 
     lastitem = which;
@@ -1523,7 +1546,9 @@ EraseGun (CP_iteminfo * item_i, CP_itemtype * items, int x, int y, int which)
     PrintX = item_i->x + item_i->indent;
     PrintY = item_i->y + which * 13;
     US_Print ((items + which)->string);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
 }
 
 
@@ -1534,7 +1559,9 @@ void
 DrawHalfStep (int x, int y)
 {
     VWB_DrawPic (x, y, C_CURSOR1PIC);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     SD_PlaySound (MOVEGUN1SND);
     SDL_Delay (8 * 100 / 7);
 }
@@ -1561,7 +1588,9 @@ DrawGun (CP_iteminfo * item_i, CP_itemtype * items, int x, int *y, int which, in
     //
     if (routine)
         routine (which);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     SD_PlaySound (MOVEGUN2SND);
 }
 
@@ -1708,7 +1737,9 @@ Confirm (const char *string)
                     PrintY = y;
                     US_Print ("_");
             }
+#ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#endif			
             tick ^= 1;
             lastBlinkTime = GetTimeCount();
         }
@@ -1759,7 +1790,9 @@ GetYorN (int x, int y, int pic)
     CA_CacheGrChunk (pic);
     VWB_DrawPic (x * 8, y * 8, pic);
     UNCACHEGRCHUNK (pic);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     IN_ClearKeysDown ();
 
     do
@@ -1845,7 +1878,9 @@ Message (const char *string)
     SETFONTCOLOR (0, TEXTCOLOR);
 
     US_Print (string);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -2088,7 +2123,7 @@ CheckForEpisodes (void)
 //    strcpy (audioext, "sdm");
 #endif
 #else
-    strcpy (graphext, extension);
+//    strcpy (graphext, extension);
 //    strcpy (audioext, extension);
 #endif
 

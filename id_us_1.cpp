@@ -319,6 +319,7 @@ char USL_RotateChar(char ch, int dir)
 //		returned
 //
 ///////////////////////////////////////////////////////////////////////////
+/*
 boolean
 US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 				int maxchars,int maxwidth)
@@ -581,8 +582,9 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 		else SDL_Delay(5);
 		if (cursorvis)
 			USL_XORICursor(x,y,s,cursor);
-
+#ifndef USE_SPRITES
 		VW_UpdateScreen();
+#endif		
 	}
 
 	if (cursorvis)
@@ -593,12 +595,13 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 		py = y;
 		USL_DrawString(olds);
 	}
+#ifndef USE_SPRITES	
 	VW_UpdateScreen();
-
+#endif
 	IN_ClearKeysDown();
 	return(result);
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////
 //
 // US_InitRndT - Initializes the pseudo random number generator.

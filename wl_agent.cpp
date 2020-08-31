@@ -1443,7 +1443,7 @@ void    T_Attack (objtype *ob)
                     break;
                 }
                 GunAttack (ob);
-                if (!ammocheat)
+//                if (!ammocheat)
                     gamestate.ammo--;
                 DrawAmmo ();
                 break;

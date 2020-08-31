@@ -816,7 +816,8 @@ typedef struct objstruct
     short       hitpoints;
     int32_t     speed;
 
-    short       temp1,temp2,hidden;
+    short       temp1,temp2;
+	short     hidden;
     struct objstruct *next,*prev;
 } objtype;
 
@@ -926,9 +927,6 @@ extern  short    centerx;
 extern  int32_t  heightnumerator;
 extern  fixed    scale;
 
-extern  int      dirangle[9];
-
-//extern  int      mouseadjustment;
 extern  int      shootdelta;
 extern  unsigned screenofs;
 
@@ -939,7 +937,7 @@ extern  boolean  startgame;
 //
 // Command line parameter variables
 //
-extern  boolean  param_debugmode;
+//extern  boolean  param_debugmode;
 extern  boolean  param_nowait;
 extern  int      param_difficulty;
 extern  int      param_tedlevel;

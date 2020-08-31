@@ -35,7 +35,7 @@ static musicnames lastmusicchunk = (musicnames) 0;
 objtype objlist[MAXACTORS];
 objtype *newobj, *obj, *player, *lastobj, *objfreelist, *killerobj;
 
-boolean /*noclip,*/ ammocheat;
+/*boolean noclip, ammocheat;*/
 int godmode;//, singlestep, extravbls = 1; // to remove flicker (gray stuff at the bottom)
 
 byte tilemap[MAPSIZE][MAPSIZE]; // wall values only
@@ -452,7 +452,7 @@ void CheckKeys (void)
     }
 #endif
 
-
+/*
     //
     // SECRET CHEAT CODE: 'MLI'
     //
@@ -484,7 +484,7 @@ void CheckKeys (void)
         if (viewsize < 17)
             DrawPlayBorder ();
     }
-
+*/
     //
     // OPEN UP DEBUG KEYS
     //
@@ -504,7 +504,7 @@ void CheckKeys (void)
         DebugOk = 1;
     }
 #endif
-
+/*
     //
     // TRYING THE KEEN CHEAT CODE!
     //
@@ -525,7 +525,7 @@ void CheckKeys (void)
         if (viewsize < 18)
             DrawPlayBorder ();
     }
-
+*/
 //
 // pause key weirdness can't be checked as a scan code
 //
@@ -534,7 +534,9 @@ void CheckKeys (void)
     {
         int lastoffs = StopMusic();
         LatchDrawPic (20 - 4, 80 - 2 * 8, PAUSEDPIC);
+#ifndef USE_SPRITES		
         VH_UpdateScreen();
+#endif		
         IN_Ack ();
         Paused = false;
         ContinueMusic(lastoffs);
@@ -545,7 +547,7 @@ void CheckKeys (void)
 //
 // F1-F7/ESC to enter control panel
 //
-    if (
+/*    if (
 #ifndef DEBCHECK
            scan == sc_F10 ||
 #endif
@@ -563,8 +565,9 @@ void CheckKeys (void)
         IN_ClearKeysDown ();
         return;
     }
-
-    if ((scan >= sc_F1 && scan <= sc_F9) || scan == sc_Escape || buttonstate[bt_esc])
+*/
+//    if ((scan >= sc_F1 && scan <= sc_F9) || scan == sc_Escape || buttonstate[bt_esc])
+    if (scan == sc_Escape)
     {
         int lastoffs = StopMusic ();
         
@@ -584,7 +587,7 @@ void CheckKeys (void)
         lasttimecount = GetTimeCount();
         return;
     }
-
+/*
 //
 // TAB-? debug keys
 //
@@ -600,6 +603,7 @@ void CheckKeys (void)
         return;
     }
 #endif
+*/
 }
 
 
@@ -1142,12 +1146,12 @@ void PlayLoop (void)
     funnyticount = 0;
     memset (buttonstate, 0, sizeof (buttonstate));
     ClearPaletteShifts ();
- 
+
 	if (demoplayback)
         IN_StartAck ();
-/*
+
 	UpdatePaletteShifts ();
-	FinishPaletteShifts ();
+/*	FinishPaletteShifts ();
 	slSynch();
 	VGAClearScreen ();
 */	
@@ -1212,12 +1216,10 @@ void PlayLoop (void)
                 playstate = ex_abort;
             }
         }
-//
 
-//		memcpyl((void *)(SpriteVRAM + cgaddress),(void *)wall_buffer,(SATURN_WIDTH * 64) );
 extern int frame_x,frame_y;
 	frame_x++;
-//if(frame_y+1>=60)
+
 #ifdef USE_SPRITES
 	extern int vbt;
 	extern SPRITE user_walls[];

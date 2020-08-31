@@ -44,7 +44,8 @@ void VL_FadeOut     (int start, int end, int red, int green, int blue, int steps
 void VL_FadeIn      (int start, int end, SDL_Color *palette, int steps);
 
 byte *VL_LockSurface(SDL_Surface *surface);
-void VL_UnlockSurface(SDL_Surface *surface);
+//void VL_UnlockSurface(SDL_Surface *surface);
+#define VL_UnlockSurface(surface) SDL_UnlockSurface(surface)
 
 #define LOCK() VL_LockSurface(curSurface)
 #define UNLOCK() VL_UnlockSurface(curSurface)

@@ -26,9 +26,7 @@ loaded into the data segment
 
 #pragma hdrstop
 #define THREEBYTEGRSTARTS
-#define HEAP_WALK 1
-
-extern unsigned int position_vram;
+//#define HEAP_WALK 1
 
 #ifdef HEAP_WALK
 extern Uint32  end;
@@ -150,7 +148,7 @@ int     numEpisodesMissing = 0;
 */
 
 char extension[5]; // Need a string, not constant to change cache files
-char graphext[5];
+//char graphext[5];
 //char audioext[5];
 static const char gheadname[] = "vgahead.";
 static const char gfilename[] = "vgagraph.";
@@ -174,11 +172,6 @@ huffnode grhuffman[255];
 int    grhandle = -1;               // handle to EGAGRAPH
 int    maphandle = -1;              // handle to MAPTEMP / GAMEMAPS
 //int    audiohandle = -1;            // handle to AUDIOT / AUDIO
-
-int32_t   chunkcomplen,chunkexplen;
-
-//SDMode oldsoundmode;
-
 
 static int32_t GRFILEPOS(const size_t idx)
 {
@@ -205,8 +198,9 @@ static int32_t GRFILEPOS(const size_t idx)
 ============================
 */
 
-void CAL_GetGrChunkLength (int chunk)
+int32_t CAL_GetGrChunkLength (int chunk)
 {
+	int32_t   chunkexplen;
     //lseek(grhandle,GRFILEPOS(chunk),SEEK_SET);
     //read(grhandle,&chunkexplen,sizeof(chunkexplen));
 
@@ -220,7 +214,7 @@ void CAL_GetGrChunkLength (int chunk)
 	memcpy(&chunkexplen,&Chunks[delta2],sizeof(chunkexplen));
 	Chunks = NULL;
 	chunkexplen = SWAP_BYTES_32(chunkexplen);
-    chunkcomplen = GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
+    return GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
 }
 
 /*
@@ -495,7 +489,7 @@ void CAL_SetupGrFile (void)
 //
 
     strcpy(fname,gdictname);
-    strcat(fname,graphext);
+    strcat(fname,extension);
 
 	while (fname[i])
 	{
@@ -536,7 +530,7 @@ void CAL_SetupGrFile (void)
 
     // load the data offsets from ???head.ext
     strcpy(fname,gheadname);
-    strcat(fname,graphext);
+    strcat(fname,extension);
 
 	while (fname[i])
 	{
@@ -582,7 +576,7 @@ void CAL_SetupGrFile (void)
 // Open the graphics file, leaving it open until the game is finished
 //
     strcpy(fname,gfilename);
-    strcat(fname,graphext);
+    strcat(fname,extension);
 
 	while (fname[i])
 	{
@@ -603,7 +597,7 @@ void CAL_SetupGrFile (void)
 //
     pictable=(pictabletype *) malloc(NUMPICS*sizeof(pictabletype));
     CHECKMALLOCRESULT(pictable);
-    CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
+    int32_t   chunkcomplen = CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
 //	compseg =(byte*)malloc((chunkcomplen));
 	compseg =(byte*)0x002C0000;
 //	CHECKMALLOCRESULT(compseg);

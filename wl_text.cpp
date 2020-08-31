@@ -167,8 +167,9 @@ void TimedPicCommand (void)
     //
     // update the screen, and wait for time delay
     //
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
-
+#endif
     //
     // wait for time
     //
@@ -663,7 +664,9 @@ void ShowArticle (char *article)
 #else
             PageLayout (true);
 #endif
+#ifndef USE_SPRITES
             VW_UpdateScreen ();
+#endif			
             if (firstpage)
             {
                 VL_FadeIn(0,255,gamepal,10);

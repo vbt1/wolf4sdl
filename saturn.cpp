@@ -70,8 +70,8 @@ Sint32 GetFileSize(int file_id);
 //Uint32 frame = 0;
 static unsigned char vbt_event[13][2];
 static int current_event=0;
-Uint32 previouscount=0;
-Uint16 previousmillis=0;
+static Uint32 previouscount=0;
+static Uint16 previousmillis=0;
 PCM m_dat[4];
 
 static	CdcPly	playdata;
@@ -197,8 +197,10 @@ slPriorityNbg3(7);
 	slZdspLevel(7); // vbt : ne pas déplacer !!!
 #endif	
 	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
-	CHECKMALLOCRESULT(screen->pixels);
+	
+//	CHECKMALLOCRESULT(screen->pixels);
 	screen->pitch = width;
+//	memset(screen->pixels,0x00,width*height);
 	return screen;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -235,7 +237,7 @@ int SDL_Init(Uint32 flags)
 		initcddone=1;
 	}
 #endif
-	DMA_ScuInit();
+//	DMA_ScuInit();
 //	SPR_InitSlaveSH();
 	SDL_InitSubSystem(flags);
 	return 0;
@@ -424,15 +426,17 @@ if((srcrect)!=NULL)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-void SDL_UpdateRects (SDL_Surface *screen, int numrects, SDL_Rect *rects)
+/*void SDL_UpdateRects (SDL_Surface *screen, int numrects, SDL_Rect *rects)
 {
 //	slBMPut(0, 0, 320-1, 240-1, (Sint8*)screen->pixels);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
+
 void SDL_UpdateRect (SDL_Surface *screen, Sint32 x, Sint32 y, Uint32 w, Uint32 h)
 {
 //slPrint("SDL_UpdateRect  empty       ",slLocate(10,22));
 }
+*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 
 int SDL_FillRect (SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color)
@@ -944,15 +948,15 @@ int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 //--------------------------------------------------------------------------------------------------------------------------------------
 Uint32 SDL_GetTicks(void)
 {
-	Uint32 tmp = TIM_FRT_CNT_TO_MCR(TIM_FRT_GET_16());
-	Uint32 tmp2 = tmp/ 1000;
-	
-	previouscount += (tmp+previousmillis) / 1000; 
-	TIM_FRT_SET_16(0);
-	previousmillis= (tmp-(tmp2*1000));
+    Uint32 tmp = TIM_FRT_CNT_TO_MCR(TIM_FRT_GET_16())+previousmillis;
+    Uint32 tmp2 = tmp/ 1000;
+
+    previouscount += tmp2;
+    TIM_FRT_SET_16(0);
+    previousmillis= (tmp-(tmp2*1000));
     //set_imask(imask);
-	//
-	return previouscount;
+    //
+    return previouscount;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_Delay(long delay)

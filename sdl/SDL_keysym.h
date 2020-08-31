@@ -36,15 +36,18 @@ static char rcsid =
  
 typedef enum {
 	/* The keyboard syms have been cleverly chosen to map to ASCII */
+#if 0	
 	SDLK_UNKNOWN		= 0,
 	SDLK_FIRST		= 0,
 	SDLK_BACKSPACE		= 8,
+#endif	
 	SDLK_TAB		= 9,
 	SDLK_CLEAR		= 12,
 	SDLK_RETURN		= 13,
 	SDLK_PAUSE		= 19,
 	SDLK_ESCAPE		= 27,
 	SDLK_SPACE		= 32,
+#if 0	
 	SDLK_EXCLAIM		= 33,
 	SDLK_QUOTEDBL		= 34,
 	SDLK_HASH		= 35,
@@ -60,10 +63,12 @@ typedef enum {
 	SDLK_PERIOD		= 46,
 	SDLK_SLASH		= 47,
 	SDLK_0			= 48,
+#endif	
 	SDLK_1			= 49,
 	SDLK_2			= 50,
 	SDLK_3			= 51,
 	SDLK_4			= 52,
+#if 0	
 	SDLK_5			= 53,
 	SDLK_6			= 54,
 	SDLK_7			= 55,
@@ -214,6 +219,7 @@ typedef enum {
 
 	/* Numeric keypad */
 	SDLK_KP0		= 256,
+#endif	
 	SDLK_KP1		= 257,
 	SDLK_KP2		= 258,
 	SDLK_KP3		= 259,
@@ -222,12 +228,15 @@ typedef enum {
 	SDLK_KP6		= 262,
 	SDLK_KP7		= 263,
 	SDLK_KP8		= 264,
+#if 0	
 	SDLK_KP9		= 265,
+
 	SDLK_KP_PERIOD		= 266,
 	SDLK_KP_DIVIDE		= 267,
 	SDLK_KP_MULTIPLY	= 268,
 	SDLK_KP_MINUS		= 269,
 	SDLK_KP_PLUS		= 270,
+#endif	
 	SDLK_KP_ENTER		= 271,
 	SDLK_KP_EQUALS		= 272,
 
@@ -241,7 +250,7 @@ typedef enum {
 	SDLK_END		= 279,
 	SDLK_PAGEUP		= 280,
 	SDLK_PAGEDOWN		= 281,
-
+#if 0
 	/* Function keys */
 	SDLK_F1			= 282,
 	SDLK_F2			= 283,
@@ -263,12 +272,14 @@ typedef enum {
 	SDLK_NUMLOCK		= 300,
 	SDLK_CAPSLOCK		= 301,
 	SDLK_SCROLLOCK		= 302,
+#endif	
 	SDLK_RSHIFT		= 303,
 	SDLK_LSHIFT		= 304,
 	SDLK_RCTRL		= 305,
 	SDLK_LCTRL		= 306,
 	SDLK_RALT		= 307,
 	SDLK_LALT		= 308,
+#if 0		
 	SDLK_RMETA		= 309,
 	SDLK_LMETA		= 310,
 	SDLK_LSUPER		= 311,		/* Left "Windows" key */
@@ -287,7 +298,7 @@ typedef enum {
 	SDLK_UNDO		= 322,		/* Atari keyboard has Undo */
 
 	/* Add any other keys here */
-
+#endif
 	SDLK_LAST
 } SDLKey;
 
