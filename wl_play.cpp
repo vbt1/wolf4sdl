@@ -1,5 +1,5 @@
 // WL_PLAY.C
-//#define USE_SPRITES 1
+#define USE_SPRITES 1
 #include "wl_def.h"
 #pragma hdrstop
 
@@ -85,7 +85,8 @@ int lastgamemusicoffset = 0;
 #ifdef USE_SPRITES
 extern unsigned int position_vram;
 extern unsigned int static_items;
-extern unsigned char wall_buffer[];
+extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
+extern SPRITE user_walls[SATURN_WIDTH*2];
 #endif
 //===========================================================================
 
@@ -108,7 +109,7 @@ void PlayLoop (void);
 */
 
 
-objtype dummyobj;
+//objtype dummyobj;
 
 //
 // LIST OF SONGS FOR EACH VERSION
@@ -845,19 +846,20 @@ void InitRedShifts (void)
 //
 // fade through intermediate frames
 //
+
     for (i = 1; i <= NUMREDSHIFTS; i++)
     {
         workptr = redshifts[i - 1];
-        baseptr = gamepal;
+        baseptr = &gamepal[0];
 
         for (j = 0; j <= 255; j++)
         {
             delta = 256 - baseptr->r;
-            workptr->r = baseptr->r + delta * i / REDSTEPS;
+            workptr->r = (baseptr->r + delta * i / REDSTEPS);
             delta = -baseptr->g;
-            workptr->g = baseptr->g + delta * i / REDSTEPS;
+            workptr->g = (baseptr->g + delta * i / REDSTEPS);
             delta = -baseptr->b;
-            workptr->b = baseptr->b + delta * i / REDSTEPS;
+            workptr->b = (baseptr->b + delta * i / REDSTEPS);
             baseptr++;
             workptr++;
         }
@@ -866,20 +868,21 @@ void InitRedShifts (void)
     for (i = 1; i <= NUMWHITESHIFTS; i++)
     {
         workptr = whiteshifts[i - 1];
-        baseptr = gamepal;
+        baseptr = &gamepal[0];
 
         for (j = 0; j <= 255; j++)
         {
             delta = 256 - baseptr->r;
-            workptr->r = baseptr->r + delta * i / WHITESTEPS;
+            workptr->r = (baseptr->r + delta * i / WHITESTEPS);
             delta = 248 - baseptr->g;
-            workptr->g = baseptr->g + delta * i / WHITESTEPS;
+            workptr->g = (baseptr->g + delta * i / WHITESTEPS);
             delta = 0-baseptr->b;
-            workptr->b = baseptr->b + delta * i / WHITESTEPS;
+            workptr->b = (baseptr->b + delta * i / WHITESTEPS);
             baseptr++;
             workptr++;
         }
     }
+	
 }
 
 
@@ -1149,7 +1152,6 @@ void PlayLoop (void)
 
 	if (demoplayback)
         IN_StartAck ();
-
 	UpdatePaletteShifts ();
 /*	FinishPaletteShifts ();
 	slSynch();
@@ -1221,15 +1223,14 @@ extern int frame_x,frame_y;
 	frame_x++;
 
 #ifdef USE_SPRITES
-	extern int vbt;
-	extern SPRITE user_walls[];
+//	extern int vbt;
 	SPRITE *user_wall = user_walls;
 
 	for(int pixx=0;pixx<viewwidth;pixx++)
     {
 		slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre
 		user_wall++;
-		vbt++;
+//		vbt++;
 	}
 #endif		
 
@@ -1237,12 +1238,13 @@ extern int frame_x,frame_y;
 
 #ifdef USE_SPRITES		
 		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
+//		memcpy((void *)(SpriteVRAM + cgaddress),(void *)&wall_buffer[0],(SATURN_WIDTH+64) * 64);
 		position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
 #endif
 		
     }
     while (!playstate && !startgame);
-
+//slPrint("end play loop",slLocate(1,20));
     if (playstate != ex_died)
         FinishPaletteShifts ();
 }

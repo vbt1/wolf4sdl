@@ -36,7 +36,7 @@
 
 #define ORIGSAMPLERATE 7042
 extern int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained);
-extern PCM m_dat[];
+extern PCM m_dat[4];
 
 static Mix_Chunk *SoundChunks[ STARTMUSIC - STARTDIGISOUNDS];
 
@@ -69,7 +69,7 @@ void SD_PrepareSound(int which)
 	{
 		fileSize = GetFileSize(fileId);
 
-		if(which <24)
+		if(which <23)
 //		if(fileSize>8192 && fileSize<20000)
 		{
 			mem_buf = (unsigned char *)malloc(fileSize);
@@ -83,6 +83,7 @@ void SD_PrepareSound(int which)
 			if (lowsound % 4 != 0)
 				lowsound = (lowsound + (4 - 1)) & -4;			
 		}
+		
 		GFS_Load(fileId, 0, mem_buf, fileSize);
 		SoundChunks[which] = (Mix_Chunk*)malloc(sizeof(Mix_Chunk));
 		
@@ -96,11 +97,12 @@ void SD_PrepareSound(int which)
 	{
 	   SoundChunks[which]->alen = 0;
 	}
+	
 }
 
 
 boolean
-SD_PlaySound(soundnames sound)
+SD_PlaySound(int sound)
 {
 //slPrint("SD_PlaySound",slLocate(10,16));
 //	slPrintHex(DigiMap[sound],slLocate(23,16));
@@ -116,7 +118,7 @@ SD_PlaySound(soundnames sound)
 word
 SD_SoundPlaying(void)
 {
-/*	unsigned char i;
+	unsigned char i;
 	for(i=0;i<4;i++)
 	{
 		if(slPCMStat(&m_dat[i]))
@@ -125,7 +127,7 @@ SD_SoundPlaying(void)
 			//slSynch(); // vbt remis 26/05 // necessaire sinon reste planré à la fin du niveau
 			return true;
 		}
-	}*/
+	}
 	////slPrintHex(SoundMode,slLocate(10,3));
 	return false;
 }

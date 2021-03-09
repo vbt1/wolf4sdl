@@ -5,6 +5,7 @@
 #define USE_SLAVE 1
 #define SATURN_WIDTH 320
 #define SATURN_SORT_VALUE 240
+#define SATURN_CHUNK_ADDR 0x002F4000
 // 240 pour du 320, 264 pour du 352
 #define		LINE_COLOR_TABLE		(VDP2_VRAM_A0	+ 0x1f400)
 
@@ -939,6 +940,7 @@ extern  boolean  startgame;
 //
 //extern  boolean  param_debugmode;
 extern  boolean  param_nowait;
+/*
 extern  int      param_difficulty;
 extern  int      param_tedlevel;
 extern  int      param_joystickindex;
@@ -947,8 +949,8 @@ extern  int      param_samplerate;
 extern  int      param_audiobuffer;
 extern  int      param_mission;
 extern  boolean  param_goodtimes;
+*/
 extern  boolean  param_ignorenumchunks;
-
 
 void            NewGame (int difficulty,int episode);
 inline void     CalcProjection (int32_t focal);
@@ -1123,14 +1125,12 @@ extern  short *pixelangle;
 extern  int32_t finetangent[FINEANGLES/4];
 extern  fixed sintable[];
 extern  fixed *costable;
-extern  int *wallheight;
+extern  short *wallheight;
 extern  word horizwall[],vertwall[];
 extern  int32_t    lasttimecount;
 extern  int32_t    frameon;
 
-extern  unsigned screenloc[3];
-
-extern  boolean fizzlein, fpscounter;
+extern  boolean fizzlein;//, fpscounter;
 
 extern  fixed   viewx,viewy;                    // the focal point
 extern  fixed   viewsin,viewcos;

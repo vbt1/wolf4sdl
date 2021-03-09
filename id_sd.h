@@ -15,25 +15,25 @@
 typedef enum
 {
     sdm_Off,
-    sdm_PC,sdm_AdLib,
+    sdm_PC//,sdm_AdLib,
 } SDMode;
 
 typedef enum
 {
-    smm_Off,smm_AdLib
+    smm_Off//,smm_AdLib
 } SMMode;
 
 typedef enum
 {
     sds_Off,sds_PC,sds_SoundBlaster
 } SDSMode;
-
+/*
 typedef struct
 {
     longword        length;
     word            priority;
 } SoundCommon;
-
+*/
 #define ORIG_SOUNDCOMMON_SIZE 6
 
 //      PC Sound stuff
@@ -42,13 +42,13 @@ typedef struct
 #define pcSpeaker       0x61
 
 #define pcSpkBits       3
-
+/*
 typedef struct
 {
     SoundCommon     common;
     byte            data[1];
 } PCSound;
-
+*/
 //      Register addresses
 // Operator stuff
 #define alChar          0x20
@@ -62,7 +62,7 @@ typedef struct
 #define alFeedCon       0xc0
 // Global stuff
 #define alEffects       0xbd
-
+/*
 typedef struct
 {
     byte    mChar,cChar,
@@ -77,9 +77,9 @@ typedef struct
             mode;
     byte    unused[3];
 } Instrument;
-
+*/
 #define ORIG_INSTRUMENT_SIZE 16
-
+/*
 typedef struct
 {
     SoundCommon     common;
@@ -87,14 +87,14 @@ typedef struct
     byte            block;
     byte            data[1];
 } AdLibSound;
-
+*/
 #define ORIG_ADLIBSOUND_SIZE (ORIG_SOUNDCOMMON_SIZE + ORIG_INSTRUMENT_SIZE + 2)
 
 //
 //      Sequencing stuff
 //
 #define sqMaxTracks     10
-
+/*
 typedef struct
 {
     word    length;
@@ -106,8 +106,8 @@ typedef struct
     int valid;
     fixed globalsoundx, globalsoundy;
 } globalsoundpos;
-
-extern globalsoundpos channelSoundPos[];
+*/
+//extern globalsoundpos channelSoundPos[];
 
 // Global variables
 extern  boolean         //AdLibPresent,
@@ -132,7 +132,7 @@ extern  void    SD_Startup(void),
 
 extern  int     SD_GetChannelForDigi(int which);
 extern  void    SD_PositionSound(int leftvol,int rightvol);
-extern  boolean SD_PlaySound(soundnames sound);
+extern  boolean SD_PlaySound(int sound);
 extern  void    SD_SetPosition(int channel, int leftvol,int rightvol);
 extern  void    SD_StopSound(void),
                 SD_WaitSoundDone(void);

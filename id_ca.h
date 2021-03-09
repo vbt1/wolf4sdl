@@ -28,12 +28,12 @@ typedef struct
 extern  int   mapon;
 
 extern  word *mapsegs[MAPPLANES];
-extern  byte *audiosegs[NUMSNDCHUNKS];
+//extern  byte *audiosegs[NUMSNDCHUNKS];
 extern  byte *grsegs[NUMCHUNKS];
 
 extern  char  extension[5];
-extern  char  graphext[5];
-extern  char  audioext[5];
+//extern  char  graphext[5];
+//extern  char  audioext[5];
 
 //===========================================================================
 

@@ -1,25 +1,31 @@
+OUTPUT_FORMAT(coff-sh)
+MEMORY 
+  {
+  ram  : ORIGIN = 0x6000000, l = 983040
+  }
 SECTIONS {		
 	SLSTART 0x06004000 : {	
 		___Start = .;	
 		KEEP(*(SLSTART))
-	}			
+	}	> ram		
 	.text ALIGN(0x20) :			
 	{			
 		* (.text)
                 *("P")
                 *("SEGA_P")                
-		*(.strings)			
+		*(.strings)		
 		__etext = .;			
-	}			
+	}	> ram	
 	.rodata ALIGN(0x20) :			
 	{			
 		*(.rodata)			
-	}
+	}> ram	
 	SLPROG ALIGN(0x20): {	
 		__slprog_start = .;	
 		*(SLPROG)	
 		__slprog_end = .;	
-	}			
+	}	> ram	
+
 	.tors  ALIGN(0x10) :			
 	{			
 		___ctors = . ;			
@@ -28,19 +34,20 @@ SECTIONS {
 		___dtors = . ;			
 		*(.dtors)			
 		___dtors_end = . ;			
-	}			
+	}	> ram		
 	.data ALIGN(0x10):			
 	{			
 		* (.data)			
 		__edata = . ;			
-	}			
+	}	> ram		
 	.bss ALIGN(0x10) (NOLOAD):			
 	{			
 		__bstart = . ;			
-		*(.bss)			
-		* ( COMMON )			
+		*(.bss .bss.*)			
+		* ( COMMON )
+		. = ALIGN(4);
 		__bend = . ;			
-	_end = .;			
-	}
+		_end = .;			
+	}> ram
 
 }				

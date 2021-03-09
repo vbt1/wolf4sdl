@@ -469,7 +469,7 @@ US_ControlPanel (ScanCode scancode)
 	//slPrint("exit game 8!!!!",slLocate(10,11));	
 	
     // RETURN/START GAME EXECUTION
-	slScrTransparent(NBG1OFF);
+	slScrTransparent(0);
 #ifdef SPEAR
     UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
 #endif
@@ -1102,7 +1102,7 @@ CP_ChangeView (int)
 void
 DrawChangeView (int view)
 {
-	slScrTransparent(NBG1OFF);
+	slScrTransparent(0);
     int rescaledHeight = screenHeight / scaleFactor;
     if(view != 21) VWB_Bar (0, rescaledHeight - 40, 320, 40, bordercol);
 
@@ -1282,11 +1282,12 @@ CleanupControlPanel (void)
 
     fontnumber = 0;
 // vbt 13/08/2020 : ajout	
-		byte *vbuf = (byte *)curSurface->pixels;
-		byte *ptr = vbuf;
+//		byte *vbuf = (byte *)curSurface->pixels;
+//		byte *ptr = vbuf;
 
-		for(int y = 0; y < screenHeight; y++, ptr += curPitch)
-			memset(ptr, 0x00, screenWidth);	
+	//	for(int y = 0; y < screenHeight; y++, ptr += curPitch)
+	//		memset(ptr, 0x00, screenWidth);	
+	memset((byte *)curSurface->pixels, 0x00, screenWidth*screenHeight);	
 }
 
 

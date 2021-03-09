@@ -10,7 +10,15 @@
 
 #ifdef IGNORE_BAD_DEST
 #undef assert
-#define assert(x) if(!(x)) return
+#define assert(x) if(!(x))  { slPrint((char *)"asset test failed0", slLocate(10,20));return;}
+#define assert1(x) if(!(x)) { slPrint((char *)"asset test failed1", slLocate(10,20));return;}
+#define assert2(x) if(!(x)) { slPrint((char *)"asset test failed2", slLocate(10,20));return;}
+#define assert3(x) if(!(x)) { slPrint((char *)"asset test failed3", slLocate(10,20));return;}
+#define assert4(x) if(!(x)) { slPrint((char *)"asset test failed4", slLocate(10,20));return;}
+#define assert5(x) if(!(x)) { slPrint((char *)"asset test failed5", slLocate(10,20));return;}
+#define assert6(x) if(!(x)) { slPrint((char *)"asset test failed6", slLocate(10,20));return;}
+#define assert7(x) if(!(x)) { slPrint((char *)"asset test failed7", slLocate(10,20));return;}
+#define assert8(x) if(!(x)) { slPrint((char *)"asset test failed8", slLocate(10,20));return;}
 #define assert_ret(x) if(!(x)) return 0
 #else
 #define assert_ret(x) assert(x)
@@ -44,7 +52,9 @@ boolean	 screenfaded;
 SDL_Color curpal[256];
 
 #define CASSERT(x) extern int ASSERT_COMPILE[((x) != 0) * 2 - 1];
+#undef RGB
 #define RGB(r, g, b) {(r)*255/63, (g)*255/63, (b)*255/63, 0}
+//#define RGB(r, g, b) (r<<2,g<<2,b<<2,0)
 
 SDL_Color gamepal[]={
 #ifdef SPEAR
@@ -54,7 +64,7 @@ SDL_Color gamepal[]={
 #endif
 };
 
-CASSERT(lengthof(gamepal) == 256)
+//CASSERT(lengthof(gamepal) == 256)
 
 //===========================================================================
 
@@ -94,12 +104,12 @@ void	VL_SetVGAPlaneMode (void)
 		screen = SDL_SetVideoMode(screenWidth, screenHeight, screenBits,
 			SDL_SWSURFACE | (screenBits == 8 ? SDL_HWPALETTE : 0) );
 	}
-	
+//slPrintHex(screen->pixels,slLocate(20,8));	
     if(!screen)
     {
 //        printf("Unable to set %ix%ix%i video mode: %s\n", screenWidth,
 //            screenHeight, screenBits, SDL_GetError());
-        exit(1);
+        SYS_Exit(1);
     }
 
     SDL_ShowCursor(SDL_DISABLE);
@@ -107,12 +117,11 @@ void	VL_SetVGAPlaneMode (void)
     SDL_SetColors(screen, gamepal, 0, 256);
     memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
 
-    screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth,
-        screenHeight, 8, 0, 0, 0, 0);
+    screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth, screenHeight, 8, 0, 0, 0, 0);
     if(!screenBuffer)
     {
 //        printf("Unable to create screen buffer surface: %s\n", SDL_GetError());
-        exit(1);
+        SYS_Exit(1);
     }
     SDL_SetColors(screenBuffer, gamepal, 0, 256);
 
@@ -121,12 +130,11 @@ void	VL_SetVGAPlaneMode (void)
 
     curSurface = screenBuffer;
     curPitch = screenBuffer->pitch;
-
     scaleFactor = screenWidth/320;
     if(screenHeight/200 < scaleFactor) scaleFactor = screenHeight/200;
     pixelangle = (short *) malloc(screenWidth * sizeof(short));
     CHECKMALLOCRESULT(pixelangle);
-    wallheight = (int *) malloc(screenWidth * sizeof(int));
+    wallheight = (short *) malloc(screenWidth * sizeof(short));
     CHECKMALLOCRESULT(wallheight);
 }
 
@@ -349,7 +357,6 @@ byte VL_GetPixel (int x, int y)
 //	return col;
 }
 
-
 /*
 =================
 =
@@ -360,7 +367,7 @@ byte VL_GetPixel (int x, int y)
 
 void VL_Hlin (unsigned x, unsigned y, unsigned width, int color)
 {
-    assert(x >= 0 && x + width <= screenWidth
+    assert1(x >= 0 && x + width <= screenWidth
             && y >= 0 && y < screenHeight
             && "VL_Hlin: Destination rectangle out of bounds!");
 
@@ -369,7 +376,6 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, int color)
     memset(dest, color, width);
     VL_UnlockSurface(curSurface);
 }
-
 
 /*
 =================
@@ -381,7 +387,7 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, int color)
 
 void VL_Vlin (int x, int y, int height, int color)
 {
-	assert(x >= 0 && (unsigned) x < screenWidth
+	assert2(x >= 0 && (unsigned) x < screenWidth
 			&& y >= 0 && (unsigned) y + height <= screenHeight
 			&& "VL_Vlin: Destination rectangle out of bounds!");
 
@@ -396,7 +402,6 @@ void VL_Vlin (int x, int y, int height, int color)
 	VL_UnlockSurface(curSurface);
 }
 
-
 /*
 =================
 =
@@ -407,7 +412,7 @@ void VL_Vlin (int x, int y, int height, int color)
 
 void VL_BarScaledCoord (int scx, int scy, int scwidth, int scheight, int color)
 {
-	assert(scx >= 0 && (unsigned) scx + scwidth <= screenWidth
+	assert3(scx >= 0 && (unsigned) scx + scwidth <= screenWidth
 			&& scy >= 0 && (unsigned) scy + scheight <= screenHeight
 			&& "VL_BarScaledCoord: Destination rectangle out of bounds!");
 
@@ -441,7 +446,7 @@ void VL_BarScaledCoord (int scx, int scy, int scwidth, int scheight, int color)
 void VL_MemToLatch(byte *source, int width, int height,
     SDL_Surface *destSurface, int x, int y)
 {
-    assert(x >= 0 && (unsigned) x + width <= screenWidth
+    assert4(x >= 0 && (unsigned) x + width <= screenWidth
             && y >= 0 && (unsigned) y + height <= screenHeight
             && "VL_MemToLatch: Destination rectangle out of bounds!");
 
@@ -474,7 +479,7 @@ void VL_MemToLatch(byte *source, int width, int height,
 
 void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, int desty)
 {
-    assert(destx >= 0 && destx + width * scaleFactor <= screenWidth
+    assert5(destx >= 0 && destx + width * scaleFactor <= screenWidth
             && desty >= 0 && desty + height * scaleFactor <= screenHeight
             && "VL_MemToScreenScaledCoord: Destination rectangle out of bounds!");
 
@@ -513,7 +518,7 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
 void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int srcx, int srcy,
                                 int destx, int desty, int width, int height)
 {
-    assert(destx >= 0 && destx + width * scaleFactor <= screenWidth
+    assert6(destx >= 0 && destx + width * scaleFactor <= screenWidth
             && desty >= 0 && desty + height * scaleFactor <= screenHeight
             && "VL_MemToScreenScaledCoord: Destination rectangle out of bounds!");
 
@@ -549,7 +554,7 @@ void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int
 void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
     int width, int height, int scxdest, int scydest)
 {
-	assert(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
+	assert7(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
 			&& scydest >= 0 && scydest + height * scaleFactor <= screenHeight
 			&& "VL_LatchToScreenScaledCoord: Destination rectangle out of bounds!");
 	if(scaleFactor == 1)

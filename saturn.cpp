@@ -1,4 +1,4 @@
-//#define USE_SPRITES 1
+#define USE_SPRITES 1
 #include "wl_def.h"
 #include "sdl/SDL.h"
 #include "sdl/SDL_mixer.h"
@@ -25,7 +25,7 @@ void /* slave SH Initialize (RUNS on main SH) */
 
 //
 #ifdef USE_SPRITES
-extern TEXTURE tex_spr[];
+extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 #endif
 
 #ifdef VBT
@@ -124,9 +124,9 @@ static const Sint8	logtbl[] = {
  SDL_Surface * SDL_SetVideoMode  (int width, int height, int bpp, Uint32 flags)
 {
 	unsigned char tv_mode;
-	SDL_Surface *screen;
-	screen = (SDL_Surface*)malloc(sizeof(SDL_Surface));
-	CHECKMALLOCRESULT(screen);
+	SDL_Surface *screeny;
+	screeny = (SDL_Surface*)malloc(sizeof(SDL_Surface));
+	CHECKMALLOCRESULT(screeny);
 	if(width==320)
 	{
 		tv_mode = TV_320x224;
@@ -196,12 +196,14 @@ slPriorityNbg3(7);
 #ifdef USE_SPRITES 	
 	slZdspLevel(7); // vbt : ne pas déplacer !!!
 #endif	
-	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
+	screeny->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	
-//	CHECKMALLOCRESULT(screen->pixels);
-	screen->pitch = width;
+	CHECKMALLOCRESULT(screeny->pixels);
+	screeny->pitch = width;
+	screeny->w     = width;
+	screeny->h     = height;	
 //	memset(screen->pixels,0x00,width*height);
-	return screen;
+	return screeny;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_SetColors(SDL_Surface *surface, 	SDL_Color *colors, int firstcolor, int ncolors)
@@ -367,6 +369,7 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 // vbt : remttre la copie dma		
 		slDMACopy((unsigned long*)(surface->pixels + (i * screenWidth)),(void *)(NBG1_CEL_ADR + (i<<9)),screenWidth);
 	}
+//xxxxx	
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
@@ -464,16 +467,17 @@ int SDL_FillRect (SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color)
 //--------------------------------------------------------------------------------------------------------------------------------------
 SDL_Surface * SDL_CreateRGBSurface(Uint32 flags, int width, int height, int depth, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask)
 {
-	SDL_Surface *screen;
-	screen = (SDL_Surface*)malloc(sizeof(SDL_Surface));
-//	CHECKMALLOCRESULT(screen);
-	screen->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
-//	CHECKMALLOCRESULT(screen->pixels);
-	screen->pitch = width;
-	screen->w     =	width;
-	screen->h     =	height;
+	SDL_Surface *screeny;
+	screeny = (SDL_Surface*)malloc(sizeof(SDL_Surface));
+	CHECKMALLOCRESULT(screeny);
+	screeny->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
+//	screeny->pixels = (unsigned char*)0x002E0000;
+	CHECKMALLOCRESULT(screeny->pixels);
+	screeny->pitch = width;
+	screeny->w     = width;
+	screeny->h     = height;
 	
-	return screen;
+	return screeny;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_Quit(void)
@@ -943,6 +947,7 @@ int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 				break;
 		}		 
 	}
+	
 	return 1;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------

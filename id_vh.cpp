@@ -1,7 +1,7 @@
 #include "wl_def.h"
 
 
-pictabletype	*pictable;
+pictabletype	*pictable; //[NUMPICS];
 SDL_Surface     *latchpics[NUMLATCHPICS];
 
 int	    px,py;
@@ -74,10 +74,11 @@ void VL_MungePic (byte *source, unsigned width, unsigned height)
 //
 // copy the pic to a temp buffer
 //
-	temp=(byte *) malloc(size);
+//	temp=(byte *)SATURN_CHUNK_ADDR; //malloc(size);
+	temp=(byte *)malloc(size);
     CHECKMALLOCRESULT(temp);
-//	memcpy (temp,source,size);
-	memcpyl (temp,source,size);
+	memcpy (temp,source,size);
+//	memcpyl (temp,source,size);
 
 //
 // munge it back into the original buffer
@@ -236,18 +237,18 @@ void LoadLatchMem (void)
 {
 	int	i,width,height,start,end;
 	byte *src;
-	SDL_Surface *surf,*surf1;
+	SDL_Surface *surf; //,*surf1;
 
 //
 // tile 8s
 //
-	////slPrint("LoadLatchMem",slLocate(10,15));
+	//////slPrint("LoadLatchMem",slLocate(10,15));
 /*
     surf1 = SDL_CreateRGBSurface(SDL_HWSURFACE, 8*8,
         ((NUMTILE8 + 7) / 8) * 8, 8, 0, 0, 0, 0);
     if(surf1 == NULL)
     {
-		////slPrint("LoadLatchMem bad",slLocate(10,15));
+		//////slPrint("LoadLatchMem bad",slLocate(10,15));
         Quit("Unable to create surface for tiles!");
     }
 */	
@@ -291,7 +292,7 @@ void LoadLatchMem (void)
 // vbt 26/07/2020 free remis	
 // vbt 15/08/2020 utilisation de lowworkram
 //free(surf1);
-surf1=NULL;
+//surf1=NULL;
 }
 
 //==========================================================================
@@ -360,9 +361,10 @@ void VH_Startup()
 boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
     unsigned width, unsigned height, unsigned frames, boolean abortable)
 {
-	unsigned x,y,p,frame,pixperframe;
+	//slPrint("FizzleFade start  ",slLocate(1,16) );
+#if 1
+	unsigned x,y,frame,pixperframe;
 	int32_t  rndval;
-
 	rndval = 0;
 	pixperframe = width * height / frames;
 
@@ -372,6 +374,8 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 	byte *srcptr = (byte *)source->pixels;
 	do
 	{
+			//slPrint("FizzleFade loop strt  ",slLocate(1,16) );
+			
 		if (abortable && IN_CheckAck ())
 		{
 //		    VL_UnlockSurface(source);
@@ -383,8 +387,8 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 		}
 
 		byte *destptr = (byte *)dest->pixels;
-
-		for (p=0;p<pixperframe;p++)
+		
+		for (unsigned p=0;p<pixperframe;p++)
 		{
 			//
 			// seperate random value into x/y pair
@@ -415,39 +419,33 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 
 
 			if (rndval == 0)		// entire sequence has been completed
+			{
+				//slPrint("rndval == 0  ",slLocate(1,17) );
                 goto finished;
+			}
 		}
-
-	
-//slPrintHex(&source,slLocate(10,5));		
-//slPrintHex(&dest,slLocate(10,6));		
-slPrintHex(source->pixels,slLocate(10,7));			
-slPrintHex(dest->pixels,slLocate(10,8));	
-slPrintHex(source->pitch,slLocate(10,9));			
-slPrintHex(dest->pitch,slLocate(10,10));
 /*
-if (source->pixels==NULL)
-slPrint("source empty",slLocate(10,7));
-if (dest->pixels==NULL)
-slPrint("dest empty",slLocate(20,8));
-if (source->pitch==0)
-slPrint("src pitch",slLocate(20,9));
-if (dest->pitch==0)
-slPrint("dest pitch",slLocate(20,10));
+//slPrintHex(source->pixels,slLocate(10,7));			
+//slPrintHex(dest->pixels,slLocate(10,8));	
+//slPrintHex(source->pitch,slLocate(10,9));			
+//slPrintHex(dest->pitch,slLocate(10,10));
 */
 //		memset(dest->pixels,4,320*200);
-        VL_UnlockSurface(dest);
+//        VL_UnlockSurface(dest);
     /*    SDL_UpdateRect(dest, 0, 0, 0, 0);
 		*/
 		frame++;
         Delay(frame-GetTimeCount());        // don't go too fast
-		slSynch();
+//		slSynch();
+			//slPrint("FizzleFade loop end  ",slLocate(1,16) );
 	} while (1);
 
 finished:
+			//slPrint("FizzleFade finished    ",slLocate(1,18) );
 //    VL_UnlockSurface(source);
-/*    VL_UnlockSurface(dest);
-    SDL_UpdateRect(dest, 0, 0, 0, 0);
-*/	
+    VL_UnlockSurface(dest);
+//    SDL_UpdateRect(dest, 0, 0, 0, 0);
+	//slPrint("FizzleFade return  ",slLocate(1,16) );	
 	return false;
+#endif
 }

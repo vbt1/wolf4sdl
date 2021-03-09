@@ -49,18 +49,20 @@ void PM_Startup()
     uint32_t* pageOffsets = (uint32_t *) malloc((ChunksInFile + 1) * sizeof(int32_t));
     CHECKMALLOCRESULT(pageOffsets);
 	
-	for(i=0;i<(ChunksInFile*2);i+=2,j++)
+	for(i=0;i<(ChunksInFile);i++)
 	{
-		pageOffsets[j]=SWAP_BYTES_16(Chunks[i+3]) | (SWAP_BYTES_16(Chunks[i+4])<<16);
+		pageOffsets[i]=SWAP_BYTES_16(Chunks[3]) | (SWAP_BYTES_16(Chunks[4])<<16);
+		Chunks+=2;
 	} 
 
     //fread(pageOffsets, sizeof(uint32_t), ChunksInFile, file);
     word *pageLengths = (word *) malloc(ChunksInFile * sizeof(word));
     CHECKMALLOCRESULT(pageLengths);
 
-	for(j=0;i<(ChunksInFile*3);i++,j++)
+	for(i=0;i<ChunksInFile;i++)
 	{
-		pageLengths[j]=SWAP_BYTES_16(Chunks[i+3]);
+		pageLengths[i]=SWAP_BYTES_16(Chunks[3]);
+		Chunks++;
 	}
 	
     //fread(pageLengths, sizeof(word), ChunksInFile, file);
@@ -95,18 +97,20 @@ void PM_Startup()
     uint32_t* pageOffsets = (uint32_t *) malloc((ChunksInFile + 1) * sizeof(int32_t));
     CHECKMALLOCRESULT(pageOffsets);
 
-	for(i=0;i<(ChunksInFile*4);i+=4,j++)
+	for(i=0;i<ChunksInFile;i++)
 	{
-		pageOffsets[j]=Chunks[6+i]<<0|Chunks[7+i]<<8|Chunks[8+i]<<16|Chunks[9+i]<<24;
+		pageOffsets[i]=Chunks[6]<<0|Chunks[7]<<8|Chunks[8]<<16|Chunks[9]<<24;
+		Chunks+=4;
 	} 
 
     //fread(pageOffsets, sizeof(uint32_t), ChunksInFile, file);
     word *pageLengths = (word *) malloc(ChunksInFile * sizeof(word));
     CHECKMALLOCRESULT(pageLengths);
 
-	for(j=0;i<(ChunksInFile*6);i+=2,j++)
+	for(i=0;i<ChunksInFile;i++)
 	{
-		pageLengths[j]=Chunks[6+i]|Chunks[7+i]<<8; //SWAP_BYTES_16(Chunks[i+3]);
+		pageLengths[i]=Chunks[6]|Chunks[7]<<8; //SWAP_BYTES_16(Chunks[i+3]);
+		Chunks+=2;
 	}
 
     //fread(pageLengths, sizeof(word), ChunksInFile, file);
@@ -128,6 +132,7 @@ void PM_Startup()
     }	
 #endif
     uint8_t *PMPageData = (uint8_t *) 0x00202000;
+	Chunks=(Uint8*)0x00240000;
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
     CHECKMALLOCRESULT(PMPages);
     // Load pages and initialize PMPages pointers

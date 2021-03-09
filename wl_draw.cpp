@@ -1,5 +1,5 @@
 // WL_DRAW.C
-//#define USE_SPRITES 1
+#define USE_SPRITES 1
 #include "wl_def.h"
 #pragma hdrstop
 
@@ -15,23 +15,24 @@
 void heapWalk();
 #ifdef USE_SPRITES
 unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
-SPRITE user_walls[SATURN_WIDTH];
+SPRITE user_walls[SATURN_WIDTH*2];
+extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 #endif
 //unsigned char spr_buffer[30*64*64];
 typedef struct
 {
-	byte *postsource;
+	byte *postsource;	
 	int postx;
 //	int texdelta;
-	word tilehit;
-	short xtile,ytile;
+	int tilehit;
+	int lasttilehit;
 	int xintercept,yintercept;
+	short xtile,ytile;	
 	short xtilestep,ytilestep;
 // wall optimization variables	
-	int lastside;
-	int32_t lastintercept;
-	int lasttilehit;
-	int lasttexture;
+	word lastside;
+	word lastintercept;
+	word lasttexture;
 } 
 ray_struc;
 
@@ -55,17 +56,11 @@ ray_struc;
 
 =============================================================================
 */
-#ifndef USE_SPRITES
-//static byte *vbuf = NULL;
-#endif
-//unsigned vbufPitch = 0;
 
 int32_t    lasttimecount;
-//int32_t    frameon;
 
-int *wallheight;
+short *wallheight;
 int min_wallheight;
-//#define min_wallheight viewheight
 
 //
 // math tables
@@ -75,7 +70,7 @@ int32_t finetangent[FINEANGLES/4];
 fixed sintable[ANGLES+ANGLES/4];
 fixed *costable = sintable+(ANGLES/4);
 
-static int     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8,
+static short     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8,
                        5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
 
 //
@@ -279,6 +274,8 @@ void ScalePost(int postx,byte *postsource)
 {
 #ifdef USE_SPRITES	
 //--------------------------------------------------------------------------------------------
+if(postx>=0 & postx<=SATURN_WIDTH)
+{
 	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
 //  a           b          c             d
 // top left, top right, bottom right, bottom left
@@ -302,7 +299,14 @@ void ScalePost(int postx,byte *postsource)
 	
 //    user_wall->GRDA=0;
 	// 240 pour du 320, 264 pour du 352
-//	slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	
+//	slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// ne pas remettre
+}
+else
+{
+	char toto[50];
+	sprintf(toto,"bad wall %d   ",postx);
+	//slPrint(toto,slLocate(10,11));
+}
 //--------------------------------------------------------------------------------------------
 #else
     byte *vbuf = LOCK()+screenofs;	
@@ -380,7 +384,7 @@ void ScalePost(int postx,byte *postsource)
 void HitVertWall (int pixx, int texdelta, ray_struc *ray)
 {
     int wallpic;
-    int texture;
+    word texture;
 
     texture = ((ray->yintercept+texdelta)>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
     if (ray->xtilestep == -1)
@@ -391,18 +395,21 @@ void HitVertWall (int pixx, int texdelta, ray_struc *ray)
 
     if(ray->lastside==1 && ray->lastintercept==ray->xtile && ray->lasttilehit==ray->tilehit && !(ray->lasttilehit & 0x40))
     {
+        ScalePost(ray->postx,ray->postsource);
+		ray->postx = pixx;
+			
         if((pixx&3) && texture == ray->lasttexture)
         {
-            ScalePost(ray->postx,ray->postsource);
-            ray->postx = pixx;
+//            ScalePost(ray->postx,ray->postsource);
+ //           ray->postx = pixx;
             wallheight[pixx] = wallheight[pixx-1];
             return;
         }
-        ScalePost(ray->postx,ray->postsource);
+//        ScalePost(ray->postx,ray->postsource);
         wallheight[pixx] = CalcHeight(ray->xintercept,ray->yintercept);
         ray->postsource+=texture-ray->lasttexture;
 //        postwidth=1;
-        ray->postx=pixx;
+//        ray->postx=pixx;
         ray->lasttexture=texture;
         return;
     }
@@ -446,7 +453,7 @@ void HitVertWall (int pixx, int texdelta, ray_struc *ray)
 void HitHorizWall (int pixx, int texdelta, ray_struc *ray)
 {
     int wallpic;
-    int texture;
+    word texture;
 
     texture = ((ray->xintercept+texdelta)>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
     if (ray->ytilestep == -1)
@@ -456,18 +463,21 @@ void HitHorizWall (int pixx, int texdelta, ray_struc *ray)
 
     if(ray->lastside==0 && ray->lastintercept==ray->ytile && ray->lasttilehit==ray->tilehit && !(ray->lasttilehit & 0x40))
     {
+        ScalePost(ray->postx,ray->postsource);
+        ray->postx=pixx;
+			
         if((pixx&3) && texture == ray->lasttexture)
         {
-            ScalePost(ray->postx,ray->postsource);
-            ray->postx=pixx;
+//            ScalePost(ray->postx,ray->postsource);
+//            ray->postx=pixx;
             wallheight[pixx] = wallheight[pixx-1];
             return;
         }
-        ScalePost(ray->postx,ray->postsource);
+//        ScalePost(ray->postx,ray->postsource);
         wallheight[pixx] = CalcHeight(ray->xintercept,ray->yintercept);
         ray->postsource+=texture-ray->lasttexture;
 //        postwidth=1;
-        ray->postx=pixx;
+//        ray->postx=pixx;
         ray->lasttexture=texture;
         return;
     }
@@ -509,25 +519,28 @@ void HitHorizDoor2 (int pixx,ray_struc *ray)
 {
     int doorpage;
     int doornum;
-    int texture;
+    word texture;
 
     doornum = ray->tilehit&0x7f;
     texture = ((ray->xintercept-doorposition[doornum])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
 
     if(ray->lasttilehit==ray->tilehit)
     {
+        ScalePost(ray->postx,ray->postsource);
+        ray->postx=pixx;
+ 
         if((pixx&3) && texture == ray->lasttexture)
         {
-            ScalePost(ray->postx,ray->postsource);
-            ray->postx=pixx;
+ //           ScalePost(ray->postx,ray->postsource);
+ //           ray->postx=pixx;
             wallheight[pixx] = wallheight[pixx-1];
             return;
         }
-        ScalePost(ray->postx,ray->postsource);
+//        ScalePost(ray->postx,ray->postsource);
         wallheight[pixx] = CalcHeight(ray->xintercept,ray->yintercept);
         ray->postsource+=texture-ray->lasttexture;
 //        postwidth=1;
-        ray->postx=pixx;
+//        ray->postx=pixx;
         ray->lasttexture=texture;
         return;
     }
@@ -573,25 +586,28 @@ void HitVertDoor2 (int pixx,ray_struc *ray)
 {
     int doorpage;
     int doornum;
-    int texture;
+    word texture;
 
     doornum = ray->tilehit&0x7f;
     texture = ((ray->yintercept-doorposition[doornum])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
 
     if(ray->lasttilehit==ray->tilehit)
     {
+		ScalePost(ray->postx,ray->postsource);
+		ray->postx=pixx;
+			
         if((pixx&3) && texture == ray->lasttexture)
         {
-            ScalePost(ray->postx,ray->postsource);
-            ray->postx=pixx;
+//            ScalePost(ray->postx,ray->postsource);
+//            ray->postx=pixx;
             wallheight[pixx] = wallheight[pixx-1];
             return;
         }
-        ScalePost(ray->postx,ray->postsource);
+//        ScalePost(ray->postx,ray->postsource);
         wallheight[pixx] = CalcHeight(ray->xintercept,ray->yintercept);
         ray->postsource+=texture-ray->lasttexture;
 //        postwidth=1;
-        ray->postx=pixx;
+//        ray->postx=pixx;
         ray->lasttexture=texture;
         return;
     }
@@ -747,8 +763,8 @@ int CalcRotate (objtype *ob)
 
     return angle/(ANGLES/8);
 }
-int vbt=0;
-void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
+//int vbt=0;
+inline void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 {
     unsigned scale,pixheight;
 
@@ -768,13 +784,12 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 #ifdef USE_SPRITES
 //    char msg[100];
 //	sprintf (msg,"shape %d %d max %d h %d         ", shapenum, SPR_TOTAL, SPR_TOTAL+SATURN_WIDTH,height) ;
-//	slPrint((char *)msg,slLocate(1,4));
+//	//slPrint((char *)msg,slLocate(1,4));
 
 if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 //	if(shapenum==296) //||shapenum==298||shapenum==299||shapenum==300||shapenum==301||shapenum==302)	
 	loadActorTexture(shapenum,true);
 //--------------------------------------------------------------------------------------------
-	extern 	TEXTURE tex_spr[];		
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+shapenum]; 
 // correct on touche pas		
     SPRITE user_sprite;
@@ -789,7 +804,7 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
 	slSetSprite(&user_sprite, toFIXED(0+(SATURN_SORT_VALUE-pixheight/2)));	// à remettre
-	vbt++;
+//	vbt++;
 //--------------------------------------------------------------------------------------------	
 #else
 	byte *vbuf = LOCK()+screenofs;
@@ -878,10 +893,9 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     scale=height>>1;
     pixheight=scale*SPRITESCALEFACTOR;
 #ifdef USE_SPRITES	
-//slPrintHex(shapenum,slLocate(10,4));
+////slPrintHex(shapenum,slLocate(10,4));
 	loadActorTexture(shapenum,false);
 //--------------------------------------------------------------------------------------------
-	extern 	TEXTURE tex_spr[];		
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH];
 // correct on touche pas		
     SPRITE user_sprite;
@@ -896,7 +910,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
 	slSetSprite(&user_sprite, toFIXED(10)); //+(SATURN_SORT_VALUE+1)));	// à remettre	
-	vbt++;
+//	vbt++;
 //--------------------------------------------------------------------------------------------	
 #else
     t_compshape   *shape;
@@ -922,13 +936,15 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 
 #else // vbt on affiche l'arme en bitmap
 // vbt : ajout nettoyage bitmap vdp2
-#ifdef USE_SPRITES
+#ifdef USE_SPRITES // plus besoin !!!
+/*
 	Uint8*d = (Uint8*)vbuf + ((pixheight-height) * vbufPitch) + (xcenter-scale); 
 	for( Sint16 i=0;i<height;i++)
 	{
 		memset(d,0x0,height);
 		d+=(vbufPitch );
 	}
+*/	
 #endif
     for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
     {
@@ -1221,7 +1237,8 @@ void CalcTics (void)
 
 
 //==========================================================================
-
+	ray_struc my_ray;
+	
 void AsmRefresh()
 {
 // vbt :moins de variable globale
@@ -1236,7 +1253,6 @@ void AsmRefresh()
 	
     int32_t xstep=0,ystep=0;
     longword xpartial=0,ypartial=0;
-	ray_struc my_ray;
 	
     my_ray.lastside = -1;                  // the first pixel is on a new wall	
 	
@@ -2127,18 +2143,6 @@ inline void WallRefresh (void)
 #endif	
 //	AsmRefreshSlave();
     AsmRefresh ();
-	/*
-#ifdef USE_SPRITES
-	SPRITE *user_wall = user_walls;
-
-	for(int pixx=0;pixx<viewwidth;pixx++)
-    {
-		slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre
-		user_wall++;
-		vbt++;
-	}
-#endif	
-*/
 }
 
 void CalcViewVariables()
@@ -2172,14 +2176,13 @@ void    ThreeDRefresh (void)
 //
 // clear out the traced array
 //
-    memset4_fast(spotvis,0,maparea);
+    memset(spotvis,0,maparea);
     spotvis[player->tilex][player->tiley] = 1;       // Detect all sprites over player fix
 
     byte *vbuf = (byte *)screenBuffer->pixels;
     vbuf += screenofs;
 	
     CalcViewVariables();
-
 //
 // follow the walls from there to the right, drawing as we go
 //
@@ -2231,24 +2234,30 @@ void    ThreeDRefresh (void)
         ShowActStatus();
 	}
     VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
-
+	vbuf = NULL;
 //
 // show screen and time last cycle
 //
     if (fizzlein)
     {
+	//slPrint("fizzlein true       ",slLocate(1,15) );		
+		
 		memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
 //    FinishPaletteShifts ();
 
 //    VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
 	
-        FizzleFade(screenBuffer, screen, 0, 0,
-            screenWidth, screenHeight, 20, false);
-	
+        FizzleFade(screenBuffer, screen, 0, 0, screenWidth, screenHeight, 20, false);
         fizzlein = false;
 
         lasttimecount = GetTimeCount();          // don't make a big tic count
     }
+	else
+	{
+		//slPrint("fizzlein false       ",slLocate(1,15) );		
+	
+	}
+	fizzlein = false;
 #ifndef USE_SPRITES	
     else
     {

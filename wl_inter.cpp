@@ -575,7 +575,7 @@ LevelCompleted (void)
     CacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
     ClearSplitVWB ();           // set up for double buffering in split screen
 	slBack1ColSet((void *)BACK_COL_ADR , 0);	
-	slScrTransparent(NBG1OFF);
+	slScrTransparent(0);
 	slSynch();
     VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
     if (bordercol != VIEWCOLOR)
@@ -1694,7 +1694,7 @@ CopyProtection (void)
     ShutdownId ();
 
 //    printf ("%s\n", DosMessages[US_RndT () % 9]);
-    exit (1);
+    SYS_Exit (1);
 }
 #endif //copy
 

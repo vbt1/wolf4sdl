@@ -75,7 +75,7 @@ boolean startgame;
 
 boolean param_nowait = true;
 int     param_difficulty = 1;           // default is "normal"
-int     param_tedlevel = -1;            // default is not to start a level
+//int     param_tedlevel = -1;            // default is not to start a level
 
 int     param_mission = 1;
 boolean param_goodtimes = false;
@@ -85,7 +85,7 @@ boolean param_ignorenumchunks = false;
 unsigned frame_x=0,frame_y=0;
 
 void VblIn(void);
-extern int vbt;
+//extern int vbt;
 void VblIn(void)
 {
 	char buffer[8];
@@ -94,11 +94,11 @@ void VblIn(void)
 				 
 	if(frame_y==60)
 	{
-		slPrint((char*)"fps                                                   ",slLocate(10,1));
+//		//slPrint((char*)"fps                                                   ",slLocate(10,1));
 		slPrint((char*)ltoa(frame_x,buffer,8),slLocate(14,1));
-slPrint((char*)ltoa(vbt,buffer,8),slLocate(22,1));		
+////slPrint((char*)ltoa(vbt,buffer,8),slLocate(22,1));		
 		frame_y=frame_x=0;
-		vbt=0;
+//		vbt=0;
 	}		   
 }
 
@@ -705,12 +705,12 @@ void FinishSignon (void)
     US_CPrint ("pensando...");
     #else
     US_CPrint ("Working...");
+	
     #endif
 #ifndef USE_SPRITES
     VH_UpdateScreen();
 #endif
     #endif
-
     SETFONTCOLOR(0,15);
 #else
 #ifndef USE_SPRITES	
@@ -1033,14 +1033,14 @@ static void InitGame()
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
     {
 //        printf("Unable to init SDL: %s\n", SDL_GetError());
-        exit(1);
+        SYS_Exit(1);
     }
 	SDL_SetVideoMode  (screenWidth, screenHeight, screenBits, NULL);
 
 //#ifndef REMDEBUG
 	slIntFunction(VblIn) ;
 //#endif
-    atexit(SDL_Quit);
+//    atexit(SDL_Quit);
     SignonScreen ();
 	 slScrTransparent(NBG1ON);
 	 
@@ -1061,21 +1061,21 @@ static void InitGame()
 #endif
 	//ajout VBT
 //param_nowait = true;
-//slPrint((char *)"VH_Startup     ",slLocate(10,12));
+////slPrint((char *)"VH_Startup     ",slLocate(10,12));
     VH_Startup ();
 //    IN_Startup (); // VBT à remettre
-//slPrint((char *)"PM_Startup     ",slLocate(10,12));
+////slPrint((char *)"PM_Startup     ",slLocate(10,12));
     PM_Startup ();
-//slPrint((char *)"SD_Startup     ",slLocate(10,12));
+////slPrint((char *)"SD_Startup     ",slLocate(10,12));
     SD_Startup ();
-//slPrint((char *)"CA_Startup     ",slLocate(10,12));
+////slPrint((char *)"CA_Startup     ",slLocate(10,12));
     CA_Startup ();
-//slPrint((char *)"US_Startup     ",slLocate(10,12));
+////slPrint((char *)"US_Startup     ",slLocate(10,12));
     US_Startup ();
     // TODO: Will any memory checking be needed someday??
 //
 // build some tables
-//slPrint((char *)"InitDigiMap     ",slLocate(10,12));
+////slPrint((char *)"InitDigiMap     ",slLocate(10,12));
     InitDigiMap ();
 	viewsize = 19;                          // start with a good size
 
@@ -1102,26 +1102,34 @@ static void InitGame()
 //
 // load in and lock down some basic chunks
 //
-
+//slPrint("screen->pixels9",slLocate(1,9));
+//slPrintHex(screen->pixels,slLocate(20,9));
     CA_CacheGrChunk(STARTFONT);
-
+//slPrint("screen->pixels10",slLocate(1,10));	
+//slPrintHex(screen->pixels,slLocate(20,10));
     CA_CacheGrChunk(STATUSBARPIC);
 //	slTVOff();
-    LoadLatchMem ();	   
-    BuildTables ();          // trig tables
+   LoadLatchMem ();	   
+   BuildTables ();          // trig tables
     SetupWalls ();
     NewViewSize (viewsize);
-		slTVOn();
-//		slSynch();
-//	slPrint("C4 - 2008-2009     www.rockin-b.de",slLocate(2,29));
+
+//		slTVOn();
+//slPrint("screen->pixels11",slLocate(1,11));		
+//slPrintHex(screen->pixels,slLocate(20,11));			
+		slSynch();
+//	//slPrint("C4 - 2008-2009     www.rockin-b.de",slLocate(2,29));
 //
 // initialize variables
 //
-    InitRedShifts ();		
+    InitRedShifts ();	
+//slPrint("screen->pixels12",slLocate(1,12));	
+//slPrintHex(screen->pixels,slLocate(21,12));	
 #ifndef SPEARDEMO
     if(!didjukebox)
 #endif
         FinishSignon();
+//slPrintHex(screen->pixels,slLocate(20,13));		
 #ifdef NOTYET
     vdisp = (byte *) (0xa0000+PAGE1START);
     vbuf = (byte *) (0xa0000+PAGE2START);
@@ -1232,7 +1240,7 @@ void Quit (const char *errorStr, ...)
         va_end(vlist);
     }
     else error[0] = 0;
- 	slPrint((char *)error,slLocate(1,3));
+ 	//slPrint((char *)error,slLocate(1,3));
 	
     if (!pictable)  // don't try to display the red box before it's loaded
     {
@@ -1248,7 +1256,7 @@ void Quit (const char *errorStr, ...)
 #endif
             VW_WaitVBL(100);
         }
-        exit(1);
+        SYS_Exit(1);
     }
 
     if (!error || !*error)
@@ -1281,7 +1289,7 @@ void Quit (const char *errorStr, ...)
         SetTextCursor(0,7);
 #endif
         VW_WaitVBL(200);
-        exit(1);
+        SYS_Exit(1);
     }
     else
     if (!error || !(*error))
@@ -1293,7 +1301,7 @@ void Quit (const char *errorStr, ...)
         SetTextCursor(0,23);
 #endif
     }
-    exit(0);
+    SYS_Exit(0);
 }
 
 //===========================================================================
@@ -1315,7 +1323,7 @@ static void DemoLoop()
 //
 // check for launch from ted
 //
-    if (param_tedlevel != -1)
+/*    if (param_tedlevel != -1)
     {
         param_nowait = true;
         EnableEndGameMenuItem();
@@ -1331,7 +1339,7 @@ static void DemoLoop()
         GameLoop();
         Quit (NULL);
     }
-
+*/
 
 //
 // main game cycle
@@ -1398,22 +1406,25 @@ static void DemoLoop()
 
             UNCACHEGRCHUNK (TITLEPALETTE);
 #else
-//slPrint((char*)"CA_CacheScreen1",slLocate(10,22));		
+////slPrint((char*)"CA_CacheScreen1",slLocate(10,22));	
             CA_CacheScreen (TITLEPIC);
-//slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
+////slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
+
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #endif
-//slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
+
+////slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
             VW_FadeIn();
+		
 #endif
 	// VBT déplacé
-//slPrint((char*)"StartCPMusic",slLocate(10,22));	
+////slPrint((char*)"StartCPMusic",slLocate(10,22));	
 	StartCPMusic(INTROSONG);
-//slPrint((char*)"IN_UserInput1",slLocate(10,22));		
+////slPrint((char*)"IN_UserInput1",slLocate(10,22));		
             if (IN_UserInput(TickBase*15))
                 break;
-//slPrint((char*)"VW_FadeOut1",slLocate(10,22));					
+////slPrint((char*)"VW_FadeOut1",slLocate(10,22));					
             VW_FadeOut();
 //
 // credits page
@@ -1488,6 +1499,26 @@ static void DemoLoop()
 
 int main (int argc, char *argv[])
 {
+	
+#define		SystemWork		0x060ffc00		/* System Variable Address */
+#define		SystemSize		(0x06100000-0x060ffc00)		/* System Variable Size */
+	
+	extern Uint32 _bstart, _bend;
+	Uint8	*dst;
+	Uint32	i;
+
+	/* 1.Zero Set .bss Section */
+	for( dst = (Uint8 *)&_bstart; dst < (Uint8 *)&_bend; dst++ ) {
+		*dst = 0;
+	}
+	/* 2.ROM has data at end of text; copy it. */
+
+	/* 3.SGL System Variable Clear */
+	for( dst = (Uint8 *)SystemWork, i = 0;i < SystemSize; i++) {
+		*dst = 0;
+	}	
+	
+	
 #if defined(_arch_dreamcast)
     DC_Main();
     DC_CheckParameters();
@@ -1507,7 +1538,7 @@ int main (int argc, char *argv[])
     CheckForEpisodes();
 
     InitGame();
-
+//slPrintHex(screen->pixels,slLocate(20,14));
     DemoLoop();
 
     Quit("Demo loop exited???");

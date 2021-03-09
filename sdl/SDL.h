@@ -6,11 +6,11 @@
 extern "C" {
 //#endif
 	   
-#include "C:/SaturnOrbit/SGL_302j/inc/sgl.h"
+#include "sgl.h"
 
-#include "C:/SaturnOrbit/SGL_302j/inc/sega_sys.h"
-#include "C:/SaturnOrbit/SGL_302j/inc/sega_gfs.h"
-#include "C:/SaturnOrbit/SGL_302j/inc/sega_tim.h"
+#include "sega_sys.h"
+#include "sega_gfs.h"
+#include "sega_tim.h"
 //#ifdef __cplusplus
 }
 //#endif

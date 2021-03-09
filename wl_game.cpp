@@ -1,5 +1,5 @@
 // WL_GAME.C
-//#define USE_SPRITES 1
+#define USE_SPRITES 1
 #include <math.h>
 #include "wl_def.h"
 //#include <SDL_mixer.h>
@@ -15,6 +15,8 @@ extern fixed MTH_Atan(fixed y, fixed x);
 #ifdef USE_SPRITES
 unsigned int position_vram=((SATURN_WIDTH+64)*32);
 unsigned int static_items=0;
+extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
+extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 #endif
 
 #undef atan2
@@ -83,7 +85,6 @@ void set_sprite(PICTURE *pcptr)
 }
 void loadActorTexture(int texture, boolean direct)
 {
-	extern TEXTURE tex_spr[];
 	byte bmpbuff[64*64];
 	PICTURE pic_spr;
 	t_compshape   *shape = (t_compshape   *)PM_GetSprite(texture);
@@ -122,8 +123,7 @@ void loadActorTexture(int texture, boolean direct)
 	}
 	else
 	{
-		extern unsigned char wall_buffer[];
-		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)bmpbuff,64*64);
+		memcpy((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)bmpbuff,64*64);
 	}
 	position_vram+=0x800;	
 	
@@ -624,7 +624,7 @@ slIntFunction(VblIn) ;
 //
     memset (tilemap,0,sizeof(tilemap));
     memset (actorat,0,sizeof(objtype));
-slPrintHex(screen->pixels,slLocate(10,17));
+//slPrintHex(screen->pixels,slLocate(10,17));
     map = mapsegs[0];
     for (y=0;y<mapheight;y++)
     {
@@ -645,7 +645,7 @@ slPrintHex(screen->pixels,slLocate(10,17));
             }
         }
     }
-slPrintHex(screen->pixels,slLocate(10,18));	
+//slPrintHex(screen->pixels,slLocate(10,18));	
 //
 // spawn doors
 //
@@ -727,7 +727,7 @@ slPrintHex(screen->pixels,slLocate(10,18));
         }
     }
 	//VGAClearScreen ();
-	slScrTransparent(NBG1OFF);
+	slScrTransparent(0);
 }
 
 

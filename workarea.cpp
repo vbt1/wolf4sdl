@@ -11,14 +11,14 @@ extern "C" {
 
 /*---- [2.This part must not be modified] ---------------------------------*/
 
-#define		MAX_VERTICES	1	/* number of vertices that can be used */
-#define		MAX_POLYGONS	7100	/* number of vertices that can be used */
-#define		MAX_EVENTS		 1	/* number of events that can be used   */
-#define		MAX_WORKS		 1	/* number of works that can be used    */
+#define		MAX_VERTICES	 8	/* number of vertices that can be used */
+#define		MAX_POLYGONS	 512	/* number of vertices that can be used */
+#define		MAX_EVENTS		  8	/* number of events that can be used   */
+#define		MAX_WORKS		 8	/* number of works that can be used    */
 
-#define		WORK_AREA		0x060E0000			/* SGL Work Area           */
+#define		WORK_AREA		0x060F0000			/* SGL Work Area           */
 
-#define		trans_list		SystemWork-0x100			/* DMA Transfer Table      */
+#define		trans_list		SystemWork-0x0100	/* DMA Transfer Table      */
 #define		pcmbuf			SoundRAM+0x78000	/* PCM Stream Address      */
 #define		PCM_SIZE		0x8000				/* PCM Stream Size         */
 
@@ -29,7 +29,8 @@ extern "C" {
 #define		_Byte_			sizeof(Uint8)
 #define		_Word_			sizeof(Uint16)
 #define		_LongWord_		sizeof(Uint32)
-#define		_Sprite_		(sizeof(Uint16) )
+#define		_Sprite_		(sizeof(Uint16) * 18)
+
 
 #define		AdjWork(pt,sz,ct)	(pt + (sz) * (ct))
 
@@ -37,7 +38,7 @@ extern "C" {
     enum workarea{
         sort_list  = WORK_AREA ,
         zbuffer    = AdjWork(sort_list , _LongWord_ * 3, MAX_POLYGONS + 6) ,
-        spritebuf  = AdjWork(zbuffer   , _LongWord_, 256) ,
+        spritebuf  = AdjWork(zbuffer   , _LongWord_, 512) ,
         pbuffer    = AdjWork(spritebuf , _Sprite_, (MAX_POLYGONS + 6) * 2) ,
         clofstbuf  = AdjWork(pbuffer   , _LongWord_ * 4, MAX_VERTICES) ,
         commandbuf = AdjWork(clofstbuf , _Byte_ * 32*3, 32) ,
@@ -64,10 +65,9 @@ extern "C" {
     const void*   PCM_Work      = (void*)(pcmbuf) ;
     const Uint32  PCM_WkSize    = PCM_SIZE ;
     const void*   TransList     = (void*)(trans_list) ;
-		/*
+/*
     EVENT  EventBuf[MAX_EVENTS] ;
     WORK   WorkBuf[MAX_WORKS] ;
     EVENT* RemainEvent[MAX_EVENTS] ;
-    WORK*  RemainWork[MAX_WORKS] ;  	  */
-
-/*------------------------------------------------------------------------*/
+    WORK*  RemainWork[MAX_WORKS] ;
+*/	

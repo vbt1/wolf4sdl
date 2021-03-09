@@ -31,8 +31,8 @@ typedef struct
 //===========================================================================
 
 
+//extern	pictabletype	pictable[NUMPICS];
 extern	pictabletype	*pictable;
-//extern	pictabletype	*picmtable;
 
 extern  byte            fontcolor,backcolor;
 extern	int             fontnumber;
