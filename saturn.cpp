@@ -361,15 +361,20 @@ Uint32 SDL_MapRGB (SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b)
 void SDL_UnlockSurface(SDL_Surface *surface)
 {
 	unsigned short i; // vbt : le plus rapide
+	unsigned char *surfacePtr = (unsigned char*)surface->pixels;
 	for (i = 0; i < screenHeight; i++) 
 	{
 //		DMA_ScuMemCopy((unsigned char*)(NBG1_CEL_ADR + (i<<9)), (unsigned char*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt 20-22fps
 //		SCU_DMAWait();
 //		memcpyl((unsigned long*)(NBG1_CEL_ADR + (i<<9)), (unsigned long*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt : 22-24fps
 // vbt : remttre la copie dma		
-		slDMACopy((unsigned long*)(surface->pixels + (i * screenWidth)),(void *)(NBG1_CEL_ADR + (i<<9)),screenWidth);
+		slDMACopy((unsigned long*)surfacePtr,(void *)(NBG1_CEL_ADR + (i<<9)),screenWidth);
+		surfacePtr+=screenWidth;
+//		slDMACopy((unsigned long*)(surface->pixels + (i * screenWidth)),(void *)(NBG1_CEL_ADR + (i<<9)),screenWidth);
+//		slDMACopy((unsigned long*)(surface->pixels + ((i+1) * screenWidth)),(void *)(NBG1_CEL_ADR + ((i+1)<<9)),screenWidth);
+//		slDMACopy((unsigned long*)(surface->pixels + ((i+2) * screenWidth)),(void *)(NBG1_CEL_ADR + ((i+2)<<9)),screenWidth);
+//		slDMACopy((unsigned long*)(surface->pixels + ((i+3) * screenWidth)),(void *)(NBG1_CEL_ADR + ((i+3)<<9)),screenWidth);		
 	}
-//xxxxx	
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
@@ -448,9 +453,9 @@ int SDL_FillRect (SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color)
 		if((dstrect)!=NULL)
 		{
 	//		slBMBoxFill(dstrect->x, dstrect->y, dstrect->x + dstrect->w - 1, dstrect->y + dstrect->h - 1, color);
-		Uint8*d = (Uint8*)dst->pixels + dstrect->x; 
+			Uint8*d = (Uint8*)dst->pixels + dstrect->x; 
 
-		for( Sint16 i=0;i<dstrect->h;i++)
+			for( Sint16 i=0;i<dstrect->h;i++)
 			{
 				memset(d,color,dstrect->w);
 				d+=dst->pitch;

@@ -279,7 +279,7 @@ void LoadLatchMem (void)
         {
             Quit("Unable to create surface for picture!");
         }			  
-        SDL_SetColors(surf, gamepal, 0, 256);
+ //       SDL_SetColors(surf, gamepal, 0, 256);
 		latchpics[2+i-start] = surf;
 		CA_CacheGrChunk (i);
 		VL_MemToLatch (grsegs[i], width, height, surf, 0, 0);

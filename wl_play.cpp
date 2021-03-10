@@ -29,7 +29,6 @@ boolean madenoise;              // true when shooting or screaming
 exit_t playstate;
 
 static musicnames lastmusicchunk = (musicnames) 0;
-
 //static int DebugOk;
 
 objtype objlist[MAXACTORS];
@@ -87,6 +86,7 @@ extern unsigned int position_vram;
 extern unsigned int static_items;
 extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 extern SPRITE user_walls[SATURN_WIDTH*2];
+extern char texture_list[256];
 #endif
 //===========================================================================
 
@@ -1167,7 +1167,7 @@ void PlayLoop (void)
         madenoise = false;
 
         MoveDoors ();
-        MovePWalls ();
+       MovePWalls ();
 
         for (obj = player; obj; obj = obj->next)
             DoActor (obj);
@@ -1239,7 +1239,11 @@ extern int frame_x,frame_y;
 #ifdef USE_SPRITES		
 		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
 //		memcpy((void *)(SpriteVRAM + cgaddress),(void *)&wall_buffer[0],(SATURN_WIDTH+64) * 64);
-		position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
+		if(position_vram>0x30000)
+		{
+			memset(texture_list,-1,256);
+			position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
+		}
 #endif
 		
     }

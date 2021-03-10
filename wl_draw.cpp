@@ -268,7 +268,8 @@ int CalcHeight(int xintercept, int yintercept)
 ===================
 */
 
-void loadActorTexture(int texture,boolean direct);
+void loadActorTexture(int texture);
+void loadActorTexture2(int texture);
 
 void ScalePost(int postx,byte *postsource)
 {
@@ -788,7 +789,7 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t fla
 
 if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 //	if(shapenum==296) //||shapenum==298||shapenum==299||shapenum==300||shapenum==301||shapenum==302)	
-	loadActorTexture(shapenum,true);
+	loadActorTexture(shapenum);
 //--------------------------------------------------------------------------------------------
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+shapenum]; 
 // correct on touche pas		
@@ -885,8 +886,11 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
     }
 #endif	
 }
-
+#ifdef USE_SPRITES
+void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
+#else
 void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
+#endif
 {
     unsigned scale,pixheight;
 
@@ -894,7 +898,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     pixheight=scale*SPRITESCALEFACTOR;
 #ifdef USE_SPRITES	
 ////slPrintHex(shapenum,slLocate(10,4));
-	loadActorTexture(shapenum,false);
+	loadActorTexture2(shapenum);
 //--------------------------------------------------------------------------------------------
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH];
 // correct on touche pas		
@@ -910,7 +914,6 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
 	slSetSprite(&user_sprite, toFIXED(10)); //+(SATURN_SORT_VALUE+1)));	// à remettre	
-//	vbt++;
 //--------------------------------------------------------------------------------------------	
 #else
     t_compshape   *shape;
@@ -946,6 +949,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 	}
 */	
 #endif
+xxxxx
     for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
     {
         lpix=rpix;
@@ -1177,23 +1181,40 @@ void DrawScaleds (void)
 int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
     SPR_MACHINEGUNREADY, SPR_CHAINREADY};
 
+#ifdef USE_SPRITES
+void DrawPlayerWeapon ()
+#else
 void DrawPlayerWeapon (byte *vbuf)
+#endif
 {
     if (gamestate.weapon != -1)
     {
         int shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
+#ifdef USE_SPRITES
+        SimpleScaleShape(viewwidth/2,shapenum,viewheight+1);
+#else
         SimpleScaleShape(vbuf,viewwidth/2,shapenum,viewheight+1,curPitch);
+#endif		
     }
 
     if (demoplayback)
+#ifdef USE_SPRITES
+        SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1);
+#else
         SimpleScaleShape(vbuf,viewwidth/2,SPR_DEMO,viewheight+1,curPitch);
+#endif		
 
 #ifndef SPEAR
     if (gamestate.victoryflag)
     {
 #ifndef APOGEE_1_0
         if (player->state == &s_deathcam && (GetTimeCount()&32) )
-            SimpleScaleShape(vbuf,viewwidth/2,SPR_DEATHCAM,viewheight+1,curPitch);
+#ifdef USE_SPRITES
+			SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1);
+#else
+			SimpleScaleShape(vbuf,viewwidth/2,SPR_DEATHCAM,viewheight+1,curPitch);
+#endif
+
 #endif
         return;
     }
@@ -2139,10 +2160,10 @@ inline void WallRefresh (void)
 //	slCashPurge();
     min_wallheight = viewheight;
 #ifdef USE_SLAVE	
-	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
+	slSlaveFunc(AsmRefresh,(void*)NULL);
 #endif	
 //	AsmRefreshSlave();
-    AsmRefresh ();
+    AsmRefreshSlave ();
 }
 
 void CalcViewVariables()
@@ -2226,15 +2247,18 @@ void    ThreeDRefresh (void)
         DrawSnow(vbuf, vbufPitch);
 #endif
 
-//#ifndef USE_SPRITES
+#ifdef USE_SPRITES
+    DrawPlayerWeapon ();    // draw player's hands
+#else
     DrawPlayerWeapon (vbuf);    // draw player's hands
-//#endif
+#endif
     if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
 	{
         ShowActStatus();
 	}
     VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
 	vbuf = NULL;
+	
 //
 // show screen and time last cycle
 //
