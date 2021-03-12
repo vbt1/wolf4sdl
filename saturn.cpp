@@ -358,10 +358,7 @@ Uint32 SDL_MapRGB (SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b)
 	return 0x8000 | RGB(r>>3,g>>3,b>>3);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-void SDL_UnlockSurface2(SDL_Surface *surface)
-{
-	
-}
+
 void SDL_UnlockSurface(SDL_Surface *surface)
 {
 	unsigned short i; // vbt : le plus rapide

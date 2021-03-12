@@ -1247,7 +1247,7 @@ extern int frame_x,frame_y;
 //		memcpy((void *)(SpriteVRAM + cgaddress),(void *)&wall_buffer[0],(SATURN_WIDTH+64) * 64);
 		if(position_vram>0x30000)
 		{
-			memset(texture_list,-1,256);
+			memset(texture_list,0xFF,sizeof(texture_list));
 			position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
 		}
 #endif

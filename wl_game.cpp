@@ -16,7 +16,7 @@ unsigned int position_vram=((SATURN_WIDTH+64)*32);
 unsigned int static_items=0;
 extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
-char texture_list[256];
+unsigned char texture_list[256];
 #endif
 
 #undef atan2
@@ -88,42 +88,39 @@ void loadActorTexture(int texture)
 	byte *bmpptr;
 	PICTURE pic_spr;
 	unsigned short  *cmdptr, *sprdata;
+		
+	t_compshape   *shape = (t_compshape   *)PM_GetSprite(texture);
+	// set the texel index to the first texel
+	unsigned char  *sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
+	// clear the buffers
+	memset(bmpbuff,0,64*64);
+	// setup a pointer to the column offsets	
+	cmdptr = shape->dataofs;
 
-//	if(texture_list[texture]==-1)
+	for (int x = (shape->leftpix); x <= (shape->rightpix); x++)
 	{
-		t_compshape   *shape = (t_compshape   *)PM_GetSprite(texture);
-		// set the texel index to the first texel
-		unsigned char  *sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
-		// clear the buffers
-		memset(bmpbuff,0,64*64);
-		// setup a pointer to the column offsets	
-		cmdptr = shape->dataofs;
-
-		for (int x = (shape->leftpix); x <= (shape->rightpix); x++)
+		sprdata = (unsigned short *)((unsigned char  *)shape+*cmdptr);
+		bmpptr = (byte *)bmpbuff+x;
+		
+		while (SWAP_BYTES_16(*sprdata) != 0)
 		{
-			sprdata = (unsigned short *)((unsigned char  *)shape+*cmdptr);
-			bmpptr = (byte *)bmpbuff+x;
-			
-			while (SWAP_BYTES_16(*sprdata) != 0)
+			for (int y = SWAP_BYTES_16(sprdata[2])/2; y < SWAP_BYTES_16(*sprdata)/2; y++)
 			{
-				for (int y = SWAP_BYTES_16(sprdata[2])/2; y < SWAP_BYTES_16(*sprdata)/2; y++)
-				{
-					bmpptr[y<<6] = *sprptr++;
-					if(bmpptr[y<<6]==0) bmpptr[y<<6]=0xa0;
-				}
-				sprdata += 3;
+				bmpptr[y<<6] = *sprptr++;
+				if(bmpptr[y<<6]==0) bmpptr[y<<6]=0xa0;
 			}
-			cmdptr++;
+			sprdata += 3;
 		}
-		texture_list[texture]=position_vram/2048;
-		position_vram+=0x800;	
+		cmdptr++;
 	}
+	texture_list[texture]=position_vram/0x800;
 	
 	pic_spr.texno = SATURN_WIDTH+1+texture;
 	pic_spr.cmode = COL_256;
 	pic_spr.pcsrc = &bmpbuff[0];
-	tex_spr[SATURN_WIDTH+1+texture] = TEXDEF(64, 64, texture_list[texture]*2048);
-	set_sprite(&pic_spr);
+	tex_spr[SATURN_WIDTH+1+texture] = TEXDEF(64, 64, texture_list[texture]*0x800);
+	set_sprite(&pic_spr);		
+	position_vram+=0x800;	
 }
 
 int old_texture = -1;
@@ -719,7 +716,7 @@ slIntFunction(VblIn) ;
     }
 // vbt : on recharge la vram
 #ifdef USE_SPRITES
-	memset(texture_list,-1,256);
+	memset(texture_list,0xff,256);
 	position_vram=(SATURN_WIDTH+64)*32;
 
 	if(viewheight == screenHeight)

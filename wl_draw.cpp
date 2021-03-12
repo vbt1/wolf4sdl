@@ -11,6 +11,7 @@ void heapWalk();
 unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 SPRITE user_walls[SATURN_WIDTH*2];
 extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
+extern unsigned char texture_list[256];
 #endif
 //unsigned char spr_buffer[30*64*64];
 typedef struct
@@ -783,7 +784,8 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t fla
 
 if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 //	if(shapenum==296) //||shapenum==298||shapenum==299||shapenum==300||shapenum==301||shapenum==302)	
-	loadActorTexture(shapenum);
+	if(texture_list[shapenum]==0xff)
+		loadActorTexture(shapenum);
 //--------------------------------------------------------------------------------------------
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+shapenum]; 
 // correct on touche pas		
