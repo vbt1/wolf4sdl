@@ -2,7 +2,6 @@
 
 //#include <string.h>
 #include "wl_def.h"
-#pragma hdrstop
 
 // Uncomment the following line, if you get destination out of bounds
 // assertion errors and want to ignore them during debugging
@@ -457,9 +456,10 @@ void VL_MemToLatch(byte *source, int width, int height,
     {
         for(int xsrc = 0; xsrc < width; xsrc++)
         {
-            dest[ysrc * pitch + xsrc] = source[(ysrc * (width >> 2) + (xsrc >> 2))
+            dest[xsrc] = source[(ysrc * (width >> 2) + (xsrc >> 2))
                 + (xsrc & 3) * (width >> 2) * height];
         }
+		dest+=pitch;
     }	 
     VL_UnlockSurface(destSurface);
 }
@@ -476,7 +476,7 @@ void VL_MemToLatch(byte *source, int width, int height,
 =
 =================
 */
-
+// vbt : à améliorer
 void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, int desty)
 {
     assert5(destx >= 0 && destx + width * scaleFactor <= screenWidth
@@ -484,21 +484,37 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
             && "VL_MemToScreenScaledCoord: Destination rectangle out of bounds!");
 
     VL_LockSurface(curSurface);
-    byte *vbuf = (byte *)curSurface->pixels;
-    for(unsigned int j=0,scj=0; j<height; j++, scj+=scaleFactor)
+	byte *vbuf = (byte *)curSurface->pixels+(desty*curPitch)+destx;
+	
+	if(scaleFactor == 1)
     {
-        for(unsigned int i=0,sci=0; i<width; i++, sci+=scaleFactor)
-        {
-            byte col = source[(j*(width>>2)+(i>>2))+(i&3)*(width>>2)*height];
-            for(unsigned m=0; m<scaleFactor; m++)
-            {
-                for(unsigned n=0; n<scaleFactor; n++)
-                {
-                    vbuf[(scj+m+desty)*curPitch+sci+n+destx] = col;
-                }
-            }
-        }
-    }
+		for(unsigned int j=0; j<height; j++)
+		{
+			for(unsigned int i=0; i<width; i++)
+			{
+				byte col = source[(j*(width>>2)+(i>>2))+(i&3)*(width>>2)*height];
+				vbuf[i] = col;
+			}
+			vbuf+=curPitch;
+		}
+    }		
+	else
+	{
+		for(unsigned int j=0,scj=0; j<height; j++, scj+=scaleFactor)
+		{
+			for(unsigned int i=0,sci=0; i<width; i++, sci+=scaleFactor)
+			{
+				byte col = source[(j*(width>>2)+(i>>2))+(i&3)*(width>>2)*height];
+				for(unsigned m=0; m<scaleFactor; m++)
+				{
+					for(unsigned n=0; n<scaleFactor; n++)
+					{
+						vbuf[(scj+m)*curPitch+sci+n] = col;
+					}
+				}
+			}
+		}
+	}
     VL_UnlockSurface(curSurface);
 }
 
@@ -514,7 +530,7 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
 =
 =================
 */
-
+// vbt : à améliorer
 void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int srcx, int srcy,
                                 int destx, int desty, int width, int height)
 {
@@ -540,7 +556,6 @@ void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int
     }
     VL_UnlockSurface(curSurface);
 }
-
 //==========================================================================
 
 /*
@@ -550,10 +565,11 @@ void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int
 =
 =================
 */
-
+// vbt à améliorer
 void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
     int width, int height, int scxdest, int scydest)
 {
+
 	assert7(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
 			&& scydest >= 0 && scydest + height * scaleFactor <= screenHeight
 			&& "VL_LatchToScreenScaledCoord: Destination rectangle out of bounds!");
@@ -576,7 +592,7 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
             for(int i=0,sci=0; i<width; i++, sci+=scaleFactor)
             {
                 byte col = src[(ysrc + j)*srcPitch + xsrc + i];
-                for(unsigned m=0; m<scaleFactor; m++)
+				for(unsigned m=0; m<scaleFactor; m++)
                 {
                     for(unsigned n=0; n<scaleFactor; n++)
                     {
@@ -587,5 +603,6 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
         }
         VL_UnlockSurface(curSurface);
  //       VL_UnlockSurface(source);
-    }				
+    }	
+
 }

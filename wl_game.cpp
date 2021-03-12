@@ -3,7 +3,6 @@
 #include <math.h>
 #include "wl_def.h"
 //#include <SDL_mixer.h>
-#pragma hdrstop
 
 #ifdef MYPROFILE
 #include <TIME.H>
@@ -162,7 +161,7 @@ void loadActorTexture2(int texture)
 			}
 			cmdptr++;
 		}			
-//			slDMACopy((unsigned long*)bmpbuff,(void *)(wall_buffer + (SATURN_WIDTH<<6)),64*64);
+//		slDMACopy((unsigned long*)bmpbuff,(void *)(wall_buffer + (SATURN_WIDTH<<6)),64*64);
 		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)bmpbuff,64*64);
 		old_texture=texture;
 	}
@@ -927,8 +926,10 @@ void DrawPlayScreen (void)
 			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*320)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
     DrawPlayBorder ();
+/*	
   	//		slPrint("DrawFace",slLocate(10,12));
     DrawFace ();
+	
   	//		slPrint("DrawHealth",slLocate(10,13));
     DrawHealth ();
   	//		slPrint("DrawLives",slLocate(10,14));
@@ -944,6 +945,7 @@ void DrawPlayScreen (void)
   	//		slPrint("DrawScore",slLocate(10,19));
     DrawScore ();
   	//		slPrint("DrawScore",slLocate(10,30));
+*/	
 }
 /*
 // Uses LatchDrawPic instead of StatusDrawPic

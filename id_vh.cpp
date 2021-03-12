@@ -214,7 +214,8 @@ void VWB_Vlin (int y1, int y2, int x, int color)
 
 void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 {
-	VL_LatchToScreen (latchpics[2+picnum-LATCHPICS_LUMP_START], x*8, y);
+// pas super utile pour l'instant	
+//	VL_LatchToScreen (latchpics[2+picnum-LATCHPICS_LUMP_START], x*8, y);
 }
 
 void LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum)

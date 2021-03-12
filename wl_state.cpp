@@ -1520,6 +1520,9 @@ boolean SightPlayer (objtype *ob)
             case deathobj:
                 ob->temp2 = 1;
                 break;
+                break;
+            default:
+                break;				
         }
         return false;
     }

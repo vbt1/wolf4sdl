@@ -1442,13 +1442,13 @@ inline static fixed FixedMul(fixed a, fixed b)
     #define strcasecmp stricmp
     #define strncasecmp strnicmp
 #else
-    inline char* itoa(int value, char* string, int radix)
+    inline char* itoa(int value, char* string)
     {
 	    sprintf(string, "%d", value);
 	    return string;
     }
 
-    inline char* ltoa(long value, char* string, int radix)
+    inline char* ltoa(long value, char* string)
     {
 	    sprintf(string, "%ld", value);
 	    return string;

@@ -95,7 +95,7 @@ void VblIn(void)
 	if(frame_y==60)
 	{
 //		//slPrint((char*)"fps                                                   ",slLocate(10,1));
-		slPrint((char*)ltoa(frame_x,buffer,8),slLocate(14,1));
+		slPrint((char*)ltoa(frame_x,buffer),slLocate(14,1));
 ////slPrint((char*)ltoa(vbt,buffer,8),slLocate(22,1));		
 		frame_y=frame_x=0;
 //		vbt=0;

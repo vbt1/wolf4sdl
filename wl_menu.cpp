@@ -2045,7 +2045,7 @@ CheckForEpisodes (void)
 #ifdef UPLOAD
     if(!stat("vswap.wl1", &statbuf))
     {
-        strcpy (extension, "wl1");
+        strcpy (extension, "WL1");
         numEpisodesMissing = 5;
     }
     else
@@ -2073,9 +2073,9 @@ CheckForEpisodes (void)
         }
         else
         {
-            if(!stat("vswap.wl1", &statbuf))
+            if(!stat("VSWAP.WL1", &statbuf))
             {
-                strcpy (extension, "wl1");
+                strcpy (extension, "WL1");
                 numEpisodesMissing = 5;
             }
             else

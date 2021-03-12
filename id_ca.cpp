@@ -227,11 +227,8 @@ int32_t CAL_GetGrChunkLength (int chunk)
 
 static void CAL_HuffExpand(byte *source, byte *dest, int32_t length, huffnode *hufftable)
 {
-    volatile byte *end;
-    volatile huffnode *headptr, *huffptr;
-//char toto[100];	
-//sprintf(toto, "%04x %04x %04x %s",&source[0],&pic[0],expanded,grhuffman);	
-//slPrint((char*)"start CAL_HuffExpand",slLocate(10,20));	
+    byte *end;
+    huffnode *headptr, *huffptr;
 
     if(!length || !dest)
     {
@@ -267,8 +264,6 @@ static void CAL_HuffExpand(byte *source, byte *dest, int32_t length, huffnode *h
             written++;
             huffptr = headptr;
 
-//sprintf(toto, "dest>=end %04x %04x*    ",dest,end);				
-//slPrint((char*)toto,slLocate(10,20));				
             if(dest>=end) break;
         }
         else
@@ -628,7 +623,6 @@ void CAL_SetupGrFile (void)
 void CAL_SetupMapFile (void)
 {
     int     i,j;
-    int handle;
     int32_t length,pos;
     char fname[13];
 	long fileSize;

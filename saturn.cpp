@@ -123,7 +123,7 @@ static const Sint8	logtbl[] = {
 //--------------------------------------------------------------------------------------------------------------------------------------
  SDL_Surface * SDL_SetVideoMode  (int width, int height, int bpp, Uint32 flags)
 {
-	unsigned char tv_mode;
+	unsigned char tv_mode=TV_320x224;
 	SDL_Surface *screeny;
 	screeny = (SDL_Surface*)malloc(sizeof(SDL_Surface));
 	CHECKMALLOCRESULT(screeny);
@@ -211,7 +211,7 @@ int SDL_SetColors(SDL_Surface *surface, 	SDL_Color *colors, int firstcolor, int 
 	Uint16	palo[256];
 //	CHECKMALLOCRESULT(palo);
 
-	for(unsigned int i=0;i<ncolors;i++)
+	for(int i=0;i<ncolors;i++)
 	{
 		palo[i] = 0x8000 | RGB(colors[i].r>>3,colors[i].g>>3,colors[i].b>>3);
 	}
@@ -358,6 +358,10 @@ Uint32 SDL_MapRGB (SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b)
 	return 0x8000 | RGB(r>>3,g>>3,b>>3);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
+void SDL_UnlockSurface2(SDL_Surface *surface)
+{
+	
+}
 void SDL_UnlockSurface(SDL_Surface *surface)
 {
 	unsigned short i; // vbt : le plus rapide
@@ -423,16 +427,19 @@ void SDL_PauseAudio(int pause_on)
 		slPCMOff(&m_dat[i]);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
+
 int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
 {
+//	unsigned char *surfacePtr = (unsigned char*)surface->pixels;
 if((srcrect)!=NULL)
 	for( Sint16 i=0;i<srcrect->h;i++)
 	{
 //		memcpyl((unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),(unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),srcrect->w);
-		slDMACopy((unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),srcrect->w);
+		slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(NBG1_CEL_ADR + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
 	}	
 	return 0;
 }
+
 //--------------------------------------------------------------------------------------------------------------------------------------
 /*void SDL_UpdateRects (SDL_Surface *screen, int numrects, SDL_Rect *rects)
 {
@@ -563,14 +570,14 @@ sc_1, sc_2, sc_3, sc_4
 
 int SDL_PollEvent(SDL_Event *event)
 {
-	Uint16 push = 0, data = 0;
+	Uint16 /*push = 0,*/ data = 0;
 	Uint8 i,found=0;
  				 //LastScan=0;
 	//event->type = SDL_NOEVENT;
 	//event->key.keysym.sym = SDLK_FIRST;	  
 //slPrint("SDL_PollEvent       ",slLocate(3,22));	
 	if(Per_Connect1) {
-		push = ~Smpc_Peripheral[0].push;
+//		push = ~Smpc_Peripheral[0].push;
 		data = ~Smpc_Peripheral[0].data;
 	}
 /*	if(Per_Connect2) {
@@ -1110,16 +1117,27 @@ Uint32 SWAP_BYTES_32(Uint32 a) {
 extern "C" {
 void CSH_Purge(void *adrs, Uint32 P_size)
 {
+#if 0	
 	typedef Uint32 LineX[0x10/sizeof(Uint32)];	/* ラインは 0x10 バイト単位 */
 	LineX *ptr, *end;
 	Uint32 zero = 0;
 
-	ptr = (void*)(((Uint32)adrs & 0x1fffffff) | 0x40000000);	/* キャッシュパージ領域 */
-	end = (void*)((Uint32)ptr + P_size - 0x10);	/* 終了ポインタ（-0x10 はポストインクリメントの為） */
-	ptr = (void*)((Uint32)ptr & -sizeof(LineX));	/* ラインアライメントに整合 */
+	ptr = (LineX*)(((Uint32)adrs & 0x1fffffff) | 0x40000000);	/* キャッシュパージ領域 */
+	end = (LineX*)((Uint32)ptr + P_size - 0x10);	/* 終了ポインタ（-0x10 はポストインクリメントの為） */
+	ptr = (LineX*)((Uint32)ptr & -sizeof(LineX));	/* ラインアライメントに整合 */
 	do {
 		(*ptr)[0] = zero;			/* キャッシュパージ */
 	} while (ptr++ < end);			/* ポストインクリメントはディレイスロット活用の為 */
+#endif	
+    void *ea;                                    /*    終了アドレス            */
+
+    adrs = (void *)((Uint32)adrs
+     & 0x1ffffff0 | 0x40000000);                /*    先頭ｲﾝﾊﾞﾘﾃﾞｰﾄｱﾄﾞﾚｽ作成    */
+    ea = (void *)((Uint32)adrs + P_size);        /*    終了アドレス＋１算出    */
+    while ((Uint32)adrs < (Uint32)ea) {            /*    対象ライン分繰り返す    */
+        *(Uint32 *)adrs = 0;                    /*    インバリデート            */
+        adrs = (void *)((Uint32)adrs + 16);        /*    次の準備                */
+    }                                            /*    end    while                */
 }
 }
 //-------------------------------------------------------------------------------------------------------------------------------------

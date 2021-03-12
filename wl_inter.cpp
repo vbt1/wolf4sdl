@@ -685,7 +685,7 @@ LevelCompleted (void)
         {
             for (i = 0; i <= timeleft; i++)
             {
-                ltoa ((int32_t) i * PAR_AMOUNT, tempstr, 10);
+                ltoa ((int32_t) i * PAR_AMOUNT, tempstr);
                 x = 36 - (int) strlen(tempstr) * 2;
                 Write (x, 7, tempstr);
                 if (!(i % (PAR_AMOUNT / 10)))
@@ -737,7 +737,7 @@ LevelCompleted (void)
             VW_WaitVBL (VBLWAIT);
             SD_StopSound ();
             bonus += PERCENT100AMT;
-            ltoa (bonus, tempstr, 10);
+            ltoa (bonus, tempstr);
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
             Write (x, 7, tempstr);
 #ifndef USE_SPRITES			
@@ -765,7 +765,7 @@ LevelCompleted (void)
         ratio = sr;
         for (i = 0; i <= ratio; i++)
         {
-            itoa (i, tempstr, 10);
+            itoa (i, tempstr);
             x = RATIOXX - (int) strlen(tempstr) * 2;
             Write (x, 16, tempstr);
             if (!(i % 10))
@@ -785,7 +785,7 @@ LevelCompleted (void)
             VW_WaitVBL (VBLWAIT);
             SD_StopSound ();
             bonus += PERCENT100AMT;
-            ltoa (bonus, tempstr, 10);
+            ltoa (bonus, tempstr);
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
             Write (x, 7, tempstr);
 #ifndef USE_SPRITES			
@@ -813,7 +813,7 @@ LevelCompleted (void)
         ratio = tr;
         for (i = 0; i <= ratio; i++)
         {
-            itoa (i, tempstr, 10);
+            itoa (i, tempstr);
             x = RATIOXX - (int) strlen(tempstr) * 2;
             Write (x, 18, tempstr);
             if (!(i % 10))
@@ -832,7 +832,7 @@ LevelCompleted (void)
             VW_WaitVBL (VBLWAIT);
             SD_StopSound ();
             bonus += PERCENT100AMT;
-            ltoa (bonus, tempstr, 10);
+            ltoa (bonus, tempstr);
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
             Write (x, 7, tempstr);
 #ifndef USE_SPRITES			
@@ -858,15 +858,15 @@ LevelCompleted (void)
         //
         // JUMP STRAIGHT HERE IF KEY PRESSED
         //
-done:   itoa (kr, tempstr, 10);
+done:   itoa (kr, tempstr);
         x = RATIOXX - (int) strlen(tempstr) * 2;
         Write (x, 14, tempstr);
 
-        itoa (sr, tempstr, 10);
+        itoa (sr, tempstr);
         x = RATIOXX - (int) strlen(tempstr) * 2;
         Write (x, 16, tempstr);
 
-        itoa (tr, tempstr, 10);
+        itoa (tr, tempstr);
         x = RATIOXX - (int) strlen(tempstr) * 2;
         Write (x, 18, tempstr);
 
@@ -875,7 +875,7 @@ done:   itoa (kr, tempstr, 10);
             (PERCENT100AMT * (sr >= 100)) + (PERCENT100AMT * (tr >= 100));
 
         GivePoints (bonus);
-        ltoa (bonus, tempstr, 10);
+        ltoa (bonus, tempstr);
         x = 36 - (int) strlen(tempstr) * 2;
         Write (x, 7, tempstr);
 

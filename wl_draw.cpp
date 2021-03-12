@@ -1,16 +1,10 @@
 // WL_DRAW.C
 #define USE_SPRITES 1
 #include "wl_def.h"
-#pragma hdrstop
 
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
 #include "wl_shade.h"
-
-//typedef void PARA_RTN(void *parm);
-
-//void  SPR_RunSlaveSH(PARA_RTN *routine, void *parm);
-//void  SPR_WaitEndSlaveSH(void);
 
 void heapWalk();
 #ifdef USE_SPRITES
@@ -284,7 +278,7 @@ if(postx>=0 & postx<=SATURN_WIDTH)
     user_wall->CTRL=FUNC_Texture | _ZmCC;
     user_wall->PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
 
-    user_wall->SRCA=(void *)(0x2000|(postx*8));
+    user_wall->SRCA=0x2000|(postx*8);
     user_wall->COLR=256;
     user_wall->SIZE=0x801;
 
@@ -905,7 +899,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     SPRITE user_sprite;
     user_sprite.CTRL = FUNC_Sprite | _ZmCC;
     user_sprite.PMOD=CL256Bnk| ECenb;// | ECenb | SPdis;  // pas besoin pour les sprites
-    user_sprite.SRCA=(void *)(0x2000|(SATURN_WIDTH*8));
+    user_sprite.SRCA=0x2000|(SATURN_WIDTH*8);
     user_sprite.COLR=256;
     user_sprite.SIZE=0x840;
 	user_sprite.XA=(xcenter-centerx);
@@ -2160,10 +2154,9 @@ inline void WallRefresh (void)
 //	slCashPurge();
     min_wallheight = viewheight;
 #ifdef USE_SLAVE	
-	slSlaveFunc(AsmRefresh,(void*)NULL);
+	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
 #endif	
-//	AsmRefreshSlave();
-    AsmRefreshSlave ();
+	AsmRefresh();
 }
 
 void CalcViewVariables()
@@ -2199,10 +2192,10 @@ void    ThreeDRefresh (void)
 //
     memset(spotvis,0,maparea);
     spotvis[player->tilex][player->tiley] = 1;       // Detect all sprites over player fix
-
+#ifndef USE_SPRITES
     byte *vbuf = (byte *)screenBuffer->pixels;
     vbuf += screenofs;
-	
+#endif	
     CalcViewVariables();
 //
 // follow the walls from there to the right, drawing as we go
@@ -2229,11 +2222,6 @@ void    ThreeDRefresh (void)
 #endif
 
 //---------------------------------------------------------------------------	
-
-
-#ifdef USE_SPRITES
-//    DrawPlayerWeapon (vbuf);    // draw player's hands
-#endif
 //
 // draw all the scaled images
 //
@@ -2256,9 +2244,10 @@ void    ThreeDRefresh (void)
 	{
         ShowActStatus();
 	}
-    VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
+//    VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
+#ifndef USE_SPRITES
 	vbuf = NULL;
-	
+#endif	
 //
 // show screen and time last cycle
 //

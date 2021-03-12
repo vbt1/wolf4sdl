@@ -10,7 +10,7 @@ uint8_t **PMPages;
 void PM_Startup()
 {
 //#define READ16 1
-    char fname[13] = "vswap.";
+    char fname[13] = "VSWAP.";
 	Uint32 i=0,j=0;
 #ifdef READ16	
 	Uint16 *Chunks;
@@ -22,13 +22,6 @@ void PM_Startup()
 	
 	Sint32 fileId;
 
-	while (fname[i])
-	{
-		fname[i]= toupper(fname[i]);
-		i++;
-	}	 
-
-	i=0;
 	fileId = GFS_NameToId((Sint8*)fname);
 	fileSize = GetFileSize(fileId);
 

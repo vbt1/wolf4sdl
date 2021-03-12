@@ -324,10 +324,6 @@ typedef struct {
 //    Uint8 volume;     /* Per-sample volume, 0-128 */
 } Mix_Chunk;
 
-//#define	SDL_Flip(arg)	\
-	//slSynch();
-
-
 #define SDL_RLEACCEL	0x00004000	/* Surface is RLE encoded */
 #define SDL_MUSTLOCK(surface)	\
   (surface->offset ||		\
