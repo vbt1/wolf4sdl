@@ -1,4 +1,4 @@
-OUTPUT_FORMAT(coff-sh)
+/* OUTPUT_FORMAT(coff-sh) */
 MEMORY 
   {
   ram  : ORIGIN = 0x6000000, l = 983040

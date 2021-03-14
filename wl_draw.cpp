@@ -791,7 +791,7 @@ if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 // correct on touche pas		
     SPRITE user_sprite;
     user_sprite.CTRL = FUNC_Sprite | _ZmCC;
-    user_sprite.PMOD=CL256Bnk| ECenb;// | ECenb | SPdis;  // pas besoin pour les sprites
+    user_sprite.PMOD=CL256Bnk| ECdis;// | ECenb | SPdis;  // pas besoin pour les sprites
     user_sprite.SRCA=((txptr->CGadr));
     user_sprite.COLR=256;
     user_sprite.SIZE=0x840;
@@ -900,7 +900,8 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 // correct on touche pas		
     SPRITE user_sprite;
     user_sprite.CTRL = FUNC_Sprite | _ZmCC;
-    user_sprite.PMOD=CL256Bnk| ECenb;// | ECenb | SPdis;  // pas besoin pour les sprites
+    user_sprite.PMOD=CL256Bnk| ECdis | 0x0800;// | ECenb | SPdis;  // pas besoin pour les sprites
+//    user_sprite.SRCA=0x2000|(SATURN_WIDTH*8);
     user_sprite.SRCA=0x2000|(SATURN_WIDTH*8);
     user_sprite.COLR=256;
     user_sprite.SIZE=0x840;
@@ -945,7 +946,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 	}
 */	
 #endif
-xxxxx
+
     for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
     {
         lpix=rpix;
@@ -2257,12 +2258,12 @@ void    ThreeDRefresh (void)
     {
 	//slPrint("fizzlein true       ",slLocate(1,15) );		
 		
-		memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
+//		memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
 //    FinishPaletteShifts ();
 
 //    VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
 	
-        FizzleFade(screenBuffer, screen, 0, 0, screenWidth, screenHeight, 20, false);
+//        FizzleFade(screenBuffer, screen, 0, 0, screenWidth, screenHeight, 20, false);
         fizzlein = false;
 
         lasttimecount = GetTimeCount();          // don't make a big tic count

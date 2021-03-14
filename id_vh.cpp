@@ -240,22 +240,6 @@ void LoadLatchMem (void)
 	byte *src;
 	SDL_Surface *surf; //,*surf1;
 
-//
-// tile 8s
-//
-	//////slPrint("LoadLatchMem",slLocate(10,15));
-/*
-    surf1 = SDL_CreateRGBSurface(SDL_HWSURFACE, 8*8,
-        ((NUMTILE8 + 7) / 8) * 8, 8, 0, 0, 0, 0);
-    if(surf1 == NULL)
-    {
-		//////slPrint("LoadLatchMem bad",slLocate(10,15));
-        Quit("Unable to create surface for tiles!");
-    }
-*/	
-//	surf1 = (SDL_Surface *)0x002C0000;
-//    SDL_SetColors(surf1, gamepal, 0, 256);
-
 //	latchpics[0] = surf1;
 	CA_CacheGrChunk (STARTTILE8);
 	src = grsegs[STARTTILE8];

@@ -158,9 +158,10 @@ void loadActorTexture2(int texture)
 			}
 			cmdptr++;
 		}			
-//		slDMACopy((unsigned long*)bmpbuff,(void *)(wall_buffer + (SATURN_WIDTH<<6)),64*64);
-		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)bmpbuff,64*64);
+		slDMACopy((unsigned long*)bmpbuff,(void *)(wall_buffer + (SATURN_WIDTH<<6)),64*64);
+//		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)bmpbuff,64*64);
 		old_texture=texture;
+		slDMAWait();
 	}
 }
 #endif
@@ -629,13 +630,11 @@ slIntFunction(VblIn) ;
         US_InitRndT (false);
     else
         US_InitRndT (true);
-//slPrintHex(screen->pixels,slLocate(10,14));
 //
 // load the level
 //
     CA_CacheMap (gamestate.mapon+10*gamestate.episode);
     mapon-=gamestate.episode*10;
-//slPrintHex(screen->pixels,slLocate(10,15));
 #ifdef USE_FEATUREFLAGS
     // Temporary definition to make things clearer
     #define MXX MAPSIZE - 1
@@ -653,7 +652,6 @@ slIntFunction(VblIn) ;
 //
     memset (tilemap,0,sizeof(tilemap));
     memset (actorat,0,sizeof(objtype));
-//slPrintHex(screen->pixels,slLocate(10,17));
     map = mapsegs[0];
     for (y=0;y<mapheight;y++)
     {
@@ -674,7 +672,6 @@ slIntFunction(VblIn) ;
             }
         }
     }
-//slPrintHex(screen->pixels,slLocate(10,18));	
 //
 // spawn doors
 //
@@ -1175,7 +1172,7 @@ void Died (void)
 
     IN_ClearKeysDown ();
 
-    FizzleFade(screenBuffer,screen,viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
+//    FizzleFade(screenBuffer,screen,viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
 
     IN_UserInput(100);
     SD_WaitSoundDone ();

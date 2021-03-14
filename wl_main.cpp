@@ -1102,11 +1102,7 @@ static void InitGame()
 //
 // load in and lock down some basic chunks
 //
-//slPrint("screen->pixels9",slLocate(1,9));
-//slPrintHex(screen->pixels,slLocate(20,9));
     CA_CacheGrChunk(STARTFONT);
-//slPrint("screen->pixels10",slLocate(1,10));	
-//slPrintHex(screen->pixels,slLocate(20,10));
     CA_CacheGrChunk(STATUSBARPIC);
 //	slTVOff();
    LoadLatchMem ();	   
@@ -1115,21 +1111,16 @@ static void InitGame()
     NewViewSize (viewsize);
 
 //		slTVOn();
-//slPrint("screen->pixels11",slLocate(1,11));		
-//slPrintHex(screen->pixels,slLocate(20,11));			
 		slSynch();
 //	//slPrint("C4 - 2008-2009     www.rockin-b.de",slLocate(2,29));
 //
 // initialize variables
 //
     InitRedShifts ();	
-//slPrint("screen->pixels12",slLocate(1,12));	
-//slPrintHex(screen->pixels,slLocate(21,12));	
 #ifndef SPEARDEMO
     if(!didjukebox)
 #endif
         FinishSignon();
-//slPrintHex(screen->pixels,slLocate(20,13));		
 #ifdef NOTYET
     vdisp = (byte *) (0xa0000+PAGE1START);
     vbuf = (byte *) (0xa0000+PAGE2START);
@@ -1383,6 +1374,7 @@ static void DemoLoop()
     {
         while (!param_nowait)
         {
+			slScrTransparent(NBG1ON);
 			slSynch(); // applique la non transparence
 //
 // title page

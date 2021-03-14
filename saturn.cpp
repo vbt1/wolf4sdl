@@ -376,6 +376,7 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 //		slDMACopy((unsigned long*)(surface->pixels + ((i+2) * screenWidth)),(void *)(NBG1_CEL_ADR + ((i+2)<<9)),screenWidth);
 //		slDMACopy((unsigned long*)(surface->pixels + ((i+3) * screenWidth)),(void *)(NBG1_CEL_ADR + ((i+3)<<9)),screenWidth);		
 	}
+	slDMAWait();
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
@@ -952,11 +953,14 @@ int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 			slSndFlush() ;
 // vbt 26/07/2020 : à remettre	
 				m_dat[i].mode= _PCM8Bit;
+			slPrintHex((Uint32)i,slLocate(1,2));				
+			slPrintHex((Uint32)&m_dat[i],slLocate(1,3));
+			slPrintHex((Uint32)chunk->abuf,slLocate(1,4));
+			slPrintHex((Uint32)chunk->alen,slLocate(1,5));			
 			slPCMOn(&m_dat[i],chunk->abuf,chunk->alen);
 				break;
 		}		 
 	}
-	
 	return 1;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------

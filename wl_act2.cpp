@@ -3830,7 +3830,7 @@ void    A_StartDeathCam (objtype *ob)
     gamestate.victoryflag = true;
     unsigned fadeheight = viewsize != 21 ? screenHeight-scaleFactor*STATUSLINES : screenHeight;
     VL_BarScaledCoord (0, 0, screenWidth, fadeheight, bordercol);
-    FizzleFade(screenBuffer, screen, 0, 0, screenWidth, fadeheight, 70, false);
+ //   FizzleFade(screenBuffer, screen, 0, 0, screenWidth, fadeheight, 70, false);
 
     if (bordercol != VIEWCOLOR)
     {

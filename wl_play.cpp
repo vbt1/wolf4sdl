@@ -1250,6 +1250,7 @@ extern int frame_x,frame_y;
 			memset(texture_list,0xFF,sizeof(texture_list));
 			position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
 		}
+		slDMAWait();
 #endif
 		
     }

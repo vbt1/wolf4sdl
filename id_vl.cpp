@@ -38,7 +38,7 @@ unsigned screenHeight = 240;
 unsigned screenBits = 8;      // use "best" color depth according to libSDL
 #endif
 
-SDL_Surface *screen = NULL;
+//SDL_Surface *screen = NULL;
 SDL_Surface *screenBuffer = NULL;
 SDL_Surface *curSurface = NULL;
 
@@ -97,7 +97,7 @@ void	VL_SetVGAPlaneMode (void)
         const SDL_VideoInfo *vidInfo = SDL_GetVideoInfo();
         screenBits = vidInfo->vfmt->BitsPerPixel;
     }
-	
+/*	
 	if(screen==NULL)
 	{
 		screen = SDL_SetVideoMode(screenWidth, screenHeight, screenBits,
@@ -110,10 +110,11 @@ void	VL_SetVGAPlaneMode (void)
 //            screenHeight, screenBits, SDL_GetError());
         SYS_Exit(1);
     }
-
+*/
     SDL_ShowCursor(SDL_DISABLE);
 
-    SDL_SetColors(screen, gamepal, 0, 256);
+//    SDL_SetColors(screen, gamepal, 0, 256);
+    SDL_SetColors(curSurface, gamepal, 0, 256);
     memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
 
     screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth, screenHeight, 8, 0, 0, 0, 0);
@@ -199,7 +200,8 @@ void VL_FillPalette (int red, int green, int blue)
 void VL_SetPalette (SDL_Color *palette)
 {
     memcpyl(curpal, palette, sizeof(SDL_Color) * 256);
-    SDL_SetPalette(screen, SDL_PHYSPAL, palette, 0, 256);
+ //   SDL_SetPalette(screen, SDL_PHYSPAL, palette, 0, 256);
+    SDL_SetPalette(curSurface, SDL_PHYSPAL, palette, 0, 256);
 }
 
 
