@@ -13,10 +13,10 @@ extern fixed MTH_Atan(fixed y, fixed x);
 }
 #ifdef USE_SPRITES
 unsigned int position_vram=((SATURN_WIDTH+64)*32);
-unsigned int static_items=0;
+//unsigned int static_items=0;
 extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
-unsigned char texture_list[256];
+unsigned char texture_list[SPR_TOTAL];
 #endif
 
 #undef atan2
@@ -572,9 +572,9 @@ static void ScanInfoPlane(void)
         }
     }
 // on charge les statics :
-	unsigned char sprite_list[SPR_STAT_47+1];
-	memset(sprite_list,0,SPR_STAT_47+1);
-	
+//	unsigned char sprite_list[SPR_STAT_47+1];
+//	memset(sprite_list,0,SPR_STAT_47+1);
+/*	
 	statobj_t *statptr;
 #ifdef USE_SPRITES
 	static_items=0;
@@ -583,14 +583,14 @@ static void ScanInfoPlane(void)
     {
 		unsigned char texture = statptr->shapenum;
 
-		if(sprite_list[texture]==0)
+		if(texture_list[texture]==0xff)
 		{
 			loadActorTexture(texture);
-			sprite_list[texture]=1;
 			static_items++;
 		}
 	}
 #endif	
+*/
 }
 
 //==========================================================================
@@ -713,7 +713,7 @@ slIntFunction(VblIn) ;
     }
 // vbt : on recharge la vram
 #ifdef USE_SPRITES
-	memset(texture_list,0xff,256);
+	memset(texture_list,0xff,SPR_TOTAL);
 	position_vram=(SATURN_WIDTH+64)*32;
 
 	if(viewheight == screenHeight)
@@ -1216,7 +1216,7 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
-//gamestate.mapon = 8;	
+gamestate.mapon = 8;	
 GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	
 gamestate.keys = 3;

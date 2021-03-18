@@ -111,11 +111,6 @@ void	VL_SetVGAPlaneMode (void)
         SYS_Exit(1);
     }
 */
-    SDL_ShowCursor(SDL_DISABLE);
-
-//    SDL_SetColors(screen, gamepal, 0, 256);
-    SDL_SetColors(curSurface, gamepal, 0, 256);
-    memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
 
     screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth, screenHeight, 8, 0, 0, 0, 0);
     if(!screenBuffer)
@@ -123,13 +118,17 @@ void	VL_SetVGAPlaneMode (void)
 //        printf("Unable to create screen buffer surface: %s\n", SDL_GetError());
         SYS_Exit(1);
     }
-    SDL_SetColors(screenBuffer, gamepal, 0, 256);
 
-//   screenPitch = screen->pitch;
-//   bufferPitch = screenBuffer->pitch;
-
+//    SDL_ShowCursor(SDL_DISABLE);
     curSurface = screenBuffer;
     curPitch = screenBuffer->pitch;
+//    SDL_SetColors(screen, gamepal, 0, 256);
+    SDL_SetColors(curSurface, gamepal, 0, 256);
+    memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
+
+
+//    SDL_SetColors(screenBuffer, gamepal, 0, 256);
+
     scaleFactor = screenWidth/320;
     if(screenHeight/200 < scaleFactor) scaleFactor = screenHeight/200;
     pixelangle = (short *) malloc(screenWidth * sizeof(short));

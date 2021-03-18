@@ -11,7 +11,7 @@ void heapWalk();
 unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 SPRITE user_walls[SATURN_WIDTH*2];
 extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
-extern unsigned char texture_list[256];
+extern unsigned char texture_list[SPR_TOTAL];
 #endif
 //unsigned char spr_buffer[30*64*64];
 typedef struct
@@ -782,7 +782,7 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t fla
 //	sprintf (msg,"shape %d %d max %d h %d         ", shapenum, SPR_TOTAL, SPR_TOTAL+SATURN_WIDTH,height) ;
 //	//slPrint((char *)msg,slLocate(1,4));
 
-if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
+//if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
 //	if(shapenum==296) //||shapenum==298||shapenum==299||shapenum==300||shapenum==301||shapenum==302)	
 	if(texture_list[shapenum]==0xff)
 		loadActorTexture(shapenum);
