@@ -1041,6 +1041,7 @@ static void InitGame()
 //#endif
 //    atexit(SDL_Quit);
     SignonScreen ();
+slPrint("slScrTransparent4",slLocate(1,17));		
 	 slScrTransparent(NBG1ON);
 	 
 #if defined _WIN32
@@ -1363,7 +1364,11 @@ static void DemoLoop()
 //    if (!param_nowait)
 //        PG13 ();
 //    else
+slPrint((char*)"StartCPMusic",slLocate(10,22));	
+
 		StartCPMusic(INTROSONG);
+		
+slPrint((char*)"StartCPMusic end",slLocate(10,22));			
 #endif
 
 #endif
@@ -1373,6 +1378,7 @@ static void DemoLoop()
     {
         while (!param_nowait)
         {
+slPrint("slScrTransparent5",slLocate(1,17));				
 			slScrTransparent(NBG1ON);
 			slSynch(); // applique la non transparence
 //
@@ -1397,25 +1403,25 @@ static void DemoLoop()
 
             UNCACHEGRCHUNK (TITLEPALETTE);
 #else
-////slPrint((char*)"CA_CacheScreen1",slLocate(10,22));	
+slPrint((char*)"CA_CacheScreen1",slLocate(10,22));	
             CA_CacheScreen (TITLEPIC);
-////slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
+slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
 
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #endif
 
-////slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
+slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
             VW_FadeIn();
 		
 #endif
 	// VBT déplacé
-////slPrint((char*)"StartCPMusic",slLocate(10,22));	
+slPrint((char*)"StartCPMusic",slLocate(10,22));	
 	StartCPMusic(INTROSONG);
-////slPrint((char*)"IN_UserInput1",slLocate(10,22));		
+slPrint((char*)"IN_UserInput1",slLocate(10,22));		
             if (IN_UserInput(TickBase*15))
                 break;
-////slPrint((char*)"VW_FadeOut1",slLocate(10,22));					
+slPrint((char*)"VW_FadeOut1",slLocate(10,22));					
             VW_FadeOut();
 //
 // credits page
@@ -1530,6 +1536,21 @@ int main (int argc, char *argv[])
 
     InitGame();
 //slPrintHex(screen->pixels,slLocate(20,14));
+slPrint((char*)"DemoLoop",slLocate(10,22));	
+#ifdef PONY
+	#include "sega_int.h"
+extern void	UsrVblankIn2( void );
+
+	INT_ChgMsk(INT_MSK_NULL,INT_MSK_VBLK_IN);
+	INT_SetScuFunc(INT_SCU_VBLK_IN,(void (*))UsrVblankIn2);
+	INT_ChgMsk(INT_MSK_VBLK_IN,INT_MSK_NULL);	
+
+	slSynch();
+#endif	
+
+
+
+
     DemoLoop();
 
     Quit("Demo loop exited???");

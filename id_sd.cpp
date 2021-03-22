@@ -31,8 +31,7 @@
 //#include <SDL_mixer.h>
 #include "fmopl.h"
 #include <string.h>
-
-#pragma hdrstop
+  #include "pcmsys.h"
 
 #define ORIGSAMPLERATE 7042
 extern int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained);
@@ -54,17 +53,30 @@ uintptr_t lowsound = (uintptr_t)0x002C0000;
 
 void SD_PrepareSound(int which)
 {
-//	slPrint("SD_PrepareSound",slLocate(10,14));
+	slPrint("SD_PrepareSound",slLocate(10,14));
 //	slPrintHex(which,slLocate(1,15));
-
-
 	Sint32 fileId;
 	long fileSize;
 	char filename[15];
 	unsigned char *mem_buf;
 	sprintf(filename,"%03d.PCM",which);
  	fileId = GFS_NameToId((Sint8*)filename);
+#ifdef PONY
+	if(fileId>0)
+	{
+		fileSize = GetFileSize(fileId);
 
+		if(which <23)
+//		if(fileSize>8192 && fileSize<20000)
+		{
+			load_8bit_pcm((Sint8*)filename, ORIGSAMPLERATE);			
+		} 
+	}
+	else
+	{
+		SoundChunks[which]->alen = 0;
+	}	
+#else
 	if(fileId>0)
 	{
 		fileSize = GetFileSize(fileId);
@@ -97,18 +109,22 @@ void SD_PrepareSound(int which)
 	{
 	   SoundChunks[which]->alen = 0;
 	}
-	
+#endif	
 }
 
 
 boolean
 SD_PlaySound(int sound)
 {
-//slPrint("SD_PlaySound",slLocate(10,16));
-//	slPrintHex(DigiMap[sound],slLocate(23,16));
+slPrint("SD_PlaySound",slLocate(10,16));
+	slPrintHex(DigiMap[sound],slLocate(23,16));
     //Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
 	Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
+#ifdef PONY
+    if(Mix_PlayChannel(DigiMap[sound], sample, 0) == -1)
+#else
     if(Mix_PlayChannel(0, sample, 0) == -1)
+#endif	
     {
 //        slPrint("Unable to play sound:", slLocate(10,19));
         return false;
@@ -118,6 +134,9 @@ SD_PlaySound(int sound)
 word
 SD_SoundPlaying(void)
 {
+#ifdef PONY	
+	
+#else
 	unsigned char i;
 	for(i=0;i<4;i++)
 	{
@@ -129,6 +148,8 @@ SD_SoundPlaying(void)
 		}
 	}
 	////slPrintHex(SoundMode,slLocate(10,3));
+#endif
+	
 	return false;
 }
 
@@ -181,7 +202,7 @@ SD_StopDigitized(void)
 void
 SD_StartMusic(int chunk)
 {
-//	slPrint((char *)"SD_StartMusic",slLocate(10,8));
+	slPrint((char *)"SD_StartMusic",slLocate(10,8));
 	satPlayMusic(chunk);
 }
 

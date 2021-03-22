@@ -2277,7 +2277,7 @@ void    ThreeDRefresh (void)
 #ifndef USE_SPRITES	
     else
     {
-        SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
+//        SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
 #endif

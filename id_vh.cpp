@@ -125,7 +125,7 @@ void VW_MeasurePropString (const char *string, word *width, word *height)
 void VH_UpdateScreen()
 {
 	
-	SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
+//	SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 //	SDL_UpdateRect(screen, 0, 0, 0, 0);
 }
 #endif
@@ -365,7 +365,7 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 		{
 //		    VL_UnlockSurface(source);
 #ifndef USE_SPRITES
-            SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
+//            SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 //            SDL_UpdateRect(screen, 0, 0, 0, 0);
 #endif			
 			return true;

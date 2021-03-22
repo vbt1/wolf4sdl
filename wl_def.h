@@ -2,6 +2,7 @@
 #define WL_DEF_H
 
 #define USE_SPRITES 1
+#define PONY 1 
 #define USE_SLAVE 1
 #define SATURN_WIDTH 320
 #define SATURN_SORT_VALUE 240

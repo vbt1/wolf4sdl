@@ -1,6 +1,7 @@
 # source_program
   SRCS =	low.s \
 		saturn.cpp \
+    	pcmsys.cpp \
 		signon.cpp \
 		workarea.cpp \
 		id_ca.cpp \
@@ -21,6 +22,7 @@
 		wl_inter.cpp \
 		wl_text.cpp \
 		wl_main.cpp 
+
 
 OBJS = $(filter %.o, $(SRCS:.s=.o) $(SRCS:.c=.o) $(SRCS:.cpp=.o))
 LIBS = C:/SaturnOrbit/SGL_302j/LIB_ELF/libsgl_real_elf.a \

@@ -754,7 +754,9 @@ slIntFunction(VblIn) ;
         }
     }
 	//VGAClearScreen ();
+slPrint("slScrTransparent1",slLocate(1,17));	
 	slScrTransparent(0);
+	slSynch();
 }
 
 
