@@ -1063,7 +1063,7 @@ slPrint("slScrTransparent4",slLocate(1,17));
 //param_nowait = true;
 ////slPrint((char *)"VH_Startup     ",slLocate(10,12));
     VH_Startup ();
-//    IN_Startup (); // VBT à remettre
+//    IN_Startup (); // VBT ? remettre
 ////slPrint((char *)"PM_Startup     ",slLocate(10,12));
     PM_Startup ();
 ////slPrint((char *)"SD_Startup     ",slLocate(10,12));
@@ -1415,7 +1415,7 @@ slPrint((char*)"VW_FadeIn1",slLocate(10,22));
             VW_FadeIn();
 		
 #endif
-	// VBT déplacé
+	// VBT d?plac?
 slPrint((char*)"StartCPMusic",slLocate(10,22));	
 	StartCPMusic(INTROSONG);
 slPrint((char*)"IN_UserInput1",slLocate(10,22));		
@@ -1537,16 +1537,6 @@ int main (int argc, char *argv[])
     InitGame();
 //slPrintHex(screen->pixels,slLocate(20,14));
 slPrint((char*)"DemoLoop",slLocate(10,22));	
-#ifdef PONY
-	#include "sega_int.h"
-extern void	UsrVblankIn2( void );
-
-	INT_ChgMsk(INT_MSK_NULL,INT_MSK_VBLK_IN);
-	INT_SetScuFunc(INT_SCU_VBLK_IN,(void (*))UsrVblankIn2);
-	INT_ChgMsk(INT_MSK_VBLK_IN,INT_MSK_NULL);	
-
-	slSynch();
-#endif	
 
 
 
@@ -1556,4 +1546,3 @@ extern void	UsrVblankIn2( void );
     Quit("Demo loop exited???");
     return 1;
 }
-

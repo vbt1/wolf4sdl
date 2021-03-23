@@ -469,7 +469,7 @@ US_ControlPanel (ScanCode scancode)
 	//slPrint("exit game 8!!!!",slLocate(10,11));	
 	
     // RETURN/START GAME EXECUTION
-slPrint("slScrTransparent6",slLocate(1,17));		
+//slPrint("slScrTransparent6",slLocate(1,17));		
 	slScrTransparent(0);
 #ifdef SPEAR
     UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
@@ -491,7 +491,7 @@ void EnableEndGameMenuItem()
 void
 DrawMainMenu (void)
 {
-slPrint("slScrTransparent7",slLocate(1,17));		
+//slPrint("slScrTransparent7",slLocate(1,17));		
 	slScrTransparent(NBG1ON);
 //	slPrint("DrawMainMenu",slLocate(10,15));
 #ifdef JAPAN
@@ -1104,7 +1104,7 @@ CP_ChangeView (int)
 void
 DrawChangeView (int view)
 {
-slPrint("slScrTransparent8",slLocate(1,17));		
+//slPrint("slScrTransparent8",slLocate(1,17));		
 	slScrTransparent(0);
     int rescaledHeight = screenHeight / scaleFactor;
     if(view != 21) VWB_Bar (0, rescaledHeight - 40, 320, 40, bordercol);

@@ -66,7 +66,7 @@ void SD_PrepareSound(int which)
 	{
 		fileSize = GetFileSize(fileId);
 
-		if(which <23)
+//		if(which <23)
 //		if(fileSize>8192 && fileSize<20000)
 		{
 			load_8bit_pcm((Sint8*)filename, ORIGSAMPLERATE);			
@@ -116,8 +116,8 @@ void SD_PrepareSound(int which)
 boolean
 SD_PlaySound(int sound)
 {
-slPrint("SD_PlaySound",slLocate(10,16));
-	slPrintHex(DigiMap[sound],slLocate(23,16));
+//	slPrint("SD_PlaySound",slLocate(10,16));
+//		slPrintHex(DigiMap[sound],slLocate(23,16));
     //Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
 	Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
 #ifdef PONY
@@ -202,7 +202,7 @@ SD_StopDigitized(void)
 void
 SD_StartMusic(int chunk)
 {
-	slPrint((char *)"SD_StartMusic",slLocate(10,8));
+//		slPrint((char *)"SD_StartMusic",slLocate(10,8));
 	satPlayMusic(chunk);
 }
 

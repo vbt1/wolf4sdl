@@ -204,7 +204,6 @@ Victory (void)
 #ifndef JAPDEMO
     VWB_DrawPic (8, 4, L_BJWINSPIC);
 #endif
-slPrint("slScrTransparent2",slLocate(1,17));	
 	slScrTransparent(2);
 	slSynch();
 
@@ -576,7 +575,6 @@ LevelCompleted (void)
     CacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
     ClearSplitVWB ();           // set up for double buffering in split screen
 	slBack1ColSet((void *)BACK_COL_ADR , 0);
-slPrint("slScrTransparent3",slLocate(1,17));		
 	slScrTransparent(0);
 	slSynch();
     VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);

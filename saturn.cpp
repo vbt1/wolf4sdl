@@ -196,7 +196,7 @@ slPrint((char *)"correct   ",slLocate(1,20));
     slScrAutoDisp(NBG0ON| NBG1ON);
 	
 
-/*  /// vbt à remettre
+/*  /// vbt ? remettre
 slCharNbg3(COL_TYPE_256, CHAR_SIZE_1x1); 
 slPageNbg3((void*)0x25e60000, 0, PNB_1WORD|CN_10BIT ); 
 slPlaneNbg3(PL_SIZE_1x1); 
@@ -211,7 +211,7 @@ slPriorityNbg3(7);
 	slPriorityNbg1(6);
 	slPrioritySpr0(5);
 #ifdef USE_SPRITES 	
-	slZdspLevel(7); // vbt : ne pas déplacer !!!
+	slZdspLevel(7); // vbt : ne pas d?placer !!!
 #endif	
 	screeny->pixels = (unsigned char*)malloc(sizeof(unsigned char)*width*height);
 	
@@ -787,7 +787,7 @@ int SDL_PollEvent(SDL_Event *event)
 			break;	
 
 			default:
-				////slPrint("pas trouvé",slLocate(3,20));
+				////slPrint("pas trouv?",slLocate(3,20));
 				//event->key.keysym.sym =999;
 				//event->type = SDL_NOEVENT;
 				event->key.keysym.sym = SDLK_LAST;//SDLK_FIRST;	  
@@ -995,7 +995,7 @@ int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 			//slPCMOff(&m_dat[i]);
 			//slPCMParmChange(&m_dat[i]);
 			slSndFlush() ;
-// vbt 26/07/2020 : à remettre	
+// vbt 26/07/2020 : ? remettre	
 				m_dat[i].mode= _PCM8Bit;
 			slPCMOn(&m_dat[i],chunk->abuf,chunk->alen);
 				break;
@@ -1132,7 +1132,7 @@ void	satPlayMusic( Uint8 track ){
     CDC_PLY_ETNO( &playdata ) = (Uint8) (track + tno[0]);
     CDC_CdPlay(&playdata);
 //	slCDDAOn(127,127,0,0);
-	slSndVolume(127);
+//	slSndVolume(127);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 Uint16 SWAP_BYTES_16(Uint16 a) {
@@ -1160,25 +1160,25 @@ extern "C" {
 void CSH_Purge(void *adrs, Uint32 P_size)
 {
 #if 0	
-	typedef Uint32 LineX[0x10/sizeof(Uint32)];	/* ƒ‰ƒCƒ“‚Í 0x10 ƒoƒCƒg’PˆÊ */
+	typedef Uint32 LineX[0x10/sizeof(Uint32)];	/* ???C???? 0x10 ?o?C?g?P?? */
 	LineX *ptr, *end;
 	Uint32 zero = 0;
 
-	ptr = (LineX*)(((Uint32)adrs & 0x1fffffff) | 0x40000000);	/* ƒLƒƒƒbƒVƒ…ƒp[ƒW—Ìˆæ */
-	end = (LineX*)((Uint32)ptr + P_size - 0x10);	/* I—¹ƒ|ƒCƒ“ƒ^i-0x10 ‚Íƒ|ƒXƒgƒCƒ“ƒNƒŠƒƒ“ƒg‚Ìˆ×j */
-	ptr = (LineX*)((Uint32)ptr & -sizeof(LineX));	/* ƒ‰ƒCƒ“ƒAƒ‰ƒCƒƒ“ƒg‚É®‡ */
+	ptr = (LineX*)(((Uint32)adrs & 0x1fffffff) | 0x40000000);	/* ?L???b?V???p?[?W?¨? */
+	end = (LineX*)((Uint32)ptr + P_size - 0x10);	/* ?I???|?C???^?i-0x10 ??|?X?g?C???N???????g?¨?j */
+	ptr = (LineX*)((Uint32)ptr & -sizeof(LineX));	/* ???C???A???C?????g????? */
 	do {
-		(*ptr)[0] = zero;			/* ƒLƒƒƒbƒVƒ…ƒp[ƒW */
-	} while (ptr++ < end);			/* ƒ|ƒXƒgƒCƒ“ƒNƒŠƒƒ“ƒg‚ÍƒfƒBƒŒƒCƒXƒƒbƒgŠˆ—p‚Ìˆ× */
+		(*ptr)[0] = zero;			/* ?L???b?V???p?[?W */
+	} while (ptr++ < end);			/* ?|?X?g?C???N???????g??f?B???C?X???b?g???p?¨? */
 #endif	
-    void *ea;                                    /*    I—¹ƒAƒhƒŒƒX            */
+    void *ea;                                    /*    ?I???A?h???X            */
 
     adrs = (void *)((Uint32)adrs
-     & 0x1ffffff0 | 0x40000000);                /*    æ“ª²İÊŞØÃŞ°Ä±ÄŞÚ½ì¬    */
-    ea = (void *)((Uint32)adrs + P_size);        /*    I—¹ƒAƒhƒŒƒX{‚PZo    */
-    while ((Uint32)adrs < (Uint32)ea) {            /*    ‘ÎÛƒ‰ƒCƒ“•ªŒJ‚è•Ô‚·    */
-        *(Uint32 *)adrs = 0;                    /*    ƒCƒ“ƒoƒŠƒf[ƒg            */
-        adrs = (void *)((Uint32)adrs + 16);        /*    Ÿ‚Ì€”õ                */
+     & 0x1ffffff0 | 0x40000000);                /*    ?????????i?????    */
+    ea = (void *)((Uint32)adrs + P_size);        /*    ?I???A?h???X?{?P?Z?o    */
+    while ((Uint32)adrs < (Uint32)ea) {            /*    ?????C?????J????    */
+        *(Uint32 *)adrs = 0;                    /*    ?C???o???f?[?g            */
+        adrs = (void *)((Uint32)adrs + 16);        /*    ???????                */
     }                                            /*    end    while                */
 }
 }
@@ -1468,7 +1468,7 @@ void /* slave SH Initialize (RUNS on main SH) */
 #endif
 
 #if 0 // code pour faire le sol
-// slScrTransparent(RBG0ON); à mettre dans l'affichages des menus!!!
+// slScrTransparent(RBG0ON); ? mettre dans l'affichages des menus!!!
 #define		RBG0RB_CEL_ADR			(VDP2_VRAM_A0            )	
 #define		RBG0_PRA_ADR			(VDP2_VRAM_A1   + 0x1fe00)
 #define		RBG0_KTB_ADR			(VDP2_VRAM_A1            )	
