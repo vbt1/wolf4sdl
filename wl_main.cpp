@@ -9,7 +9,7 @@
 #include "wl_def.h"
 #include "wl_atmos.h"
 #include "sdl/SDL_syswm.h"
-
+#include "pcmsys.h"
 /*
 =============================================================================
 
@@ -99,7 +99,17 @@ void VblIn(void)
 		frame_y=frame_x=0;
 //		vbt=0;
 	}		   
+
+#ifdef PONY
+if(m68k_com->start == 1)
+slPrint((char *)"pas bon    ",slLocate(1,20));
+else
+slPrint((char *)"correct   ",slLocate(1,20));
+//	DrvMakeInputs();
+	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;
+#endif
 }
+
 
 //#endif
 
@@ -1063,7 +1073,7 @@ slPrint("slScrTransparent4",slLocate(1,17));
 //param_nowait = true;
 ////slPrint((char *)"VH_Startup     ",slLocate(10,12));
     VH_Startup ();
-//    IN_Startup (); // VBT ? remettre
+//    IN_Startup (); // VBT à remettre
 ////slPrint((char *)"PM_Startup     ",slLocate(10,12));
     PM_Startup ();
 ////slPrint((char *)"SD_Startup     ",slLocate(10,12));
@@ -1415,7 +1425,7 @@ slPrint((char*)"VW_FadeIn1",slLocate(10,22));
             VW_FadeIn();
 		
 #endif
-	// VBT d?plac?
+	// VBT déplacé
 slPrint((char*)"StartCPMusic",slLocate(10,22));	
 	StartCPMusic(INTROSONG);
 slPrint((char*)"IN_UserInput1",slLocate(10,22));		
@@ -1537,7 +1547,18 @@ int main (int argc, char *argv[])
     InitGame();
 //slPrintHex(screen->pixels,slLocate(20,14));
 slPrint((char*)"DemoLoop",slLocate(10,22));	
+/*
+#ifdef PONY
+	#include "sega_int.h"
+extern void	UsrVblankIn2( void );
 
+	INT_ChgMsk(INT_MSK_NULL,INT_MSK_VBLK_IN);
+	INT_SetScuFunc(INT_SCU_VBLK_IN,(void (*))UsrVblankIn2);
+	INT_ChgMsk(INT_MSK_VBLK_IN,INT_MSK_NULL);	
+
+	slSynch();
+#endif	
+*/
 
 
 
@@ -1546,3 +1567,4 @@ slPrint((char*)"DemoLoop",slLocate(10,22));
     Quit("Demo loop exited???");
     return 1;
 }
+
