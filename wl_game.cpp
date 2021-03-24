@@ -1218,7 +1218,7 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
-gamestate.mapon = 8;	
+//gamestate.mapon = 8;	
 GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	
 gamestate.keys = 3;

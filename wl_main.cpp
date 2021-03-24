@@ -101,10 +101,11 @@ void VblIn(void)
 	}		   
 
 #ifdef PONY
+/*
 if(m68k_com->start == 1)
 slPrint((char *)"pas bon    ",slLocate(1,20));
 else
-slPrint((char *)"correct   ",slLocate(1,20));
+slPrint((char *)"correct   ",slLocate(1,20));*/
 //	DrvMakeInputs();
 	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;
 #endif
@@ -857,6 +858,18 @@ static int wolfdigimap[] =
 
 void InitDigiMap (void)
 {
+#ifdef PONY	
+    int *map;
+    for (map = wolfdigimap; *map != LASTSOUND; map += 3)
+    {
+        DigiMap[map[0]] = map[1];
+    }
+	
+    for (int i = 0; i<46; i++)
+    {
+        SD_PrepareSound(i);
+    }
+#else
     int *map;
     for (map = wolfdigimap; *map != LASTSOUND; map += 3)
     {
@@ -864,6 +877,7 @@ void InitDigiMap (void)
 //        DigiChannel[map[1]] = map[2];
         SD_PrepareSound(map[1]);
     }
+#endif	
 }
 /*
 #ifndef SPEAR
@@ -1051,7 +1065,7 @@ static void InitGame()
 //#endif
 //    atexit(SDL_Quit);
     SignonScreen ();
-slPrint("slScrTransparent4",slLocate(1,17));		
+//slPrint("slScrTransparent4",slLocate(1,17));		
 	 slScrTransparent(NBG1ON);
 	 
 #if defined _WIN32
@@ -1374,11 +1388,11 @@ static void DemoLoop()
 //    if (!param_nowait)
 //        PG13 ();
 //    else
-slPrint((char*)"StartCPMusic",slLocate(10,22));	
+//slPrint((char*)"StartCPMusic",slLocate(10,22));	
 
 		StartCPMusic(INTROSONG);
 		
-slPrint((char*)"StartCPMusic end",slLocate(10,22));			
+//slPrint((char*)"StartCPMusic end",slLocate(10,22));			
 #endif
 
 #endif
@@ -1388,7 +1402,7 @@ slPrint((char*)"StartCPMusic end",slLocate(10,22));
     {
         while (!param_nowait)
         {
-slPrint("slScrTransparent5",slLocate(1,17));				
+//slPrint("slScrTransparent5",slLocate(1,17));				
 			slScrTransparent(NBG1ON);
 			slSynch(); // applique la non transparence
 //
@@ -1413,25 +1427,25 @@ slPrint("slScrTransparent5",slLocate(1,17));
 
             UNCACHEGRCHUNK (TITLEPALETTE);
 #else
-slPrint((char*)"CA_CacheScreen1",slLocate(10,22));	
+//slPrint((char*)"CA_CacheScreen1",slLocate(10,22));	
             CA_CacheScreen (TITLEPIC);
-slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
+//slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
 
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #endif
 
-slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
+//slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
             VW_FadeIn();
 		
 #endif
 	// VBT déplacé
-slPrint((char*)"StartCPMusic",slLocate(10,22));	
+//slPrint((char*)"StartCPMusic",slLocate(10,22));	
 	StartCPMusic(INTROSONG);
-slPrint((char*)"IN_UserInput1",slLocate(10,22));		
+//slPrint((char*)"IN_UserInput1",slLocate(10,22));		
             if (IN_UserInput(TickBase*15))
                 break;
-slPrint((char*)"VW_FadeOut1",slLocate(10,22));					
+//slPrint((char*)"VW_FadeOut1",slLocate(10,22));					
             VW_FadeOut();
 //
 // credits page
@@ -1546,7 +1560,7 @@ int main (int argc, char *argv[])
 
     InitGame();
 //slPrintHex(screen->pixels,slLocate(20,14));
-slPrint((char*)"DemoLoop",slLocate(10,22));	
+//slPrint((char*)"DemoLoop",slLocate(10,22));	
 /*
 #ifdef PONY
 	#include "sega_int.h"

@@ -35,7 +35,11 @@
 
 #define ORIGSAMPLERATE 7042
 extern int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained);
+#ifdef PONY	
+	
+#else
 extern PCM m_dat[4];
+#endif
 
 static Mix_Chunk *SoundChunks[ STARTMUSIC - STARTDIGISOUNDS];
 
@@ -53,7 +57,7 @@ uintptr_t lowsound = (uintptr_t)0x002C0000;
 
 void SD_PrepareSound(int which)
 {
-	slPrint("SD_PrepareSound",slLocate(10,14));
+//	slPrint("SD_PrepareSound",slLocate(10,14));
 //	slPrintHex(which,slLocate(1,15));
 	Sint32 fileId;
 	long fileSize;
@@ -116,17 +120,13 @@ void SD_PrepareSound(int which)
 boolean
 SD_PlaySound(int sound)
 {
-//	slPrint("SD_PlaySound",slLocate(10,16));
-//		slPrintHex(DigiMap[sound],slLocate(23,16));
-    //Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
-	Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
 #ifdef PONY
-    if(Mix_PlayChannel(DigiMap[sound], sample, 0) == -1)
+    if(Mix_PlayChannel(DigiMap[sound], NULL, 0) == -1)
 #else
+	Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
     if(Mix_PlayChannel(0, sample, 0) == -1)
 #endif	
     {
-//        slPrint("Unable to play sound:", slLocate(10,19));
         return false;
     }
 	return true;

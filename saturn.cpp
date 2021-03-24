@@ -116,27 +116,7 @@ static const Sint8	logtbl[] = {
 			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
 			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
 	};
-#ifdef PONY
-/*
- dummy
- */
- int cccc=0;
-void	UsrVblankIn2( void )
-{
-slPrintHex(cccc++,slLocate(1,21));
 
-if(m68k_com->start == 1)
-//FNT_Print256_2bpp((volatile Uint8 *)SS_FONT,(Uint8 *)"pas bon    ",80,130);
-slPrint((char *)"pas bon    ",slLocate(1,20));
-else
-//FNT_Print256_2bpp((volatile Uint8 *)SS_FONT,(Uint8 *)"correct   ",80,130);	
-slPrint((char *)"correct   ",slLocate(1,20));
-//	DrvMakeInputs();
-	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;
-}
-
-
-#endif
 //--------------------------------------------------------------------------------------------------------------------------------------
  SDL_Surface * SDL_SetVideoMode  (int width, int height, int bpp, Uint32 flags)
 {
@@ -268,14 +248,7 @@ int SDL_InitSubSystem(Uint32 flags)
 	{
 		
 #ifdef PONY
-	#include "sega_int.h"
-
-	INT_ChgMsk(INT_MSK_NULL,INT_MSK_VBLK_IN);
-	INT_SetScuFunc(INT_SCU_VBLK_IN,(void (*))UsrVblankIn2);
-	INT_ChgMsk(INT_MSK_VBLK_IN,INT_MSK_NULL);	
-
 	load_drv(ADX_MASTER_2304);
-
 #else		
 		
 		char sound_map[] =  {0xff,0xff,0xff,0xff};//,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
@@ -421,7 +394,9 @@ int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
 	Uint8 i;
 	Sint8 err=0;
 	memcpy(obtained,desired,sizeof(SDL_AudioSpec));
-
+#ifdef PONY	
+	
+#else
 	for (i=0; i<4; i++)
 	{
 		m_dat[i].mode = 0;
@@ -446,6 +421,7 @@ int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
 		}	 */
 //		slSynch();  // vbt 26/05/2019 remis // change rien
 	}
+#endif	
 	return err;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -980,13 +956,15 @@ Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
 //--------------------------------------------------------------------------------------------------------------------------------------
 int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 {
-	unsigned char i;
+
 //	slPrintHex(chunk->alen,slLocate(2,10));
 //	slPrintHex(&chunk->abuf[0],slLocate(2,11));
 //	slPCMOn(sounds[chunk].pcm, sounds[chunk].data, sounds[chunk].size);
 #ifdef PONY
 	pcm_play(channel, PCM_SEMI, 6);
 #else
+	unsigned char i;
+	
 	if(chunk->alen>0 && chunk->alen <100000)
 	for(i=0;i<4;i++)
 	{

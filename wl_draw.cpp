@@ -1278,7 +1278,7 @@ void AsmRefresh()
     short focalty = (short)(viewy>>TILESHIFT);	
     boolean playerInPushwallBackTile = tilemap[focaltx][focalty] == 64;
 #ifdef USE_SLAVE
-    for(int pixx=0;pixx<viewwidth/2;pixx++)
+    for(int pixx=0;pixx<=(viewwidth/2);pixx++)
 #else
     for(int pixx=0;pixx<viewwidth;pixx++)
 #endif		
