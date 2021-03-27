@@ -693,6 +693,10 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 
 	SDL_Color *sdlCeilingColor = (SDL_Color *)&curpal[vgaCeiling[gamestate.episode*10+mapon]];
 	Uint16 ceilingColor = SDL_MapRGB(NULL,(*sdlCeilingColor).r,(*sdlCeilingColor).g,(*sdlCeilingColor).b);
+
+	SDL_Color *sdlFloorColor = (SDL_Color *)&curpal[25];
+	Uint16 floorColor = SDL_MapRGB(NULL,(*sdlFloorColor).r,(*sdlFloorColor).g,(*sdlFloorColor).b);	
+	
 	int start=0,end=0;
 
     if(viewsize == 21)
@@ -714,14 +718,14 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 		Line_Color_Pal0[y] = ceilingColor;
 	
 	for(; y < viewheight+viewscreeny; y++)
-		Line_Color_Pal0[y] = RGB(14,14,14);
+//		Line_Color_Pal0[y] = RGB(14,14,14);
+		Line_Color_Pal0[y] = floorColor;
 
 	for(; y < 240; y++)
 		Line_Color_Pal0[y] = RGB(0,0,0);
 	
 	slBackColTable((void *)LINE_COLOR_TABLE);
 #endif
-
 }
 
 //==========================================================================
@@ -2256,7 +2260,7 @@ void    ThreeDRefresh (void)
 //
     if (fizzlein)
     {
-	//slPrint("fizzlein true       ",slLocate(1,15) );		
+//	slPrint("fizzlein true       ",slLocate(1,15) );		
 		
 //		memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
 //    FinishPaletteShifts ();
@@ -2270,7 +2274,7 @@ void    ThreeDRefresh (void)
     }
 	else
 	{
-		//slPrint("fizzlein false       ",slLocate(1,15) );		
+//		slPrint("fizzlein false       ",slLocate(1,15) );		
 	
 	}
 	fizzlein = false;

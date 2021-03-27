@@ -1153,10 +1153,7 @@ void PlayLoop (void)
 	if (demoplayback)
         IN_StartAck ();
 	UpdatePaletteShifts ();
-/*	FinishPaletteShifts ();
-	slSynch();
-	VGAClearScreen ();
-*/	
+	
     do
     {
         PollControls ();
@@ -1232,6 +1229,8 @@ extern int frame_x,frame_y;
 //			user_wall++;
 		}
 #endif		
+VGAClearScreen();
+
 
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
 /*

@@ -1561,20 +1561,6 @@ int main (int argc, char *argv[])
     InitGame();
 //slPrintHex(screen->pixels,slLocate(20,14));
 //slPrint((char*)"DemoLoop",slLocate(10,22));	
-/*
-#ifdef PONY
-	#include "sega_int.h"
-extern void	UsrVblankIn2( void );
-
-	INT_ChgMsk(INT_MSK_NULL,INT_MSK_VBLK_IN);
-	INT_SetScuFunc(INT_SCU_VBLK_IN,(void (*))UsrVblankIn2);
-	INT_ChgMsk(INT_MSK_VBLK_IN,INT_MSK_NULL);	
-
-	slSynch();
-#endif	
-*/
-
-
 
     DemoLoop();
 

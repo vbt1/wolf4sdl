@@ -515,6 +515,7 @@ void SDL_Quit(void)
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_SetPalette(SDL_Surface *surface, int flags, SDL_Color *colors, int firstcolor, int ncolors)
 {
+	SDL_SetColors(surface, colors, firstcolor, ncolors);
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
