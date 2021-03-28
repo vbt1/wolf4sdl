@@ -38,7 +38,7 @@ unsigned screenHeight = 240;
 unsigned screenBits = 8;      // use "best" color depth according to libSDL
 #endif
 
-//SDL_Surface *screen = NULL;
+SDL_Surface *screen = NULL;
 SDL_Surface *screenBuffer = NULL;
 SDL_Surface *curSurface = NULL;
 
@@ -97,7 +97,7 @@ void	VL_SetVGAPlaneMode (void)
         const SDL_VideoInfo *vidInfo = SDL_GetVideoInfo();
         screenBits = vidInfo->vfmt->BitsPerPixel;
     }
-/*	
+	
 	if(screen==NULL)
 	{
 		screen = SDL_SetVideoMode(screenWidth, screenHeight, screenBits,
@@ -110,7 +110,6 @@ void	VL_SetVGAPlaneMode (void)
 //            screenHeight, screenBits, SDL_GetError());
         SYS_Exit(1);
     }
-*/
 
     screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth, screenHeight, 8, 0, 0, 0, 0);
     if(!screenBuffer)

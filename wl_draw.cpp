@@ -2260,21 +2260,21 @@ void    ThreeDRefresh (void)
 //
     if (fizzlein)
     {
-//	slPrint("fizzlein true       ",slLocate(1,15) );		
+	slPrint("fizzlein true       ",slLocate(1,15) );		
 		
-//		memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
-//    FinishPaletteShifts ();
+	memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
+    FinishPaletteShifts ();
 
 //    VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
-	
-//        FizzleFade(screenBuffer, screen, 0, 0, screenWidth, screenHeight, 20, false);
+        FizzleFade(screenBuffer, screen, 0, 0, screenWidth, screenHeight, 20, false);
+
         fizzlein = false;
 
         lasttimecount = GetTimeCount();          // don't make a big tic count
     }
 	else
 	{
-//		slPrint("fizzlein false       ",slLocate(1,15) );		
+		slPrint("fizzlein false       ",slLocate(1,16) );		
 	
 	}
 	fizzlein = false;

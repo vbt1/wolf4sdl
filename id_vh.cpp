@@ -215,7 +215,7 @@ void VWB_Vlin (int y1, int y2, int x, int color)
 void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 {
 // pas super utile pour l'instant	
-//	VL_LatchToScreen (latchpics[2+picnum-LATCHPICS_LUMP_START], x*8, y);
+	VL_LatchToScreen (latchpics[2+picnum-LATCHPICS_LUMP_START], x*8, y);
 }
 
 void LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum)
@@ -416,9 +416,9 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 //slPrintHex(dest->pitch,slLocate(10,10));
 */
 //		memset(dest->pixels,4,320*200);
-//        VL_UnlockSurface(dest);
-    /*    SDL_UpdateRect(dest, 0, 0, 0, 0);
-		*/
+        VL_UnlockSurface(dest);
+//        SDL_UpdateRect(dest, 0, 0, 0, 0);
+		
 		frame++;
         Delay(frame-GetTimeCount());        // don't go too fast
 //		slSynch();
