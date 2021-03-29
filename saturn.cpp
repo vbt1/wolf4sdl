@@ -1,4 +1,4 @@
-#define USE_SPRITES 1
+//#define USE_SPRITES 1
 #include "wl_def.h"
 #include "sdl/SDL.h"
 #include "sdl/SDL_mixer.h"
@@ -13,7 +13,7 @@ extern "C" {
 #include	"C:/SaturnOrbit/SGL_302j/INC/sl_def.h"
 //#ifdef VBT
  #include "sega_cdc.h"
-
+ #include "sega_snd.h"
 //#endif
 
 }
@@ -242,12 +242,64 @@ int SDL_Init(Uint32 flags)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
+ void sound_external_audio_enable(Uint8 vol_l, Uint8 vol_r) {
+    volatile Uint16 *slot_ptr;
+
+    //max sound volume is 7
+    if (vol_l > 7) {
+        vol_l = 7;
+    }
+    if (vol_r > 7) {
+        vol_r = 7;
+    }
+
+    // Setup SCSP Slot 16 and Slot 17 for playing
+    slot_ptr = (volatile Uint16 *)(0x25B00000 + (0x20 * 16));
+    slot_ptr[0] = 0x1000;
+    slot_ptr[1] = 0x0000; 
+    slot_ptr[2] = 0x0000; 
+    slot_ptr[3] = 0x0000; 
+    slot_ptr[4] = 0x0000; 
+    slot_ptr[5] = 0x0000; 
+    slot_ptr[6] = 0x00FF; 
+    slot_ptr[7] = 0x0000; 
+    slot_ptr[8] = 0x0000; 
+    slot_ptr[9] = 0x0000; 
+    slot_ptr[10] = 0x0000; 
+    slot_ptr[11] = 0x001F | (vol_l << 5);
+    slot_ptr[12] = 0x0000; 
+    slot_ptr[13] = 0x0000; 
+    slot_ptr[14] = 0x0000; 
+    slot_ptr[15] = 0x0000; 
+
+    slot_ptr = (volatile Uint16 *)(0x25B00000 + (0x20 * 17));
+    slot_ptr[0] = 0x1000;
+    slot_ptr[1] = 0x0000; 
+    slot_ptr[2] = 0x0000; 
+    slot_ptr[3] = 0x0000; 
+    slot_ptr[4] = 0x0000; 
+    slot_ptr[5] = 0x0000; 
+    slot_ptr[6] = 0x00FF; 
+    slot_ptr[7] = 0x0000; 
+    slot_ptr[8] = 0x0000; 
+    slot_ptr[9] = 0x0000; 
+    slot_ptr[10] = 0x0000; 
+    slot_ptr[11] = 0x000F | (vol_r << 5);
+    slot_ptr[12] = 0x0000; 
+    slot_ptr[13] = 0x0000; 
+    slot_ptr[14] = 0x0000; 
+    slot_ptr[15] = 0x0000;
+
+    *((volatile Uint16 *)(0x25B00400)) = 0x020F;
+}
+//--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_InitSubSystem(Uint32 flags)
 {
 	if(flags &= SDL_INIT_AUDIO)
 	{
 		
 #ifdef PONY
+	sound_external_audio_enable(5, 5);
 	load_drv(ADX_MASTER_2304);
 #else		
 		

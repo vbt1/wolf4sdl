@@ -1,5 +1,5 @@
 // WL_DRAW.C
-#define USE_SPRITES 1
+//#define USE_SPRITES 1
 #include "wl_def.h"
 
 #include "wl_cloudsky.h"
@@ -918,7 +918,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 //--------------------------------------------------------------------------------------------	
 #else
     t_compshape   *shape;
-    shape = (t_compshape *) PM_GetSprite(shapenum);
+
 
     unsigned starty,endy;
     word *cmdptr;
@@ -930,26 +930,15 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     unsigned j;
     byte col;
     byte *vmem;
-	
+
+    shape = (t_compshape *) PM_GetSprite(shapenum);
+
+    scale=height>>1;
+    pixheight=scale*SPRITESCALEFACTOR;
     actx=xcenter-scale;
     upperedge=viewheight/2-scale;
 
     cmdptr=shape->dataofs;
-
-#if 0
-
-#else // vbt on affiche l'arme en bitmap
-// vbt : ajout nettoyage bitmap vdp2
-#ifdef USE_SPRITES // plus besoin !!!
-/*
-	Uint8*d = (Uint8*)vbuf + ((pixheight-height) * vbufPitch) + (xcenter-scale); 
-	for( Sint16 i=0;i<height;i++)
-	{
-		memset(d,0x0,height);
-		d+=(vbufPitch );
-	}
-*/	
-#endif
 
     for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
     {
@@ -999,7 +988,6 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
             }
         }
     }
-#endif	
 #endif // end use sprites
 }
 
@@ -1027,7 +1015,6 @@ typedef struct
 #endif
 } visobj_t;
 
-
 visobj_t vislist[MAXVISABLE];
 visobj_t *visptr,*visstep,*farthest;
 
@@ -1042,12 +1029,9 @@ void DrawScaleds (void)
 
     visptr = &vislist[0];
 
-
-
 //
 // place static objects
 //
-
     for (statptr = &statobjlist[0] ; statptr !=laststatobj ; statptr++)
     {
         if ((visptr->shapenum = statptr->shapenum) == -1)
@@ -1079,6 +1063,7 @@ void DrawScaleds (void)
             visptr++;
         }
     }
+
 //
 // place active objects
 //
@@ -1163,8 +1148,6 @@ void DrawScaleds (void)
 		ScaleShape(farthest->viewx, farthest->shapenum, farthest->viewheight, farthest->flags);
         farthest->viewheight = 32000;
     }
-
-
 }
 
 //==========================================================================
@@ -2215,7 +2198,7 @@ void    ThreeDRefresh (void)
         DrawStarSky(vbuf, vbufPitch);
 #endif
     WallRefresh ();
-	
+
 #if defined(USE_FEATUREFLAGS) && defined(USE_PARALLAX)
     if(GetFeatureFlags() & FF_PARALLAXSKY)
         DrawParallax(vbuf, vbufPitch);
@@ -2233,6 +2216,7 @@ void    ThreeDRefresh (void)
 // draw all the scaled images
 //
     DrawScaleds();                  // draw scaled stuff
+
 #if defined(USE_FEATUREFLAGS) && defined(USE_RAIN)
     if(GetFeatureFlags() & FF_RAIN)
         DrawRain(vbuf, vbufPitch);
@@ -2251,21 +2235,18 @@ void    ThreeDRefresh (void)
 	{
         ShowActStatus();
 	}
-//    VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
 #ifndef USE_SPRITES
+	VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
 	vbuf = NULL;
 #endif	
 //
 // show screen and time last cycle
 //
+
     if (fizzlein)
     {
-	slPrint("fizzlein true       ",slLocate(1,15) );		
-		
-	memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
-    FinishPaletteShifts ();
-
-//    VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
+//		memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
+//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
         FizzleFade(screenBuffer, screen, 0, 0, screenWidth, screenHeight, 20, false);
 
         fizzlein = false;
@@ -2274,15 +2255,10 @@ void    ThreeDRefresh (void)
     }
 	else
 	{
-		slPrint("fizzlein false       ",slLocate(1,16) );		
-	
-	}
-	fizzlein = false;
 #ifndef USE_SPRITES	
-    else
-    {
-//        SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
+        SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
-    }
 #endif
+    }
+
 }

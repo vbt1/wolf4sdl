@@ -199,6 +199,9 @@ SD_StopDigitized(void)
 
 }
 */
+
+extern 	void sound_cdda(int track, int loop);
+
 void
 SD_StartMusic(int chunk)
 {

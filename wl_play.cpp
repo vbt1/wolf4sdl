@@ -1,5 +1,5 @@
 // WL_PLAY.C
-#define USE_SPRITES 1
+//#define USE_SPRITES 1
 #include "wl_def.h"
 #pragma hdrstop
 
