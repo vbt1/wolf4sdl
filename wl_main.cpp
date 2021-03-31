@@ -1555,7 +1555,7 @@ int main (int argc, char *argv[])
     //CheckParameters(argc, argv);
 #endif
 // vbt : invincible
-	godmode = 1;
+//	godmode = 1;
     CheckForEpisodes();
 
     InitGame();

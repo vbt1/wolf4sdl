@@ -428,7 +428,11 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 finished:
 			//slPrint("FizzleFade finished    ",slLocate(1,18) );
 //    VL_UnlockSurface(source);
+
     VL_UnlockSurface(dest);
+//	memset (source->pixels,0,320*200);
+//	VL_UnlockSurface(screenBuffer);
+
 //    SDL_UpdateRect(dest, 0, 0, 0, 0);
 	//slPrint("FizzleFade return  ",slLocate(1,16) );	
 	return false;

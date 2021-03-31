@@ -3856,7 +3856,8 @@ void    A_StartDeathCam (objtype *ob)
     VW_UpdateScreen ();
 #endif
     IN_UserInput(300);
-
+	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0); // vbt nettoie l'écran, à mettre en sortant du resize
+	
     //
     // line angle up exactly
     //

@@ -1179,6 +1179,8 @@ void Died (void)
     IN_UserInput(100);
     SD_WaitSoundDone ();
 
+	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0); // vbt nettoie l'écran, à mettre en sortant du resize
+
     gamestate.lives--;
 
     if (gamestate.lives > -1)
@@ -1219,9 +1221,9 @@ void GameLoop (void)
 {
 // vbt dernier niveau
 //gamestate.mapon = 8;	
-GiveWeapon (gamestate.bestweapon+2);
-gamestate.ammo = 99;	
-gamestate.keys = 3;
+//GiveWeapon (gamestate.bestweapon+2);
+//gamestate.ammo = 99;	
+//gamestate.keys = 3;
 // vbt dernier niveau
    
     boolean died;

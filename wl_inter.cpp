@@ -1036,7 +1036,7 @@ PreloadGraphics (void)
     VW_FadeIn ();
 
 //      PM_Preload (PreloadUpdate);
-    PreloadUpdate (10, 10);
+//    PreloadUpdate (10, 10);
     IN_UserInput (70);
     VW_FadeOut ();
 
