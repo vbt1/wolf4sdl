@@ -18,7 +18,6 @@ _MTH_Mul2:
 	RTS		! return
  	XTRCT	R3,R0	! xtract for Fixed32
 
-
 ! dst 	   = r4
 ! src 	   = r5
 ! size     = r6

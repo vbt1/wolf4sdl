@@ -74,7 +74,7 @@ static unsigned char vbt_event[13][2];
 static int current_event=0;
 static Uint32 previouscount=0;
 static Uint16 previousmillis=0;
-PCM m_dat[4];
+//PCM m_dat[4];
 
 static	CdcPly	playdata;
 static	CdcPos	posdata;
@@ -1055,6 +1055,17 @@ Uint32 SDL_GetTicks(void)
 void SDL_Delay(long delay)
 {
 //	sc_usleep(delay);
+}
+//--------------------------------------------------------------------------------------------------------------------------------------
+#define TVSTAT      (*(volatile Uint16 *)0x25F80004)
+
+void wait_vblank(int nb)
+{
+	for(int i=0;i<nb;i++)
+	{
+		 while((TVSTAT & 8) == 0);
+		 while((TVSTAT & 8) == 8);
+	}
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void sc_tmr_start(void)

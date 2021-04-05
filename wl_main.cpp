@@ -860,6 +860,10 @@ void InitDigiMap (void)
 {
 #ifdef PONY	
     int *map;
+	
+	for (int i = 0; i < LASTSOUND; i++)
+		DigiMap[i] = -1;	
+	
     for (map = wolfdigimap; *map != LASTSOUND; map += 3)
     {
         DigiMap[map[0]] = map[1];

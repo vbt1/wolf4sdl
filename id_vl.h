@@ -21,6 +21,7 @@ extern	boolean  screenfaded;
 //extern	unsigned bordercolor;
 
 extern SDL_Color gamepal[];
+void wait_vblank(int nb);
 
 //===========================================================================
 
@@ -28,7 +29,7 @@ extern SDL_Color gamepal[];
 // VGA hardware routines
 //
 
-#define VL_WaitVBL(a) SDL_Delay((a)*8)
+#define VL_WaitVBL(a)	wait_vblank(a*8)  //SDL_Delay((a)*8)
 
 void VL_SetVGAPlaneMode (void);
 void VL_SetTextMode (void);
