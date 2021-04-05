@@ -218,26 +218,6 @@ void Scale3DShape(byte *vbuf, unsigned vbufPitch, statobj_t *ob)
     viewx1=(int)(centerx+ny1*scale/nx1);
     viewx2=(int)(centerx+ny2*scale/nx2);
 */
-/*	
-	FIXED pos[][XYZS] =
-	{	
-		{toFIXED( farthest->viewx-scale),toFIXED( (farthest->viewheight/2-scale)+30),toFIXED(65000),toFIXED(scale)},	
-	};
-*/	
-
-	
-/*
-    if(viewx2 < viewx1)
-    {
-        Scale3DShaper(viewx2,viewx1,ob->shapenum,ob->flags,ny2,ny1,nx2,nx1,vbuf,vbufPitch);
-    }
-    else
-    {
-        Scale3DShaper(viewx1,viewx2,ob->shapenum,ob->flags,ny1,ny2,nx1,nx2,vbuf,vbufPitch);
-    }
-*/	
-	
-	
 }
 
 //#endif

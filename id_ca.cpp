@@ -598,6 +598,7 @@ void CAL_SetupGrFile (void)
 	compseg =(byte*)0x002C0000;
 //	CHECKMALLOCRESULT(compseg);
 	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen));
+//    CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
     CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
 
 	for(unsigned long j=0;j<NUMPICS;j++)

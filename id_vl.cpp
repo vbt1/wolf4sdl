@@ -269,6 +269,7 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 
 		VL_WaitVBL(1);
 		VL_SetPalette (palette2);
+		VGAClearScreen(); // vbt : maj du fond d'écran
 	}
 
 //
@@ -314,6 +315,7 @@ void VL_FadeIn (int start, int end, SDL_Color *palette, int steps)
 
 		VL_WaitVBL(1);
 		VL_SetPalette(palette2);
+		VGAClearScreen(); // vbt : maj du fond d'écran
 	}
 
 //
@@ -373,7 +375,7 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, int color)
     VL_LockSurface(curSurface);
     Uint8 *dest = ((byte *) curSurface->pixels) + y * curPitch + x;
     memset(dest, color, width);
-    VL_UnlockSurface(curSurface);
+//    VL_UnlockSurface(curSurface); // vbt on vire pour voir
 }
 
 /*
@@ -398,7 +400,7 @@ void VL_Vlin (int x, int y, int height, int color)
 		*dest = color;
 		dest += curPitch;
 	}
-	VL_UnlockSurface(curSurface);
+//	VL_UnlockSurface(curSurface);// vbt on vire pour voir
 }
 
 /*
@@ -423,7 +425,7 @@ void VL_BarScaledCoord (int scx, int scy, int scwidth, int scheight, int color)
 		memset(dest, color, scwidth);
 		dest += curPitch;
 	}
-	VL_UnlockSurface(curSurface);
+	VL_UnlockSurface(curSurface);// vbt utile
 }
 
 /*
@@ -449,7 +451,7 @@ void VL_MemToLatch(byte *source, int width, int height,
             && y >= 0 && (unsigned) y + height <= screenHeight
             && "VL_MemToLatch: Destination rectangle out of bounds!");
 
-    VL_LockSurface(destSurface);
+//    VL_LockSurface(destSurface);
     int pitch = destSurface->pitch;
     byte *dest = (byte *) destSurface->pixels + y * pitch + x;
     for(int ysrc = 0; ysrc < height; ysrc++)
@@ -461,7 +463,7 @@ void VL_MemToLatch(byte *source, int width, int height,
         }
 		dest+=pitch;
     }	 
-    VL_UnlockSurface(destSurface);
+//    VL_UnlockSurface(destSurface); // vbt : evite l'affichage des chargements au boot
 }
 
 //===========================================================================
@@ -515,7 +517,7 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
 			}
 		}
 	}
-    VL_UnlockSurface(curSurface);
+    VL_UnlockSurface(curSurface); // vbt utile pour signon screen
 }
 
 /*
@@ -554,7 +556,7 @@ void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int
             }
         }
     }
-    VL_UnlockSurface(curSurface);
+    VL_UnlockSurface(curSurface); // vbt utile
 }
 //==========================================================================
 
@@ -604,5 +606,4 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
         VL_UnlockSurface(curSurface);
  //       VL_UnlockSurface(source);
     }	
-
 }

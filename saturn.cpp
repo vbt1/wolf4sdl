@@ -47,6 +47,7 @@ extern "C" {
 	extern void	load_driver_binary(char * filename, void * buffer);
 }
 void SCU_DMAWait(void);
+void sc_usleep(unsigned long usec);
 
 extern void CheckWeaponChange (void);
 //extern void ShapeTest (void);
@@ -162,7 +163,6 @@ static const Sint8	logtbl[] = {
 		slCharNbg1(COL_TYPE_32768 , CHAR_SIZE_1x1);
 	}
 
-//	slScrPosNbg1(toFIXED(0) , toFIXED(0));
     slInitBitMap(bmNBG1, BM_512x256, (void *)NBG1_CEL_ADR);
     slBMPaletteNbg1(1);
 
@@ -498,16 +498,19 @@ void SDL_PauseAudio(int pause_on)
 
 int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
 {
-//	unsigned char *surfacePtr = (unsigned char*)surface->pixels;
-if((srcrect)!=NULL)
-	for( Sint16 i=0;i<srcrect->h;i++)
-	{
-//		memcpyl((unsigned long*)(dst->pixels + ((i + dstrect->y) * dst->pitch) + dstrect->x),(unsigned long*)(src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),srcrect->w);
-		slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(NBG1_CEL_ADR + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
-	}	
+	unsigned char *surfacePtr = (unsigned char*)src->pixels + ((srcrect->y) * src->pitch) + srcrect->x;
+	unsigned int *nbg1Ptr = (unsigned int*)(NBG1_CEL_ADR + (dstrect->y<<9)+ dstrect->x);
+	
+	if((srcrect)!=NULL)
+		for( Sint16 i=0;i<srcrect->h;i++)
+		{
+//			slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(NBG1_CEL_ADR + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
+			slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,srcrect->w);
+			surfacePtr+=src->pitch;
+			nbg1Ptr+=128;
+		}	
 	return 0;
 }
-
 //--------------------------------------------------------------------------------------------------------------------------------------
 /*void SDL_UpdateRects (SDL_Surface *screen, int numrects, SDL_Rect *rects)
 {
@@ -1051,7 +1054,58 @@ Uint32 SDL_GetTicks(void)
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_Delay(long delay)
 {
+//	sc_usleep(delay);
+}
+//--------------------------------------------------------------------------------------------------------------------------------------
+void sc_tmr_start(void)
+{
+    TIM_FRT_INIT(8); // 8, 32 or 128
+    TIM_FRT_SET_16(0);
+}
+//--------------------------------------------------------------------------------------------------------------------------------------
+unsigned short sc_tmr_lap(void)
+{
+    return (TIM_FRT_GET_16());
+}
+//--------------------------------------------------------------------------------------------------------------------------------------
+unsigned short sc_tmr_lap_usec(void)
+{
+    Float32 f = TIM_FRT_CNT_TO_MCR(TIM_FRT_GET_16());
+    return ((unsigned short)(f));
+}
+//--------------------------------------------------------------------------------------------------------------------------------------
+unsigned long sc_tmr_tick2usec(unsigned long tick)
+{
+    Float32 f = TIM_FRT_CNT_TO_MCR(tick);
+    return ((unsigned long)(f));
+}
+//--------------------------------------------------------------------------------------------------------------------------------------
+void sc_tick_sleep(unsigned short tick)
+{
+    sc_tmr_start();
+    while(sc_tmr_lap() < tick);
+}
+//--------------------------------------------------------------------------------------------------------------------------------------
+void sc_usleep(unsigned long usec)
+{
+    /* Convert delay to tick value. */
+    unsigned long delay_tick = 0;
+    if(usec < 50*1000)
+    { /* Compute tick value at good precision for delay lower than 50 msec. */
+        delay_tick = (usec*60000) / (sc_tmr_tick2usec(60000));
+    }
+    else
+    { /* Poor precision, but no overflow (up to 42 seconds) for higher values. */
+        delay_tick = (usec*100) / (sc_tmr_tick2usec(100));
+    }
 
+    /* Sleep at most 60000 ticks. */
+    unsigned long i;
+    for(i=0; i<delay_tick; i+=60000)
+    {
+        unsigned long s = ((i+60000) < delay_tick ? 60000 : delay_tick - i);
+        sc_tick_sleep(s);
+    }
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu )

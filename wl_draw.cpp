@@ -270,39 +270,30 @@ void ScalePost(int postx,byte *postsource)
 {
 #ifdef USE_SPRITES	
 //--------------------------------------------------------------------------------------------
-if(postx>=0 & postx<=SATURN_WIDTH)
-{
-	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
-//  a           b          c             d
-// top left, top right, bottom right, bottom left
-    SPRITE *user_wall = &user_walls[postx];
-    user_wall->CTRL=FUNC_Texture | _ZmCC;
-    user_wall->PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
+	if(postx>=0 & postx<=SATURN_WIDTH)
+	{
+		memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
+	//  a           b          c             d
+	// top left, top right, bottom right, bottom left
+		SPRITE *user_wall = &user_walls[postx];
+		user_wall->CTRL=FUNC_Texture | _ZmCC;
+		user_wall->PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
 
-    user_wall->SRCA=0x2000|(postx*8);
-    user_wall->COLR=256;
-    user_wall->SIZE=0x801;
+		user_wall->SRCA=0x2000|(postx*8);
+		user_wall->COLR=256;
+		user_wall->SIZE=0x801;
 
-	user_wall->XD=postx-(viewwidth/2);
-	user_wall->YC=(wallheight[postx] / 8);
-	user_wall->YD=-user_wall->YC;
-	user_wall->XC=user_wall->XD;
-//	user_wall->YC=(wallheight[postx] / 8);
-	user_wall->XA=user_wall->XD;
-	user_wall->YA=user_wall->YD;
-	user_wall->XB=user_wall->XA;
-	user_wall->YB=user_wall->YC;
-	
-//    user_wall->GRDA=0;
-	// 240 pour du 320, 264 pour du 352
-//	slSetSprite(user_wall, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// ne pas remettre
-}
-else
-{
-	char toto[50];
-	sprintf(toto,"bad wall %d   ",postx);
-	//slPrint(toto,slLocate(10,11));
-}
+		user_wall->XD=postx-(viewwidth/2);
+		user_wall->YC=(wallheight[postx] / 8);
+		user_wall->YD=-user_wall->YC;
+		user_wall->XC=user_wall->XD;
+	//	user_wall->YC=(wallheight[postx] / 8);
+		user_wall->XA=user_wall->XD;
+		user_wall->YA=user_wall->YD;
+		user_wall->XB=user_wall->XA;
+		user_wall->YB=user_wall->YC;
+	//    user_wall->GRDA=0;
+	}
 //--------------------------------------------------------------------------------------------
 #else
     byte *vbuf = LOCK()+screenofs;	
