@@ -1178,9 +1178,12 @@ void Died (void)
 
     IN_UserInput(100);
     SD_WaitSoundDone ();
-
-	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0); // vbt nettoie l'écran, à mettre en sortant du resize
-
+	
+//    VL_UnlockSurface(curSurface);
+//	VGAClearScreen(); // vbt : maj du fond d'écran
+//	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0); // vbt nettoie l'écran, à mettre en sortant du resize
+//    VL_UnlockSurface(curSurface);
+	
     gamestate.lives--;
 
     if (gamestate.lives > -1)

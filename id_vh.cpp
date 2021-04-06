@@ -432,7 +432,8 @@ finished:
 //    VL_UnlockSurface(source);
     VL_UnlockSurface(dest);
 	VGAClearScreen(); // vbt : maj du fond d'écran
-	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0); // vbt ajout	
+	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4); // vbt ajout
+
 //	memset (source->pixels,0,320*200);
 //	VL_UnlockSurface(screenBuffer);
 

@@ -1062,6 +1062,9 @@ PreloadGraphics (void)
 void
 DrawHighScores (void)
 {
+	slScrTransparent(2);
+	slSynch();
+	
     char buffer[16];
 #ifndef SPEAR
     char *str;

@@ -1232,7 +1232,7 @@ extern int frame_x,frame_y;
 VGAClearScreen();
 
 
-		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!
+
         if(viewsize != 21)
 		{
 			DrawHealth ();
@@ -1252,6 +1252,7 @@ VGAClearScreen();
 			position_vram = (SATURN_WIDTH+64)*32;
 		}
 		slDMAWait();
+		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!		
 #endif
 		
     }

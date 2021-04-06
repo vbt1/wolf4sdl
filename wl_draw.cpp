@@ -2243,6 +2243,7 @@ void    ThreeDRefresh (void)
         fizzlein = false;
 
         lasttimecount = GetTimeCount();          // don't make a big tic count
+		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0); // vbt nettoie l'écran, à mettre en sortant du resize
     }
 	else
 	{
