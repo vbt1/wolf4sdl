@@ -531,7 +531,7 @@ int SDL_FillRect (SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color)
 		if((dstrect)!=NULL)
 		{
 	//		slBMBoxFill(dstrect->x, dstrect->y, dstrect->x + dstrect->w - 1, dstrect->y + dstrect->h - 1, color);
-			Uint8*d = (Uint8*)dst->pixels + dstrect->x; 
+			Uint8*d = (Uint8*)dst->pixels + dstrect->x + dstrect->y*screenWidth; 
 
 			for( Sint16 i=0;i<dstrect->h;i++)
 			{

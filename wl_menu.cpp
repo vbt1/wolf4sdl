@@ -472,6 +472,9 @@ US_ControlPanel (ScanCode scancode)
 //slPrint("slScrTransparent6",slLocate(1,17));		
 	slScrTransparent(0);
 // vbt : nettoyage ecran en sortie de menu	
+	curSurface = screen;
+	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
+	curSurface = screenBuffer;
 	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0); // vbt nettoie l'écran, à mettre en sortant du resize	
 #ifdef SPEAR
     UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);

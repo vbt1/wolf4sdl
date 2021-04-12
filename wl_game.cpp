@@ -1174,14 +1174,14 @@ void Died (void)
 
     IN_ClearKeysDown ();
 
-    FizzleFade(screenBuffer,screen,viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
-
+    FizzleFade(screenBuffer,screen,viewscreenx,viewscreeny,viewwidth,viewheight,70,false); // died !!!
+	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4); // vbt nettoie l'écran, à mettre en sortant du resize
+	
     IN_UserInput(100);
     SD_WaitSoundDone ();
 	
 //    VL_UnlockSurface(curSurface);
 //	VGAClearScreen(); // vbt : maj du fond d'écran
-//	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0); // vbt nettoie l'écran, à mettre en sortant du resize
 //    VL_UnlockSurface(curSurface);
 	
     gamestate.lives--;

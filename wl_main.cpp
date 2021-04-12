@@ -10,6 +10,7 @@
 #include "wl_atmos.h"
 #include "sdl/SDL_syswm.h"
 #include "pcmsys.h"
+#include "SEGA_PER.H"
 /*
 =============================================================================
 
@@ -1251,6 +1252,27 @@ void Quit (const char *errorStr, ...)
     byte *screen;
 #endif
     char error[256];
+	slIntFunction(NULL) ;
+	slSynch();
+//	memset((void*)SNDRAM,0x00,0x80000);
+//	memset((void*)SNDRAM+0x100000,0x00,32*32);	
+	unsigned short *vbt = (unsigned short *)SNDRAM+0x100000;
+	volatile unsigned short *vbt2 = (volatile unsigned short *)0x25b0042e;	
+	
+
+			
+
+//	*vbt2 = (1 << 5);
+PER_SMPC_SND_OFF();
+
+	
+/*
+	for (int i=0;i<32*16;i++)
+	{
+		vbt[i]=0;
+	}*/
+	slSynch();
+	
     if(errorStr != NULL)
     {
         va_list vlist;

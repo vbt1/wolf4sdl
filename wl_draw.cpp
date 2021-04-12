@@ -2236,14 +2236,16 @@ void    ThreeDRefresh (void)
 
     if (fizzlein)
     {
-//		memset (screen->pixels,4,320*200); // la source doit être rouge (perdu en quelque part !!!)
-//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
-        FizzleFade(screenBuffer, screen, 0, 0, screenWidth, screenHeight, 20, false);
+		SDL_Rect destrect = { viewscreenx, viewscreeny, viewwidth, viewheight }; 
+		SDL_FillRect (screenBuffer, &destrect, 0);
 
+//		VGAClearScreen(); // vbt : maj du fond d'écran
+		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
+        FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 220, false);
+		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
         fizzlein = false;
 
         lasttimecount = GetTimeCount();          // don't make a big tic count
-		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0); // vbt nettoie l'écran, à mettre en sortant du resize
     }
 	else
 	{

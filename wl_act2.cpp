@@ -3826,7 +3826,6 @@ void    A_StartDeathCam (objtype *ob)
         playstate = ex_victorious;                              // exit castle tile
         return;
     }
-
     gamestate.victoryflag = true;
     unsigned fadeheight = viewsize != 21 ? screenHeight-scaleFactor*STATUSLINES : screenHeight;
     VL_BarScaledCoord (0, 0, screenWidth, fadeheight, bordercol);
