@@ -353,31 +353,35 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 	rndval = 0;
 	pixperframe = width * height / frames;
 	IN_StartAck ();
+	
 
-	frame = GetTimeCount();
+	frame = 0;//GetTimeCount();
 	byte *srcptr = (byte *)source->pixels;
+	byte color = (srcptr[x1+(y1*width)]?0:4);
+	SDL_Rect rect = { x1,y1,width,height };	
 
-	byte color = srcptr[x1+(y1*width)];
-/*	
-	curSurface = source;
-	VL_BarScaledCoord (x1,y1,width,height,color);
-	curSurface = dest;
-	VL_BarScaledCoord (x1,y1,width,height,0);
-*/	
+	screenBuffer = source;
+	VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
+	screenBuffer = dest;
+//	VL_BarScaledCoord (x1,y1,width,height,color);
+slPrintHex(rndmask,slLocate(1,17) );
+slPrintHex(rndbits_y,slLocate(1,18) );
+slPrintHex(pixperframe,slLocate(1,19) );
+slPrint("  ",slLocate(1,20) );
+
 	do
 	{
 			//slPrint("FizzleFade loop strt  ",slLocate(1,16) );
 			
 		if (abortable && IN_CheckAck ())
 		{
-//		    VL_UnlockSurface(source);
 #ifndef USE_SPRITES
 //            SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 //            SDL_UpdateRect(screen, 0, 0, 0, 0);
 #endif
-VGAClearScreen(); // vbt : maj du fond d'écran
-curSurface = source;
-VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
+			VGAClearScreen(); // vbt : maj du fond d'écran
+			//curSurface = source;
+			VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
 			return true;
 		}
 
@@ -401,7 +405,9 @@ VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
 			if (x>=width || y>=height)
 			{
                 if(rndval == 0)     // entire sequence has been completed
+				{
                     goto finished;
+				}
 			    p--;
 				continue;
 			}
@@ -412,7 +418,6 @@ VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
 
 			*(destptr + (y1 + y) * dest->pitch + x1 + x) = *(srcptr + (y1 + y) * source->pitch + x1 + x);
 
-
 			if (rndval == 0)		// entire sequence has been completed
 			{
 				//slPrint("rndval == 0  ",slLocate(1,17) );
@@ -420,30 +425,23 @@ VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
 			}
 		}
 		
-//		VL_BarScaledCoord (x1,y1,width,height,color);
-        VL_UnlockSurface(dest);
-//        SDL_UpdateRect(dest, 0, 0, 0, 0);
-//		SDL_Rect rect = { x1,y1,width,height };
-//		SDL_BlitSurface(source, &rect, dest, &rect);
-//		VL_UnlockSurface(dest);
-		
+		SDL_BlitSurface(dest, &rect, source, &rect);
 		frame++;
+slPrintHex(frame,slLocate(1,20) );		
         Delay(frame-GetTimeCount());        // don't go too fast
-//		slSynch();
-			//slPrint("FizzleFade loop end  ",slLocate(1,16) );
 	} while (1);
+	
 
 finished:
-			//slPrint("FizzleFade finished    ",slLocate(1,18) );
-//    VL_UnlockSurface(source);
-//    VL_UnlockSurface(dest);
-	VGAClearScreen(); // vbt : maj du fond d'écran
-//	VL_BarScaledCoord (x1,y1,width,height,color); // vbt obligatoire
-	VL_UnlockSurface(dest);
-	curSurface = source;
+	SDL_BlitSurface(dest, &rect, source, &rect);
+/*
+//	color = (color?0:4);
 
-//    SDL_UpdateRect(dest, 0, 0, 0, 0);
-	//slPrint("FizzleFade return  ",slLocate(1,16) );	
+	screenBuffer = source;
+	VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
+	screenBuffer = dest;
+*/
+
 	return false;
 #endif
 }

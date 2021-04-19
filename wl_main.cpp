@@ -1252,9 +1252,10 @@ void Quit (const char *errorStr, ...)
     byte *screen;
 #endif
     char error[256];
+/*
 	slIntFunction(NULL) ;
 	slSynch();
-//	memset((void*)SNDRAM,0x00,0x80000);
+	memset((void*)SNDRAM,0x00,8564);
 //	memset((void*)SNDRAM+0x100000,0x00,32*32);	
 	unsigned short *vbt = (unsigned short *)SNDRAM+0x100000;
 	volatile unsigned short *vbt2 = (volatile unsigned short *)0x25b0042e;	
@@ -1263,9 +1264,8 @@ void Quit (const char *errorStr, ...)
 			
 
 //	*vbt2 = (1 << 5);
-PER_SMPC_SND_OFF();
-
-	
+	slInitSystem(TV_352x224, NULL, 1);
+*/	
 /*
 	for (int i=0;i<32*16;i++)
 	{

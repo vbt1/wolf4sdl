@@ -2236,12 +2236,12 @@ void    ThreeDRefresh (void)
 
     if (fizzlein)
     {
-		SDL_Rect destrect = { viewscreenx, viewscreeny, viewwidth, viewheight }; 
-		SDL_FillRect (screenBuffer, &destrect, 0);
+//		SDL_Rect destrect = { viewscreenx, viewscreeny, viewwidth, viewheight }; 
+//		SDL_FillRect (screenBuffer, &destrect, 0);
 
 //		VGAClearScreen(); // vbt : maj du fond d'écran
-		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
-        FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 220, false);
+//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
+        FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 70, false);
 		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
         fizzlein = false;
 
