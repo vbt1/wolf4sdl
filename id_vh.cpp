@@ -346,35 +346,37 @@ void VH_Startup()
 boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
     unsigned width, unsigned height, unsigned frames, boolean abortable)
 {
-	//slPrint("FizzleFade start  ",slLocate(1,16) );
 #if 1
-	unsigned x,y,frame,pixperframe;
-	int32_t  rndval;
-	rndval = 0;
-	pixperframe = width * height / frames;
-	IN_StartAck ();
-	
+    unsigned x, y, frame, pixperframe;
+    int32_t  rndval, lastrndval;
+    int      first = 1;
 
-	frame = 0;//GetTimeCount();
+    lastrndval = 0;
+    pixperframe = width * height / frames;
+
+    IN_StartAck ();
+
+	frame = GetTimeCount();
 	byte *srcptr = (byte *)source->pixels;
 	byte color = (srcptr[x1+(y1*width)]?0:4);
-	SDL_Rect rect = { x1,y1,width,height };	
 
-	screenBuffer = source;
-	VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
-	screenBuffer = dest;
-//	VL_BarScaledCoord (x1,y1,width,height,color);
-slPrintHex(rndmask,slLocate(1,17) );
-slPrintHex(rndbits_y,slLocate(1,18) );
-slPrintHex(pixperframe,slLocate(1,19) );
-slPrint("  ",slLocate(1,20) );
-
-	do
+	SDL_Rect rect = { x1,y1,width,height };
+	
+	if(curSurface==screen)
 	{
-			//slPrint("FizzleFade loop strt  ",slLocate(1,16) );
-			
-		if (abortable && IN_CheckAck ())
-		{
+		curSurface = screenBuffer;
+		VL_BarScaledCoord (x1,y1,width,height,srcptr[x1+(y1*width)]); // vbt ajout	
+	}
+	else
+	{
+		VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout		
+		curSurface = screen;
+	}
+
+    do
+    {
+        if(abortable && IN_CheckAck ())
+        {
 #ifndef USE_SPRITES
 //            SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 //            SDL_UpdateRect(screen, 0, 0, 0, 0);
@@ -382,66 +384,66 @@ slPrint("  ",slLocate(1,20) );
 			VGAClearScreen(); // vbt : maj du fond d'écran
 			//curSurface = source;
 			VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
-			return true;
-		}
+            return true;
+        }
+
 
 		byte *destptr = (byte *)dest->pixels;
 
-		for (unsigned p=0;p<pixperframe;p++)
-		{
-			//
-			// seperate random value into x/y pair
-			//
+        rndval = lastrndval;
 
-			x = rndval >> rndbits_y;
-			y = rndval & ((1 << rndbits_y) - 1);
+        // When using double buffering, we have to copy the pixels of the last AND the current frame.
+        // Only for the first frame, there is no "last frame"
+        for(int i = first; i < 2; i++)
+        {
 
-			//
-			// advance to next random element
-			//
+            for(unsigned p = 0; p < pixperframe; p++)
+            {
+                //
+                // seperate random value into x/y pair
+                //
 
-			rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
+                x = rndval >> rndbits_y;
+                y = rndval & ((1 << rndbits_y) - 1);
 
-			if (x>=width || y>=height)
-			{
-                if(rndval == 0)     // entire sequence has been completed
-				{
+                //
+                // advance to next random element
+                //
+
+                rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
+
+                if(x >= width || y >= height)
+                {
+                    if(rndval == 0)     // entire sequence has been completed
+                        goto finished;
+                    p--;
+                    continue;
+                }
+
+                //
+                // copy one pixel
+                //
+
+				*(destptr + (y1 + y) * dest->pitch + x1 + x) = *(srcptr + (y1 + y) * source->pitch + x1 + x);
+
+                if(rndval == 0)		// entire sequence has been completed
                     goto finished;
-				}
-			    p--;
-				continue;
-			}
+            }
 
-			//
-			// copy one pixel
-			//
-
-			*(destptr + (y1 + y) * dest->pitch + x1 + x) = *(srcptr + (y1 + y) * source->pitch + x1 + x);
-
-			if (rndval == 0)		// entire sequence has been completed
-			{
-				//slPrint("rndval == 0  ",slLocate(1,17) );
-                goto finished;
-			}
-		}
+            if(!i || first) lastrndval = rndval;
+        }
+		first = 0;
 		
 		SDL_BlitSurface(dest, &rect, source, &rect);
 		frame++;
-slPrintHex(frame,slLocate(1,20) );		
-        Delay(frame-GetTimeCount());        // don't go too fast
+
+       Delay(frame-GetTimeCount());        // don't go too fast
 	} while (1);
 	
 
 finished:
 	SDL_BlitSurface(dest, &rect, source, &rect);
-/*
-//	color = (color?0:4);
-
-	screenBuffer = source;
-	VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout
-	screenBuffer = dest;
-*/
-
 	return false;
 #endif
 }
+

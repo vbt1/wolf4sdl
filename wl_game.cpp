@@ -1170,12 +1170,9 @@ void Died (void)
     //
     FinishPaletteShifts ();
 
- //   VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4); // force le rouge
-
     IN_ClearKeysDown ();
 
     FizzleFade(screenBuffer,screen,viewscreenx,viewscreeny,viewwidth,viewheight,70,false); // died !!!
-//	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4); // vbt nettoie l'écran, à mettre en sortant du resize
 	
     IN_UserInput(100);
     SD_WaitSoundDone ();

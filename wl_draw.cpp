@@ -2239,20 +2239,25 @@ void    ThreeDRefresh (void)
 //		SDL_Rect destrect = { viewscreenx, viewscreeny, viewwidth, viewheight }; 
 //		SDL_FillRect (screenBuffer, &destrect, 0);
 
-//		VGAClearScreen(); // vbt : maj du fond d'écran
-//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
+		VGAClearScreen(); // vbt : maj du fond d'écran
+//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
+/*
+	curSurface = screen;
+	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
+	curSurface = screenBuffer;
+*/	
         FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 70, false);
-		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
+//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
         fizzlein = false;
 
         lasttimecount = GetTimeCount();          // don't make a big tic count
     }
+#ifndef USE_SPRITES		
 	else
 	{
-#ifndef USE_SPRITES	
+
         SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
-#endif
     }
-
+#endif
 }
