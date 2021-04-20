@@ -365,11 +365,13 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 	if(curSurface==screen)
 	{
 		curSurface = screenBuffer;
-		VL_BarScaledCoord (x1,y1,width,height,srcptr[x1+(y1*width)]); // vbt ajout	
+		VL_BarScaledCoord (x1,y1,width,height,srcptr[x1+(y1*width)]); // vbt ajout
+		DrawStatusBar(); // vbt : ajout
 	}
 	else
 	{
 		VL_BarScaledCoord (x1,y1,width,height,color); // vbt ajout		
+		DrawStatusBar(); // vbt : ajout
 		curSurface = screen;
 	}
 

@@ -12,6 +12,7 @@ unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 SPRITE user_walls[SATURN_WIDTH*2];
 extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_TOTAL];
+extern unsigned int position_vram;
 #endif
 //unsigned char spr_buffer[30*64*64];
 typedef struct
@@ -2230,6 +2231,29 @@ void    ThreeDRefresh (void)
 	VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
 	vbuf = NULL;
 #endif	
+
+#ifdef USE_SPRITES
+	//	extern int vbt;
+		SPRITE *user_wall = user_walls;
+
+		for(int pixx=0;pixx<viewwidth;pixx++)
+		{
+			slSetSprite(user_wall++, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre
+//			user_wall++;
+		}
+	
+		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
+//		memcpy((void *)(SpriteVRAM + cgaddress),(void *)&wall_buffer[0],(SATURN_WIDTH+64) * 64);
+		if(position_vram>0x38000)
+		{
+			memset(texture_list,0xFF,SPR_TOTAL);
+//			position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
+			position_vram = (SATURN_WIDTH+64)*32;
+		}
+		slDMAWait();
+		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!		
+#endif
+
 //
 // show screen and time last cycle
 //
@@ -2249,7 +2273,7 @@ void    ThreeDRefresh (void)
         FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 70, false);
 //		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
         fizzlein = false;
-
+		DrawStatusBar(); // vbt ajout
         lasttimecount = GetTimeCount();          // don't make a big tic count
     }
 #ifndef USE_SPRITES		

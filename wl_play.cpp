@@ -1154,6 +1154,8 @@ void PlayLoop (void)
         IN_StartAck ();
 	UpdatePaletteShifts ();
 	
+	DrawStatusBar(); // vbt : ajout
+
     do
     {
         PollControls ();
@@ -1216,45 +1218,8 @@ void PlayLoop (void)
             }
         }
 
-extern int frame_x,frame_y;
-	frame_x++;
-
-#ifdef USE_SPRITES
-	//	extern int vbt;
-		SPRITE *user_wall = user_walls;
-
-		for(int pixx=0;pixx<viewwidth;pixx++)
-		{
-			slSetSprite(user_wall++, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre
-//			user_wall++;
-		}
-#endif		
-VGAClearScreen();
-
-
-
-        if(viewsize != 21)
-		{
-			DrawHealth ();
-			DrawLives ();
-	//		DrawLevel ();
-			DrawAmmo ();
-			DrawKeys ();
-			DrawScore ();
-		}
-#ifdef USE_SPRITES		
-		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
-//		memcpy((void *)(SpriteVRAM + cgaddress),(void *)&wall_buffer[0],(SATURN_WIDTH+64) * 64);
-		if(position_vram>0x38000)
-		{
-			memset(texture_list,0xFF,SPR_TOTAL);
-//			position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
-			position_vram = (SATURN_WIDTH+64)*32;
-		}
-		slDMAWait();
-		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!		
-#endif
-		
+		extern int frame_x,frame_y;
+		frame_x++;
     }
     while (!playstate && !startgame);
 //slPrint("end play loop",slLocate(1,20));

@@ -981,6 +981,7 @@ void    GameLoop (void);
 void    DrawPlayBorder (void);
 void    DrawStatusBorder (byte color);
 void    DrawPlayScreen (void);
+void	DrawStatusBar (void);
 void    DrawPlayBorderSides (void);
 void    ShowActStatus();
 
