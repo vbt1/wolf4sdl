@@ -575,6 +575,24 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
 	assert7(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
 			&& scydest >= 0 && scydest + height * scaleFactor <= screenHeight
 			&& "VL_LatchToScreenScaledCoord: Destination rectangle out of bounds!");
+			
+//	if(!(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
+//			&& scydest >= 0 && scydest + height * scaleFactor <= 
+
+if(!(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth))
+	{
+
+		slPrintHex(scxdest,slLocate(10,10));
+		slPrintHex(scxdest + width * scaleFactor,slLocate(10,11));
+		slPrintHex(screenHeight,slLocate(10,15));	
+		
+		
+//		slPrintHex(scydest,slLocate(10,12));
+//		slPrintHex(scydest + height * scaleFactor,slLocate(10,13));		
+//		slPrintHex(screenWidth,slLocate(10,14));
+
+	}
+			
 	if(scaleFactor == 1)
     {
 		SDL_Rect srcrect = { xsrc, ysrc, width, height };

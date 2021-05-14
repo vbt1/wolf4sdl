@@ -2182,9 +2182,7 @@ void    ThreeDRefresh (void)
 //
 // follow the walls from there to the right, drawing as we go
 //
-#ifndef USE_SPRITES	
-    VGAClearScreen ();
-#endif	
+    VGAClearScreen (); // vbt : maj du fond d'écran
 #if defined(USE_FEATUREFLAGS) && defined(USE_STARSKY)
     if(GetFeatureFlags() & FF_STARSKY)
         DrawStarSky(vbuf, vbufPitch);
@@ -2263,7 +2261,7 @@ void    ThreeDRefresh (void)
 //		SDL_Rect destrect = { viewscreenx, viewscreeny, viewwidth, viewheight }; 
 //		SDL_FillRect (screenBuffer, &destrect, 0);
 
-		VGAClearScreen(); // vbt : maj du fond d'écran
+//		VGAClearScreen(); // vbt : maj du fond d'écran
 //		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
 /*
 	curSurface = screen;
