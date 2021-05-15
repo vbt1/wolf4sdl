@@ -220,6 +220,8 @@ void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 
 void LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum)
 {
+//	if(2+picnum-LATCHPICS_LUMP_START==1)
+//		return;
 	VL_LatchToScreenScaledCoord (latchpics[2+picnum-LATCHPICS_LUMP_START], scx*8, scy);
 }
 
@@ -240,7 +242,19 @@ void LoadLatchMem (void)
 	byte *src;
 	SDL_Surface *surf; //,*surf1;
 
-//	latchpics[0] = surf1;
+//
+// tile 8s
+//
+   surf = SDL_CreateRGBSurface(SDL_HWSURFACE, 8*8,
+        ((NUMTILE8 + 7) / 8) * 8, 8, 0, 0, 0, 0);
+    if(surf == NULL)
+    {
+        Quit("Unable to create surface for tiles!");
+    }
+    SDL_SetColors(surf, gamepal, 0, 256);
+
+	latchpics[0] = surf;
+	
 	CA_CacheGrChunk (STARTTILE8);
 	src = grsegs[STARTTILE8];
 	for (i=0;i<NUMTILE8;i++)
@@ -249,6 +263,8 @@ void LoadLatchMem (void)
 		src += 64;
 	}	
 	UNCACHEGRCHUNK (STARTTILE8);
+	
+	latchpics[1] = surf;
 //
 // pics
 //
@@ -259,6 +275,7 @@ void LoadLatchMem (void)
 	{
 		width = pictable[i-STARTPICS].width;
 		height = pictable[i-STARTPICS].height;
+		
 		surf = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, 8, 0, 0, 0, 0);
         if(surf == NULL)
         {

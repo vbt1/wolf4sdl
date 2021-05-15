@@ -98,6 +98,6 @@ void inline VL_LatchToScreenScaledCoord (SDL_Surface *source, int scx, int scy)
 }
 void inline VL_LatchToScreen (SDL_Surface *source, int x, int y)
 {
-    VL_LatchToScreenScaledCoord(source,0,0,source->w,source->h,
+   VL_LatchToScreenScaledCoord(source,0,0,source->w,source->h,
         scaleFactor*x,scaleFactor*y);
 }

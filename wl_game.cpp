@@ -1019,7 +1019,7 @@ void ShowActStatus()
     DrawLevel ();
     DrawAmmo ();
     DrawKeys ();
-    DrawWeapon ();
+//    DrawWeapon ();
     DrawScore ();
     ingame = true;
 }
@@ -1100,7 +1100,7 @@ void PlayDemo (int demonumber)
 
 void Died (void)
 {
-    float   fangle;
+   float   fangle;
 //    int   fangle;
     int32_t dx,dy;
     int     iangle,curangle,clockwise,counter,change;
@@ -1122,9 +1122,8 @@ void Died (void)
         dx = killerobj->x - player->x;
         dy = player->y - killerobj->y;
 
-        fangle = (float) atan2((float) dy, (float) dx);     // returns -pi to pi
-//		fangle = slAtan ((dy<<16), (dx<<16));
-		
+//        fangle = (float) atan2((float) dy, (float) dx);     // returns -pi to pi
+		fangle = (slAtan ((dy<<16), (dx<<16)))>>16;
         if (fangle<0)
             fangle = (float) (M_PI*2+fangle);
 //            fangle = (int) (M_PI*2+fangle);
@@ -1147,7 +1146,6 @@ void Died (void)
         clockwise = iangle - player->angle;
         counter = player->angle + ANGLES-iangle;
     }
-
     curangle = player->angle;
 
     if (clockwise<counter)
@@ -1160,6 +1158,7 @@ void Died (void)
         do
         {
             change = tics*DEATHROTATE;
+
             if (curangle + change > iangle)
                 change = iangle-curangle;
 
@@ -1182,6 +1181,7 @@ void Died (void)
         do
         {
             change = -(int)tics*DEATHROTATE;
+
             if (curangle + change < iangle)
                 change = iangle-curangle;
 
@@ -1227,7 +1227,8 @@ void Died (void)
         if(viewsize != 21)
         {
             DrawKeys ();
-            DrawWeapon ();
+			if(gamestate.weapon!=-1)
+				DrawWeapon ();
             DrawAmmo ();
             DrawHealth ();
             DrawFace ();

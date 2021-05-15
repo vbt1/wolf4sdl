@@ -8,15 +8,15 @@
 #define IGNORE_BAD_DEST
 
 #ifdef IGNORE_BAD_DEST
-#undef assert
-#define assert(x) if(!(x))  { slPrint((char *)"asset test failed0", slLocate(10,20));return;}
+//#undef assert
+//#define assert(x) if(!(x))  { slPrint((char *)"asset test failed0", slLocate(10,20));return;}
 #define assert1(x) if(!(x)) { slPrint((char *)"asset test failed1", slLocate(10,20));return;}
 #define assert2(x) if(!(x)) { slPrint((char *)"asset test failed2", slLocate(10,20));return;}
 #define assert3(x) if(!(x)) { slPrint((char *)"asset test failed3", slLocate(10,20));return;}
 #define assert4(x) if(!(x)) { slPrint((char *)"asset test failed4", slLocate(10,20));return;}
 #define assert5(x) if(!(x)) { slPrint((char *)"asset test failed5", slLocate(10,20));return;}
 #define assert6(x) if(!(x)) { slPrint((char *)"asset test failed6", slLocate(10,20));return;}
-#define assert7(x) if(!(x)) { slPrint((char *)"asset test failed7", slLocate(10,20));return;}
+//#define assert7(x) if(!(x)) { slPrint((char *)"asset test failed7", slLocate(10,20));return;}
 #define assert8(x) if(!(x)) { slPrint((char *)"asset test failed8", slLocate(10,20));return;}
 #define assert_ret(x) if(!(x)) return 0
 #else
@@ -571,28 +571,10 @@ void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int
 void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
     int width, int height, int scxdest, int scydest)
 {
-
-	assert7(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
-			&& scydest >= 0 && scydest + height * scaleFactor <= screenHeight
-			&& "VL_LatchToScreenScaledCoord: Destination rectangle out of bounds!");
-			
-//	if(!(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
-//			&& scydest >= 0 && scydest + height * scaleFactor <= 
-
-if(!(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth))
-	{
-
-		slPrintHex(scxdest,slLocate(10,10));
-		slPrintHex(scxdest + width * scaleFactor,slLocate(10,11));
-		slPrintHex(screenHeight,slLocate(10,15));	
+	assert(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
+		&& scydest >= 0 && scydest + height * scaleFactor <= screenHeight
+		&& "VL_LatchToScreenScaledCoord: Destination rectangle out of bounds!");
 		
-		
-//		slPrintHex(scydest,slLocate(10,12));
-//		slPrintHex(scydest + height * scaleFactor,slLocate(10,13));		
-//		slPrintHex(screenWidth,slLocate(10,14));
-
-	}
-			
 	if(scaleFactor == 1)
     {
 		SDL_Rect srcrect = { xsrc, ysrc, width, height };

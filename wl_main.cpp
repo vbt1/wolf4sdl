@@ -85,7 +85,7 @@ boolean param_ignorenumchunks = false;
 unsigned frame_x=0,frame_y=0;
 
 void VblIn(void);
-//extern int vbt;
+
 void VblIn(void)
 {
 	char buffer[8];
@@ -94,20 +94,11 @@ void VblIn(void)
 				 
 	if(frame_y==60)
 	{
-//		//slPrint((char*)"fps                                                   ",slLocate(10,1));
 		slPrint((char*)ltoa(frame_x,buffer),slLocate(14,1));
-////slPrint((char*)ltoa(vbt,buffer,8),slLocate(22,1));		
 		frame_y=frame_x=0;
-//		vbt=0;
 	}		   
 
 #ifdef PONY
-/*
-if(m68k_com->start == 1)
-slPrint((char *)"pas bon    ",slLocate(1,20));
-else
-slPrint((char *)"correct   ",slLocate(1,20));*/
-//	DrvMakeInputs();
 	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;
 #endif
 }

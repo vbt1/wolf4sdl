@@ -280,7 +280,7 @@ void StatusDrawPic (unsigned x, unsigned y, unsigned picnum)
 void StatusDrawFace(unsigned picnum)
 {
     StatusDrawPic(17, 4, picnum);
-    StatusDrawLCD(picnum);
+//    StatusDrawLCD(picnum);
 }
 
 
@@ -579,7 +579,8 @@ void GivePoints (int32_t points)
 void DrawWeapon (void)
 {
     if(viewsize == 21 && ingame) return;
-    StatusDrawPic (32,8,KNIFEPIC+gamestate.weapon);
+	if(gamestate.weapon==-1) return; // vbt ajout
+	StatusDrawPic (32,8,KNIFEPIC+gamestate.weapon);
 }
 
 
