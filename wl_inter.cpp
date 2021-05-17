@@ -131,8 +131,7 @@ Victory (void)
 #define RATIOY  14
 #define TIMEX   14
 #define TIMEY   8
-
-
+	
 #ifdef SPEAR
     StartCPMusic (XTHEEND_MUS);
 
@@ -574,8 +573,8 @@ LevelCompleted (void)
     };
     CacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
     ClearSplitVWB ();           // set up for double buffering in split screen
-	slBack1ColSet((void *)BACK_COL_ADR , 0);
-	slScrTransparent(0);
+//	slBack1ColSet((void *)BACK_COL_ADR , 0);
+	slScrTransparent(2);
 	slSynch();
     VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
     if (bordercol != VIEWCOLOR)

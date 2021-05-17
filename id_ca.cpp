@@ -546,12 +546,23 @@ void CAL_SetupGrFile (void)
     //lseek(handle, 0, SEEK_SET);
 
     if(!param_ignorenumchunks && headersize / 3 != (long) (lengthof(grstarts) - numEpisodesMissing))
-        Quit("Wolf4SDL was not compiled for these data files:\n"
+	{
+/*        Quit("Wolf4SDL was not compiled for these data files:\n"
             "        %s contains a wrong number of offsets                          (%i instead of %i)!\n\n"
             "                          Please check whether you are using the right executable!\n"
             "(For mod developers: perhaps you forgot to update NUMCHUNKS?)",
             fname, headersize / 3, lengthof(grstarts) - numEpisodesMissing);
-
+*/
+			char msg[200];
+			sprintf(msg,"Wolf4SDL was not compiled for these data files:\n"
+            "        %s contains a wrong number of offsets                          (%i instead of %i)!\n\n"
+            "                          Please check whether you are using the right executable!\n"
+            "(For mod developers: perhaps you forgot to update NUMCHUNKS?)",
+            fname, headersize / 3, lengthof(grstarts) - numEpisodesMissing);
+			
+			slPrint((char *)msg,slLocate(1,3));
+						while(1);
+	}
     byte data[lengthof(grstarts) * 3];
 	//GFS_Load(fileId, 0, (void *)data, fileSize);
 	GFS_Load(fileId, 0, (void *)data, sizeof(data));
@@ -692,7 +703,6 @@ void CAL_SetupMapFile (void)
     if (maphandle == -1)
         CA_CannotOpen(fname);
 #endif
-
 //
 // load all map header
 //
@@ -722,7 +732,6 @@ void CAL_SetupMapFile (void)
 		mapheaderseg[i]->width=SWAP_BYTES_16(mapheaderseg[i]->width);
 		mapheaderseg[i]->height=SWAP_BYTES_16(mapheaderseg[i]->height);
     }
-
 //	free(maphandleptr);
 	maphandleptr = NULL;	
 //    free(tinf);

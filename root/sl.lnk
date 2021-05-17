@@ -50,10 +50,4 @@ SECTIONS {
 		__bend = . ;			
 		_end = .;			
 	}> ram
-	.gcov_info      :
-	{
-		PROVIDE (gcov_info_start = .);
-		KEEP (*(.gcov_info))
-		PROVIDE (gcov_info_end = .);
-	}> ram
 }				

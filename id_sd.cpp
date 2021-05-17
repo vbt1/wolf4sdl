@@ -33,38 +33,41 @@
 #include <string.h>
   #include "pcmsys.h"
 
-#define ORIGSAMPLERATE 7042
+#define ORIGSAMPLERATE 7000
 extern int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained);
-#ifdef PONY	
-	
-#else
+#ifndef PONY	
 extern PCM m_dat[4];
-#endif
-
 static Mix_Chunk *SoundChunks[ STARTMUSIC - STARTDIGISOUNDS];
-
+#endif
 //      Global variables
         boolean         //AdLibPresent,
                         SoundBlasterPresent,//SBProPresent,
                         SoundPositioned;
         SDSMode         DigiMode;
+#ifndef USE_ADX			
         int             DigiMap[LASTSOUND];
+#endif
 
 extern void	satPlayMusic( Uint8 track );
 extern void	satStopMusic( void );
-
+#ifndef PONY
 uintptr_t lowsound = (uintptr_t)0x002C0000;
+#endif
 
 void SD_PrepareSound(int which)
 {
-//	slPrint("SD_PrepareSound",slLocate(10,14));
-//	slPrintHex(which,slLocate(1,15));
 	Sint32 fileId;
 	long fileSize;
 	char filename[15];
 	unsigned char *mem_buf;
+#ifndef USE_ADX	
 	sprintf(filename,"%03d.PCM",which);
+#else	
+	sprintf(filename,"%03d.ADX",which);
+#endif
  	fileId = GFS_NameToId((Sint8*)filename);
+
+
 #ifdef PONY
 	if(fileId>0)
 	{
@@ -73,13 +76,13 @@ void SD_PrepareSound(int which)
 //		if(which <23)
 //		if(fileSize>8192 && fileSize<20000)
 		{
-			load_8bit_pcm((Sint8*)filename, ORIGSAMPLERATE);			
+#ifndef USE_ADX				
+			load_8bit_pcm((Sint8*)filename, ORIGSAMPLERATE);
+#else
+			load_adx((Sint8*)filename);
+#endif			
 		} 
 	}
-	else
-	{
-		SoundChunks[which]->alen = 0;
-	}	
 #else
 	if(fileId>0)
 	{
@@ -121,7 +124,11 @@ boolean
 SD_PlaySound(int sound)
 {
 #ifdef PONY
+#ifndef USE_ADX	
     if(Mix_PlayChannel(DigiMap[sound], NULL, 0) == -1)
+#else
+    if(Mix_PlayChannel(sound, NULL, 0) == -1)
+#endif
 #else
 	Mix_Chunk *sample = SoundChunks[DigiMap[sound]];	 //DigiMap[sound]
     if(Mix_PlayChannel(0, sample, 0) == -1)

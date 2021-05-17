@@ -738,6 +738,7 @@ void FinishSignon (void)
 //   0: player weapons
 //   1: boss weapons
 //vbtvbt sound reference
+#ifndef USE_ADX
 static int wolfdigimap[] =
     {
         // These first sounds are in the upload version
@@ -783,6 +784,7 @@ static int wolfdigimap[] =
         MECHSTEPSND,            31, -1,
 
         SCHEISTSND,             33, -1,
+#ifndef APOGEE_1_0		
         DEATHSCREAM4SND,        34, -1,         // AIIEEE
         DEATHSCREAM5SND,        35, -1,         // DEE-DEE
         DONNERSND,              36, -1,         // EPISODE 4 BOSS DIE
@@ -795,6 +797,7 @@ static int wolfdigimap[] =
         KEINSND,                43, -1,         // EPISODE 5 BOSS SIGHTING
         MEINSND,                44, -1,         // EPISODE 6 BOSS DIE
         ROSESND,                45, -1,         // EPISODE 5 BOSS DIE
+#endif		
 #else
 //
 // SPEAR OF DESTINY DIGISOUNDS
@@ -846,11 +849,12 @@ static int wolfdigimap[] =
 #endif
         LASTSOUND
     };
-
+#endif
 
 void InitDigiMap (void)
 {
 #ifdef PONY	
+#ifndef USE_ADX
     int *map;
 	
 	for (int i = 0; i < LASTSOUND; i++)
@@ -860,7 +864,7 @@ void InitDigiMap (void)
     {
         DigiMap[map[0]] = map[1];
     }
-	
+#endif	
     for (int i = 0; i<46; i++)
     {
         SD_PrepareSound(i);
@@ -1055,7 +1059,6 @@ static void InitGame()
         SYS_Exit(1);
     }
 	SDL_SetVideoMode  (screenWidth, screenHeight, screenBits, NULL);
-
 //#ifndef REMDEBUG
 	slIntFunction(VblIn) ;
 //#endif

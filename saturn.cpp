@@ -300,7 +300,7 @@ int SDL_InitSubSystem(Uint32 flags)
 		
 #ifdef PONY
 	sound_external_audio_enable(5, 5);
-	load_drv(ADX_MASTER_2304);
+	load_drv(ADX_MASTER_768);
 #else		
 		
 		char sound_map[] =  {0xff,0xff,0xff,0xff};//,0xff,0xff,0xff,0xff,0xff,0xff,0xff};

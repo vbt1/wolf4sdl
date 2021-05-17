@@ -241,7 +241,7 @@ void LoadLatchMem (void)
 	int	i,width,height,start,end;
 	byte *src;
 	SDL_Surface *surf; //,*surf1;
-
+#if 0
 //
 // tile 8s
 //
@@ -265,6 +265,7 @@ void LoadLatchMem (void)
 	UNCACHEGRCHUNK (STARTTILE8);
 	
 	latchpics[1] = surf;
+#endif	
 //
 // pics
 //

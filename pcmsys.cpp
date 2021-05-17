@@ -19,7 +19,7 @@ extern "C" {
 //this file is compiled separately
 //hopefully somewhat portable
 //
-
+//#define USE_ADX 1
 
 
 static const int logtbl[] = {
@@ -179,7 +179,7 @@ short			convert_bitrate_to_pitchword(short sampleRate)
 	
 	return PCM_SET_PITCH_WORD(octr, fnsr);
 }
-
+#ifndef USE_ADX
 short			load_16bit_pcm(Sint8 * filename, int sampleRate)
 {
 	if( (int)scsp_load > 0x7F800) return -1; //Illegal PCM data address, exit
@@ -259,7 +259,7 @@ short			load_8bit_pcm(Sint8 * filename, int sampleRate)
 	scsp_load = (unsigned int *)((unsigned int )scsp_load + file_size);
 	return (numberPCMs-1); //Return the PCM # this sound recieved
 }
-
+#endif
 // Recursive function to return gcd of a and b 
 short gcd(short a, short b) 
 { 
@@ -274,7 +274,7 @@ short lcm(short a, short b)
 { 
     return (a / gcd(a, b)) * b;
 } 
-
+#ifdef USE_ADX
 short		load_adx(Sint8 * filename)
 {
 	static adx_header adx;
@@ -331,7 +331,7 @@ short		load_adx(Sint8 * filename)
 	scsp_load = (unsigned int *)((unsigned int )scsp_load + number_of_bytes_to_load);
 	return (numberPCMs-1); //Return the PCM # this sound recieved
 }
-
+#endif
 short	add_raw_pcm_buffer(bool is8Bit, short sampleRate, int size)
 {
 	
