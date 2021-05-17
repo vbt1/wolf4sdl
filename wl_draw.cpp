@@ -9,7 +9,7 @@
 void heapWalk();
 #ifdef USE_SPRITES
 unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
-SPRITE user_walls[SATURN_WIDTH*2];
+SPRITE user_walls[SATURN_WIDTH];
 extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_TOTAL];
 extern unsigned int position_vram;
@@ -2249,6 +2249,29 @@ void    ThreeDRefresh (void)
 			position_vram = (SATURN_WIDTH+64)*32;
 		}
 		slDMAWait();
+		
+		
+/*		
+extern Uint16 VDP2_RAMCTL;
+			slPrintHex(VDP2_RAMCTL,slLocate(10,3));
+extern Uint16 VDP2_CYCA0L;
+			slPrintHex(VDP2_CYCA0L,slLocate(10,4));
+extern Uint16 VDP2_CYCA0U;
+			slPrintHex(VDP2_CYCA0U,slLocate(10,5));
+extern Uint16 VDP2_CYCA1L;
+			slPrintHex(VDP2_CYCA1L,slLocate(10,6));
+extern Uint16 VDP2_CYCA1U;
+			slPrintHex(VDP2_CYCA1U,slLocate(10,7));	
+
+extern Uint16 VDP2_CYCB0L;
+			slPrintHex(VDP2_CYCB0L,slLocate(10,8));
+extern Uint16 VDP2_CYCB0U;
+			slPrintHex(VDP2_CYCB0U,slLocate(10,9));
+extern Uint16 VDP2_CYCB1L;
+			slPrintHex(VDP2_CYCB1L,slLocate(10,10));
+extern Uint16 VDP2_CYCB1U;
+			slPrintHex(VDP2_CYCB1U,slLocate(10,11));	
+*/			
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!		
 #endif
 

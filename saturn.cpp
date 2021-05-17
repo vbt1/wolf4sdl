@@ -154,7 +154,7 @@ static const Sint8	logtbl[] = {
 
 	if(bpp==8)
 	{
-		slColRAMMode(CRM16_1024);
+		slColRAMMode(CRM16_2048);
 		slCharNbg1(COL_TYPE_256 , CHAR_SIZE_1x1);
 	}
 	else
@@ -163,9 +163,13 @@ static const Sint8	logtbl[] = {
 		slCharNbg1(COL_TYPE_32768 , CHAR_SIZE_1x1);
 	}
 
-    slInitBitMap(bmNBG1, BM_512x256, (void *)NBG1_CEL_ADR);
+    slInitBitMap(bmNBG1, BM_512x256, (void *)VDP2_VRAM_A0);
     slBMPaletteNbg1(1);
-
+	extern Uint16 VDP2_RAMCTL;	
+	VDP2_RAMCTL = VDP2_RAMCTL & 0xFCFF;
+    slScrAutoDisp(NBG0ON| NBG1ON);
+	
+	slScrCycleSet(0x55EEEEEE , NULL , 0x044EEEEE , NULL);
     // screen coordinates like in SDL
 //    slBitMapBase(0, 0);
 //#define		BACK_COL_ADR		( VDP2_VRAM_A1 + 0x1fffe )	
@@ -173,8 +177,9 @@ static const Sint8	logtbl[] = {
 //	slScrTransparent(RBG0ON);
 	
 //    slScrAutoDisp(RBG0ON| NBG0ON| NBG1ON| NBG3ON);
-    slScrAutoDisp(NBG0ON| NBG1ON);
-	
+
+
+//	VDP2_RAMCTL = VDP2_RAMCTL & 0xFCFF;
 
 /*  /// vbt ? remettre
 slCharNbg3(COL_TYPE_256, CHAR_SIZE_1x1); 
@@ -420,22 +425,22 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 {
 	unsigned short i; // vbt : le plus rapide
 	unsigned char *surfacePtr = (unsigned char*)surface->pixels;
-	unsigned int *nbg1Ptr = (unsigned int*)NBG1_CEL_ADR;
+	unsigned int *nbg1Ptr = (unsigned int*)VDP2_VRAM_A0;
 	
 	for (i = 0; i < screenHeight; i++) 
 	{
-//		DMA_ScuMemCopy((unsigned char*)(NBG1_CEL_ADR + (i<<9)), (unsigned char*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt 20-22fps
+//		DMA_ScuMemCopy((unsigned char*)(VDP2_VRAM_A0 + (i<<9)), (unsigned char*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt 20-22fps
 //		SCU_DMAWait();
-//		memcpyl((unsigned long*)(NBG1_CEL_ADR + (i<<9)), (unsigned long*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt : 22-24fps
+//		memcpyl((unsigned long*)(VDP2_VRAM_A0 + (i<<9)), (unsigned long*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt : 22-24fps
 // vbt : remttre la copie dma		
-//		slDMACopy((unsigned long*)surfacePtr,(void *)(NBG1_CEL_ADR + (i<<9)),screenWidth);
+//		slDMACopy((unsigned long*)surfacePtr,(void *)(VDP2_VRAM_A0 + (i<<9)),screenWidth);
 		slDMACopy((unsigned long*)surfacePtr,(void *)nbg1Ptr,screenWidth);
 		surfacePtr+=screenWidth;
 		nbg1Ptr+=128;
-//		slDMACopy((unsigned long*)(surface->pixels + (i * screenWidth)),(void *)(NBG1_CEL_ADR + (i<<9)),screenWidth);
-//		slDMACopy((unsigned long*)(surface->pixels + ((i+1) * screenWidth)),(void *)(NBG1_CEL_ADR + ((i+1)<<9)),screenWidth);
-//		slDMACopy((unsigned long*)(surface->pixels + ((i+2) * screenWidth)),(void *)(NBG1_CEL_ADR + ((i+2)<<9)),screenWidth);
-//		slDMACopy((unsigned long*)(surface->pixels + ((i+3) * screenWidth)),(void *)(NBG1_CEL_ADR + ((i+3)<<9)),screenWidth);		
+//		slDMACopy((unsigned long*)(surface->pixels + (i * screenWidth)),(void *)(VDP2_VRAM_A0 + (i<<9)),screenWidth);
+//		slDMACopy((unsigned long*)(surface->pixels + ((i+1) * screenWidth)),(void *)(VDP2_VRAM_A0 + ((i+1)<<9)),screenWidth);
+//		slDMACopy((unsigned long*)(surface->pixels + ((i+2) * screenWidth)),(void *)(VDP2_VRAM_A0 + ((i+2)<<9)),screenWidth);
+//		slDMACopy((unsigned long*)(surface->pixels + ((i+3) * screenWidth)),(void *)(VDP2_VRAM_A0 + ((i+3)<<9)),screenWidth);		
 	}
 	slDMAWait();
 }
@@ -499,12 +504,12 @@ void SDL_PauseAudio(int pause_on)
 int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
 {
 	unsigned char *surfacePtr = (unsigned char*)src->pixels + ((srcrect->y) * src->pitch) + srcrect->x;
-	unsigned int *nbg1Ptr = (unsigned int*)(NBG1_CEL_ADR + (dstrect->y<<9)+ dstrect->x);
+	unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + (dstrect->y<<9)+ dstrect->x);
 	
 	if((srcrect)!=NULL)
 		for( Sint16 i=0;i<srcrect->h;i++)
 		{
-//			slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(NBG1_CEL_ADR + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
+//			slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(VDP2_VRAM_A0 + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
 			slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,srcrect->w);
 			surfacePtr+=src->pitch;
 			nbg1Ptr+=128;
@@ -796,7 +801,7 @@ int SDL_PollEvent(SDL_Event *event)
 			break;	
 
 			case 7:/*PER_DGT_ST: */
-				////slPrint("gros connard",slLocate(3,24));
+				////slPrint("gros ...",slLocate(3,24));
 			event->key.keysym.sym = SDLK_ESCAPE;
 			break;	
 
@@ -1013,7 +1018,7 @@ Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
 int Mix_PlayChannel (int channel, Mix_Chunk *chunk, int loops)
 {
 
-//	slPrintHex(chunk->alen,slLocate(2,10));
+//	slPrintHex(channel,slLocate(2,10));
 //	slPrintHex(&chunk->abuf[0],slLocate(2,11));
 //	slPCMOn(sounds[chunk].pcm, sounds[chunk].data, sounds[chunk].size);
 #ifdef PONY

@@ -19,7 +19,7 @@ extern "C" {
 //this file is compiled separately
 //hopefully somewhat portable
 //
-//#define USE_ADX 1
+#define USE_ADX 1
 
 
 static const int logtbl[] = {
