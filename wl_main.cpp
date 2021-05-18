@@ -97,7 +97,7 @@ void VblIn(void)
 		slPrint((char*)ltoa(frame_x,buffer),slLocate(14,1));
 		frame_y=frame_x=0;
 	}		   
-
+	VGAClearScreen (); // vbt : maj du fond d'écran
 #ifdef PONY
 	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;
 #endif
@@ -1224,7 +1224,7 @@ void NewViewSize (int width)
         SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
     else
         SetViewSize(width*16*screenWidth/320, (unsigned) (width*16*HEIGHTRATIO*screenHeight/200));
-	VGAClearScreen ();
+// xxx	VGAClearScreen ();
 }
 
 

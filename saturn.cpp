@@ -167,6 +167,9 @@ static const Sint8	logtbl[] = {
     slBMPaletteNbg1(1);
 	extern Uint16 VDP2_RAMCTL;	
 	VDP2_RAMCTL = VDP2_RAMCTL & 0xFCFF;
+	extern Uint16 VDP2_TVMD;
+	VDP2_TVMD &= 0xFEFF;
+	
     slScrAutoDisp(NBG0ON| NBG1ON);
 	
 	slScrCycleSet(0x55EEEEEE , NULL , 0x044EEEEE , NULL);

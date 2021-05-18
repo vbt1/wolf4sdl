@@ -298,7 +298,7 @@ boolean ProjectileTryMove (objtype *ob)
                 return false;
         }
 
-        return true;
+    return true;
 }
 
 
@@ -1646,8 +1646,8 @@ void T_Launch (objtype *ob)
 
     deltax = player->x - ob->x;
     deltay = ob->y - player->y;
-    angle = (float) atan2 ((float) deltay, (float) deltax);
-//	angle = slAtan ((deltay<<16), (deltax<<16));
+//    angle = (float) atan2 ((float) deltay, (float) deltax);
+	angle = (slAtan ((deltay<<16), (deltax<<16)))>>16;
     if (angle<0)
 //        angle = (float) (M_PI*2+angle);
         angle = (int) (M_PI*2+angle);
@@ -2313,8 +2313,8 @@ void T_SchabbThrow (objtype *ob)
 
     deltax = player->x - ob->x;
     deltay = ob->y - player->y;
-    angle = (float) atan2((float) deltay, (float) deltax);
-//	angle = slAtan ((deltay<<16), (deltax<<16));
+//    angle = (float) atan2((float) deltay, (float) deltax);
+	angle = (slAtan ((deltay<<16), (deltax<<16)))>>16;
 	
     if (angle<0)
 //        angle = (float) (M_PI*2+angle);
@@ -2358,8 +2358,8 @@ void T_GiftThrow (objtype *ob)
 
     deltax = player->x - ob->x;
     deltay = ob->y - player->y;
-    angle = (float) atan2((float) deltay, (float) deltax);
-//	angle = slAtan ((deltay<<16), (deltax<<16));
+//    angle = (float) atan2((float) deltay, (float) deltax);
+	angle = (slAtan ((deltay<<16), (deltax<<16)))>>16;
 
     if (angle<0)
 //        angle = (float) (M_PI*2+angle);
@@ -2958,8 +2958,8 @@ void T_FakeFire (objtype *ob)
 
     deltax = player->x - ob->x;
     deltay = ob->y - player->y;
-    angle = (float) atan2((float) deltay, (float) deltax);
-//	angle = slAtan ((deltay<<16), (deltax<<16));
+//    angle = (float) atan2((float) deltay, (float) deltax);
+	angle = (slAtan ((deltay<<16), (deltax<<16)))>>16;
 	
     if (angle<0)
 //        angle = (float)(M_PI*2+angle);
@@ -3868,8 +3868,8 @@ void    A_StartDeathCam (objtype *ob)
     dx = ob->x - player->x;
     dy = player->y - ob->y;
 
-    fangle = (float) atan2((float) dy, (float) dx);          // returns -pi to pi
-//	fangle = slAtan ((dy<<16), (dx<<16));
+//    fangle = (float) atan2((float) dy, (float) dx);          // returns -pi to pi
+	fangle = (slAtan ((dy<<16), (dx<<16)))>>16;
     if (fangle<0)
         fangle = (float) (M_PI*2+fangle);
 //        fangle = (int) (M_PI*2+fangle);

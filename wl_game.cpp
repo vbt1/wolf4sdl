@@ -74,14 +74,6 @@ void GameLoop (void);
 #ifdef USE_SPRITES
 TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 
-inline void set_sprite(PICTURE *pcptr)
-{
-	TEXTURE *txptr = &tex_spr[pcptr->texno];
-//	slDMACopy((void *)pcptr->pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
-//slTransferEntry((unsigned long*)bmpbuff,(void *)(wall_buffer + (SATURN_WIDTH<<6)),64*64);		
-	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)pcptr->pcsrc,(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pcptr->cmode)));
-}
-
 void loadActorTexture(int texture)
 {
 	byte bmpbuff[64*64];
@@ -113,14 +105,16 @@ void loadActorTexture(int texture)
 		}
 		cmdptr++;
 	}
-	texture_list[texture]=position_vram/0x800;
-	
 	pic_spr.texno = SATURN_WIDTH+1+texture;
 	pic_spr.cmode = COL_256;
 	pic_spr.pcsrc = &bmpbuff[0];
-	tex_spr[SATURN_WIDTH+1+texture] = TEXDEF(64, 64, texture_list[texture]*0x800);
-	set_sprite(&pic_spr);		
+	
+	TEXTURE *txptr = &tex_spr[pic_spr.texno];	
+	*txptr = TEXDEF(64, 64, position_vram);
+	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
+	texture_list[texture]=position_vram/0x800;
 	position_vram+=0x800;	
+	slDMAWait();
 }
 
 int old_texture = -1;

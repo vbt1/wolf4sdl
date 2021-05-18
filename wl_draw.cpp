@@ -30,7 +30,7 @@ typedef struct
 	word lastintercept;
 	word lasttexture;
 } 
-ray_struc;
+ray_struc __attribute__ ((aligned (4)));
 
 /*
 =============================================================================
@@ -274,6 +274,9 @@ void ScalePost(int postx,byte *postsource)
 	if(postx>=0 & postx<=SATURN_WIDTH)
 	{
 		memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
+//	slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);
+//	slTransferEntry((void *)postsource,(void *)(wall_buffer + (postx<<6)),64);		
+
 	//  a           b          c             d
 	// top left, top right, bottom right, bottom left
 		SPRITE *user_wall = &user_walls[postx];
@@ -293,6 +296,7 @@ void ScalePost(int postx,byte *postsource)
 		user_wall->YA=user_wall->YD;
 		user_wall->XB=user_wall->XA;
 		user_wall->YB=user_wall->YC;
+		
 	//    user_wall->GRDA=0;
 	}
 //--------------------------------------------------------------------------------------------
@@ -1234,7 +1238,7 @@ void CalcTics (void)
 
 
 //==========================================================================
-	ray_struc my_ray;
+static	ray_struc my_ray;
 	
 void AsmRefresh()
 {
@@ -1698,7 +1702,7 @@ void AsmRefreshSlave()
 	
     int32_t xstep=0,ystep=0;
     longword xpartial=0,ypartial=0;
-	ray_struc my_ray;
+	static ray_struc my_ray;
 	
 //    my_ray.lastside = -1;                  // the first pixel is on a new wall
     short focaltx = (short)(viewx>>TILESHIFT);
@@ -2182,7 +2186,8 @@ void    ThreeDRefresh (void)
 //
 // follow the walls from there to the right, drawing as we go
 //
-    VGAClearScreen (); // vbt : maj du fond d'écran
+//    VGAClearScreen (); // vbt : maj du fond d'écran
+//  on deplace dans le vblank
 #if defined(USE_FEATUREFLAGS) && defined(USE_STARSKY)
     if(GetFeatureFlags() & FF_STARSKY)
         DrawStarSky(vbuf, vbufPitch);
@@ -2225,12 +2230,9 @@ void    ThreeDRefresh (void)
 	{
         ShowActStatus();
 	}
-#ifndef USE_SPRITES
-	VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
-	vbuf = NULL;
-#endif	
 
 #ifdef USE_SPRITES
+		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
 	//	extern int vbt;
 		SPRITE *user_wall = user_walls;
 
@@ -2239,8 +2241,6 @@ void    ThreeDRefresh (void)
 			slSetSprite(user_wall++, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre
 //			user_wall++;
 		}
-	
-		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
 //		memcpy((void *)(SpriteVRAM + cgaddress),(void *)&wall_buffer[0],(SATURN_WIDTH+64) * 64);
 		if(position_vram>0x38000)
 		{
@@ -2249,8 +2249,6 @@ void    ThreeDRefresh (void)
 			position_vram = (SATURN_WIDTH+64)*32;
 		}
 		slDMAWait();
-		
-		
 /*		
 extern Uint16 VDP2_RAMCTL;
 			slPrintHex(VDP2_RAMCTL,slLocate(10,3));
@@ -2272,7 +2270,10 @@ extern Uint16 VDP2_CYCB1L;
 extern Uint16 VDP2_CYCB1U;
 			slPrintHex(VDP2_CYCB1U,slLocate(10,11));	
 */			
-		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!		
+		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
+#else
+	VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
+	vbuf = NULL;
 #endif
 
 //
@@ -2286,11 +2287,7 @@ extern Uint16 VDP2_CYCB1U;
 
 //		VGAClearScreen(); // vbt : maj du fond d'écran
 //		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
-/*
-	curSurface = screen;
-	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
-	curSurface = screenBuffer;
-*/	
+
         FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 70, false);
 //		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
         fizzlein = false;

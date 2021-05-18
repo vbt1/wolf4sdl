@@ -269,7 +269,7 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 
 		VL_WaitVBL(1);
 		VL_SetPalette (palette2);
-		VGAClearScreen(); // vbt : maj du fond d'écran
+// xxx		VGAClearScreen(); // vbt : maj du fond d'écran
 	}
 
 //
@@ -315,7 +315,7 @@ void VL_FadeIn (int start, int end, SDL_Color *palette, int steps)
 
 		VL_WaitVBL(1);
 		VL_SetPalette(palette2);
-		VGAClearScreen(); // vbt : maj du fond d'écran
+// xxx		VGAClearScreen(); // vbt : maj du fond d'écran
 	}
 
 //
