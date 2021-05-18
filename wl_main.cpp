@@ -83,6 +83,7 @@ boolean param_ignorenumchunks = false;
 
 //#ifndef REMDEBUG
 unsigned frame_x=0,frame_y=0;
+extern SDL_Color curpal[256];
 
 void VblIn(void);
 
@@ -96,7 +97,8 @@ void VblIn(void)
 	{
 		slPrint((char*)ltoa(frame_x,buffer),slLocate(14,1));
 		frame_y=frame_x=0;
-	}		   
+	}
+	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
 	VGAClearScreen (); // vbt : maj du fond d'écran
 #ifdef PONY
 	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;

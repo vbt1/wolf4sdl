@@ -199,7 +199,7 @@ void VL_SetPalette (SDL_Color *palette)
 {
     memcpyl(curpal, palette, sizeof(SDL_Color) * 256);
  //   SDL_SetPalette(screen, SDL_PHYSPAL, palette, 0, 256);
-    SDL_SetPalette(curSurface, SDL_PHYSPAL, palette, 0, 256);
+//    SDL_SetPalette(curSurface, SDL_PHYSPAL, palette, 0, 256);
 }
 
 
