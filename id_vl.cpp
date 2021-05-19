@@ -241,8 +241,8 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
     green = green * 255 / 63;
     blue = blue * 255 / 63;
 
-	VL_WaitVBL(1);
 	VL_GetPalette(palette1);
+	VL_WaitVBL(1);	
 	memcpyl(palette2, palette1, sizeof(SDL_Color) * 256);
 
 //
@@ -267,8 +267,8 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 			newptr++;
 		}
 
-		VL_WaitVBL(1);
 		VL_SetPalette (palette2);
+		VL_WaitVBL(1);		
 // xxx		VGAClearScreen(); // vbt : maj du fond d'écran
 	}
 
@@ -294,9 +294,9 @@ void VL_FadeIn (int start, int end, SDL_Color *palette, int steps)
 	SDL_Color palette1[256], palette2[256];	
 	int i,j,delta;
 
-	VL_WaitVBL(1);
 	VL_GetPalette(palette1);
-	memcpy(palette2, palette1, sizeof(SDL_Color) * 256);
+	VL_WaitVBL(1);	
+	memcpyl(palette2, palette1, sizeof(SDL_Color) * 256);
 
 //
 // fade through intermediate frames
@@ -313,8 +313,8 @@ void VL_FadeIn (int start, int end, SDL_Color *palette, int steps)
 			palette2[j].b = palette1[j].b + delta * i / steps;
 		}
 
-		VL_WaitVBL(1);
 		VL_SetPalette(palette2);
+		VL_WaitVBL(1);		
 // xxx		VGAClearScreen(); // vbt : maj du fond d'écran
 	}
 
