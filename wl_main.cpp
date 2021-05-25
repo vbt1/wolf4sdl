@@ -65,6 +65,7 @@ int32_t  heightnumerator;
 
 
 void    Quit (const char *error,...);
+void	loadActorTextureLowRam();
 
 boolean startgame;
 //boolean loadedgame;
@@ -84,22 +85,28 @@ boolean param_ignorenumchunks = false;
 //#ifndef REMDEBUG
 unsigned frame_x=0,frame_y=0;
 extern SDL_Color curpal[256];
-
+//extern int nb_unlock;
 void VblIn(void);
 
 void VblIn(void)
 {
-	char buffer[8];
-	
+	char buffer[8];/*
+extern Uint8 TransRequest;
+TransRequest*=2;
+extern Uint16 TransCount;
+TransCount*=2;	*/
 	frame_y++;
-				 
+	
 	if(frame_y==60)
 	{
 		slPrint((char*)ltoa(frame_x,buffer),slLocate(14,1));
+//		slPrintHex(nb_unlock,slLocate(14,2));		
 		frame_y=frame_x=0;
+//		nb_unlock=0;
 	}
-	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
-	VGAClearScreen (); // vbt : maj du fond d'écran
+//	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
+//	VGAClearScreen (); // vbt : maj du fond d'écran
+//	VL_UnlockSurface(curSurface);
 #ifdef PONY
 	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;
 #endif

@@ -60,7 +60,7 @@ GfsDirName dir_name[MAX_DIR];
 #define SDL_FillRect(arg1, dest, arg3)	\
 	slBMBoxFill((dest)->x, (dest)->y, (dest)->x + (dest)->w - 1, (dest)->y + (dest)->h - 1, 0)
 	 */
-void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
+inline void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
 void InitCD();
 void InitCDBlock(void);
 void ChangeDir(char *dirname);
@@ -221,8 +221,7 @@ int SDL_SetColors(SDL_Surface *surface, 	SDL_Color *colors, int firstcolor, int 
 		palo[i] = 0x8000 | RGB(colors[i].r>>3,colors[i].g>>3,colors[i].b>>3);
 	}
 	Pal2CRAM(palo , (void *)NBG1_COL_ADR , ncolors);
-//	Pal2CRAM(palo , (void *)TEX_COL_ADR , ncolors);
-	Pal2CRAM(palo+14 , (void *)NBG0_COL_ADR , ncolors);
+	Pal2CRAM(palo+14 , (void *)NBG0_COL_ADR , ncolors);  
 	
 	return 1;
 }
@@ -235,7 +234,6 @@ int SDL_SetColorKey	(SDL_Surface *surface, Uint32 flag, Uint32 key)
 static unsigned char initcddone=0;
 int SDL_Init(Uint32 flags)
 {
-	//lowram=(Uint8 *)0x00202000;
 #ifndef ACTION_REPLAY
 	if(initcddone==0)
 	{
@@ -423,13 +421,14 @@ Uint32 SDL_MapRGB (SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b)
 	return 0x8000 | RGB(r>>3,g>>3,b>>3);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
+//int nb_unlock;
 
 void SDL_UnlockSurface(SDL_Surface *surface)
 {
 	unsigned short i; // vbt : le plus rapide
 	unsigned char *surfacePtr = (unsigned char*)surface->pixels;
 	unsigned int *nbg1Ptr = (unsigned int*)VDP2_VRAM_A0;
-	
+
 	for (i = 0; i < screenHeight; i++) 
 	{
 //		DMA_ScuMemCopy((unsigned char*)(VDP2_VRAM_A0 + (i<<9)), (unsigned char*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt 20-22fps
@@ -437,7 +436,7 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 //		memcpyl((unsigned long*)(VDP2_VRAM_A0 + (i<<9)), (unsigned long*)(surface->pixels + (i * screenWidth)), screenWidth); // vbt : 22-24fps
 // vbt : remttre la copie dma		
 //		slDMACopy((unsigned long*)surfacePtr,(void *)(VDP2_VRAM_A0 + (i<<9)),screenWidth);
-		slDMACopy((unsigned long*)surfacePtr,(void *)nbg1Ptr,screenWidth);
+		slDMACopy((unsigned long*)surfacePtr,(void *)nbg1Ptr,screenWidth); // vbt à remettre !!!
 		surfacePtr+=screenWidth;
 		nbg1Ptr+=128;
 //		slDMACopy((unsigned long*)(surface->pixels + (i * screenWidth)),(void *)(VDP2_VRAM_A0 + (i<<9)),screenWidth);
@@ -513,7 +512,9 @@ int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Re
 		for( Sint16 i=0;i<srcrect->h;i++)
 		{
 //			slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(VDP2_VRAM_A0 + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
-			slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,srcrect->w);
+//			memcpyl((unsigned long*)nbg1Ptr, (unsigned long*)surfacePtr, srcrect->w); // vbt : 22-24fps
+			slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,srcrect->w); // vbt à remettre
+//			slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(VDP2_VRAM_A0 + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
 			surfacePtr+=src->pitch;
 			nbg1Ptr+=128;
 		}	
@@ -1313,72 +1314,6 @@ void SDL_FreeWAV(Uint8 *audio_buf)
 
 SDL_AudioSpec * SDL_LoadWAV_RW(SDL_RWops *src, int freesrc, SDL_AudioSpec *spec, Uint8 **audio_buf, Uint32 *audio_len)
 {
-#ifndef ACTION_REPLAY
-	Uint8 i, fileId;
-	long fileSize;
-    char directory[64];
-	char filename[15];
-	unsigned char *mem_buf;
-	if(strlen(src->hidden.stdio.name)>5)
-	{
-		for(i=0;i<strlen(src->hidden.stdio.name);i++)
-			if (src->hidden.stdio.name[i]=='/')	break;
-
-		if(i<strlen(src->hidden.stdio.name) )
-		{
-			strncpy(directory,src->hidden.stdio.name,i);
-			 directory[i]='\0';
-
-			strcpy(filename,&src->hidden.stdio.name[i+1]);
-		  
-			i=0;
-			while (directory[i])
-			{
-				directory[i]= toupper(directory[i]);
-				i++;
-			}			 
-			ChangeDir(directory);
-
-			slPrint(directory,slLocate(1,18));
-			slPrint(filename,slLocate(1,19));
-		}
-	}
-	else
-		strcpy(filename,src->hidden.stdio.name);
-	i=0;
-	while (filename[i])
-	{
-		filename[i]= toupper(filename[i]);
-		i++;
-	}	  
-
-	fileId = GFS_NameToId((Sint8*)filename);
-	fileSize = GetFileSize(fileId);
-
-	 if (fileSize<80000)
-		mem_buf = (unsigned char*)malloc(fileSize)	;
-	else if (fileSize<90000)
-		mem_buf =  (Uint8 *)(0x00202000)	;
-	else
-		   mem_buf = (Uint8 *)(0x00232000);
-
-	GFS_Load(fileId, 0, mem_buf, fileSize);
-	audio_buf[0] = mem_buf;
-	*audio_len = fileSize;
-	if (fileSize<0x900)
-	*audio_len = 0x900;
-	ChangeDir(NULL);
-		return spec;
-#else
-
-	 if(strcmp(src->hidden.stdio.name,"sounds/tune5.wav")==0)
-	{
-		audio_buf[0] = tune0;
-		*audio_len = sizeof(tune0);
-	}	  
-#endif
-  	//slPrint("                                    ",slLocate(2,21));
-	return spec;
 }
 */
 /*int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)

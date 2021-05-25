@@ -13,14 +13,15 @@ extern "C" {
 
 #define		MAX_VERTICES	 8	/* number of vertices that can be used */
 #define		MAX_POLYGONS	 512	/* number of vertices that can be used */
-#define		MAX_EVENTS		  8	/* number of events that can be used   */
+#define		MAX_EVENTS		 8	/* number of events that can be used   */
 #define		MAX_WORKS		 8	/* number of works that can be used    */
+#define		MAX_TRANSFER	0x200
 
-#define		WORK_AREA		0x060F0000			/* SGL Work Area           */
+#define		WORK_AREA		0x060E0000			/* SGL Work Area           */
 
-#define		trans_list		SystemWork-0x0100	/* DMA Transfer Table      */
+#define		trans_list		0x060fb800	/* DMA Transfer Table      */
 #define		pcmbuf			SoundRAM+0x78000	/* PCM Stream Address      */
-#define		PCM_SIZE		0x8000				/* PCM Stream Size         */
+#define		PCM_SIZE		0x80				/* PCM Stream Size         */
 
 #define		master_stack	SystemWork			/* MasterSH2 StackPointer  */
 #define		slave_stack		0x06001e00			/* SlaveSH2  StackPointer  */
@@ -35,6 +36,31 @@ extern "C" {
 #define		AdjWork(pt,sz,ct)	(pt + (sz) * (ct))
 
 /*---- [4.Work Area] ------------------------------------------------------*/
+/*
+    enum workarea{
+        sort_list  = WORK_AREA ,
+        zbuffer    = AdjWork(sort_list , _LongWord_ * 3, MAX_POLYGONS + 6) ,		
+        trans_list = AdjWork(zbuffer  , _LongWord_, 512) , 
+        spritebuf  = AdjWork(trans_list , _LongWord_ * 3, MAX_TRANSFER) ,
+        pbuffer    = AdjWork(spritebuf , _Sprite_, (MAX_POLYGONS + 6) * 2) ,
+        clofstbuf  = AdjWork(pbuffer   , _LongWord_ * 4, MAX_VERTICES) ,
+        commandbuf = AdjWork(clofstbuf , _Byte_ * 32*3, 32) ,
+        NextEntry  = AdjWork(commandbuf, _LongWord_ * 8, MAX_POLYGONS)
+    } ;
+*/
+/*
+    enum workarea{
+        sort_list  = WORK_AREA ,
+        zbuffer    = AdjWork(sort_list , _LongWord_ * 3, MAX_POLYGONS + 6) ,
+        spritebuf  = AdjWork(zbuffer   , _LongWord_, 512) ,
+        pbuffer    = AdjWork(spritebuf , _Sprite_, (MAX_POLYGONS + 6) * 2) ,
+        clofstbuf  = AdjWork(pbuffer   , _LongWord_ * 4, MAX_VERTICES) ,
+        commandbuf = AdjWork(clofstbuf , _Byte_ * 32*3, 32) ,
+        trans_list  = AdjWork(commandbuf, _LongWord_ * 8, MAX_POLYGONS) ,
+		NextEntry  = AdjWork(trans_list , _LongWord_ * 3, MAX_TRANSFER)
+    } ;
+*/
+
     enum workarea{
         sort_list  = WORK_AREA ,
         zbuffer    = AdjWork(sort_list , _LongWord_ * 3, MAX_POLYGONS + 6) ,

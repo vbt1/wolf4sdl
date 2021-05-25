@@ -481,32 +481,34 @@ void VL_MemToLatch(byte *source, int width, int height,
 // vbt : à améliorer
 void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, int desty)
 {
-    assert5(destx >= 0 && destx + width * scaleFactor <= screenWidth
-            && desty >= 0 && desty + height * scaleFactor <= screenHeight
-            && "VL_MemToScreenScaledCoord: Destination rectangle out of bounds!");
+//    assert5(destx >= 0 && destx + width * scaleFactor <= screenWidth
+//            && desty >= 0 && desty + height * scaleFactor <= screenHeight
+//            && "VL_MemToScreenScaledCoord: Destination rectangle out of bounds!");
 
-    VL_LockSurface(curSurface);
+//    VL_LockSurface(curSurface);
 	byte *vbuf = (byte *)curSurface->pixels+(desty*curPitch)+destx;
+	unsigned char w2 = width>>2;
+	unsigned int mul = w2*height;
 	
-	if(scaleFactor == 1)
+//	if(scaleFactor == 1)
     {
 		for(unsigned int j=0; j<height; j++)
 		{
 			for(unsigned int i=0; i<width; i++)
 			{
-				byte col = source[(j*(width>>2)+(i>>2))+(i&3)*(width>>2)*height];
-				vbuf[i] = col;
+				vbuf[i] = source[(i>>2)+(i&3)*mul];
 			}
 			vbuf+=curPitch;
+			source+=w2;
 		}
     }		
-	else
+/*	else
 	{
 		for(unsigned int j=0,scj=0; j<height; j++, scj+=scaleFactor)
 		{
 			for(unsigned int i=0,sci=0; i<width; i++, sci+=scaleFactor)
 			{
-				byte col = source[(j*(width>>2)+(i>>2))+(i&3)*(width>>2)*height];
+				byte col = source[(j*w2+(i>>2))+(i&3)*mul];
 				for(unsigned m=0; m<scaleFactor; m++)
 				{
 					for(unsigned n=0; n<scaleFactor; n++)
@@ -516,7 +518,7 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
 				}
 			}
 		}
-	}
+	}*/
     VL_UnlockSurface(curSurface); // vbt utile pour signon screen
 }
 
@@ -533,6 +535,7 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
 =================
 */
 // vbt : à améliorer
+/*
 void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int srcx, int srcy,
                                 int destx, int desty, int width, int height)
 {
@@ -556,8 +559,10 @@ void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int
             }
         }
     }
+	
     VL_UnlockSurface(curSurface); // vbt utile
 }
+*/
 //==========================================================================
 
 /*
@@ -603,7 +608,71 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
                 }
             }
         }
-        VL_UnlockSurface(curSurface);
+        VL_UnlockSurface(curSurface); // pas de cas de scale
  //       VL_UnlockSurface(source);
     }	
+}
+
+
+typedef struct TC_TRANSFER {
+    Uint32 size;
+    void *target;
+    void *source;
+} TC_transfer __attribute__ ((aligned (8)));
+
+Bool   slTransferEntry2(void *src , void *dest , Uint16 size) 
+{
+	extern Uint8 TransRequest;
+
+	if(TransRequest>0xF0)TransRequest=0;
+
+	TC_transfer *tc = (TC_transfer *)(TransList + sizeof(TC_transfer)*TransRequest);
+    tc->source = (void *)src;
+    tc->target = (void *)dest;
+    tc->size = size;
+	TransRequest++;
+	(tc + TransRequest)->source += 1 << 31;
+	return true;
+}
+
+
+
+
+//0,0,latchpics[2+picnum-LATCHPICS_LUMP_START]->w,latchpics[2+picnum-LATCHPICS_LUMP_START]->h,
+void VL_LatchToScreenScaledCoordIndirect(SDL_Surface *source, int scxdest, int scydest)
+{
+//	assert(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
+//		&& scydest >= 0 && scydest + height * scaleFactor <= screenHeight
+//		&& "VL_LatchToScreenScaledCoord: Destination rectangle out of bounds!");
+
+//	SDL_Rect srcrect = { xsrc, ysrc, width, height };
+//	SDL_Rect dstrect = { scxdest, scydest, 0, 0 }; // width and height are ignored
+//	SDL_BlitSurface(source, &srcrect, curSurface, &dstrect);
+
+/*	unsigned char *surfacePtr = (unsigned char*)curSurface->pixels;
+	unsigned int *nbg1Ptr = (unsigned int*)VDP2_VRAM_A0;
+
+	for (int i = 0; i < screenHeight; i++) 
+	{
+//		slTransferEntry((void *)surfacePtr,(void *)nbg1Ptr,screenWidth);
+		slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,screenWidth);
+		surfacePtr+=screenWidth;
+		nbg1Ptr+=128;
+	}	*/	
+		unsigned char *surfacePtr = (unsigned char*)source->pixels + ((0) * source->pitch) + 0;
+		unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + (scydest<<9)+ scxdest);
+
+//if(TransCount!=0)
+//			slPrintHex(TransCount,slLocate(10,4));
+			
+		for( Sint16 i=0;i<source->h;i++)
+		{
+//			slDMACopy((unsigned long*)(byte*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,srcrect.w);
+			slTransferEntry((void *)surfacePtr,(void *)nbg1Ptr,source->w);
+			surfacePtr+=source->pitch;
+			nbg1Ptr+=128;
+		}			
+//		TransfertRequest=32;
+//      VL_UnlockSurface(curSurface);
+//      VL_UnlockSurface(source);
 }

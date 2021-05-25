@@ -17,6 +17,7 @@ unsigned int position_vram=((SATURN_WIDTH+64)*32);
 extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 unsigned char texture_list[SPR_TOTAL];
+static const Uint8 *lowram=(Uint8 *)0x002E0000;
 #endif
 
 #undef atan2
@@ -117,16 +118,14 @@ void loadActorTexture(int texture)
 	slDMAWait();
 }
 
-int old_texture = -1;
-
-void loadActorTexture2(int texture)
+void loadActorTextureLowRam()
 {
 	byte bmpbuff[64*64];
 	byte *bmpptr;
 	PICTURE pic_spr;
 	unsigned short  *cmdptr, *sprdata;
 	
-	if (old_texture!=texture)
+	for(int texture=SPR_KNIFEREADY;texture<SPR_NULLSPRITE;texture++)
 	{
 		t_compshape   *shape = (t_compshape   *)PM_GetSprite(texture);
 		// set the texel index to the first texel
@@ -152,10 +151,10 @@ void loadActorTexture2(int texture)
 			}
 			cmdptr++;
 		}			
-		slDMACopy((unsigned long*)bmpbuff,(void *)(wall_buffer + (SATURN_WIDTH<<6)),64*64);
-//		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)bmpbuff,64*64);
-		old_texture=texture;
-		slDMAWait();
+//		slDMACopy((unsigned long*)bmpbuff,(void *)(wall_buffer + (SATURN_WIDTH<<6)),64*64);
+		memcpyl((void *)lowram+64*64*(texture-SPR_KNIFEREADY),(void *)bmpbuff,64*64);
+//		old_texture=texture;
+//		slDMAWait();
 	}
 }
 #endif
@@ -751,6 +750,8 @@ slIntFunction(VblIn) ;
 //	slPrint("slScrTransparent1",slLocate(1,17));	
 	slScrTransparent(0);
 	slSynch();
+	extern const void * TransList;
+	memset((void *)TransList,0x00,0xf0*4*3);	
 }
 
 
@@ -994,7 +995,7 @@ void LatchNumberHERE (int x, int y, unsigned width, int32_t number)
         c++;
     }
 }
-*/
+
 void ShowActStatus()
 {
     // Draw status bar without borders
@@ -1017,7 +1018,7 @@ void ShowActStatus()
     DrawScore ();
     ingame = true;
 }
-
+*/
 /*
 ==================
 =
@@ -1250,7 +1251,8 @@ void GameLoop (void)
 //gamestate.ammo = 99;	
 //gamestate.keys = 3;
 // vbt dernier niveau
-   
+		loadActorTextureLowRam();
+		
     boolean died;
 #ifdef MYPROFILE
     clock_t start,end;

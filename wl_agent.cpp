@@ -270,10 +270,17 @@ void ControlMovement (objtype *ob)
 =
 ==================
 */
+void LatchDrawPicScaledCoordIndirect (unsigned scx, unsigned scy, unsigned picnum);
 
 void StatusDrawPic (unsigned x, unsigned y, unsigned picnum)
 {
     LatchDrawPicScaledCoord ((screenWidth-scaleFactor*320)/16 + scaleFactor*x,
+        screenHeight-scaleFactor*(STATUSLINES-y),picnum);
+}
+
+inline void StatusDrawPicIndirect (unsigned x, unsigned y, unsigned picnum)
+{
+    LatchDrawPicScaledCoordIndirect ((screenWidth-scaleFactor*320)/16 + scaleFactor*x,
         screenHeight-scaleFactor*(STATUSLINES-y),picnum);
 }
 
@@ -580,7 +587,7 @@ void DrawWeapon (void)
 {
     if(viewsize == 21 && ingame) return;
 	if(gamestate.weapon==-1) return; // vbt ajout
-	StatusDrawPic (32,8,KNIFEPIC+gamestate.weapon);
+	StatusDrawPicIndirect (32,8,KNIFEPIC+gamestate.weapon);
 }
 
 

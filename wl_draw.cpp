@@ -13,6 +13,8 @@ SPRITE user_walls[SATURN_WIDTH];
 extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_TOTAL];
 extern unsigned int position_vram;
+static const Uint8 *lowram=(Uint8 *)0x002E0000;
+
 #endif
 //unsigned char spr_buffer[30*64*64];
 typedef struct
@@ -883,6 +885,7 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t fla
 #endif	
 }
 #ifdef USE_SPRITES
+int old_texture = -1;
 void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
 #else
 void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
@@ -894,7 +897,12 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     pixheight=scale*SPRITESCALEFACTOR;
 #ifdef USE_SPRITES	
 ////slPrintHex(shapenum,slLocate(10,4));
-	loadActorTexture2(shapenum);
+	if (old_texture!=shapenum)
+	{
+		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)lowram+64*64*(shapenum-SPR_KNIFEREADY),64*64);
+		old_texture=shapenum;
+	}	
+	
 //--------------------------------------------------------------------------------------------
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH];
 // correct on touche pas		
@@ -2226,10 +2234,10 @@ void    ThreeDRefresh (void)
 #else
     DrawPlayerWeapon (vbuf);    // draw player's hands
 #endif
-    if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
+  /*  if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
 	{
         ShowActStatus();
-	}
+	}*/
 
 #ifdef USE_SPRITES
 		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
@@ -2249,6 +2257,21 @@ void    ThreeDRefresh (void)
 			position_vram = (SATURN_WIDTH+64)*32;
 		}
 		slDMAWait();
+/*		
+extern Uint8 TransRequest;
+
+//if(TransRequest!=0)
+			slPrintHex(TransRequest,slLocate(10,3));
+extern Uint16 TransCount;
+			slPrintHex(TransCount,slLocate(10,4));	
+*/			
+/*
+extern const void* TransList;
+unsigned int *vbt=(unsigned int *)TransList;
+char toto[50];
+sprintf(toto,"%04x",&vbt);
+				slPrint(toto,slLocate(10,6));	
+				*/
 /*		
 extern Uint16 VDP2_RAMCTL;
 			slPrintHex(VDP2_RAMCTL,slLocate(10,3));
@@ -2271,6 +2294,9 @@ extern Uint16 VDP2_CYCB1U;
 			slPrintHex(VDP2_CYCB1U,slLocate(10,11));	
 */			
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
+		extern const void * TransList;
+//		memset((void *)TransList,0x00,0xf0*4*3);
+//TransRequest=0;
 #else
 	VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
 	vbuf = NULL;

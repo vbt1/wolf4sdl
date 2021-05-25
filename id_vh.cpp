@@ -3,7 +3,6 @@
 
 pictabletype	*pictable; //[NUMPICS];
 SDL_Surface     *latchpics[NUMLATCHPICS];
-
 int	    px,py;
 byte	fontcolor,backcolor;
 int	    fontnumber;
@@ -224,6 +223,21 @@ void LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum)
 //		return;
 	VL_LatchToScreenScaledCoord (latchpics[2+picnum-LATCHPICS_LUMP_START], scx*8, scy);
 }
+
+void LatchDrawPicScaledCoordIndirect (unsigned scx, unsigned scy, unsigned picnum)
+{
+//	if(2+picnum-LATCHPICS_LUMP_START==1)
+//		return;
+	VL_LatchToScreenScaledCoordIndirect (latchpics[2+picnum-LATCHPICS_LUMP_START], scx*8, scy);
+//void VL_LatchToScreenScaledCoordIndirect(SDL_Surface *source, int xsrc, int ysrc, int width, int height, int scxdest, int scydest);	
+}
+/*
+void inline VL_LatchToScreen (SDL_Surface *source, int x, int y)
+{
+   VL_LatchToScreenScaledCoord(source,0,0,source->w,source->h,
+        scaleFactor*x,scaleFactor*y);
+}
+*/
 
 
 //==========================================================================
