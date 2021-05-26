@@ -138,7 +138,32 @@ void PM_Startup()
 		ptr+=end;
 	}
 	
-    ptr = (uint8_t *) PMPageData;	
+    ptr = (uint8_t *) PMPageData;
+	
+    for(i = 40; i < PMSpriteStart-8; i++)
+    {
+        PMPages[i] = ptr;
+	
+        if(!pageOffsets[i])
+            continue;               // sparse page
+
+        // Use specified page length, when next page is sparse page.
+        // Otherwise, calculate size from the offset difference between this and the next page.
+        uint32_t size;
+        if(!pageOffsets[i + 1]) size = pageLengths[i];
+        else size = pageOffsets[i + 1] - pageOffsets[i];
+
+		int end = size;
+		if (size % 4 != 0)
+		{
+			end = ((size + (4 - 1)) & -4);
+		}
+		memset(ptr,0x00,end);
+		memcpy(ptr,&Chunks[pageOffsets[i]],size);
+		ptr+=end;
+	}	
+	
+	ptr = (uint8_t *)0x00202000+0x8000;
 	
     for(i = PMSpriteStart; i < ChunksInFile; i++)
     {
@@ -162,17 +187,54 @@ void PM_Startup()
 		memcpy(ptr,&Chunks[pageOffsets[i]],size);
 		
 //		if(i >= PMSpriteStart && i < PMSoundStart)
-        {
-			t_compshape   *shape = (t_compshape   *)ptr;
-			shape->leftpix=SWAP_BYTES_16(shape->leftpix);
-			shape->rightpix=SWAP_BYTES_16(shape->rightpix);
+//        {
+		t_compshape   *shape = (t_compshape   *)ptr;
+		shape->leftpix=SWAP_BYTES_16(shape->leftpix);
+		shape->rightpix=SWAP_BYTES_16(shape->rightpix);
 
-			for (int x=0;x<(shape->rightpix-shape->leftpix)+1;x++ )
-			{
-				shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
-			}
+		for (int x=0;x<(shape->rightpix-shape->leftpix)+1;x++ )
+		{
+			shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
 		}
+//		}
+#if 1
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx		
+		byte bmpbuff[64*64];
+		byte *bmpptr;
+		PICTURE pic_spr;
+		unsigned short  *cmdptr, *sprdata;
+
+		// set the texel index to the first texel
+		unsigned char  *sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
+		// clear the buffers
+		memset(bmpbuff,0,64*64);
+		// setup a pointer to the column offsets	
+		cmdptr = shape->dataofs;
+
+		for (int x = (shape->leftpix); x <= (shape->rightpix); x++)
+		{
+			sprdata = (unsigned short *)((unsigned char  *)shape+*cmdptr);
+			bmpptr = (byte *)bmpbuff+x;
+			
+			while (SWAP_BYTES_16(*sprdata) != 0)
+			{
+				for (int y = SWAP_BYTES_16(sprdata[2])/2; y < SWAP_BYTES_16(*sprdata)/2; y++)
+				{
+					bmpptr[y<<6] = *sprptr++;
+					if(bmpptr[y<<6]==0) bmpptr[y<<6]=0xa0;
+				}
+				sprdata += 3;
+			}
+			cmdptr++;
+		}			
+
+		memcpy((void *)ptr,bmpbuff,0x1000);
+		ptr+=0x1000;
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx		
+#else
 		ptr+=end;
+#endif		
+		
 	}
 	
     // last page points after page buffer

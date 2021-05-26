@@ -80,7 +80,8 @@ void loadActorTexture(int texture)
 {
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];	
 	*txptr = TEXDEF(64, 64, position_vram);
-	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)lowram+((texture-SPR_STAT_0)*0x1000),0x1000);
+//	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)lowram+((texture-SPR_STAT_0)*0x1000),0x1000);
+	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)PM_GetSprite(texture),0x1000);
 //	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
 //	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
 	texture_list[texture]=position_vram/0x800;
@@ -90,6 +91,7 @@ void loadActorTexture(int texture)
 
 void loadActorTextureLowRam()
 {
+#if 0	
 	byte bmpbuff[64*64];
 	byte *bmpptr;
 	PICTURE pic_spr;
@@ -124,10 +126,18 @@ void loadActorTextureLowRam()
 			cmdptr++;
 		}			
 //		slDMACopy((unsigned long*)bmpbuff,(void *)(wall_buffer + (SATURN_WIDTH<<6)),64*64);
-		memcpyl((void *)lowram+64*64*(texture-SPR_STAT_0),(void *)bmpbuff,64*64);
+		memcpyl((void *)lowram+64*64*(texture-SPR_STAT_0),(void *)bmpbuff,0x1000);
+	}		
+#else
+	/*for(int texture=SPR_STAT_0;texture<SPR_STAT_0+126;texture++)
+	{
+		uint8_t   *shape = (uint8_t   *)PM_GetSprite(texture);
+		memcpyl((void *)lowram+(texture-SPR_STAT_0)*0x1000,(void *)shape,0x1000);
+	}*/
+#endif
 //		old_texture=texture;
 //		slDMAWait();
-	}
+
 }
 #endif
 /*
