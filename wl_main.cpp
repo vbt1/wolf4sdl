@@ -65,7 +65,6 @@ int32_t  heightnumerator;
 
 
 void    Quit (const char *error,...);
-void	loadActorTextureLowRam();
 
 boolean startgame;
 //boolean loadedgame;
@@ -666,8 +665,8 @@ void SignonScreen (void)                        // VGA version
 {
     VL_SetVGAPlaneMode ();
 
-    VL_MungePic (signon,320,200);
-    VL_MemToScreen (signon,320,200,0,0);
+//    VL_MungePic (signon,320,200);
+//    VL_MemToScreen (signon,320,200,0,0);
 }
 
 
@@ -1584,7 +1583,7 @@ int main (int argc, char *argv[])
     //CheckParameters(argc, argv);
 #endif
 // vbt : invincible
-//	godmode = 1;
+	godmode = 1;
     CheckForEpisodes();
 
     InitGame();

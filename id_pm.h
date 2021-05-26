@@ -18,14 +18,15 @@ extern uint8_t **PMPages;
 
 void PM_Startup();
 void PM_Shutdown();
-
+uint8_t * PM_DecodeSprites(unsigned int start,unsigned int endi,uint8_t *ptr,uint32_t* pageOffsets,word *pageLengths,Uint8 *Chunks);
+/*
 static inline uint32_t PM_GetPageSize(int page)
 {
 //    if(page < 0 || page >= ChunksInFile)
 //        Quit("PM_GetPageSize: Tried to access illegal                             page: %i", page);
     return (uint32_t) (PMPages[page + 1] - PMPages[page]);
 }
-
+*/
 #define	PM_GetSpritePage(v)	PM_GetPage(PMSpriteStart + (v))
 
 static inline uint8_t *PM_GetPage(int page)

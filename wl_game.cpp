@@ -73,73 +73,6 @@ void GameLoop (void);
 =============================================================================
 */
 
-#ifdef USE_SPRITES
-TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
-
-void loadActorTexture(int texture)
-{
-	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];	
-	*txptr = TEXDEF(64, 64, position_vram);
-//	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)lowram+((texture-SPR_STAT_0)*0x1000),0x1000);
-	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)PM_GetSprite(texture),0x1000);
-//	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
-//	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
-	texture_list[texture]=position_vram/0x800;
-	position_vram+=0x800;	
-//	slDMAWait();
-}
-
-void loadActorTextureLowRam()
-{
-#if 0	
-	byte bmpbuff[64*64];
-	byte *bmpptr;
-	PICTURE pic_spr;
-	unsigned short  *cmdptr, *sprdata;
-//	unsigned char * cache = (unsigned char *)malloc(120000);
-	
-//	for(int texture=SPR_GRD_S_1;texture<SPR_NULLSPRITE;texture++)
-	for(int texture=SPR_STAT_0;texture<SPR_STAT_0+126;texture++)
-	{
-		t_compshape   *shape = (t_compshape   *)PM_GetSprite(texture);
-		// set the texel index to the first texel
-		unsigned char  *sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
-		// clear the buffers
-		memset(bmpbuff,0,64*64);
-		// setup a pointer to the column offsets	
-		cmdptr = shape->dataofs;
-
-		for (int x = (shape->leftpix); x <= (shape->rightpix); x++)
-		{
-			sprdata = (unsigned short *)((unsigned char  *)shape+*cmdptr);
-			bmpptr = (byte *)bmpbuff+x;
-			
-			while (SWAP_BYTES_16(*sprdata) != 0)
-			{
-				for (int y = SWAP_BYTES_16(sprdata[2])/2; y < SWAP_BYTES_16(*sprdata)/2; y++)
-				{
-					bmpptr[y<<6] = *sprptr++;
-					if(bmpptr[y<<6]==0) bmpptr[y<<6]=0xa0;
-				}
-				sprdata += 3;
-			}
-			cmdptr++;
-		}			
-//		slDMACopy((unsigned long*)bmpbuff,(void *)(wall_buffer + (SATURN_WIDTH<<6)),64*64);
-		memcpyl((void *)lowram+64*64*(texture-SPR_STAT_0),(void *)bmpbuff,0x1000);
-	}		
-#else
-	/*for(int texture=SPR_STAT_0;texture<SPR_STAT_0+126;texture++)
-	{
-		uint8_t   *shape = (uint8_t   *)PM_GetSprite(texture);
-		memcpyl((void *)lowram+(texture-SPR_STAT_0)*0x1000,(void *)shape,0x1000);
-	}*/
-#endif
-//		old_texture=texture;
-//		slDMAWait();
-
-}
-#endif
 /*
 ==========================
 =
@@ -1209,11 +1142,11 @@ void GameLoop (void)
 {
 // vbt dernier niveau
 //gamestate.mapon = 8;	
+//gamestate.mapon = 8;	
 //GiveWeapon (gamestate.bestweapon+2);
-//gamestate.ammo = 99;	
-//gamestate.keys = 3;
+gamestate.ammo = 99;	
+gamestate.keys = 3;
 // vbt dernier niveau
-		loadActorTextureLowRam();
 		
     boolean died;
 #ifdef MYPROFILE

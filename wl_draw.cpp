@@ -14,7 +14,7 @@ extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_TOTAL];
 extern unsigned int position_vram;
 //static const Uint8 *lowram=(Uint8 *)0x00202000;
-Uint8 *lowram=(Uint8 *)0x00242000;
+Uint8 *lowram=NULL;
 
 #endif
 //unsigned char spr_buffer[30*64*64];
@@ -267,7 +267,25 @@ int CalcHeight(int xintercept, int yintercept)
 ===================
 */
 
-void loadActorTexture(int texture);
+inline void loadActorTexture(int texture);
+
+
+#ifdef USE_SPRITES
+TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
+
+inline void loadActorTexture(int texture)
+{
+	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];	
+	*txptr = TEXDEF(64, 64, position_vram);
+//	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)lowram+((texture-SPR_STAT_0)*0x1000),0x1000);
+	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)PM_GetSprite(texture),0x1000);
+//	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
+//	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
+	texture_list[texture]=position_vram/0x800;
+	position_vram+=0x800;	
+//	slDMAWait();
+}
+#endif
 
 void ScalePost(int postx,byte *postsource)
 {
@@ -761,7 +779,6 @@ int CalcRotate (objtype *ob)
 
     return angle/(ANGLES/8);
 }
-//int vbt=0;
 inline void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 {
     unsigned scale,pixheight;
@@ -777,15 +794,7 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t fla
     if(!scale) return;   // too close or far away
     pixheight=scale*SPRITESCALEFACTOR;
 
-//shapenum=190;	
-	
 #ifdef USE_SPRITES
-//    char msg[100];
-//	sprintf (msg,"shape %d %d max %d h %d         ", shapenum, SPR_TOTAL, SPR_TOTAL+SATURN_WIDTH,height) ;
-//	//slPrint((char *)msg,slLocate(1,4));
-
-//if(shapenum>SPR_STAT_47) // surtout ne pas commenter !
-//	if(shapenum==296) //||shapenum==298||shapenum==299||shapenum==300||shapenum==301||shapenum==302)	
 	if(texture_list[shapenum]==0xff)
 		loadActorTexture(shapenum);
 //--------------------------------------------------------------------------------------------
@@ -803,7 +812,6 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t fla
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
 	slSetSprite(&user_sprite, toFIXED(0+(SATURN_SORT_VALUE-pixheight/2)));	// à remettre
-//	vbt++;
 //--------------------------------------------------------------------------------------------	
 #else
 	byte *vbuf = LOCK()+screenofs;
@@ -899,10 +907,10 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 ////slPrintHex(shapenum,slLocate(10,4));
 	if (old_texture!=shapenum)
 	{
-		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)lowram+64*64*(shapenum-SPR_STAT_0),64*64);
+//		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)lowram+(shapenum-SPR_STAT_0)*0x1000,0x1000);
+		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)PM_GetSprite(shapenum),0x1000);
 		old_texture=shapenum;
 	}	
-	
 //--------------------------------------------------------------------------------------------
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH];
 // correct on touche pas		
@@ -2228,13 +2236,12 @@ void    ThreeDRefresh (void)
     if(GetFeatureFlags() & FF_SNOW)
         DrawSnow(vbuf, vbufPitch);
 #endif
-/* // vbt : à remettre pour afficher l'arme
+ // vbt : à remettre pour afficher l'arme
 #ifdef USE_SPRITES
     DrawPlayerWeapon ();    // draw player's hands
 #else
     DrawPlayerWeapon (vbuf);    // draw player's hands
 #endif
-*/
 
   /*  if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
 	{

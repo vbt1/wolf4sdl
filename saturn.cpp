@@ -439,10 +439,6 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 		slDMACopy((unsigned long*)surfacePtr,(void *)nbg1Ptr,screenWidth); // vbt à remettre !!!
 		surfacePtr+=screenWidth;
 		nbg1Ptr+=128;
-//		slDMACopy((unsigned long*)(surface->pixels + (i * screenWidth)),(void *)(VDP2_VRAM_A0 + (i<<9)),screenWidth);
-//		slDMACopy((unsigned long*)(surface->pixels + ((i+1) * screenWidth)),(void *)(VDP2_VRAM_A0 + ((i+1)<<9)),screenWidth);
-//		slDMACopy((unsigned long*)(surface->pixels + ((i+2) * screenWidth)),(void *)(VDP2_VRAM_A0 + ((i+2)<<9)),screenWidth);
-//		slDMACopy((unsigned long*)(surface->pixels + ((i+3) * screenWidth)),(void *)(VDP2_VRAM_A0 + ((i+3)<<9)),screenWidth);		
 	}
 	slDMAWait();
 }
