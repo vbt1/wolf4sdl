@@ -27,58 +27,10 @@ void PM_Startup()
 
     int ChunksInFile = 0;
 //    fread(&ChunksInFile, sizeof(word), 1, file);
-#ifdef READ16	
-	Chunks=(Uint16*)0x00230000;
+
+	Chunks=(Uint8*)0x00242000;
 //	CHECKMALLOCRESULT(Chunks);
-	GFS_Load(fileId, 0, (void *)Chunks, fileSize); //(ChunksInFile*3)+3);
-	ChunksInFile=SWAP_BYTES_16(Chunks[0]);
-    PMSpriteStart = 0;
-    //fread(&PMSpriteStart, sizeof(word), 1, file);
-	PMSpriteStart=SWAP_BYTES_16(Chunks[1]);
-    PMSoundStart = 0;
-    //fread(&PMSoundStart, sizeof(word), 1, file);
-	PMSoundStart=SWAP_BYTES_16(Chunks[2]);
-
-    uint32_t* pageOffsets = (uint32_t *) malloc((ChunksInFile + 1) * sizeof(int32_t));
-    CHECKMALLOCRESULT(pageOffsets);
-	
-	for(i=0;i<(ChunksInFile);i++)
-	{
-		pageOffsets[i]=SWAP_BYTES_16(Chunks[3]) | (SWAP_BYTES_16(Chunks[4])<<16);
-		Chunks+=2;
-	} 
-
-    //fread(pageOffsets, sizeof(uint32_t), ChunksInFile, file);
-    word *pageLengths = (word *) malloc(ChunksInFile * sizeof(word));
-    CHECKMALLOCRESULT(pageLengths);
-
-	for(i=0;i<ChunksInFile;i++)
-	{
-		pageLengths[i]=SWAP_BYTES_16(Chunks[3]);
-		Chunks++;
-	}
-	
-    //fread(pageLengths, sizeof(word), ChunksInFile, file);
-    long pageDataSize = fileSize - pageOffsets[0];
-    if(pageDataSize > (size_t) -1)
-        Quit("The page file \"%s\" is too large!", fname);
-
-    pageOffsets[ChunksInFile] = fileSize;
-
-    uint32_t dataStart = pageOffsets[0];
-	
-    // Check that all pageOffsets are valid
-    for(i = 0; i < ChunksInFile; i++)
-    {
-        if(!pageOffsets[i]) continue;   // sparse page
-        if(pageOffsets[i] < dataStart || pageOffsets[i] >= (size_t) fileSize)
-            Quit("Illegal page offset for page %i: %u (filesize: %u)",
-                    i, pageOffsets[i], fileSize);
-    }	
-#else
-	Chunks=(Uint8*)0x00240000;
-//	CHECKMALLOCRESULT(Chunks);
-	GFS_Load(fileId, 0, (void *)Chunks, fileSize); //(ChunksInFile*3)+3);
+	GFS_Load(fileId, 0, (void *)Chunks, fileSize);
 	ChunksInFile=Chunks[0]|Chunks[1]<<8;
     PMSpriteStart = 0;
     //fread(&PMSpriteStart, sizeof(word), 1, file);
@@ -87,34 +39,39 @@ void PM_Startup()
     //fread(&PMSoundStart, sizeof(word), 1, file);
 	PMSoundStart=Chunks[4]|Chunks[5]<<8;
 
+// vbt : on ne charge pas les sons !	
+	ChunksInFile=PMSoundStart;
+	
+    PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
+    CHECKMALLOCRESULT(PMPages);	
+
     uint32_t* pageOffsets = (uint32_t *) malloc((ChunksInFile + 1) * sizeof(int32_t));
     CHECKMALLOCRESULT(pageOffsets);
 
+    word *pageLengths = (word *) malloc(ChunksInFile * sizeof(word));
+    CHECKMALLOCRESULT(pageLengths);
+	
 	for(i=0;i<ChunksInFile;i++)
 	{
 		pageOffsets[i]=Chunks[6]<<0|Chunks[7]<<8|Chunks[8]<<16|Chunks[9]<<24;
 		Chunks+=4;
-	} 
-
-    //fread(pageOffsets, sizeof(uint32_t), ChunksInFile, file);
-    word *pageLengths = (word *) malloc(ChunksInFile * sizeof(word));
-    CHECKMALLOCRESULT(pageLengths);
+	}
 
 	for(i=0;i<ChunksInFile;i++)
 	{
-		pageLengths[i]=Chunks[6]|Chunks[7]<<8; //SWAP_BYTES_16(Chunks[i+3]);
+		pageLengths[i]=Chunks[6]|Chunks[7]<<8;
 		Chunks+=2;
 	}
-
+	
     //fread(pageLengths, sizeof(word), ChunksInFile, file);
     long pageDataSize = fileSize - pageOffsets[0];
     if(pageDataSize > (size_t) -1)
         Quit("The page file \"%s\" is too large!", fname);
-	
+
     pageOffsets[ChunksInFile] = fileSize;
 
     uint32_t dataStart = pageOffsets[0];
-
+	
     // Check that all pageOffsets are valid
     for(i = 0; i < ChunksInFile; i++)
     {
@@ -123,11 +80,11 @@ void PM_Startup()
             Quit("Illegal page offset for page %i: %u (filesize: %u)",
                     i, pageOffsets[i], fileSize);
     }	
-#endif
-    uint8_t *PMPageData = (uint8_t *) 0x00202000;
-	Chunks=(Uint8*)0x00240000;
-    PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
-    CHECKMALLOCRESULT(PMPages);
+
+    uint8_t *PMPageData = (uint8_t *)0x00202000;
+//    CHECKMALLOCRESULT(PMPageData);
+
+	Chunks=(Uint8*)0x00242000;	
     // Load pages and initialize PMPages pointers
     uint8_t *ptr = (uint8_t *) PMPageData;
 	
@@ -138,7 +95,6 @@ void PM_Startup()
         if(!pageOffsets[i])
             continue;               // sparse page
 
-		uint8_t *Chunks8=(uint8_t*)Chunks;		
         // Use specified page length, when next page is sparse page.
         // Otherwise, calculate size from the offset difference between this and the next page.
         uint32_t size;
@@ -151,7 +107,7 @@ void PM_Startup()
 			end = ((size + (4 - 1)) & -4);
 		}
 		memset(ptr,0x00,end);
-		memcpy(ptr,&Chunks8[pageOffsets[i]],size);
+		memcpy(ptr,&Chunks[pageOffsets[i]],size);
 		
 		if(i >= PMSpriteStart && i < PMSoundStart)
         {
@@ -166,8 +122,11 @@ void PM_Startup()
 		}
 		ptr+=end;
 	}
+	
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr;
+	extern Uint8 *lowram;
+	lowram = ptr;
 
 	free(pageLengths);
 	pageLengths = NULL;	

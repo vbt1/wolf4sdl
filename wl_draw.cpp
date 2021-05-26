@@ -13,7 +13,8 @@ SPRITE user_walls[SATURN_WIDTH];
 extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_TOTAL];
 extern unsigned int position_vram;
-static const Uint8 *lowram=(Uint8 *)0x002E0000;
+//static const Uint8 *lowram=(Uint8 *)0x00202000;
+Uint8 *lowram=(Uint8 *)0x00242000;
 
 #endif
 //unsigned char spr_buffer[30*64*64];
@@ -899,7 +900,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 ////slPrintHex(shapenum,slLocate(10,4));
 	if (old_texture!=shapenum)
 	{
-		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)lowram+64*64*(shapenum-SPR_KNIFEREADY),64*64);
+		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)lowram+64*64*(shapenum-SPR_STAT_0),64*64);
 		old_texture=shapenum;
 	}	
 	
