@@ -268,7 +268,6 @@ int CalcHeight(int xintercept, int yintercept)
 */
 
 void loadActorTexture(int texture);
-void loadActorTexture2(int texture);
 
 void ScalePost(int postx,byte *postsource)
 {
@@ -2229,12 +2228,14 @@ void    ThreeDRefresh (void)
     if(GetFeatureFlags() & FF_SNOW)
         DrawSnow(vbuf, vbufPitch);
 #endif
-
+/* // vbt : à remettre pour afficher l'arme
 #ifdef USE_SPRITES
     DrawPlayerWeapon ();    // draw player's hands
 #else
     DrawPlayerWeapon (vbuf);    // draw player's hands
 #endif
+*/
+
   /*  if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
 	{
         ShowActStatus();

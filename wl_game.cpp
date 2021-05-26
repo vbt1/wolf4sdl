@@ -97,7 +97,7 @@ void loadActorTextureLowRam()
 //	unsigned char * cache = (unsigned char *)malloc(120000);
 	
 //	for(int texture=SPR_GRD_S_1;texture<SPR_NULLSPRITE;texture++)
-	for(int texture=SPR_STAT_0;texture<SPR_STAT_0+100;texture++)
+	for(int texture=SPR_STAT_0;texture<SPR_STAT_0+126;texture++)
 	{
 		t_compshape   *shape = (t_compshape   *)PM_GetSprite(texture);
 		// set the texel index to the first texel

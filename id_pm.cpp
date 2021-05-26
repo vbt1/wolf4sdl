@@ -50,6 +50,9 @@ void PM_Startup()
 
     word *pageLengths = (word *) malloc(ChunksInFile * sizeof(word));
     CHECKMALLOCRESULT(pageLengths);
+
+	uint8_t *wallData = (uint8_t *) malloc(48*0x1000);
+	CHECKMALLOCRESULT(wallData);
 	
 	for(i=0;i<ChunksInFile;i++)
 	{
@@ -86,9 +89,58 @@ void PM_Startup()
 
 	Chunks=(Uint8*)0x00242000;	
     // Load pages and initialize PMPages pointers
-    uint8_t *ptr = (uint8_t *) PMPageData;
 	
-    for(i = 0; i < ChunksInFile; i++)
+	uint8_t *ptr = (uint8_t *)wallData;
+	
+    for(i = SPR_STAT_0; i < 40; i++)
+    {
+        PMPages[i] = ptr;
+	
+        if(!pageOffsets[i])
+            continue;               // sparse page
+
+        // Use specified page length, when next page is sparse page.
+        // Otherwise, calculate size from the offset difference between this and the next page.
+        uint32_t size;
+        if(!pageOffsets[i + 1]) size = pageLengths[i];
+        else size = pageOffsets[i + 1] - pageOffsets[i];
+
+		int end = size;
+		if (size % 4 != 0)
+		{
+			end = ((size + (4 - 1)) & -4);
+		}
+		memset(ptr,0x00,end);
+		memcpy(ptr,&Chunks[pageOffsets[i]],size);
+		ptr+=end;
+	}			
+
+    for(i = PMSpriteStart-8; i < PMSpriteStart; i++)
+    {
+        PMPages[i] = ptr;
+	
+        if(!pageOffsets[i])
+            continue;               // sparse page
+
+        // Use specified page length, when next page is sparse page.
+        // Otherwise, calculate size from the offset difference between this and the next page.
+        uint32_t size;
+        if(!pageOffsets[i + 1]) size = pageLengths[i];
+        else size = pageOffsets[i + 1] - pageOffsets[i];
+
+		int end = size;
+		if (size % 4 != 0)
+		{
+			end = ((size + (4 - 1)) & -4);
+		}
+		memset(ptr,0x00,end);
+		memcpy(ptr,&Chunks[pageOffsets[i]],size);
+		ptr+=end;
+	}
+	
+    ptr = (uint8_t *) PMPageData;	
+	
+    for(i = PMSpriteStart; i < ChunksInFile; i++)
     {
         PMPages[i] = ptr;
 	
@@ -109,7 +161,7 @@ void PM_Startup()
 		memset(ptr,0x00,end);
 		memcpy(ptr,&Chunks[pageOffsets[i]],size);
 		
-		if(i >= PMSpriteStart && i < PMSoundStart)
+//		if(i >= PMSpriteStart && i < PMSoundStart)
         {
 			t_compshape   *shape = (t_compshape   *)ptr;
 			shape->leftpix=SWAP_BYTES_16(shape->leftpix);
@@ -127,6 +179,11 @@ void PM_Startup()
     PMPages[ChunksInFile] = ptr;
 	extern Uint8 *lowram;
 	lowram = ptr;
+	
+	int *val = (int *)ptr;
+	
+	slPrintHex((int)ChunksInFile-PMSpriteStart,slLocate(3,3));	
+	slPrintHex((int)val,slLocate(3,4));
 
 	free(pageLengths);
 	pageLengths = NULL;	
