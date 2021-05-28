@@ -24,7 +24,6 @@ loaded into the data segment
  */
 #include "wl_def.h"
 
-#pragma hdrstop
 #define THREEBYTEGRSTARTS
 //#define HEAP_WALK 1
 
@@ -1017,7 +1016,7 @@ void CA_CacheScreen (int chunk)
 
     for(unsigned int y = 0; y < 200; y++)
     {
-        for(unsigned int x = 0; x < 320; x++)
+        for(unsigned int x = 0; x < SATURN_WIDTH; x++)
         {
             byte col = pic[(y * 80 + (x >> 2)) + (x & 3) * 80 * 200];
 			byte *vbufptr= (byte *)(vbuf+(y* curPitch +x) *scaleFactor);

@@ -17,8 +17,6 @@ unsigned int position_vram=((SATURN_WIDTH+64)*32);
 extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 unsigned char texture_list[SPR_TOTAL];
-//static const Uint8 *lowram=(Uint8 *)0x00202000;
-extern Uint8 *lowram;
 #endif
 
 #undef atan2
@@ -691,9 +689,9 @@ void DrawPlayBorderSides(void)
     if(xl != 0)
     {
         // Paint game view border lines
-	    VWB_BarScaledCoord(xl - px, yl - px, vw + px, px,          0);                      // upper border
+	    VWB_BarScaledCoord(xl - px, yl - px, vw + px, px,          160);                      // upper border
 	    VWB_BarScaledCoord(xl,      yl + vh, vw + px, px,          bordercol - 2);          // lower border
-	    VWB_BarScaledCoord(xl - px, yl - px, px,      vh + px,     0);                      // left border
+	    VWB_BarScaledCoord(xl - px, yl - px, px,      vh + px,     160);                      // left border
 	    VWB_BarScaledCoord(xl + vw, yl - px, px,      vh + px * 2, bordercol - 2);          // right border
 	    VWB_BarScaledCoord(xl - px, yl + vh, px,      px,          bordercol - 3);          // lower left highlight
     }
@@ -715,7 +713,7 @@ void DrawPlayBorderSides(void)
 
 void DrawStatusBorder (byte color)
 {
-    int statusborderw = (screenWidth-scaleFactor*320)/2;
+    int statusborderw = (screenWidth-scaleFactor*SATURN_WIDTH)/2;
 
     VWB_BarScaledCoord (0,0,screenWidth,screenHeight-scaleFactor*(STATUSLINES-3),color);
     VWB_BarScaledCoord (0,screenHeight-scaleFactor*(STATUSLINES-3),
@@ -753,7 +751,7 @@ void DrawPlayBorder (void)
         DrawStatusBorder(bordercol);
     else
     {
-        const int statusborderw = (screenWidth-px*320)/2;
+        const int statusborderw = (screenWidth-px*SATURN_WIDTH)/2;
         VWB_BarScaledCoord (0, screenHeight-px*STATUSLINES,
             statusborderw+px*8, px*STATUSLINES, bordercol);
         VWB_BarScaledCoord (screenWidth-statusborderw-px*8, screenHeight-px*STATUSLINES,
@@ -778,9 +776,9 @@ void DrawPlayBorder (void)
 //xl-px=15
 //yl=9
         // Paint game view border lines
-        VWB_BarScaledCoord(xl-px, yl-px, viewwidth+px, px, 0);                      // upper border
+        VWB_BarScaledCoord(xl-px, yl-px, viewwidth+px, px, 160);                      // upper border
         VWB_BarScaledCoord(xl, yl+viewheight, viewwidth+px, px, bordercol-2);       // lower border
-        VWB_BarScaledCoord(xl-px, yl-px, px, viewheight+px, 0);                     // left border
+        VWB_BarScaledCoord(xl-px, yl-px, px, viewheight+px, 160);                     // left border
         VWB_BarScaledCoord(xl+viewwidth, yl-px, px, viewheight+2*px, bordercol-2);  // right border
         VWB_BarScaledCoord(xl-px, yl+viewheight, px, px, bordercol-3);              // lower left highlight
     }
@@ -809,7 +807,7 @@ void DrawPlayScreen (void)
 {
 	//vbt à remettre
   	//		slPrint("VWB_DrawPicScaledCoord",slLocate(10,10));
-			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*320)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
+			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
     DrawPlayBorder ();
 /*	
@@ -838,7 +836,7 @@ void DrawStatusBar (void)
 {
 	//vbt à remettre
   	//		slPrint("VWB_DrawPicScaledCoord",slLocate(10,10));
-//			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*320)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
+//			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
 //    DrawPlayBorder ();
 	
@@ -898,7 +896,7 @@ void ShowActStatus()
     int	picnum = STATUSBARPIC - STARTPICS;
     int width = pictable[picnum].width;
     int height = pictable[picnum].height;
-    int destx = (screenWidth-scaleFactor*320)/2 + 9 * scaleFactor;
+    int destx = (screenWidth-scaleFactor*SATURN_WIDTH)/2 + 9 * scaleFactor;
     int desty = screenHeight - (height - 4) * scaleFactor;
     VL_MemToScreenScaledCoord(source, width, height, 9, 4, destx, desty, width - 18, height - 7);
 

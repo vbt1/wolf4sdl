@@ -38,7 +38,7 @@ TEXT FORMATTING COMMANDS
 #define PICMARGIN       8
 #define TEXTROWS        ((200-TOPMARGIN-BOTTOMMARGIN)/FONTHEIGHT)
 #define SPACEWIDTH      7
-#define SCREENPIXWIDTH  320
+#define SCREENPIXWIDTH  SATURN_WIDTH
 #define SCREENMID       (SCREENPIXWIDTH/2)
 
 /*
@@ -425,7 +425,7 @@ void PageLayout (boolean shownumber)
     //
     // clear the screen
     //
-    VWB_Bar (0,0,320,200,BACKCOLOR);
+    VWB_Bar (0,0,SATURN_WIDTH,200,BACKCOLOR);
     VWB_DrawPic (0,0,H_TOPWINDOWPIC);
     VWB_DrawPic (0,8,H_LEFTWINDOWPIC);
     VWB_DrawPic (312,8,H_RIGHTWINDOWPIC);
@@ -643,7 +643,7 @@ void ShowArticle (char *article)
     oldfontnumber = fontnumber;
     fontnumber = 0;
     CA_CacheGrChunk(STARTFONT);
-    VWB_Bar (0,0,320,200,BACKCOLOR);
+    VWB_Bar (0,0,SATURN_WIDTH,200,BACKCOLOR);
     CacheLayoutGraphics ();
 #endif
 

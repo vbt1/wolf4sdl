@@ -13,11 +13,8 @@ SPRITE user_walls[SATURN_WIDTH];
 extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_TOTAL];
 extern unsigned int position_vram;
-//static const Uint8 *lowram=(Uint8 *)0x00202000;
-Uint8 *lowram=NULL;
-
 #endif
-//unsigned char spr_buffer[30*64*64];
+
 typedef struct
 {
 	byte *postsource;	
@@ -125,7 +122,7 @@ word horizwall[MAXWALLTILES],vertwall[MAXWALLTILES];
 //
 // transform actor
 //
-void TransformActor (objtype *ob)
+inline void TransformActor (objtype *ob)
 {
     fixed gx,gy,gxt,gyt,nx,ny;
 
@@ -277,7 +274,6 @@ inline void loadActorTexture(int texture)
 {
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];	
 	*txptr = TEXDEF(64, 64, position_vram);
-//	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)lowram+((texture-SPR_STAT_0)*0x1000),0x1000);
 	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)PM_GetSprite(texture),0x1000);
 //	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
 //	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
@@ -294,7 +290,7 @@ void ScalePost(int postx,byte *postsource)
 	if(postx>=0 & postx<=SATURN_WIDTH)
 	{
 		memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
-//	slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);
+//		slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);
 //	slTransferEntry((void *)postsource,(void *)(wall_buffer + (postx<<6)),64);		
 
 	//  a           b          c             d
@@ -779,7 +775,7 @@ int CalcRotate (objtype *ob)
 
     return angle/(ANGLES/8);
 }
-inline void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
+inline void ScaleShape (int xcenter, int shapenum, unsigned height)
 {
     unsigned scale,pixheight;
 
@@ -907,7 +903,6 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 ////slPrintHex(shapenum,slLocate(10,4));
 	if (old_texture!=shapenum)
 	{
-//		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)lowram+(shapenum-SPR_STAT_0)*0x1000,0x1000);
 		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)PM_GetSprite(shapenum),0x1000);
 		old_texture=shapenum;
 	}	
@@ -926,7 +921,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 	user_sprite.XB=pixheight;
 	user_sprite.YB=user_sprite.XB;
     user_sprite.GRDA=0;
-	slSetSprite(&user_sprite, toFIXED(10)); //+(SATURN_SORT_VALUE+1)));	// à remettre	
+	slSetSprite(&user_sprite, toFIXED(10));// à remettre	
 //--------------------------------------------------------------------------------------------	
 #else
     t_compshape   *shape;
@@ -1013,14 +1008,14 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 =====================
 */
 
-#define MAXVISABLE 250
+#define MAXVISABLE 64
 
 typedef struct
 {
     short      viewx,
                viewheight,
                shapenum;
-    short      flags;          // this must be changed to uint32_t, when you
+//    short      flags;          // this must be changed to uint32_t, when you
                                // you need more than 16-flags for drawing
 #ifdef USE_DIR3DSPR
     statobj_t *transsprite;
@@ -1071,7 +1066,7 @@ void DrawScaleds (void)
 
         if (visptr < &vislist[MAXVISABLE-1])    // don't let it overflow
         {
-            visptr->flags = (short) statptr->flags;
+//            visptr->flags = (short) statptr->flags;
             visptr++;
         }
     }
@@ -1116,7 +1111,7 @@ void DrawScaleds (void)
 
             if (visptr < &vislist[MAXVISABLE-1])    // don't let it overflow
             {
-                visptr->flags = (short) obj->flags;
+//                visptr->flags = (short) obj->flags;
 #ifdef USE_DIR3DSPR
                 visptr->transsprite = NULL;
 #endif
@@ -1157,7 +1152,7 @@ void DrawScaleds (void)
         else
 #endif
 // affiche la version bitmap
-		ScaleShape(farthest->viewx, farthest->shapenum, farthest->viewheight, farthest->flags);
+		ScaleShape(farthest->viewx, farthest->shapenum, farthest->viewheight);
         farthest->viewheight = 32000;
     }
 }
@@ -2249,7 +2244,9 @@ void    ThreeDRefresh (void)
 	}*/
 
 #ifdef USE_SPRITES
-		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
+//		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
+		slTransferEntry((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
+
 	//	extern int vbt;
 		SPRITE *user_wall = user_walls;
 
@@ -2265,7 +2262,7 @@ void    ThreeDRefresh (void)
 //			position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
 			position_vram = (SATURN_WIDTH+64)*32;
 		}
-		slDMAWait();
+//		slDMAWait();
 /*		
 extern Uint8 TransRequest;
 
@@ -2302,8 +2299,8 @@ extern Uint16 VDP2_CYCB1L;
 extern Uint16 VDP2_CYCB1U;
 			slPrintHex(VDP2_CYCB1U,slLocate(10,11));	
 */			
-		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
-		extern const void * TransList;
+
+//		extern const void * TransList;
 //		memset((void *)TransList,0x00,0xf0*4*3);
 //TransRequest=0;
 #else
@@ -2337,4 +2334,5 @@ extern Uint16 VDP2_CYCB1U;
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
 #endif
+		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
 }

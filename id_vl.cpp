@@ -128,7 +128,7 @@ void	VL_SetVGAPlaneMode (void)
 
 //    SDL_SetColors(screenBuffer, gamepal, 0, 256);
 
-    scaleFactor = screenWidth/320;
+    scaleFactor = screenWidth/SATURN_WIDTH;
     if(screenHeight/200 < scaleFactor) scaleFactor = screenHeight/200;
     pixelangle = (short *) malloc(screenWidth * sizeof(short));
     CHECKMALLOCRESULT(pixelangle);
@@ -613,7 +613,7 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
     }	
 }
 
-
+/*
 typedef struct TC_TRANSFER {
     Uint32 size;
     void *target;
@@ -634,9 +634,9 @@ Bool   slTransferEntry2(void *src , void *dest , Uint16 size)
 	(tc + TransRequest)->source += 1 << 31;
 	return true;
 }
+*/
 
-
-
+extern int nb_unlock;
 
 //0,0,latchpics[2+picnum-LATCHPICS_LUMP_START]->w,latchpics[2+picnum-LATCHPICS_LUMP_START]->h,
 void VL_LatchToScreenScaledCoordIndirect(SDL_Surface *source, int scxdest, int scydest)
@@ -644,22 +644,7 @@ void VL_LatchToScreenScaledCoordIndirect(SDL_Surface *source, int scxdest, int s
 //	assert(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
 //		&& scydest >= 0 && scydest + height * scaleFactor <= screenHeight
 //		&& "VL_LatchToScreenScaledCoord: Destination rectangle out of bounds!");
-
-//	SDL_Rect srcrect = { xsrc, ysrc, width, height };
-//	SDL_Rect dstrect = { scxdest, scydest, 0, 0 }; // width and height are ignored
-//	SDL_BlitSurface(source, &srcrect, curSurface, &dstrect);
-
-/*	unsigned char *surfacePtr = (unsigned char*)curSurface->pixels;
-	unsigned int *nbg1Ptr = (unsigned int*)VDP2_VRAM_A0;
-
-	for (int i = 0; i < screenHeight; i++) 
-	{
-//		slTransferEntry((void *)surfacePtr,(void *)nbg1Ptr,screenWidth);
-		slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,screenWidth);
-		surfacePtr+=screenWidth;
-		nbg1Ptr+=128;
-	}	*/	
-		unsigned char *surfacePtr = (unsigned char*)source->pixels + ((0) * source->pitch) + 0;
+		unsigned char *surfacePtr = (unsigned char*)source->pixels; // + ((0) * source->pitch) + 0;
 		unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + (scydest<<9)+ scxdest);
 
 //if(TransCount!=0)
@@ -667,12 +652,12 @@ void VL_LatchToScreenScaledCoordIndirect(SDL_Surface *source, int scxdest, int s
 			
 		for( Sint16 i=0;i<source->h;i++)
 		{
-//			slDMACopy((unsigned long*)(byte*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,srcrect.w);
-			slTransferEntry((void *)surfacePtr,(void *)nbg1Ptr,source->w);
+			slDMACopy((void*)surfacePtr,(void *)nbg1Ptr,source->w);
+//			slTransferEntry((void *)surfacePtr,(void *)nbg1Ptr,source->w);
 			surfacePtr+=source->pitch;
+					nb_unlock+=source->w;
 			nbg1Ptr+=128;
-		}			
-//		TransfertRequest=32;
+		}
 //      VL_UnlockSurface(curSurface);
 //      VL_UnlockSurface(source);
 }

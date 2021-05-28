@@ -14,7 +14,6 @@
 #endif
 
 #include "wl_def.h"
-#pragma hdrstop
 
 extern void SYS_Exit(Sint32 code);
 
@@ -686,7 +685,7 @@ CP_CheckQuick (ScanCode scancode)
             CA_CacheGrChunk (STARTFONT + 1);
 
             WindowX = WindowY = 0;
-            WindowW = 320;
+            WindowW = SATURN_WIDTH;
             WindowH = 160;
 #ifdef JAPAN
             if (GetYorN (7, 8, C_QUITMSGPIC))
@@ -1028,7 +1027,7 @@ CP_ChangeView (int)
     ControlInfo ci;
 
     WindowX = WindowY = 0;
-    WindowW = 320;
+    WindowW = SATURN_WIDTH;
     WindowH = 200;
     newview = oldview = viewsize;
     DrawChangeView (oldview);
@@ -1112,7 +1111,7 @@ DrawChangeView (int view)
 //slPrint("slScrTransparent8",slLocate(1,17));		
 	slScrTransparent(0);
     int rescaledHeight = screenHeight / scaleFactor;
-    if(view != 21) VWB_Bar (0, rescaledHeight - 40, 320, 40, bordercol);
+    if(view != 21) VWB_Bar (0, rescaledHeight - 40, SATURN_WIDTH, 40, bordercol);
 
 #ifdef JAPAN
     CA_CacheScreen (S_CHANGEPIC);
@@ -1123,7 +1122,7 @@ DrawChangeView (int view)
 
     PrintY = (screenHeight / scaleFactor) - 39;
     WindowX = 0;
-    WindowY = 320;                                  // TODO: Check this!
+    WindowY = SATURN_WIDTH;                                  // TODO: Check this!
     SETFONTCOLOR (HIGHLIGHT, BKGDCOLOR);
 
     US_CPrint (STR_SIZE1 "\n");
@@ -1187,7 +1186,7 @@ void
 ClearMScreen (void)
 {
 #ifndef SPEAR
-    VWB_Bar (0, 0, 320, 200, BORDCOLOR);
+    VWB_Bar (0, 0, SATURN_WIDTH, 200, BORDCOLOR);
 #else
     VWB_DrawPic (0, 0, C_BACKDROPPIC);
 #endif
@@ -1636,7 +1635,7 @@ DrawMenu (CP_iteminfo * item_i, CP_itemtype * items)
 
     WindowX = PrintX = item_i->x + item_i->indent;
     WindowY = PrintY = item_i->y;
-    WindowW = 320;
+    WindowW = SATURN_WIDTH;
     WindowH = 200;
 
     for (i = 0; i < item_i->amount; i++)
@@ -1978,11 +1977,11 @@ void
 DrawStripes (int y)
 {
 #ifndef SPEAR
-    VWB_Bar (0, y, 320, 24, 0);
-    VWB_Hlin (0, 319, y + 22, STRIPE);
+    VWB_Bar (0, y, SATURN_WIDTH, 24, 0);
+    VWB_Hlin (0, SATURN_WIDTH-1, y + 22, STRIPE);
 #else
-    VWB_Bar (0, y, 320, 22, 0);
-    VWB_Hlin (0, 319, y + 23, 0);
+    VWB_Bar (0, y, SATURN_WIDTH, 22, 0);
+    VWB_Hlin (0, SATURN_WIDTH-1, y + 23, 0);
 #endif
 }
 

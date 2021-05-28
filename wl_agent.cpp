@@ -1,7 +1,6 @@
 // WL_AGENT.C
 
 #include "wl_def.h"
-#pragma hdrstop
 
 /*
 =============================================================================
@@ -274,13 +273,13 @@ void LatchDrawPicScaledCoordIndirect (unsigned scx, unsigned scy, unsigned picnu
 
 void StatusDrawPic (unsigned x, unsigned y, unsigned picnum)
 {
-    LatchDrawPicScaledCoord ((screenWidth-scaleFactor*320)/16 + scaleFactor*x,
+    LatchDrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/16 + scaleFactor*x,
         screenHeight-scaleFactor*(STATUSLINES-y),picnum);
 }
 
 inline void StatusDrawPicIndirect (unsigned x, unsigned y, unsigned picnum)
 {
-    LatchDrawPicScaledCoordIndirect ((screenWidth-scaleFactor*320)/16 + scaleFactor*x,
+    LatchDrawPicScaledCoordIndirect ((screenWidth-scaleFactor*SATURN_WIDTH)/16 + scaleFactor*x,
         screenHeight-scaleFactor*(STATUSLINES-y),picnum);
 }
 

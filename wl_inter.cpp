@@ -16,13 +16,12 @@ void Write (int x, int y, const char *string);
 =
 ==================
 */
-
 void
 ClearSplitVWB (void)
 {
     WindowX = 0;
     WindowY = 0;
-    WindowW = 320;
+    WindowW = SATURN_WIDTH;
     WindowH = 160;
 }
 
@@ -73,7 +72,7 @@ EndSpear (void)
     fontnumber = 0;
     fontcolor = 0xd0;
     WindowX = 0;
-    WindowW = 320;
+    WindowW = SATURN_WIDTH;
     PrintX = 0;
     PrintY = 180;
     US_CPrint (STR_ENDGAME1 "\n");
@@ -85,7 +84,7 @@ EndSpear (void)
 
     PrintX = 0;
     PrintY = 180;
-    VWB_Bar (0, 180, 320, 20, 0);
+    VWB_Bar (0, 180, SATURN_WIDTH, 20, 0);
     US_CPrint (STR_ENDGAME3 "\n");
     US_CPrint (STR_ENDGAME4);
 #ifndef USE_SPRITES	
@@ -140,7 +139,7 @@ Victory (void)
     CA_CacheGrChunk (BJCOLLAPSE3PIC);
     CA_CacheGrChunk (BJCOLLAPSE4PIC);
 
-    VWB_Bar (0, 0, 320, 200, VIEWCOLOR);
+    VWB_Bar (0, 0, SATURN_WIDTH, 200, VIEWCOLOR);
     VWB_DrawPic (124, 44, BJCOLLAPSE1PIC);
     VW_UpdateScreen ();
     VW_FadeIn ();
@@ -171,7 +170,7 @@ Victory (void)
     CA_CacheGrChunk (C_TIMECODEPIC);
 #endif
 
-    VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
+    VWB_Bar (0, 0, SATURN_WIDTH, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
     if (bordercol != VIEWCOLOR)
         DrawStatusBorder (VIEWCOLOR);
 
@@ -304,41 +303,6 @@ Victory (void)
 
 #endif // SPEARDEMO
 }
-
-
-//==========================================================================
-
-#ifndef JAPAN
-/*
-==================
-=
-= PG13
-=
-==================
-*/
-/*
-void
-PG13 (void)
-{
-    VW_FadeOut ();
-    VWB_Bar (0, 0, 320, 200, 0x82);     // background
-
-    CA_CacheGrChunk (PG13PIC);
-    VWB_DrawPic (216, 110, PG13PIC);
-    VW_UpdateScreen ();
-
-    UNCACHEGRCHUNK (PG13PIC);
-
-    VW_FadeIn ();
-	// VBT déplacé
-	StartCPMusic(INTROSONG);
-    IN_UserInput (TickBase * 7);
-
-    VW_FadeOut ();
-}
-*/
-#endif
-
 
 //==========================================================================
 
@@ -577,7 +541,7 @@ LevelCompleted (void)
 	slScrTransparent(2);
 	slSynch();
 		
-    VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
+    VWB_Bar (0, 0, SATURN_WIDTH, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
     if (bordercol != VIEWCOLOR)
         DrawStatusBorder (VIEWCOLOR);
     StartCPMusic (ENDLEVEL_MUS);
@@ -1561,7 +1525,7 @@ CopyProtection (void)
         VWB_DrawPic (0, 0, COPYPROTTOPPIC);
         VWB_DrawPic (0, 20 * 8, COPYPROTBOXPIC);
         WindowX = WindowY = 0;
-        WindowW = 320;
+        WindowW = SATURN_WIDTH;
         WindowH = 200;
         PrintY = 65;
 
@@ -1766,7 +1730,7 @@ CopyProtection (void)
     }
 
     
-    ShutdownId ();
+//    ShutdownId ();
 
 //    printf ("%s\n", DosMessages[US_RndT () % 9]);
     SYS_Exit (1);

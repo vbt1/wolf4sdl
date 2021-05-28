@@ -83,8 +83,10 @@ boolean param_ignorenumchunks = false;
 
 //#ifndef REMDEBUG
 unsigned frame_x=0,frame_y=0;
+unsigned char hz=0;
 extern SDL_Color curpal[256];
-//extern int nb_unlock;
+extern int nb_unlock;
+
 void VblIn(void);
 
 void VblIn(void)
@@ -96,15 +98,15 @@ extern Uint16 TransCount;
 TransCount*=2;	*/
 	frame_y++;
 	
-	if(frame_y==60)
+	if(frame_y==hz)
 	{
 		slPrint((char*)ltoa(frame_x,buffer),slLocate(14,1));
-//		slPrintHex(nb_unlock,slLocate(14,2));		
+		slPrintHex(nb_unlock,slLocate(14,2));		
 		frame_y=frame_x=0;
-//		nb_unlock=0;
+		nb_unlock=0;
 	}
-//	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
-//	VGAClearScreen (); // vbt : maj du fond d'écran
+	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
+	VGAClearScreen (); // vbt : maj du fond d'écran
 //	VL_UnlockSurface(curSurface);
 #ifdef PONY
 	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;
@@ -491,7 +493,7 @@ boolean LoadTheGame(FILE *file,int x,int y)
 =
 ==========================
 */
-
+/*
 void ShutdownId (void)
 {
     US_Shutdown ();         // This line is completely useless...
@@ -504,7 +506,7 @@ void ShutdownId (void)
     GP2X_Shutdown();
 #endif
 }
-
+*/
 
 //===========================================================================
 
@@ -684,7 +686,7 @@ void FinishSignon (void)
 	// vbt : fait un fond violet
     VW_Bar (0,189,300,11,VL_GetPixel(0,0));
     WindowX = 0;
-    WindowW = 320;
+    WindowW = SATURN_WIDTH;
     PrintY = 190;
 
     #ifndef JAPAN
@@ -1008,7 +1010,7 @@ void DoJukebox(void)
     SETFONTCOLOR (READHCOLOR,BKGDCOLOR);
     PrintY=15;
     WindowX = 0;
-    WindowY = 320;
+    WindowY = SATURN_WIDTH;
     US_CPrint ("Robert's Jukebox");
 
     SETFONTCOLOR (TEXTCOLOR,BKGDCOLOR);
@@ -1213,7 +1215,7 @@ void ShowViewSize (int width)
     }
     else
     {
-        viewwidth = width*16*screenWidth/320;
+        viewwidth = width*16*screenWidth/SATURN_WIDTH;
         viewheight = (int) (width*16*HEIGHTRATIO*screenHeight/200);
         DrawPlayBorder ();
     }
@@ -1231,7 +1233,7 @@ void NewViewSize (int width)
     else if(viewsize == 20)
         SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
     else
-        SetViewSize(width*16*screenWidth/320, (unsigned) (width*16*HEIGHTRATIO*screenHeight/200));
+        SetViewSize(width*16*screenWidth/SATURN_WIDTH, (unsigned) (width*16*HEIGHTRATIO*screenHeight/200));
 // xxx	VGAClearScreen ();
 }
 
@@ -1287,7 +1289,7 @@ void Quit (const char *errorStr, ...)
 	
     if (!pictable)  // don't try to display the red box before it's loaded
     {
-        ShutdownId();
+//        ShutdownId();
         if (error && *error)
         {
 #ifdef NOTYET
@@ -1319,7 +1321,7 @@ void Quit (const char *errorStr, ...)
     }
 #endif
 
-    ShutdownId ();
+//    ShutdownId ();
 
     if (error && *error)
     {

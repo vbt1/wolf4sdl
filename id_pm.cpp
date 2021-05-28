@@ -1,8 +1,8 @@
 #include "wl_def.h"
 
 #define LOADADDR 0x00242000
-#define READSIZE 0xB0000
-#define NB_WALL_HWRAM 44
+#define NB_WALL_HWRAM 45
+//#define NB_WALL_HWRAM 39
 
 int PMSpriteStart;
 //int PMSoundStart;
@@ -50,12 +50,9 @@ void PM_Startup()
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
     CHECKMALLOCRESULT(PMPages);	
 
-    uint32_t* pageOffsets = (uint32_t *) malloc((ChunksInFile + 1) * sizeof(int32_t));
-    CHECKMALLOCRESULT(pageOffsets);
-
-    word *pageLengths = (word *) malloc((ChunksInFile-PMSpriteStart) * sizeof(word));
-    CHECKMALLOCRESULT(pageLengths);
-
+	uint32_t* pageOffsets = (uint32_t *)0x002F2000; 
+	word *pageLengths = (word *)0x002F2000+(ChunksInFile + 1) * sizeof(int32_t);
+ 
 	for(i=0;i<ChunksInFile;i++)
 	{
 		pageOffsets[i]=Chunks[6]<<0|Chunks[7]<<8|Chunks[8]<<16|Chunks[9]<<24;
@@ -112,9 +109,9 @@ void PM_Startup()
 		memcpyl(ptr,&Chunks[pageOffsets[i]],0x1000);
 		ptr+=0x1000;
 	}
-
-//    for(i = PMSpriteStart; i < ChunksInFile; i++)
+//vbt + 10 faux !!!!
 	PM_DecodeSprites(PMSpriteStart,PMSpriteStart+10,ptr,pageOffsets,pageLengths,Chunks);
+
 	ptr = (uint8_t *)0x00202000;
 	ptr = PM_DecodeSprites(PMSpriteStart+10,PMSpriteStart+SPR_MUT_S_1,ptr,pageOffsets,pageLengths,Chunks);
 	ptr = PM_DecodeSprites(PMSpriteStart+SPR_BOSS_W1,PMSpriteStart+SPR_BOSS_DIE3+1,ptr,pageOffsets,pageLengths,Chunks);
@@ -125,17 +122,14 @@ SPR_KNIFEREADY, SPR_NULLSPRITE
 */
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr;
-	extern Uint8 *lowram;
-	lowram = ptr;
-	
 	int *val = (int *)ptr;
 	
-	slPrintHex((int)ChunksInFile-PMSpriteStart,slLocate(3,3));	
+//	slPrintHex((int)ChunksInFile-PMSpriteStart,slLocate(3,3));	
 	slPrintHex((int)val,slLocate(3,4));
 
-	free(pageLengths);
+//	free(pageLengths);
 	pageLengths = NULL;	
-    free(pageOffsets);
+//    free(pageOffsets);
 	pageOffsets = NULL;		
 	Chunks = NULL;		
 }	
@@ -144,8 +138,6 @@ uint8_t * PM_DecodeSprites(unsigned int start,unsigned int endi,uint8_t *ptr,uin
 {
     for(int i = start; i < endi; i++)
     {
-//		if(i>=SPR_MUT_S_1 && i<SPR_INKY_W2)
-//			continue;				// vbt : skip mutant loading		
         PMPages[i] = ptr;
 	
         if(!pageOffsets[i])
@@ -203,12 +195,12 @@ uint8_t * PM_DecodeSprites(unsigned int start,unsigned int endi,uint8_t *ptr,uin
 			cmdptr++;
 		}			
 
-		memcpy((void *)ptr,bmpbuff,0x1000);
+		memcpyl((void *)ptr,bmpbuff,0x1000);
 		ptr+=0x1000;
 	}
 	return ptr;
 }
-
+/*
 void PM_Shutdown()
 {
     free(PMPages);
@@ -216,3 +208,4 @@ void PM_Shutdown()
 //    free(PMPageData);
 //	PMPageData = NULL;	
 }
+*/

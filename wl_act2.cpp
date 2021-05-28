@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "wl_def.h"
-#pragma hdrstop
 
 extern "C"{
 //extern fixed slAtan(fixed y, fixed x);

@@ -29,6 +29,7 @@ void /* slave SH Initialize (RUNS on main SH) */
 #ifdef USE_SPRITES
 extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 #endif
+extern unsigned char hz;
 
 #ifdef VBT
 int CdUnlock();
@@ -117,7 +118,16 @@ static const Sint8	logtbl[] = {
 			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
 			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
 	};
-
+//--------------------------------------------------------------------------------------------------------------------------------------
+static unsigned int get_hz(void)
+{
+#define TVSTAT      (*(volatile Uint16 *)0x25F80004)
+	
+	if((TVSTAT & 1) == 0)
+		return 60;
+	else
+		return 50;
+}
 //--------------------------------------------------------------------------------------------------------------------------------------
  SDL_Surface * SDL_SetVideoMode  (int width, int height, int bpp, Uint32 flags)
 {
@@ -147,7 +157,7 @@ static const Sint8	logtbl[] = {
 #else
 	slInitSystem(tv_mode, NULL, 1);
 #endif	
-
+	hz = get_hz();
 //	slZdspLevel(8);
 // vbt 26/07/2020
 //	slDynamicFrame(ON);
@@ -173,17 +183,12 @@ static const Sint8	logtbl[] = {
     slScrAutoDisp(NBG0ON| NBG1ON);
 	
 	slScrCycleSet(0x55EEEEEE , NULL , 0x044EEEEE , NULL);
-    // screen coordinates like in SDL
-//    slBitMapBase(0, 0);
 //#define		BACK_COL_ADR		( VDP2_VRAM_A1 + 0x1fffe )	
 //	slBack1ColSet((void *)BACK_COL_ADR , RGB(14,14,14));
 //	slScrTransparent(RBG0ON);
 	
 //    slScrAutoDisp(RBG0ON| NBG0ON| NBG1ON| NBG3ON);
-
-
 //	VDP2_RAMCTL = VDP2_RAMCTL & 0xFCFF;
-
 /*  /// vbt ? remettre
 slCharNbg3(COL_TYPE_256, CHAR_SIZE_1x1); 
 slPageNbg3((void*)0x25e60000, 0, PNB_1WORD|CN_10BIT ); 
@@ -421,7 +426,7 @@ Uint32 SDL_MapRGB (SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b)
 	return 0x8000 | RGB(r>>3,g>>3,b>>3);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-//int nb_unlock;
+int nb_unlock =0;
 
 void SDL_UnlockSurface(SDL_Surface *surface)
 {
@@ -438,6 +443,7 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 //		slDMACopy((unsigned long*)surfacePtr,(void *)(VDP2_VRAM_A0 + (i<<9)),screenWidth);
 		slDMACopy((unsigned long*)surfacePtr,(void *)nbg1Ptr,screenWidth); // vbt à remettre !!!
 		surfacePtr+=screenWidth;
+		nb_unlock+=screenWidth;
 		nbg1Ptr+=128;
 	}
 	slDMAWait();
@@ -445,13 +451,14 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained)
 {
-	Sint32		oct, shift_freq, fns;
-	Uint8 i;
 	Sint8 err=0;
 	memcpy(obtained,desired,sizeof(SDL_AudioSpec));
 #ifdef PONY	
 	
 #else
+	Sint32		oct, shift_freq, fns;
+	Uint8 i;
+	
 	for (i=0; i<4; i++)
 	{
 		m_dat[i].mode = 0;
@@ -512,8 +519,9 @@ int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Re
 			slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,srcrect->w); // vbt à remettre
 //			slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(VDP2_VRAM_A0 + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
 			surfacePtr+=src->pitch;
+			    nb_unlock+=srcrect->w;
 			nbg1Ptr+=128;
-		}	
+		}
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------

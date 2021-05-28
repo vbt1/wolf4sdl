@@ -1,7 +1,5 @@
 // WL_PLAY.C
-//#define USE_SPRITES 1
 #include "wl_def.h"
-#pragma hdrstop
 
 #include "wl_cloudsky.h"
 #include "wl_shade.h"
@@ -397,6 +395,7 @@ void PollControls (void)
 //              middle of the screen
 //
 ///////////////////////////////////////////////////////////////////////////
+/*
 #define MAXX    320
 #define MAXY    160
 
@@ -404,7 +403,7 @@ void CenterWindow (word w, word h)
 {
     US_DrawWindow (((MAXX / 8) - w) / 2, ((MAXY / 8) - h) / 2, w, h);
 }
-
+*/
 //===========================================================================
 
 
