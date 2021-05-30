@@ -85,6 +85,7 @@ boolean param_ignorenumchunks = false;
 unsigned frame_x=0,frame_y=0;
 unsigned char hz=0;
 extern SDL_Color curpal[256];
+extern int min_wallheight;
 extern int nb_unlock;
 
 void VblIn(void);
@@ -105,7 +106,8 @@ TransCount*=2;	*/
 		frame_y=frame_x=0;
 		nb_unlock=0;
 	}
-	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
+//	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
+	SDL_SetColors(curSurface, curpal, 0, 256);
 	VGAClearScreen (); // vbt : maj du fond d'écran
 //	VL_UnlockSurface(curSurface);
 #ifdef PONY
@@ -178,10 +180,10 @@ int32_t DoChecksum(byte *source,unsigned size,int32_t checksum)
 =
 ==================
 */
-
+#ifndef EMBEDDED
 extern statetype s_grdstand;
 extern statetype s_player;
-
+#endif
 boolean SaveTheGame(FILE *file,int x,int y)
 {
 //    struct diskfree_t dfree;
@@ -1059,6 +1061,12 @@ static void InitGame()
     boolean didjukebox=false;
 #endif
 
+#ifdef EMBEDDED
+	for (int i = 0;i < MAPSIZE; i++)
+	{
+		farmapylookup[i] = i*64;
+	}
+#endif
     // initialize SDL
 #if defined _WIN32
     putenv("SDL_VIDEODRIVER=directx");
@@ -1187,6 +1195,7 @@ boolean SetViewSize (unsigned width, unsigned height)
 // calculate trace angles and projection constants
 //
     CalcProjection (FOCALLENGTH);
+	min_wallheight = viewheight;
 #ifdef USE_SPRITES
 //	VGAClearScreen ();
 #endif

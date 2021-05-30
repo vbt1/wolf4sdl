@@ -123,10 +123,7 @@ void	VL_SetVGAPlaneMode (void)
     curPitch = screenBuffer->pitch;
 //    SDL_SetColors(screen, gamepal, 0, 256);
     SDL_SetColors(curSurface, gamepal, 0, 256);
-    memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
-
-
-//    SDL_SetColors(screenBuffer, gamepal, 0, 256);
+    memcpyl(curpal, gamepal, sizeof(SDL_Color) * 256);
 
     scaleFactor = screenWidth/SATURN_WIDTH;
     if(screenHeight/200 < scaleFactor) scaleFactor = screenHeight/200;
@@ -636,7 +633,7 @@ Bool   slTransferEntry2(void *src , void *dest , Uint16 size)
 }
 */
 
-extern int nb_unlock;
+//extern int nb_unlock;
 
 //0,0,latchpics[2+picnum-LATCHPICS_LUMP_START]->w,latchpics[2+picnum-LATCHPICS_LUMP_START]->h,
 void VL_LatchToScreenScaledCoordIndirect(SDL_Surface *source, int scxdest, int scydest)
@@ -655,7 +652,7 @@ void VL_LatchToScreenScaledCoordIndirect(SDL_Surface *source, int scxdest, int s
 			slDMACopy((void*)surfacePtr,(void *)nbg1Ptr,source->w);
 //			slTransferEntry((void *)surfacePtr,(void *)nbg1Ptr,source->w);
 			surfacePtr+=source->pitch;
-					nb_unlock+=source->w;
+//					nb_unlock+=source->w;
 			nbg1Ptr+=128;
 		}
 //      VL_UnlockSurface(curSurface);

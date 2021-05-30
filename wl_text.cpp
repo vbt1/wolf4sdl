@@ -810,7 +810,7 @@ void HelpScreens (void)
 void EndText (void)
 {
     int     artnum;
-    char    *text;
+//    char    *text;
 #ifndef ARTSEXTERN
     memptr  layout;
 #endif

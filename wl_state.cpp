@@ -2,6 +2,9 @@
 
 #include "wl_def.h"
 
+#ifdef EMBEDDED
+extern statetype gamestates[MAXSTATES];
+#endif
 /*
 =============================================================================
 
@@ -38,7 +41,11 @@ static const dirtype diagonal[9][9] =
 
 
 
-void    SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
+#ifdef EMBEDDED
+void SpawnNewObj(unsigned tilex, unsigned tiley, int state);
+#else
+void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
+#endif
 void    NewState (objtype *ob, statetype *state);
 
 boolean TryWalk (objtype *ob);
@@ -76,7 +83,28 @@ boolean CheckSight (objtype *ob);
 =
 ===================
 */
+#ifdef EMBEDDED
+void SpawnNewObj(unsigned tilex, unsigned tiley, int state) /* stateenum */
+{
+	GetNewActor();
+	
+	newobj->state = state;
+	if (gamestates[state].tictime)
+		newobj->ticcount = US_RndT () % gamestates[state].tictime;
+	else
+		newobj->ticcount = 0;
 
+	newobj->tilex = tilex;
+	newobj->tiley = tiley;
+	newobj->x = ((long)tilex<<TILESHIFT)+TILEGLOBAL/2;
+	newobj->y = ((long)tiley<<TILESHIFT)+TILEGLOBAL/2;
+	newobj->dir = nodir;
+
+	actorat[tilex][tiley] = newobj->id | 0x8000;
+	newobj->areanumber =
+		*(mapsegs[0] + farmapylookup[newobj->tiley]+newobj->tilex) - AREATILE;
+}
+#else
 void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 {
     GetNewActor ();
@@ -98,8 +126,7 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
     newobj->areanumber =
         *(mapsegs[0] + (newobj->tiley<<mapshift)+newobj->tilex) - AREATILE;
 }
-
-
+#endif
 
 /*
 ===================
@@ -110,14 +137,19 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 =
 ===================
 */
-
+#ifdef EMBEDDED
+void NewState (objtype *ob, int state)
+#else
 void NewState (objtype *ob, statetype *state)
+#endif
 {
     ob->state = state;
+#ifdef EMBEDDED
+	ob->ticcount = gamestates[state].tictime;
+#else	
     ob->ticcount = state->tictime;
+#endif
 }
-
-
 
 /*
 =============================================================================
@@ -351,13 +383,17 @@ boolean TryWalk (objtype *ob)
     }
 #endif
 
+#ifdef EMBEDDED
+	ob->areanumber =
+		*(mapsegs[0] + farmapylookup[ob->tiley]+ob->tilex) - AREATILE;
+#else
     ob->areanumber =
         *(mapsegs[0] + (ob->tiley<<mapshift)+ob->tilex) - AREATILE;
+#endif
 
     ob->distance = TILEGLOBAL;
     return true;
 }
-
 
 /*
 ==================================
@@ -487,7 +523,6 @@ void SelectDodgeDir (objtype *ob)
     ob->dir = nodir;
 }
 
-
 /*
 ============================
 =
@@ -597,7 +632,6 @@ void SelectChaseDir (objtype *ob)
     ob->dir = nodir;                // can't move
 }
 
-
 /*
 ============================
 =
@@ -665,7 +699,6 @@ void SelectRunDir (objtype *ob)
 
     ob->dir = nodir;                // can't move
 }
-
 
 /*
 =================
@@ -796,54 +829,148 @@ moveok:
 /*
 ===============
 =
-= DropItem
-=
-= Tries to drop a bonus item somewhere in the tiles surrounding the
-= given tilex/tiley
-=
-===============
-*/
-
-void DropItem (wl_stat_t itemtype, int tilex, int tiley)
-{
-    int     x,y,xl,xh,yl,yh;
-
-    //
-    // find a free spot to put it in
-    //
-    if (!actorat[tilex][tiley])
-    {
-        PlaceItemType (itemtype, tilex,tiley);
-        return;
-    }
-
-    xl = tilex-1;
-    xh = tilex+1;
-    yl = tiley-1;
-    yh = tiley+1;
-
-    for (x=xl ; x<= xh ; x++)
-    {
-        for (y=yl ; y<= yh ; y++)
-        {
-            if (!actorat[x][y])
-            {
-                PlaceItemType (itemtype, x,y);
-                return;
-            }
-        }
-    }
-}
-
-
-
-/*
-===============
-=
 = KillActor
 =
 ===============
 */
+
+#ifdef EMBEDDED
+void KillActor (objtype *ob)
+{
+	int	tilex,tiley;
+
+	tilex = ob->tilex = ob->x >> TILESHIFT;		// drop item on center
+	tiley = ob->tiley = ob->y >> TILESHIFT;
+
+	switch (ob->obclass)
+	{
+	case guardobj:
+		GivePoints (100);
+		NewState (ob,s_grddie1);
+		PlaceItemType (bo_clip2,tilex,tiley);
+		break;
+
+	case officerobj:
+		GivePoints (400);
+		NewState (ob,s_ofcdie1);
+		PlaceItemType (bo_clip2,tilex,tiley);
+		break;
+
+	case mutantobj:
+		GivePoints (700);
+		NewState (ob,s_mutdie1);
+		PlaceItemType (bo_clip2,tilex,tiley);
+		break;
+
+	case ssobj:
+		GivePoints (500);
+		NewState (ob,s_ssdie1);
+		if (gamestate.bestweapon < wp_machinegun)
+			PlaceItemType (bo_machinegun,tilex,tiley);
+		else
+			PlaceItemType (bo_clip2,tilex,tiley);
+		break;
+
+	case dogobj:
+		GivePoints (200);
+		NewState (ob,s_dogdie1);
+		break;
+
+#ifndef SPEAR
+	case bossobj:
+		GivePoints (5000);
+		NewState (ob,s_bossdie1);
+		PlaceItemType (bo_key1,tilex,tiley);
+		break;
+
+	case gretelobj:
+		GivePoints (5000);
+		NewState (ob,s_greteldie1);
+		PlaceItemType (bo_key1,tilex,tiley);
+		break;
+
+	case giftobj:
+		GivePoints (5000);
+		gamestate.killx = player->x;
+		gamestate.killy = player->y;
+		NewState (ob,s_giftdie1);
+		break;
+
+	case fatobj:
+		GivePoints (5000);
+		gamestate.killx = player->x;
+		gamestate.killy = player->y;
+		NewState (ob,s_fatdie1);
+		break;
+
+	case schabbobj:
+		GivePoints (5000);
+		gamestate.killx = player->x;
+		gamestate.killy = player->y;
+		NewState (ob,s_schabbdie1);
+		A_DeathScream(ob);
+		break;
+	case fakeobj:
+		GivePoints (2000);
+		NewState (ob,s_fakedie1);
+		break;
+
+	case mechahitlerobj:
+		GivePoints (5000);
+		NewState (ob,s_mechadie1);
+		break;
+	case realhitlerobj:
+		GivePoints (5000);
+		gamestate.killx = player->x;
+		gamestate.killy = player->y;
+		NewState (ob,s_hitlerdie1);
+		A_DeathScream(ob);
+		break;
+#else
+	case spectreobj:
+		GivePoints (200);
+		NewState (ob,s_spectredie1);
+		break;
+
+	case angelobj:
+		GivePoints (5000);
+		NewState (ob,s_angeldie1);
+		break;
+
+	case transobj:
+		GivePoints (5000);
+		NewState (ob,s_transdie0);
+		PlaceItemType (bo_key1,tilex,tiley);
+		break;
+
+	case uberobj:
+		GivePoints (5000);
+		NewState (ob,s_uberdie0);
+		PlaceItemType (bo_key1,tilex,tiley);
+		break;
+
+	case willobj:
+		GivePoints (5000);
+		NewState (ob,s_willdie1);
+		PlaceItemType (bo_key1,tilex,tiley);
+		break;
+
+	case deathobj:
+		GivePoints (5000);
+		NewState (ob,s_deathdie1);
+		PlaceItemType (bo_key1,tilex,tiley);
+		break;
+#endif
+	default:
+		break;
+	}
+
+	gamestate.killcount++;
+	ob->flags &= ~FL_SHOOTABLE;
+	actorat[ob->tilex][ob->tiley] = 0;
+	ob->flags |= FL_NONMARK;
+}
+#else
 
 void KillActor (objtype *ob)
 {
@@ -980,7 +1107,7 @@ void KillActor (objtype *ob)
     actorat[ob->tilex][ob->tiley] = NULL;
     ob->flags |= FL_NONMARK;
 }
-
+#endif
 
 
 /*
@@ -1019,31 +1146,54 @@ void DamageActor (objtype *ob, unsigned damage)
         {
             case guardobj:
                 if (ob->hitpoints&1)
+#ifdef EMBEDDED
+                    NewState (ob,s_grdpain);
+                else
+                    NewState (ob,s_grdpain1);
+#else
                     NewState (ob,&s_grdpain);
                 else
                     NewState (ob,&s_grdpain1);
+#endif
                 break;
 
             case officerobj:
                 if (ob->hitpoints&1)
+#ifdef EMBEDDED
+                    NewState (ob,s_ofcpain);
+                else
+                    NewState (ob,s_ofcpain1);
+#else
                     NewState (ob,&s_ofcpain);
                 else
                     NewState (ob,&s_ofcpain1);
+#endif
                 break;
 
             case mutantobj:
                 if (ob->hitpoints&1)
+#ifdef EMBEDDED
+                    NewState (ob,s_mutpain);
+                else
+                    NewState (ob,s_mutpain1);
+#else
                     NewState (ob,&s_mutpain);
                 else
                     NewState (ob,&s_mutpain1);
+#endif
                 break;
 
             case ssobj:
                 if (ob->hitpoints&1)
+#ifdef EMBEDDED
+                    NewState (ob,s_sspain);
+                else
+                    NewState (ob,s_sspain1);
+#else
                     NewState (ob,&s_sspain);
                 else
                     NewState (ob,&s_sspain1);
-
+#endif
                 break;
         }
     }
@@ -1198,7 +1348,6 @@ boolean CheckLine (objtype *ob)
     return true;
 }
 
-
 /*
 ================
 =
@@ -1289,7 +1438,6 @@ boolean CheckSight (objtype *ob)
     return CheckLine (ob);
 }
 
-
 /*
 ===============
 =
@@ -1310,121 +1458,201 @@ void FirstSighting (objtype *ob)
     {
         case guardobj:
             SD_PlaySound(HALTSND);
+#ifdef EMBEDDED
+            NewState (ob,s_grdchase1);
+#else
             NewState (ob,&s_grdchase1);
+#endif
             ob->speed *= 3;                 // go faster when chasing player
             break;
 
         case officerobj:
             SD_PlaySound(SPIONSND);
+#ifdef EMBEDDED
+            NewState (ob,s_ofcchase1);
+#else
             NewState (ob,&s_ofcchase1);
+#endif
             ob->speed *= 5;                 // go faster when chasing player
             break;
 
         case mutantobj:
+#ifdef EMBEDDED
+            NewState (ob,s_mutchase1);
+#else
             NewState (ob,&s_mutchase1);
+#endif
             ob->speed *= 3;                 // go faster when chasing player
             break;
 
         case ssobj:
             SD_PlaySound(SCHUTZADSND);
+#ifdef EMBEDDED
+            NewState (ob,s_sschase1);
+#else
             NewState (ob,&s_sschase1);
+#endif
             ob->speed *= 4;                 // go faster when chasing player
             break;
 
         case dogobj:
             SD_PlaySound(DOGBARKSND);
+#ifdef EMBEDDED
+            NewState (ob,s_dogchase1);
+#else
             NewState (ob,&s_dogchase1);
+#endif
             ob->speed *= 2;                 // go faster when chasing player
             break;
 
 #ifndef SPEAR
         case bossobj:
             SD_PlaySound(GUTENTAGSND);
+#ifdef EMBEDDED
+            NewState (ob,s_bosschase1);
+#else
             NewState (ob,&s_bosschase1);
+#endif
             ob->speed = SPDPATROL*3;        // go faster when chasing player
             break;
 
 #ifndef APOGEE_1_0
         case gretelobj:
             SD_PlaySound(KEINSND);
+#ifdef EMBEDDED
+            NewState (ob,s_gretelchase1);
+#else
             NewState (ob,&s_gretelchase1);
+#endif
             ob->speed *= 3;                 // go faster when chasing player
             break;
 
         case giftobj:
             SD_PlaySound(EINESND);
+#ifdef EMBEDDED
+            NewState (ob,s_giftchase1);
+#else			
             NewState (ob,&s_giftchase1);
+#endif
             ob->speed *= 3;                 // go faster when chasing player
             break;
 
         case fatobj:
             SD_PlaySound(ERLAUBENSND);
+#ifdef EMBEDDED
+            NewState (ob,s_fatchase1);
+#else
             NewState (ob,&s_fatchase1);
+#endif			
             ob->speed *= 3;                 // go faster when chasing player
             break;
 #endif
 
         case schabbobj:
             SD_PlaySound(SCHABBSHASND);
+#ifdef EMBEDDED
+            NewState (ob,s_schabbchase1);
+#else
             NewState (ob,&s_schabbchase1);
+#endif
             ob->speed *= 3;                 // go faster when chasing player
             break;
 
         case fakeobj:
             SD_PlaySound(TOT_HUNDSND);
+#ifdef EMBEDDED
+            NewState (ob,s_fakechase1);
+#else
             NewState (ob,&s_fakechase1);
+#endif
             ob->speed *= 3;                 // go faster when chasing player
             break;
 
         case mechahitlerobj:
             SD_PlaySound(DIESND);
+#ifdef EMBEDDED
+            NewState (ob,s_mechachase1);
+#else
             NewState (ob,&s_mechachase1);
+#endif
             ob->speed *= 3;                 // go faster when chasing player
             break;
 
         case realhitlerobj:
             SD_PlaySound(DIESND);
+#ifdef EMBEDDED
+            NewState (ob,s_hitlerchase1);
+#else
             NewState (ob,&s_hitlerchase1);
+#endif
             ob->speed *= 5;                 // go faster when chasing player
             break;
 
         case ghostobj:
+#ifdef EMBEDDED
+            NewState (ob,s_blinkychase1);
+#else
             NewState (ob,&s_blinkychase1);
+#endif
             ob->speed *= 2;                 // go faster when chasing player
             break;
 #else
         case spectreobj:
             SD_PlaySound(GHOSTSIGHTSND);
+#ifdef EMBEDDED
+            NewState (ob,s_spectrechase1);
+#else
             NewState (ob,&s_spectrechase1);
+#endif
             ob->speed = 800;                        // go faster when chasing player
             break;
 
         case angelobj:
             SD_PlaySound(ANGELSIGHTSND);
+#ifdef EMBEDDED
+            NewState (ob,s_angelchase1);
+#else
             NewState (ob,&s_angelchase1);
+#endif
             ob->speed = 1536;                       // go faster when chasing player
             break;
 
         case transobj:
             SD_PlaySound(TRANSSIGHTSND);
+#ifdef EMBEDDED
+            NewState (ob,s_transchase1);
+#else
             NewState (ob,&s_transchase1);
+#endif
             ob->speed = 1536;                       // go faster when chasing player
             break;
 
         case uberobj:
+#ifdef EMBEDDED
+            NewState (ob,s_uberchase1);
+#else
             NewState (ob,&s_uberchase1);
+#endif
             ob->speed = 3000;                       // go faster when chasing player
             break;
 
         case willobj:
             SD_PlaySound(WILHELMSIGHTSND);
+#ifdef EMBEDDED
+            NewState (ob,s_willchase1);
+#else
             NewState (ob,&s_willchase1);
+#endif
             ob->speed = 2048;                       // go faster when chasing player
             break;
 
         case deathobj:
             SD_PlaySound(KNIGHTSIGHTSND);
+#ifdef EMBEDDED
+            NewState (ob,s_deathchase1);
+#else
             NewState (ob,&s_deathchase1);
+#endif
             ob->speed = 2048;                       // go faster when chasing player
             break;
 #endif
@@ -1435,8 +1663,6 @@ void FirstSighting (objtype *ob)
 
     ob->flags |= FL_ATTACKMODE|FL_FIRSTATTACK;
 }
-
-
 
 /*
 ===============
@@ -1530,3 +1756,4 @@ boolean SightPlayer (objtype *ob)
 
     return true;
 }
+

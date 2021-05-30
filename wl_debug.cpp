@@ -611,7 +611,7 @@ again:
 
         return 1;
     }
-    else if (Keyboard[sc_N])        // N = no clip
+/*    else if (Keyboard[sc_N])        // N = no clip
     {
         noclip^=1;
         CenterWindow (18,3);
@@ -622,7 +622,7 @@ again:
         VW_UpdateScreen();
         IN_Ack ();
         return 1;
-    }
+    }*/
     else if (Keyboard[sc_O])        // O = basic overhead
     {
         BasicOverhead();

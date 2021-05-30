@@ -421,10 +421,10 @@ int SDL_LockSurface(SDL_Surface *surface)
 	return 0;
 }*/
 //--------------------------------------------------------------------------------------------------------------------------------------
-Uint32 SDL_MapRGB (SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b)
+/*Uint32 SDL_MapRGB (SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b)
 {
 	return 0x8000 | RGB(r>>3,g>>3,b>>3);
-}
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 int nb_unlock =0;
 
@@ -443,7 +443,7 @@ void SDL_UnlockSurface(SDL_Surface *surface)
 //		slDMACopy((unsigned long*)surfacePtr,(void *)(VDP2_VRAM_A0 + (i<<9)),screenWidth);
 		slDMACopy((unsigned long*)surfacePtr,(void *)nbg1Ptr,screenWidth); // vbt à remettre !!!
 		surfacePtr+=screenWidth;
-		nb_unlock+=screenWidth;
+//		nb_unlock+=screenWidth;
 		nbg1Ptr+=128;
 	}
 	slDMAWait();
@@ -519,7 +519,7 @@ int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Re
 			slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,srcrect->w); // vbt à remettre
 //			slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(VDP2_VRAM_A0 + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
 			surfacePtr+=src->pitch;
-			    nb_unlock+=srcrect->w;
+//			    nb_unlock+=srcrect->w;
 			nbg1Ptr+=128;
 		}
 	return 0;
@@ -550,12 +550,14 @@ int SDL_FillRect (SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color)
 			{
 				memset(d,color,dstrect->w);
 				d+=dst->pitch;
+//				nb_unlock+=dst->pitch;
 			}
 		}
 		else
 		{
 	//		slBMBoxFill(dstrect->x, dstrect->y, dstrect->x + dstrect->w - 1, dstrect->y + dstrect->h - 1, color);
 		   memset(dst->pixels,color,screenWidth*screenHeight);
+//		   nb_unlock+=screenWidth*screenHeight;
 		}
 
 	return 0;
@@ -581,12 +583,6 @@ void SDL_Quit(void)
 	SYS_Exit(0);
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-int SDL_SetPalette(SDL_Surface *surface, int flags, SDL_Color *colors, int firstcolor, int ncolors)
-{
-	SDL_SetColors(surface, colors, firstcolor, ncolors);
-	return 0;
-}
-//--------------------------------------------------------------------------------------------------------------------------------------
 char * SDL_GetError(void)
 {
 	return (char*)"Error !!!";
@@ -607,6 +603,12 @@ SDL_Rect ** SDL_ListModes(SDL_PixelFormat *format, Uint32 flags)
 {
 	return (SDL_Rect **)-1;
 }
+//--------------------------------------------------------------------------------------------------------------------------------------
+/*int SDL_SetPalette(SDL_Surface *surface, int flags, SDL_Color *colors, int firstcolor, int ncolors)
+{
+	SDL_SetColors(surface, colors, firstcolor, ncolors);
+	return 0;
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 /*
 void SDL_WM_SetCaption(const char *title, const char *icon)

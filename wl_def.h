@@ -5,6 +5,7 @@
 #define PONY 1 
 #define USE_ADX 1
 #define USE_SLAVE 1
+#define EMBEDDED 1
 #define SATURN_WIDTH 320
 #define SATURN_SORT_VALUE 240
 #define SATURN_CHUNK_ADDR 0x002F4000
@@ -742,6 +743,16 @@ typedef enum {
 
 typedef void (* statefunc) (void *);
 
+#ifdef EMBEDDED
+typedef struct statestruct
+{
+	boolean	rotate;
+	int shapenum; /* a shapenum of -1 means get from ob->temp1 */
+	int tictime;
+	void (*think)(), (*action)();
+	int next; /* stateenum */
+} statetype;
+#else
 typedef struct statestruct
 {
     boolean rotate;
@@ -750,7 +761,7 @@ typedef struct statestruct
     void    (*think) (void *),(*action) (void *);
     struct  statestruct *next;
 } statetype;
-
+#endif
 
 //---------------------
 //
@@ -800,8 +811,12 @@ typedef struct objstruct
     activetype  active;
     short       ticcount;
     classtype   obclass;
+#ifndef EMBEDDED	
     statetype   *state;
-
+#else
+	int		id;
+	int		state; /* stateenum */
+#endif	
     uint32_t    flags;              // FL_SHOOTABLE, etc
 
     int32_t     distance;           // if negative, wait for that door to open
@@ -1020,8 +1035,18 @@ void UpdateSoundLoc(void);
 
 extern  byte            tilemap[MAPSIZE][MAPSIZE];      // wall values only
 extern  byte            spotvis[MAPSIZE][MAPSIZE];
-extern  objtype         *actorat[MAPSIZE][MAPSIZE];
+#ifdef EMBEDDED
 
+#include "wl_act3.h"
+extern  int         actorat[MAPSIZE][MAPSIZE];
+extern	unsigned	farmapylookup[MAPSIZE];
+extern statetype gamestates[MAXSTATES];
+
+//extern	objtype 	objlist[MAXACTORS],*new,*obj,*player,*lastobj,
+extern	objtype 	*neww;
+#else
+extern  objtype         *actorat[MAPSIZE][MAPSIZE];
+#endif
 extern  objtype         *player;
 
 extern  unsigned        tics;
@@ -1161,9 +1186,13 @@ typedef struct
 
 
 void    InitHitRect (objtype *ob, unsigned radius);
+#ifndef EMBEDDED
 void    SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
 void    NewState (objtype *ob, statetype *state);
-
+#else
+void	SpawnNewObj(unsigned tilex, unsigned tiley, int state); /* stateenum */
+void	NewState(objtype *ob, int state); /* stateenum */
+#endif
 boolean TryWalk (objtype *ob);
 void    SelectChaseDir (objtype *ob);
 void    SelectDodgeDir (objtype *ob);
@@ -1185,9 +1214,17 @@ boolean CheckSight (objtype *ob);
 =============================================================================
 */
 
-extern  short    anglefrac;
 extern  int      facecount, facetimes;
+//#ifndef EMBEDDED
+extern  short    anglefrac;
 extern  word     plux,pluy;         // player coordinates scaled to unsigned
+/*
+#else
+extern  int    anglefrac;
+extern  unsigned     plux,pluy;         // player coordinates scaled to unsigned
+extern	boolean		noclip;
+#endif
+*/
 extern  int32_t  thrustspeed;
 extern  objtype  *LastAttacker;
 
@@ -1227,7 +1264,7 @@ void    DrawAmmo (void);
 
 extern  doorobj_t doorobjlist[MAXDOORS];
 extern  doorobj_t *lastdoorobj;
-extern  short     doornum;
+//extern  short     doornum;
 
 extern  word      doorposition[MAXDOORS];
 
@@ -1262,7 +1299,7 @@ void InitAreas (void);
 */
 
 #define s_nakedbody s_static10
-
+#ifndef EMBEDDED
 extern  statetype s_grddie1;
 extern  statetype s_dogdie1;
 extern  statetype s_ofcdie1;
@@ -1323,6 +1360,8 @@ extern  statetype s_schabbdeathcam2;
 extern  statetype s_hitlerdeathcam2;
 extern  statetype s_giftdeathcam2;
 extern  statetype s_fatdeathcam2;
+
+#endif
 
 void SpawnStand (enemy_t which, int tilex, int tiley, int dir);
 void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir);

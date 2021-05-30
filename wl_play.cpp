@@ -37,8 +37,13 @@ int godmode;//, singlestep, extravbls = 1; // to remove flicker (gray stuff at t
 
 byte tilemap[MAPSIZE][MAPSIZE]; // wall values only
 byte spotvis[MAPSIZE][MAPSIZE];
-objtype *actorat[MAPSIZE][MAPSIZE];
+#ifdef EMBEDDED
+int	    actorat[MAPSIZE][MAPSIZE];
+unsigned	farmapylookup[MAPSIZE];
 
+#else
+objtype *actorat[MAPSIZE][MAPSIZE];
+#endif
 //
 // replacing refresh manager
 //
@@ -579,7 +584,10 @@ void CheckKeys (void)
         IN_ClearKeysDown ();
         VW_FadeOut();
         if(viewsize != 21)
+		{
             DrawPlayScreen ();
+			DrawStatusBar();
+		}
         if (!startgame)
             ContinueMusic (lastoffs);
 //        if (loadedgame)
@@ -1012,7 +1020,111 @@ void FinishPaletteShifts (void)
 =============================================================================
 */
 
+#ifdef EMBEDDED
+/*
+=====================
+=
+= DoActor
+=
+=====================
+*/
 
+void DoActor(objtype *ob)
+{
+	void (*think)(objtype *);
+
+	if (!ob->active && !areabyplayer[ob->areanumber])
+		return;
+
+	if (!(ob->flags & (FL_NONMARK|FL_NEVERMARK)))
+		actorat[ob->tilex][ob->tiley] = 0;
+
+//
+// non transitional object
+//
+
+	if (!ob->ticcount)
+	{
+		think =	(void (*)(objtype *)) gamestates[ob->state].think;
+		if (think)
+		{
+			think(ob);
+			if (ob->state == s_none)
+			{
+				RemoveObj (ob);
+				return;
+			}
+		}
+
+		if (ob->flags&FL_NEVERMARK)
+			return;
+
+		if ((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
+			return;
+
+		actorat[ob->tilex][ob->tiley] = ob->id | 0x8000;
+		return;
+	}
+
+//
+// transitional object
+//
+	ob->ticcount-=tics;
+	while (ob->ticcount <= 0)
+	{
+		think = (void (*)(objtype *)) gamestates[ob->state].action;	// end of state action
+		if (think)
+		{
+			think(ob);
+			if (ob->state == s_none)
+			{
+				RemoveObj(ob);
+				return;
+			}
+		}
+
+		ob->state = (int)gamestates[ob->state].next;
+
+		if (ob->state == s_none)
+		{
+			RemoveObj(ob);
+			return;
+		}
+
+		if (!gamestates[ob->state].tictime)
+		{
+			ob->ticcount = 0;
+			goto think;
+		}
+
+		ob->ticcount += gamestates[ob->state].tictime;
+	}
+
+think:
+	//
+	// think
+	//
+	think =	(void (*)(objtype *)) gamestates[ob->state].think;
+	if (think)
+	{
+		think(ob);
+		if (ob->state == s_none)
+		{
+			RemoveObj(ob);
+			return;
+		}
+	}
+
+	if (ob->flags&FL_NEVERMARK)
+		return;
+
+	if ((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
+		return;
+
+	actorat[ob->tilex][ob->tiley] = ob->id | 0x8000;
+}
+
+#else
 /*
 =====================
 =
@@ -1115,7 +1227,7 @@ think:
 
     actorat[ob->tilex][ob->tiley] = ob;
 }
-
+#endif
 //==========================================================================
 
 

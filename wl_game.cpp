@@ -19,6 +19,11 @@ extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 unsigned char texture_list[SPR_TOTAL];
 #endif
 
+#ifdef EMBEDDED
+boolean loadedgame;
+extern boolean startgame;
+#endif
+
 #undef atan2
 //#define atan2(a,b) slAtan(a,b)
 #define atan2(a,b) MTH_Atan(a,b)
@@ -548,7 +553,11 @@ slIntFunction(VblIn) ;
             {
                 // solid wall
                 tilemap[x][y] = (byte) tile;
+#ifdef EMBEDDED
+				actorat[x][y] = tile;
+#else
                 actorat[x][y] = (objtype *)(uintptr_t) tile;
+#endif				
             }
             else
             {
@@ -807,7 +816,7 @@ void DrawPlayScreen (void)
 {
 	//vbt à remettre
   	//		slPrint("VWB_DrawPicScaledCoord",slLocate(10,10));
-			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
+	VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
     DrawPlayBorder ();
 /*	
@@ -839,26 +848,14 @@ void DrawStatusBar (void)
 //			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
 //    DrawPlayBorder ();
-	
-  	//		slPrint("DrawFace",slLocate(10,12));
     DrawFace ();
-	
-  	//		slPrint("DrawHealth",slLocate(10,13));
     DrawHealth ();
-  	//		slPrint("DrawLives",slLocate(10,14));
     DrawLives ();
-  	//		slPrint("DrawLevel",slLocate(10,15));
     DrawLevel ();
-  	//		slPrint("DrawAmmo",slLocate(10,16));
     DrawAmmo ();
-  	//		slPrint("DrawKeys",slLocate(10,17));
     DrawKeys ();
-  	//		slPrint("DrawWeapon",slLocate(10,18));
     DrawWeapon ();
-  	//		slPrint("DrawScore",slLocate(10,19));
     DrawScore ();
-  	//		slPrint("DrawScore",slLocate(10,30));
-	
 }
 
 /*

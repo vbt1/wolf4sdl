@@ -1,7 +1,7 @@
 #include "wl_def.h"
 
 #define LOADADDR 0x00242000
-#define NB_WALL_HWRAM 45
+#define NB_WALL_HWRAM 44
 //#define NB_WALL_HWRAM 39
 
 int PMSpriteStart;
@@ -44,7 +44,7 @@ void PM_Startup()
 // vbt : on ne charge pas les sons !	
 	ChunksInFile=PMSoundStart;
 
-	uint8_t *wallData = (uint8_t *) malloc((NB_WALL_HWRAM+18)*0x1000);
+	uint8_t *wallData = (uint8_t *) malloc((NB_WALL_HWRAM+20)*0x1000);
 	CHECKMALLOCRESULT(wallData);
 	
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
@@ -110,10 +110,10 @@ void PM_Startup()
 		ptr+=0x1000;
 	}
 //vbt + 10 faux !!!!
-	PM_DecodeSprites(PMSpriteStart,PMSpriteStart+10,ptr,pageOffsets,pageLengths,Chunks);
+	PM_DecodeSprites(PMSpriteStart,PMSpriteStart+12,ptr,pageOffsets,pageLengths,Chunks);
 
 	ptr = (uint8_t *)0x00202000;
-	ptr = PM_DecodeSprites(PMSpriteStart+10,PMSpriteStart+SPR_MUT_S_1,ptr,pageOffsets,pageLengths,Chunks);
+	ptr = PM_DecodeSprites(PMSpriteStart+12,PMSpriteStart+SPR_MUT_S_1,ptr,pageOffsets,pageLengths,Chunks);
 	ptr = PM_DecodeSprites(PMSpriteStart+SPR_BOSS_W1,PMSpriteStart+SPR_BOSS_DIE3+1,ptr,pageOffsets,pageLengths,Chunks);
 	ptr = PM_DecodeSprites(PMSpriteStart+SPR_BJ_W1,PMSpriteStart+SPR_BJ_JUMP4+1,ptr,pageOffsets,pageLengths,Chunks);
 	ptr = PM_DecodeSprites(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,ptr,pageOffsets,pageLengths,Chunks);
