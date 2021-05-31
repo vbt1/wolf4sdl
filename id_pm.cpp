@@ -13,10 +13,9 @@ uint8_t **PMPages;
 
 void PM_Startup()
 {
-	int PMSoundStart;	
-//#define READ16 1
+	unsigned int PMSoundStart;	
     char fname[13] = "VSWAP.";
-	Uint32 i=0,j=0;
+	Uint32 i=0;
 	Uint8 *Chunks;
 	long fileSize;
 	
@@ -34,10 +33,8 @@ void PM_Startup()
 //	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(fileId, 0, (void *)Chunks, fileSize);
 	ChunksInFile=Chunks[0]|Chunks[1]<<8;
-    PMSpriteStart = 0;
     //fread(&PMSpriteStart, sizeof(word), 1, file);
 	PMSpriteStart=Chunks[2]|Chunks[3]<<8;
-    PMSoundStart = 0;
     //fread(&PMSoundStart, sizeof(word), 1, file);
 	PMSoundStart=Chunks[4]|Chunks[5]<<8;
 
@@ -72,10 +69,10 @@ void PM_Startup()
 
     pageOffsets[ChunksInFile] = fileSize;
 
+/*
     uint32_t dataStart = pageOffsets[0];
-	
     // Check that all pageOffsets are valid
-/*    for(i = 0; i < ChunksInFile; i++)
+    for(i = 0; i < ChunksInFile; i++)
     {
         if(!pageOffsets[i]) continue;   // sparse page
         if(pageOffsets[i] < dataStart || pageOffsets[i] >= (size_t) fileSize)
@@ -117,9 +114,7 @@ void PM_Startup()
 	ptr = PM_DecodeSprites(PMSpriteStart+SPR_BOSS_W1,PMSpriteStart+SPR_BOSS_DIE3+1,ptr,pageOffsets,pageLengths,Chunks);
 	ptr = PM_DecodeSprites(PMSpriteStart+SPR_BJ_W1,PMSpriteStart+SPR_BJ_JUMP4+1,ptr,pageOffsets,pageLengths,Chunks);
 	ptr = PM_DecodeSprites(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,ptr,pageOffsets,pageLengths,Chunks);
-/*
-SPR_KNIFEREADY, SPR_NULLSPRITE
-*/
+
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr;
 	int *val = (int *)ptr;
@@ -136,7 +131,7 @@ SPR_KNIFEREADY, SPR_NULLSPRITE
 
 uint8_t * PM_DecodeSprites(unsigned int start,unsigned int endi,uint8_t *ptr,uint32_t* pageOffsets,word *pageLengths,Uint8 *Chunks)
 {
-    for(int i = start; i < endi; i++)
+    for(unsigned int i = start; i < endi; i++)
     {
         PMPages[i] = ptr;
 	
@@ -165,10 +160,9 @@ uint8_t * PM_DecodeSprites(unsigned int start,unsigned int endi,uint8_t *ptr,uin
 		{
 			shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
 		}
-	
+
 		byte bmpbuff[0x1000];
 		byte *bmpptr;
-		PICTURE pic_spr;
 		unsigned short  *cmdptr, *sprdata;
 
 		// set the texel index to the first texel

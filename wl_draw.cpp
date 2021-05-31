@@ -14,7 +14,6 @@ extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_TOTAL];
 extern unsigned int position_vram;
 #endif
-int viewangle;
 
 typedef struct
 {
@@ -88,9 +87,10 @@ void    ThreeDRefresh (void);
 
 //
 // ray tracing variables
-//
+#ifndef EMBEDDED
 short   midangle;
-
+int viewangle;
+#endif
 word horizwall[MAXWALLTILES],vertwall[MAXWALLTILES];
 
 /*
@@ -762,7 +762,6 @@ void DrawScaleds (void)
     objtype   *obj;
 
     visptr = &vislist[0];
-int i2=0,i3=0;
 //
 // place static objects
 //
@@ -780,7 +779,6 @@ int i2=0,i3=0;
             if(statptr->shapenum == -1)
                 continue;                                           // object has been taken
         }
-
         if (!visptr->viewheight)
             continue;                                               // to close to the object
 
@@ -797,7 +795,6 @@ int i2=0,i3=0;
             visptr++;
         }
     }
-slPrintHex(i2,slLocate(20,6));
 //
 // place active objects
 //
@@ -813,10 +810,6 @@ slPrintHex(i2,slLocate(20,6));
         spotloc = (obj->tilex<<mapshift)+obj->tiley;   // optimize: keep in struct?
         visspot = &spotvis[0][0]+spotloc;
         tilespot = &tilemap[0][0]+spotloc;
-
-slPrintHex(spotloc,slLocate(20,6));
-slPrintHex(*visspot,slLocate(20,7));
-slPrintHex(*tilespot,slLocate(20,8));
         //
         // could be in any of the nine surrounding tiles
         //
@@ -856,21 +849,16 @@ slPrintHex(*tilespot,slLocate(20,8));
                 visptr++;
             }
             obj->flags |= FL_VISABLE;
-					i2++;
         }
         else
 		{
             obj->flags &= ~FL_VISABLE;
-					i3++;
 		}
     }
-slPrintHex(i2,slLocate(20,9));
-slPrintHex(i3,slLocate(20,10));
 //
 // draw from back to front
 //
     numvisable = (int) (visptr-&vislist[0]);
-//slPrintHex(numvisable,slLocate(20,7));	
 
     if (!numvisable)
         return;                                                                 // no visable objects
@@ -1038,7 +1026,6 @@ static void HitHorizPWall(int postx, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture, offset;
-	byte *wall;
 	
 	texture = (ray->xintercept >> 4) & 0xfc0;
 	
@@ -1064,7 +1051,6 @@ static void HitHorizWallNew(int postx, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture;
-	byte *wall;
 
 	texture = (ray->xintercept >> 4) & 0xfc0;
 	
@@ -1179,7 +1165,6 @@ static void HitVertPWall(int postx, ray_struc *ray)
 static void HitVertDoorNew(int postx, ray_struc *ray)
 {
 	unsigned texture, doorpage = 0, doornum;
-//	byte *wall;
 
 	doornum = ray->tilehit&0x7f;
 	texture = ((ray->yintercept-doorposition[doornum]) >> 4) & 0xfc0;
@@ -1218,7 +1203,7 @@ static void AsmRefresh()
 	int focaltx, focalty;
 	int xstep, ystep;
 
-    viewangle = player->angle;
+    int viewangle = player->angle;
 
     viewsin = sintable[viewangle];
     viewcos = costable[viewangle];
@@ -1340,7 +1325,9 @@ vertentry:
 		continue;
 	}
 passvert:
+//	*((byte *)spotvis+xspot)=1;
 //	setspotvis(my_ray.xtile,TILE(my_ray.yintercept));
+	spotvis[my_ray.xtile][TILE(my_ray.yintercept)] = 1;
 	my_ray.xtile += my_ray.xtilestep;
 	my_ray.yintercept += ystep;
 	goto vertcheck;
@@ -1388,7 +1375,9 @@ horizentry:
 		continue;
 	}
 passhoriz:
+//    *((byte *)spotvis+yspot)=1;
 //	setspotvis(TILE(my_ray.xintercept), my_ray.ytile);
+	spotvis[TILE(my_ray.xintercept)][my_ray.ytile] = 1;
 	my_ray.ytile += my_ray.ytilestep;
 	my_ray.xintercept += xstep;
 	goto horizcheck;
@@ -1408,7 +1397,7 @@ static void AsmRefreshSlave()
 	int focaltx, focalty;
 	int xstep, ystep;
 
-    viewangle = player->angle;
+    int viewangle = player->angle;
 
     viewsin = sintable[viewangle];
     viewcos = costable[viewangle];
@@ -1527,6 +1516,7 @@ vertentry:
 	}
 passvert:
 //	setspotvis(my_ray.xtile,TILE(my_ray.yintercept));
+	spotvis[my_ray.xtile][TILE(my_ray.yintercept)] = 1;
 	my_ray.xtile += my_ray.xtilestep;
 	my_ray.yintercept += ystep;
 	goto vertcheck;
@@ -1574,6 +1564,7 @@ horizentry:
 		continue;
 	}
 passhoriz:
+	spotvis[TILE(my_ray.xintercept)][my_ray.ytile] = 1;
 //	setspotvis(TILE(my_ray.xintercept), my_ray.ytile);
 	my_ray.ytile += my_ray.ytilestep;
 	my_ray.xintercept += xstep;
@@ -2432,8 +2423,8 @@ vertentry:
                 HitHorizBorder(pixx,texdelta,&my_ray);
                 break;
             }
-            if(xspot>=maparea) break;
-*/			
+ */         if(xspot>=maparea) break;
+			
             my_ray.tilehit=((byte *)tilemap)[xspot];
             if(my_ray.tilehit)
             {
@@ -2586,8 +2577,9 @@ horizentry:
                 HitVertBorder(pixx,texdelta,&my_ray);
                 break;
             }
+*/
             if(yspot>=maparea) break;
-*/			
+			
             my_ray.tilehit=((byte *)tilemap)[yspot];
             if(my_ray.tilehit)
             {
@@ -2761,7 +2753,9 @@ inline void WallRefresh (void)
 inline void CalcViewVariables()
 {
     int viewangle = player->angle;
+#ifndef EMBEDDED
     midangle = viewangle*(FINEANGLES/ANGLES);
+#endif	
     viewsin = sintable[viewangle];
     viewcos = costable[viewangle];
     viewx = player->x - FixedMul(focallength,viewcos);
@@ -2853,7 +2847,7 @@ void    ThreeDRefresh (void)
 	//	extern int vbt;
 		SPRITE *user_wall = user_walls;
 
-		for(int pixx=0;pixx<viewwidth;pixx++)
+		for(unsigned int pixx=0;pixx<viewwidth;pixx++)
 		{
 			slSetSprite(user_wall++, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre // murs
 //			user_wall++;

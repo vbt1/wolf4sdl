@@ -7,9 +7,9 @@
 #define PMPageSize 4096
 #endif
 
-extern int ChunksInFile;
+//extern int ChunksInFile;
 extern int PMSpriteStart;
-extern int PMSoundStart;
+//extern int PMSoundStart;
 //extern bool PMSoundInfoPagePadded;
 
 // ChunksInFile+1 pointers to page starts.
@@ -27,7 +27,7 @@ static inline uint32_t PM_GetPageSize(int page)
     return (uint32_t) (PMPages[page + 1] - PMPages[page]);
 }
 */
-#define	PM_GetSpritePage(v)	PM_GetPage(PMSpriteStart + (v))
+//#define	PM_GetSpritePage(v)	PM_GetPage(PMSpriteStart + (v))
 
 static inline uint8_t *PM_GetPage(int page)
 {
