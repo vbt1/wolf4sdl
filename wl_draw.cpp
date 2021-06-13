@@ -259,23 +259,19 @@ int CalcHeight(int xintercept, int yintercept)
 
 //==========================================================================
 
-inline void loadActorTexture(int texture);
+inline void loadActorTexture(int texture,unsigned int height,unsigned char *surfacePtr);
 
 #ifdef USE_SPRITES
 TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 
-inline void loadActorTexture(int texture)
+inline void loadActorTexture(int texture,unsigned int height,unsigned char *surfacePtr)
 {
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];
 #if 1	
-	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(texture); // + ((0) * source->pitch) + 0;
-	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(texture+1);
-	unsigned int size=(nextSurfacePtr-surfacePtr);
-
-	*txptr = TEXDEF(64, (size>>6), position_vram);
-	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)surfacePtr,size);
-	texture_list[texture]=position_vram/size/2;
-	position_vram+=size/2;	
+	*txptr = TEXDEF(64, (height>>6), position_vram);
+	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)surfacePtr,height);
+	texture_list[texture]=position_vram/height/2;
+	position_vram+=height/2;	
 #else	
 	*txptr = TEXDEF(64, 64, position_vram);
 	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)PM_GetSprite(texture),0x1000);
@@ -517,32 +513,30 @@ inline int CalcRotate (objtype *ob)
     return angle/(ANGLES/8);
 }
 
-inline void ScaleShape (int xcenter, int shapenum, unsigned height)
+inline void ScaleShape (int xcenter, int shapenum, unsigned width)
 {
-    unsigned scalel,scale2,pixheight,pixheight2;
+    unsigned scalel,pixwidth;
 
 #ifdef USE_SHADING
     byte *curshades;
     if(flags & FL_FULLBRIGHT)
         curshades = shadetable[0];
     else
-        curshades = shadetable[GetShade(height)];
+        curshades = shadetable[GetShade(width)];
 #endif
-    scalel=height/8;                 // low three bits are fractional
+    scalel=width/8;                 // low three bits are fractional
     if(!scalel) return;   // too close or far away
-    pixheight=scalel*SPRITESCALEFACTOR;
+    pixwidth=scalel*SPRITESCALEFACTOR;
 
 
 #ifdef USE_SPRITES
 
 	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
 	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
-	unsigned int size=(nextSurfacePtr-surfacePtr);
-    scale2=(height*((size>>6))/64)/8;
-    pixheight2=scale2*SPRITESCALEFACTOR;
+	unsigned int height=(nextSurfacePtr-surfacePtr)>>6;
 	
 	if(texture_list[shapenum]==0xff)
-		loadActorTexture(shapenum);
+		loadActorTexture(shapenum,height<<6,surfacePtr);
 //--------------------------------------------------------------------------------------------
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+shapenum]; 
 // correct on touche pas		
@@ -552,14 +546,13 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height)
     user_sprite.SRCA=((txptr->CGadr));
     user_sprite.COLR=256;
 
-    user_sprite.SIZE=0x800+(size>>6);
+    user_sprite.SIZE=0x800+height;
 	user_sprite.XA=(xcenter-centerx);
-//	user_sprite.YA=(32-(size>>6)/2);
-	user_sprite.YA=pixheight*(32-(size>>6)/2)/64;
-	user_sprite.XB=pixheight;
-	user_sprite.YB=pixheight*(size>>6)/64;
+	user_sprite.YA=pixwidth*(32-height/2)/64;
+	user_sprite.XB=pixwidth;
+	user_sprite.YB=pixwidth*height/64;
     user_sprite.GRDA=0;
-	slSetSprite(&user_sprite, toFIXED(0+(SATURN_SORT_VALUE-pixheight/2)));	// à remettre // ennemis et objets
+	slSetSprite(&user_sprite, toFIXED(0+(SATURN_SORT_VALUE-pixwidth/2)));	// à remettre // ennemis et objets
 //--------------------------------------------------------------------------------------------	
 #else
 	byte *vbuf = LOCK()+screenofs;
@@ -577,17 +570,17 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height)
     int scrstarty,screndy,lpix,rpix,pixcnt,ycnt;
 
     actx=xcenter-scale;
-    upperedge=viewheight/2-scale;
+    upperedge=viewwidth/2-scale;
 
     shape = (t_compshape *) PM_GetSprite(shapenum);
 	
     cmdptr=(word *) shape->dataofs;
 	
-    for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
+    for(i=shape->leftpix,pixcnt=i*pixwidth,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
     {
         lpix=rpix;
         if(lpix>=viewwidth) break;
-        pixcnt+=pixheight;
+        pixcnt+=pixwidth;
         rpix=(pixcnt>>6)+actx;
         if(lpix!=rpix && rpix>0)
         {
@@ -596,7 +589,7 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height)
             cline=(byte *)shape + *cmdptr;
             while(lpix<rpix)
             {
-                if(wallheight[lpix]<=(int)height)
+                if(wallwidth[lpix]<=(int)width)
                 {
                     line=cline;
                     while((endy = READWORD(line)) != 0)
@@ -605,14 +598,14 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height)
                         newstart = READWORD(line);
                         starty = READWORD(line) >> 1;
 //                        j=starty;
-                        ycnt=j*pixheight;
+                        ycnt=j*pixwidth;
                         screndy=(ycnt>>6)+upperedge;
                         if(screndy<0) vmem=vbuf+lpix;
                         else vmem=vbuf+screndy*curPitch+lpix;
                         for(;j<endy;j++)
                         {
                             scrstarty=screndy;
-                            ycnt+=pixheight;
+                            ycnt+=pixwidth;
                             screndy=(ycnt>>6)+upperedge;
                             if(scrstarty!=screndy && screndy>0)
                             {
@@ -622,7 +615,7 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height)
                                 col=((byte *)shape)[newstart+j];
 #endif
                                 if(scrstarty<0) scrstarty=0;
-                                if(screndy>viewheight) screndy=viewheight,j=endy;
+                                if(screndy>viewwidth) screndy=viewwidth,j=endy;
 
                                 while(scrstarty<screndy)
                                 {
