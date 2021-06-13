@@ -261,19 +261,29 @@ int CalcHeight(int xintercept, int yintercept)
 
 inline void loadActorTexture(int texture);
 
-
 #ifdef USE_SPRITES
 TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
 
 inline void loadActorTexture(int texture)
 {
-	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];	
+	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];
+#if 1	
+	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(texture); // + ((0) * source->pitch) + 0;
+	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(texture+1);
+	unsigned int size=(nextSurfacePtr-surfacePtr);
+
+	*txptr = TEXDEF(64, (size>>6), position_vram);
+	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)surfacePtr,size);
+	texture_list[texture]=position_vram/size/2;
+	position_vram+=size/2;	
+#else	
 	*txptr = TEXDEF(64, 64, position_vram);
 	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)PM_GetSprite(texture),0x1000);
 //	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
 //	slDMACopy((void *)pic_spr.pcsrc,		(void *)(SpriteVRAM + ((txptr->CGadr) << 3)),		(Uint32)((txptr->Hsize * txptr->Vsize * 4) >> (pic_spr.cmode)));
 	texture_list[texture]=position_vram/0x800;
 	position_vram+=0x800;	
+#endif
 //	slDMAWait();
 }
 #endif
@@ -509,7 +519,7 @@ inline int CalcRotate (objtype *ob)
 
 inline void ScaleShape (int xcenter, int shapenum, unsigned height)
 {
-    unsigned scalel,pixheight;
+    unsigned scalel,scale2,pixheight,pixheight2;
 
 #ifdef USE_SHADING
     byte *curshades;
@@ -522,7 +532,15 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height)
     if(!scalel) return;   // too close or far away
     pixheight=scalel*SPRITESCALEFACTOR;
 
+
 #ifdef USE_SPRITES
+
+	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
+	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
+	unsigned int size=(nextSurfacePtr-surfacePtr);
+    scale2=(height*((size>>6))/64)/8;
+    pixheight2=scale2*SPRITESCALEFACTOR;
+	
 	if(texture_list[shapenum]==0xff)
 		loadActorTexture(shapenum);
 //--------------------------------------------------------------------------------------------
@@ -533,11 +551,13 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height)
     user_sprite.PMOD=CL256Bnk| ECdis;// | ECenb | SPdis;  // pas besoin pour les sprites
     user_sprite.SRCA=((txptr->CGadr));
     user_sprite.COLR=256;
-    user_sprite.SIZE=0x840;
+
+    user_sprite.SIZE=0x800+(size>>6);
 	user_sprite.XA=(xcenter-centerx);
-	user_sprite.YA=0;
+//	user_sprite.YA=(32-(size>>6)/2);
+	user_sprite.YA=pixheight*(32-(size>>6)/2)/64;
 	user_sprite.XB=pixheight;
-	user_sprite.YB=user_sprite.XB;
+	user_sprite.YB=pixheight*(size>>6)/64;
     user_sprite.GRDA=0;
 	slSetSprite(&user_sprite, toFIXED(0+(SATURN_SORT_VALUE-pixheight/2)));	// à remettre // ennemis et objets
 //--------------------------------------------------------------------------------------------	
@@ -622,6 +642,7 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned height)
 }
 #ifdef USE_SPRITES
 int old_texture = -1;
+int old_texturesize = 1;
 void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
 #else
 void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
@@ -629,6 +650,11 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 {
 #ifdef USE_SPRITES	
 ////slPrintHex(shapenum,slLocate(10,4));
+/*
+	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum);
+	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
+	int size=(nextSurfacePtr-surfacePtr);
+*/		
 	if (old_texture!=shapenum)
 	{
 		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)PM_GetSprite(shapenum),0x1000);
@@ -642,7 +668,8 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 //    user_sprite.SRCA=0x2000|(SATURN_WIDTH*8);
     user_sprite.SRCA=0x2000|(SATURN_WIDTH*8);
     user_sprite.COLR=256;
-    user_sprite.SIZE=0x840;
+//    user_sprite.SIZE=0x840;
+//    user_sprite.SIZE=0x800+(size>>6);
 	user_sprite.XA=(xcenter-centerx);
 	user_sprite.YA=0;
 	user_sprite.XB=height;
@@ -749,15 +776,22 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     actx=xcenter-scale;
     upperedge=viewheight/2-scale;
 */	
-		unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
-		unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
-		int size=(nextSurfacePtr-surfacePtr)>>6;
+	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
+	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
+	int size=(nextSurfacePtr-surfacePtr)>>6;
 		
-		unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + ((viewheight-56+(64-size))<<9)+ (viewwidth/2-32));
+	if (old_texture!=shapenum)
+	{	
+		unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + ((viewheight-56+(64-old_texturesize))<<9)+ (viewwidth/2-32));
+	
+		for( Sint16 i=0;i<old_texturesize-size;i++)
+		{
+			memset(nbg1Ptr,0x00,64);
+			nbg1Ptr+=128;			
+		}
 
-//if(TransCount!=0)
-//			slPrintHex(TransCount,slLocate(10,4));
-			
+		nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + ((viewheight-56+(64-size))<<9)+ (viewwidth/2-32));
+#if 0
 		for( Sint16 i=0;i<size;i++)
 		{
 			slDMACopy((void*)surfacePtr,(void *)nbg1Ptr,64);
@@ -766,7 +800,31 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 			surfacePtr+=64;
 			nbg1Ptr+=128;
 		}
-	
+		old_texturesize=size;
+		old_texture=shapenum;
+	}
+	#else
+		unsigned char *nbg1Ptr2 = (unsigned char*)(VDP2_VRAM_A0 + ((viewheight-56+(64-size))<<9)+ (viewwidth/2-32));
+		
+		pixheight=scale*SPRITESCALEFACTOR;
+		int toto=64*2;
+ 
+		for( Sint16 i=0;i<size;i++)
+		{	
+			lpix=0;
+            cline = (byte *)surfacePtr;
+            while(lpix<toto)
+            {
+				nbg1Ptr2[lpix+512*i]=surfacePtr[lpix/2];
+				lpix++;
+			}
+			surfacePtr+=64;			
+//			nbg1Ptr2+=(512-lpix);			
+		}
+		old_texturesize=size;
+		old_texture=shapenum;
+	}	
+	#endif
 /*
     cmdptr=shape->dataofs;
 
@@ -808,8 +866,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 
                             while(scrstarty<screndy)
                             {
-//                                *vmem=col;
-                                *vmem=0x11;
+                                *vmem=col;
                                 vmem+=vbufPitch;
                                 scrstarty++;
                             }
@@ -1011,7 +1068,7 @@ void DrawPlayerWeapon (byte *vbuf)
     if (gamestate.weapon != -1)
     {
         int shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
-/*		
+/*
 #ifdef USE_SPRITES
 		if(viewsize != 20)
 			SimpleScaleShape(viewwidth/2,shapenum,viewheight+1);
@@ -1025,7 +1082,9 @@ unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0);
 
 //		SimpleScaleShape((byte *)curSurface->pixels,viewwidth/2,shapenum,viewheight+1,curPitch);
 //		memset((byte *)nbg1Ptr,0x11,64*128);
+ // version sur nbg1
 		SimpleScaleShape((byte *)nbg1Ptr,viewwidth/2,shapenum,viewheight+1,curPitch);
+		
 //	while(1);	
     }
 

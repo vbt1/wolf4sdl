@@ -247,6 +247,7 @@ IN_Startup(void)
 //	IN_Shutdown() - Shuts down the Input Mgr
 //
 ///////////////////////////////////////////////////////////////////////////
+/*
 void
 IN_Shutdown(void)
 {
@@ -254,7 +255,7 @@ IN_Shutdown(void)
 		return;
 	IN_Started = false;
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////
 //
 //	IN_ClearKeysDown() - Clears the keyboard array
@@ -332,6 +333,7 @@ IN_ReadControl(int player,ControlInfo *info)
 //		returns the scan code
 //
 ///////////////////////////////////////////////////////////////////////////
+/*
 ScanCode
 IN_WaitForKey(void)
 {
@@ -342,7 +344,7 @@ IN_WaitForKey(void)
 	LastScan = 0;
 	return(result);
 }
-
+*/
 ///////////////////////////////////////////////////////////////////////////
 //
 //	IN_Ack() - waits for a button or key press.  If a button is down, upon
