@@ -538,12 +538,13 @@ void CAL_SetupGrFile (void)
     //if (handle == -1)
 //	if(stat(fname, NULL))
 //        CA_CannotOpen(fname);
+//slSynch();
 
 	fileId = GFS_NameToId((Sint8*)fname);
 	fileSize = GetFileSize(fileId);
     long headersize = fileSize;//lseek(handle, 0, SEEK_END);
     //lseek(handle, 0, SEEK_SET);
-
+//headersize= 157*3;
     if(!param_ignorenumchunks && headersize / 3 != (long) (lengthof(grstarts) - numEpisodesMissing))
 	{
 /*        Quit("Wolf4SDL was not compiled for these data files:\n"
@@ -562,6 +563,7 @@ void CAL_SetupGrFile (void)
 			slPrint((char *)msg,slLocate(1,3));
 						while(1);
 	}
+
     byte data[lengthof(grstarts) * 3];
 	//GFS_Load(fileId, 0, (void *)data, fileSize);
 	GFS_Load(fileId, 0, (void *)data, sizeof(data));

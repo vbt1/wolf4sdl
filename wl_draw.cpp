@@ -81,7 +81,7 @@ void    TransformActor (objtype *ob);
 void    BuildTables (void);
 void    ClearScreen (void);
 int     CalcRotate (objtype *ob);
-void    DrawScaleds (void);
+static void    DrawScaleds (void);
 void    CalcTics (void);
 void    ThreeDRefresh (void);
 
@@ -193,7 +193,7 @@ inline void TransformActor (objtype *ob)
 ========================
 */
 
-boolean TransformTile (int tx, int ty, short *dispx, short *dispheight)
+static boolean inline TransformTile (int tx, int ty, short *dispx, short *dispheight)
 {
     fixed gx,gy,gxt,gyt,nx,ny;
 
@@ -725,6 +725,105 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 #endif // end use sprites
 }
 
+void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
+{
+	unsigned pixheight=scale*SPRITESCALEFACTOR;
+    t_compshape   *shape;
+
+    unsigned starty,endy;
+    word *cmdptr;
+    byte *cline;
+    byte *line;
+    int actx,i,upperedge;
+    short newstart;
+    int scrstarty,screndy,lpix,rpix,pixcnt,ycnt;
+    unsigned j;
+    byte col;
+    byte *vmem;
+/*
+    shape = (t_compshape *) PM_GetSprite(shapenum);
+*/
+//    scale=height>>1;
+/* 
+ pixheight=scale*SPRITESCALEFACTOR;
+    actx=xcenter-scale;
+    upperedge=viewheight/2-scale;
+*/	
+		unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
+		unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
+		int size=(nextSurfacePtr-surfacePtr)>>6;
+		
+		unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + ((viewheight-56+(64-size))<<9)+ (viewwidth/2-32));
+
+//if(TransCount!=0)
+//			slPrintHex(TransCount,slLocate(10,4));
+			
+		for( Sint16 i=0;i<size;i++)
+		{
+			slDMACopy((void*)surfacePtr,(void *)nbg1Ptr,64);
+//			memcpy((void *)nbg1Ptr,(void*)surfacePtr,64);
+//			slTransferEntry((void *)surfacePtr,(void *)nbg1Ptr,64);
+			surfacePtr+=64;
+			nbg1Ptr+=128;
+		}
+	
+/*
+    cmdptr=shape->dataofs;
+
+
+    for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
+    {
+        lpix=rpix;
+        if(lpix>=viewwidth) break;
+        pixcnt+=pixheight;
+        rpix=(pixcnt>>6)+actx;
+        if(lpix!=rpix && rpix>0)
+        {
+            if(lpix<0) lpix=0;
+            if(rpix>viewwidth) rpix=viewwidth,i=shape->rightpix+1;
+            cline = (byte *)shape + *cmdptr;
+            while(lpix<rpix)
+            {
+                line=cline;
+                while((endy = READWORD(line)) != 0)
+                {
+                    endy >>= 1;
+                    newstart = READWORD(line);
+                    starty = READWORD(line) >> 1;
+                    j=starty;
+                    ycnt=j*pixheight;
+                    screndy=(ycnt>>6)+upperedge;
+                    if(screndy<0) vmem=vbuf+lpix;
+                    else vmem=vbuf+screndy*vbufPitch+lpix;
+                    for(;j<endy;j++)
+                    {
+                        scrstarty=screndy;
+                        ycnt+=pixheight;
+                        screndy=(ycnt>>6)+upperedge;
+                        if(scrstarty!=screndy && screndy>0)
+                        {
+                            col=((byte *)shape)[newstart+j];
+                            if(scrstarty<0) scrstarty=0;
+                            if(screndy>viewheight) screndy=viewheight,j=endy;
+
+                            while(scrstarty<screndy)
+                            {
+//                                *vmem=col;
+                                *vmem=0x11;
+                                vmem+=vbufPitch;
+                                scrstarty++;
+                            }
+                        }
+                    }
+                }
+                lpix++;
+            }
+        }
+    }
+*/	
+}
+
+
 /*
 =====================
 =
@@ -735,7 +834,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 =====================
 */
 
-#define MAXVISABLE 64
+#define MAXVISABLE 150
 
 typedef struct
 {
@@ -752,7 +851,7 @@ typedef struct
 visobj_t vislist[MAXVISABLE];
 visobj_t *visptr,*visstep,*farthest;
 
-void DrawScaleds (void)
+static void DrawScaleds (void)
 {
     int      i,least,numvisable,height;
     byte     *tilespot,*visspot;
@@ -900,7 +999,7 @@ void DrawScaleds (void)
 ==============
 */
 
-int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
+static int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
     SPR_MACHINEGUNREADY, SPR_CHAINREADY};
 
 #ifdef USE_SPRITES
@@ -912,6 +1011,7 @@ void DrawPlayerWeapon (byte *vbuf)
     if (gamestate.weapon != -1)
     {
         int shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
+/*		
 #ifdef USE_SPRITES
 		if(viewsize != 20)
 			SimpleScaleShape(viewwidth/2,shapenum,viewheight+1);
@@ -919,7 +1019,14 @@ void DrawPlayerWeapon (byte *vbuf)
 			SimpleScaleShape(viewwidth/2,shapenum,viewheight-41);		
 #else
         SimpleScaleShape(vbuf,viewwidth/2,shapenum,viewheight+1,curPitch);
-#endif		
+#endif
+*/
+unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0);
+
+//		SimpleScaleShape((byte *)curSurface->pixels,viewwidth/2,shapenum,viewheight+1,curPitch);
+//		memset((byte *)nbg1Ptr,0x11,64*128);
+		SimpleScaleShape((byte *)nbg1Ptr,viewwidth/2,shapenum,viewheight+1,curPitch);
+//	while(1);	
     }
 
     if (demoplayback)
@@ -1022,7 +1129,7 @@ static inline int samey(int ytilestep, int intercept, int tile)
 #define DEG270  2700
 #define DEG360  3600
 
-static void HitHorizPWall(int postx, ray_struc *ray)
+static inline void HitHorizPWall(int postx, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture, offset;
@@ -1047,7 +1154,7 @@ static void HitHorizPWall(int postx, ray_struc *ray)
 	ScalePost(postx, ray->postsource);
 }
 
-static void HitHorizWallNew(int postx, ray_struc *ray)
+static inline void HitHorizWallNew(int postx, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture;
@@ -1076,7 +1183,7 @@ static void HitHorizWallNew(int postx, ray_struc *ray)
 	ScalePost(postx, ray->postsource);
 }
 
-static void HitHorizDoorNew(int postx, ray_struc *ray)
+static inline void HitHorizDoorNew(int postx, ray_struc *ray)
 {
 	unsigned texture, doorpage = 0, doornum;
 //	byte *wall;
@@ -1107,7 +1214,7 @@ static void HitHorizDoorNew(int postx, ray_struc *ray)
 	ScalePost(postx, ray->postsource);
 }
 
-static void HitVertWallNew(int postx, ray_struc *ray)
+static void inline HitVertWallNew(int postx, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture;
@@ -1137,7 +1244,7 @@ static void HitVertWallNew(int postx, ray_struc *ray)
 	ScalePost(postx, ray->postsource);
 }
 
-static void HitVertPWall(int postx, ray_struc *ray)
+static inline void HitVertPWall(int postx, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture, offset;
@@ -1162,7 +1269,7 @@ static void HitVertPWall(int postx, ray_struc *ray)
 	ScalePost(postx, ray->postsource);
 }
 
-static void HitVertDoorNew(int postx, ray_struc *ray)
+static inline void HitVertDoorNew(int postx, ray_struc *ray)
 {
 	unsigned texture, doorpage = 0, doornum;
 
@@ -2830,7 +2937,7 @@ void    ThreeDRefresh (void)
 #endif
  // vbt : à remettre pour afficher l'arme
 #ifdef USE_SPRITES
-    DrawPlayerWeapon ();    // draw player's hands
+//    DrawPlayerWeapon ();    // draw player's hands
 #else
     DrawPlayerWeapon (vbuf);    // draw player's hands
 #endif
@@ -2891,5 +2998,6 @@ void    ThreeDRefresh (void)
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
 #endif
+DrawPlayerWeapon ();    // draw player's hands
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
 }
