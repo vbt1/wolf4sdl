@@ -636,23 +636,24 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
 #ifdef USE_SPRITES
 int old_texture = -1;
 int old_texturesize = 1;
-void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
+void SimpleScaleShape (int xcenter, int shapenum, unsigned pixwidth)
 #else
 void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
 #endif
 {
 #ifdef USE_SPRITES	
 ////slPrintHex(shapenum,slLocate(10,4));
-/*
+
 	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum);
 	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
-	int size=(nextSurfacePtr-surfacePtr);
-*/		
+	int height=(nextSurfacePtr-surfacePtr);
+		
 	if (old_texture!=shapenum)
 	{
-		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)PM_GetSprite(shapenum),0x1000);
+		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)surfacePtr,height);
 		old_texture=shapenum;
-	}	
+	}
+	height>>=6;
 //--------------------------------------------------------------------------------------------
 // correct on touche pas		
     SPRITE user_sprite;
@@ -662,12 +663,23 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     user_sprite.SRCA=0x2000|(SATURN_WIDTH*8);
     user_sprite.COLR=256;
 //    user_sprite.SIZE=0x840;
-//    user_sprite.SIZE=0x800+(size>>6);
+	
+/*
+    user_sprite.SIZE=0x800+(size>>6);
 	user_sprite.XA=(xcenter-centerx);
 	user_sprite.YA=0;
 	user_sprite.XB=height;
 	user_sprite.YB=user_sprite.XB;
+*/	
+    user_sprite.SIZE=0x800+height;
+	user_sprite.XA=(xcenter-centerx);
+	user_sprite.YA=pixwidth*(32-height/2)/64;
+	user_sprite.XB=pixwidth;
+	user_sprite.YB=pixwidth*height/64;
+	
+
     user_sprite.GRDA=0;
+	
 	slSetSprite(&user_sprite, toFIXED(10));// à remettre	// arme
 //--------------------------------------------------------------------------------------------	
 #else
@@ -744,7 +756,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     }
 #endif // end use sprites
 }
-
+#if 0 // vbt à supprimer
 void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
 {
 	unsigned pixheight=scale*SPRITESCALEFACTOR;
@@ -872,7 +884,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     }
 */	
 }
-
+#endif
 
 /*
 =====================
@@ -1061,7 +1073,7 @@ void DrawPlayerWeapon (byte *vbuf)
     if (gamestate.weapon != -1)
     {
         int shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
-/*
+
 #ifdef USE_SPRITES
 		if(viewsize != 20)
 			SimpleScaleShape(viewwidth/2,shapenum,viewheight+1);
@@ -1070,14 +1082,14 @@ void DrawPlayerWeapon (byte *vbuf)
 #else
         SimpleScaleShape(vbuf,viewwidth/2,shapenum,viewheight+1,curPitch);
 #endif
-*/
+/*
 unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0);
 
 //		SimpleScaleShape((byte *)curSurface->pixels,viewwidth/2,shapenum,viewheight+1,curPitch);
 //		memset((byte *)nbg1Ptr,0x11,64*128);
  // version sur nbg1
 		SimpleScaleShape((byte *)nbg1Ptr,viewwidth/2,shapenum,viewheight+1,curPitch);
-		
+	*/	
 //	while(1);	
     }
 
@@ -2991,7 +3003,7 @@ void    ThreeDRefresh (void)
 #ifdef USE_SPRITES
 //    DrawPlayerWeapon ();    // draw player's hands
 #else
-    DrawPlayerWeapon (vbuf);    // draw player's hands
+    DrawPlayerWeapon ();    // draw player's hands
 #endif
 
   /*  if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)

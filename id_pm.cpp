@@ -1,6 +1,6 @@
 #include "wl_def.h"
 
-#define LOADADDR 0x00242000
+#define LOADADDR 0x00238000
 #define NB_WALL_HWRAM 50
 //#define NB_WALL_HWRAM 39
 
@@ -42,14 +42,14 @@ void PM_Startup()
 // vbt : on ne charge pas les sons !	
 	ChunksInFile=PMSoundStart;
 
-	uint8_t *wallData = (uint8_t *) malloc((NB_WALL_HWRAM+12)*0x1000);
+	uint8_t *wallData = (uint8_t *) malloc((NB_WALL_HWRAM+10)*0x1000);
 	CHECKMALLOCRESULT(wallData);
 	
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
     CHECKMALLOCRESULT(PMPages);	
 
-	uint32_t* pageOffsets = (uint32_t *)0x002F2000; 
-	word *pageLengths = (word *)0x002F2000+(ChunksInFile + 1) * sizeof(int32_t);
+	uint32_t* pageOffsets = (uint32_t *)0x002F0000; 
+	word *pageLengths = (word *)0x002F0000+(ChunksInFile + 1) * sizeof(int32_t);
  
 	for(i=0;i<ChunksInFile;i++)
 	{
@@ -108,17 +108,17 @@ void PM_Startup()
 		ptr+=0x1000;
 	}
 //vbt + 10 faux !!!!
-	ptr = PM_DecodeSprites2(PMSpriteStart,PMSpriteStart+4,ptr,pageOffsets,pageLengths,Chunks);
+//	ptr = PM_DecodeSprites2(PMSpriteStart,PMSpriteStart+4,ptr,pageOffsets,pageLengths,Chunks);
 //	ptr = PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,ptr,pageOffsets,pageLengths,Chunks);
 
 	ptr = (uint8_t *)0x00202000;
-	ptr = PM_DecodeSprites2(PMSpriteStart+4,183,ptr,pageOffsets,pageLengths,Chunks);
+	ptr = PM_DecodeSprites2(PMSpriteStart,PMSpriteStart+SPR_MUT_S_1,ptr,pageOffsets,pageLengths,Chunks);
 //	ptr = PM_DecodeSprites2(PMSpriteStart+4,PMSpriteStart+SPR_MUT_S_1,ptr,pageOffsets,pageLengths,Chunks);
 //	ptr = PM_DecodeSprites2(PMSpriteStart+4,PMSpriteStart+7,ptr,pageOffsets,pageLengths,Chunks);
-//	ptr = PM_DecodeSprites2(PMSpriteStart+SPR_BOSS_W1,PMSpriteStart+SPR_BOSS_DIE3+1,ptr,pageOffsets,pageLengths,Chunks);
-//	ptr = PM_DecodeSprites2(PMSpriteStart+SPR_BJ_W1,PMSpriteStart+SPR_BJ_JUMP4+1,ptr,pageOffsets,pageLengths,Chunks);
+	ptr = PM_DecodeSprites2(PMSpriteStart+SPR_BOSS_W1,PMSpriteStart+SPR_BOSS_DIE3+1,ptr,pageOffsets,pageLengths,Chunks);
+	ptr = PM_DecodeSprites2(PMSpriteStart+SPR_BJ_W1,PMSpriteStart+SPR_BJ_JUMP4+1,ptr,pageOffsets,pageLengths,Chunks);
 //	ptr = (uint8_t *)VDP2_VRAM_A0+0x20000;
-//	ptr = PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,ptr,pageOffsets,pageLengths,Chunks);
+	ptr = PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,ptr,pageOffsets,pageLengths,Chunks);
 //	ptr = PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_KNIFEREADY+3,ptr,pageOffsets,pageLengths,Chunks);
 
     // last page points after page buffer
@@ -270,8 +270,6 @@ slPrint(toto,slLocate(5,7));
 			}
 			cmdptr++;
 		}
-		
-//slPrint("PM_DecodeSprites2 6 ",slLocate(5,6));
 
 		sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
 
@@ -287,9 +285,9 @@ slPrint("PM_DecodeSprites2 7 ",slLocate(5,6));
 			{
 slPrint("PM_DecodeSprites2 8 ",slLocate(5,6));
 				
-				int min_y = SWAP_BYTES_16(sprdata[2])/2;
-				if (min_y<count_00)
-					min_y=count_00;
+//				int min_y = SWAP_BYTES_16(sprdata[2])/2;
+//				if (min_y<count_00)
+//					min_y=count_00;
 				
 				for (unsigned int y = SWAP_BYTES_16(sprdata[2])/2; y < SWAP_BYTES_16(*sprdata)/2; y++)
 				{
