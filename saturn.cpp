@@ -426,7 +426,7 @@ int SDL_LockSurface(SDL_Surface *surface)
 	return 0x8000 | RGB(r>>3,g>>3,b>>3);
 }*/
 //--------------------------------------------------------------------------------------------------------------------------------------
-int nb_unlock =0;
+//int nb_unlock =0;
 
 void SDL_UnlockSurface(SDL_Surface *surface)
 {

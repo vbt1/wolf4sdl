@@ -85,8 +85,10 @@ boolean param_ignorenumchunks = false;
 unsigned frame_x=0,frame_y=0;
 unsigned char hz=0;
 extern SDL_Color curpal[256];
+#ifndef EMBEDDED
 extern int min_wallheight;
-extern int nb_unlock;
+#endif
+//extern int nb_unlock;
 
 void VblIn(void);
 
@@ -102,9 +104,9 @@ TransCount*=2;	*/
 	if(frame_y==hz)
 	{
 		slPrint((char*)ltoa(frame_x,buffer),slLocate(14,1));
-		slPrintHex(nb_unlock,slLocate(14,2));		
+//		slPrintHex(nb_unlock,slLocate(14,2));		
 		frame_y=frame_x=0;
-		nb_unlock=0;
+//		nb_unlock=0;
 	}
 //	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
 	SDL_SetColors(curSurface, curpal, 0, 256);
@@ -1195,7 +1197,10 @@ boolean SetViewSize (unsigned width, unsigned height)
 // calculate trace angles and projection constants
 //
     CalcProjection (FOCALLENGTH);
+#ifndef EMBEDDED	
 	min_wallheight = viewheight;
+#endif
+
 #ifdef USE_SPRITES
 //	VGAClearScreen ();
 #endif

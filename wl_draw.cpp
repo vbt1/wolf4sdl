@@ -57,8 +57,9 @@ ray_struc __attribute__ ((aligned (4)));
 int32_t    lasttimecount;
 
 short *wallheight;
+#ifndef EMBEDDED
 int min_wallheight;
-
+#endif
 //
 // math tables
 //
@@ -246,7 +247,28 @@ static boolean inline TransformTile (int tx, int ty, short *dispx, short *disphe
 =
 ====================
 */
+#ifdef EMBEDDED
+static int CalcHeight(int xintercept, int yintercept)
+{
+	fixed gxt,gyt,nx,gx,gy;
 
+	gx = xintercept - viewx;
+	gxt = FixedMul(gx, viewcos);
+
+	gy = yintercept - viewy;
+	gyt = FixedMul(gy, viewsin);
+
+	nx = gxt-gyt;
+
+  //
+  // calculate perspective ratio (heightnumerator/(nx>>8))
+  //
+	if (nx < MINDIST)
+		nx = MINDIST;			/* don't let divide overflow */
+
+	return heightnumerator/(nx>>8);
+}
+#else
 int CalcHeight(int xintercept, int yintercept)
 {
     fixed z = FixedMul(xintercept - viewx, viewcos)
@@ -256,7 +278,7 @@ int CalcHeight(int xintercept, int yintercept)
     if(height < min_wallheight) min_wallheight = height;
     return height;
 }
-
+#endif
 //==========================================================================
 
 inline void loadActorTexture(int texture,unsigned int height,unsigned char *surfacePtr);
@@ -291,7 +313,7 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 =
 ===================
 */
-extern int 					nb_unlock;
+//extern int 					nb_unlock;
 
 void ScalePost(int postx,byte *postsource)
 {
@@ -635,7 +657,6 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
 }
 #ifdef USE_SPRITES
 int old_texture = -1;
-int old_texturesize = 1;
 void SimpleScaleShape (int xcenter, int shapenum, unsigned pixwidth)
 #else
 void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
@@ -659,25 +680,13 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     SPRITE user_sprite;
     user_sprite.CTRL = FUNC_Sprite | _ZmCC;
     user_sprite.PMOD=CL256Bnk| ECdis | 0x0800;// | ECenb | SPdis;  // pas besoin pour les sprites
-//    user_sprite.SRCA=0x2000|(SATURN_WIDTH*8);
     user_sprite.SRCA=0x2000|(SATURN_WIDTH*8);
     user_sprite.COLR=256;
-//    user_sprite.SIZE=0x840;
-	
-/*
-    user_sprite.SIZE=0x800+(size>>6);
-	user_sprite.XA=(xcenter-centerx);
-	user_sprite.YA=0;
-	user_sprite.XB=height;
-	user_sprite.YB=user_sprite.XB;
-*/	
     user_sprite.SIZE=0x800+height;
 	user_sprite.XA=(xcenter-centerx);
 	user_sprite.YA=pixwidth*(32-height/2)/64;
 	user_sprite.XB=pixwidth;
 	user_sprite.YB=pixwidth*height/64;
-	
-
     user_sprite.GRDA=0;
 	
 	slSetSprite(&user_sprite, toFIXED(10));// à remettre	// arme
@@ -756,135 +765,6 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     }
 #endif // end use sprites
 }
-#if 0 // vbt à supprimer
-void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,unsigned vbufPitch)
-{
-	unsigned pixheight=scale*SPRITESCALEFACTOR;
-    t_compshape   *shape;
-
-    unsigned starty,endy;
-    word *cmdptr;
-    byte *cline;
-    byte *line;
-    int actx,i,upperedge;
-    short newstart;
-    int scrstarty,screndy,lpix,rpix,pixcnt,ycnt;
-    unsigned j;
-    byte col;
-    byte *vmem;
-/*
-    shape = (t_compshape *) PM_GetSprite(shapenum);
-*/
-//    scale=height>>1;
-/* 
- pixheight=scale*SPRITESCALEFACTOR;
-    actx=xcenter-scale;
-    upperedge=viewheight/2-scale;
-*/	
-	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
-	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
-	int size=(nextSurfacePtr-surfacePtr)>>6;
-		
-	if (old_texture!=shapenum)
-	{	
-		unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + ((viewheight-56+(64-old_texturesize))<<9)+ (viewwidth/2-32));
-	
-		for( Sint16 i=0;i<old_texturesize-size;i++)
-		{
-			memset(nbg1Ptr,0x00,64);
-			nbg1Ptr+=128;			
-		}
-
-		nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + ((viewheight-56+(64-size))<<9)+ (viewwidth/2-32));
-#if 0
-		for( Sint16 i=0;i<size;i++)
-		{
-			slDMACopy((void*)surfacePtr,(void *)nbg1Ptr,64);
-//			memcpy((void *)nbg1Ptr,(void*)surfacePtr,64);
-//			slTransferEntry((void *)surfacePtr,(void *)nbg1Ptr,64);
-			surfacePtr+=64;
-			nbg1Ptr+=128;
-		}
-		old_texturesize=size;
-		old_texture=shapenum;
-	}
-	#else
-		unsigned char *nbg1Ptr2 = (unsigned char*)(VDP2_VRAM_A0 + ((viewheight-56+(64-size))<<9)+ (viewwidth/2-32));
-		
-		pixheight=scale*SPRITESCALEFACTOR;
-		int toto=64*2;
- 
-		for( Sint16 i=0;i<size;i++)
-		{	
-			lpix=0;
-            cline = (byte *)surfacePtr;
-            while(lpix<toto)
-            {
-				nbg1Ptr2[lpix+512*i]=surfacePtr[lpix/2];
-				lpix++;
-			}
-			surfacePtr+=64;			
-//			nbg1Ptr2+=(512-lpix);			
-		}
-		old_texturesize=size;
-		old_texture=shapenum;
-	}	
-	#endif
-/*
-    cmdptr=shape->dataofs;
-
-
-    for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
-    {
-        lpix=rpix;
-        if(lpix>=viewwidth) break;
-        pixcnt+=pixheight;
-        rpix=(pixcnt>>6)+actx;
-        if(lpix!=rpix && rpix>0)
-        {
-            if(lpix<0) lpix=0;
-            if(rpix>viewwidth) rpix=viewwidth,i=shape->rightpix+1;
-            cline = (byte *)shape + *cmdptr;
-            while(lpix<rpix)
-            {
-                line=cline;
-                while((endy = READWORD(line)) != 0)
-                {
-                    endy >>= 1;
-                    newstart = READWORD(line);
-                    starty = READWORD(line) >> 1;
-                    j=starty;
-                    ycnt=j*pixheight;
-                    screndy=(ycnt>>6)+upperedge;
-                    if(screndy<0) vmem=vbuf+lpix;
-                    else vmem=vbuf+screndy*vbufPitch+lpix;
-                    for(;j<endy;j++)
-                    {
-                        scrstarty=screndy;
-                        ycnt+=pixheight;
-                        screndy=(ycnt>>6)+upperedge;
-                        if(scrstarty!=screndy && screndy>0)
-                        {
-                            col=((byte *)shape)[newstart+j];
-                            if(scrstarty<0) scrstarty=0;
-                            if(screndy>viewheight) screndy=viewheight,j=endy;
-
-                            while(scrstarty<screndy)
-                            {
-                                *vmem=col;
-                                vmem+=vbufPitch;
-                                scrstarty++;
-                            }
-                        }
-                    }
-                }
-                lpix++;
-            }
-        }
-    }
-*/	
-}
-#endif
 
 /*
 =====================
@@ -1156,35 +1036,6 @@ void CalcTics (void)
         tics = MAXTICS;
 }
 
-static inline int samex(int xtilestep, int intercept, int tile)
-{
-    if (xtilestep > 0) {
-        if ((intercept>>TILESHIFT) >= tile)
-            return 0;
-        else
-            return 1;
-    } else {
-        if ((intercept>>TILESHIFT) <= tile)
-            return 0;
-        else
-            return 1;
-    }
-}
-
-static inline int samey(int ytilestep, int intercept, int tile)
-{
-    if (ytilestep > 0) {
-        if ((intercept>>TILESHIFT) >= tile)
-            return 0;
-        else
-            return 1;
-    } else {
-        if ((intercept>>TILESHIFT) <= tile)
-            return 0;
-        else
-            return 1;
-    }
-}
 //==========================================================================
 #ifdef EMBEDDED
 
@@ -1193,25 +1044,91 @@ static inline int samey(int ytilestep, int intercept, int tile)
 #define DEG270  2700
 #define DEG360  3600
 
-static inline void HitHorizPWall(int postx, ray_struc *ray)
+static inline void HitHorizDoorNew(int postx, ray_struc *ray)
 {
-	int wallpic;
-	unsigned texture, offset;
-	
-	texture = (ray->xintercept >> 4) & 0xfc0;
-	
-	offset = pwallpos << 10;
-	
-	if (ray->ytilestep == -1)
-		ray->yintercept += TILEGLOBAL-offset;
-	else {
-		texture = 0xfc0-texture;
-		ray->yintercept += offset;
-	}
+	unsigned texture, doorpage = 0, doornum;
+//	byte *wall;
+
+	doornum = ray->tilehit&0x7f;
+	texture = ((ray->xintercept-doorposition[doornum]) >> 4) & 0xfc0;
 
 	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
-//horizwall[ray->tilehit & ~0x40];
-	wallpic = horizwall[ray->tilehit&63];
+
+	switch(doorobjlist[doornum].lock) {
+		case dr_normal:
+			doorpage = DOORWALL;
+			break;
+		case dr_lock1:
+		case dr_lock2:
+		case dr_lock3:
+		case dr_lock4:
+			doorpage = DOORWALL+6;
+			break;
+		case dr_elevator:
+			doorpage = DOORWALL+4;
+			break;
+	}
+
+//	wall = PM_GetPage(doorpage);
+	ray->postsource = PM_GetTexture(doorpage) + texture;
+//	ray->postx=postx;
+	ScalePost(postx, ray->postsource);
+}
+
+static inline void HitVertDoorNew(int postx, ray_struc *ray)
+{
+	unsigned texture, doorpage = 0, doornum;
+
+	doornum = ray->tilehit&0x7f;
+	texture = ((ray->yintercept-doorposition[doornum]) >> 4) & 0xfc0;
+
+	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
+
+	switch(doorobjlist[doornum].lock) {
+		case dr_normal:
+			doorpage = DOORWALL;
+			break;
+		case dr_lock1:
+		case dr_lock2:
+		case dr_lock3:
+		case dr_lock4:
+			doorpage = DOORWALL+6;
+			break;
+		case dr_elevator:
+			doorpage = DOORWALL+4;
+			break;
+	}
+
+//	wall = PM_GetPage(doorpage+1);
+	ray->postsource = PM_GetTexture(doorpage+1) + texture;
+//	ray->postx=postx;
+	ScalePost(postx, ray->postsource);
+}
+
+static void inline HitVertWallNew(int postx, ray_struc *ray)
+{
+	int wallpic;
+	unsigned texture;
+//	byte *wall;
+
+	texture = (ray->yintercept>>4)&0xfc0;
+	
+	if (ray->xtilestep == -1) {
+		texture = 0xfc0-texture;
+		ray->xintercept += TILEGLOBAL;
+	}
+	
+	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
+
+	if (ray->tilehit & 0x40) { // check for adjacent doors
+		ray->ytile = ray->yintercept>>TILESHIFT;
+		if (tilemap[ray->xtile-ray->xtilestep][ray->ytile] & 0x80)
+			wallpic = DOORWALL+3;
+		else
+			wallpic = vertwall[ray->tilehit & ~0x40];
+	} else
+		wallpic = vertwall[ray->tilehit];
+		
 //	wall = PM_GetPage(wallpic);
 	ray->postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
@@ -1247,64 +1164,25 @@ static inline void HitHorizWallNew(int postx, ray_struc *ray)
 	ScalePost(postx, ray->postsource);
 }
 
-static inline void HitHorizDoorNew(int postx, ray_struc *ray)
-{
-	unsigned texture, doorpage = 0, doornum;
-//	byte *wall;
-
-	doornum = ray->tilehit&0x7f;
-	texture = ((ray->xintercept-doorposition[doornum]) >> 4) & 0xfc0;
-
-	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
-
-	switch(doorobjlist[doornum].lock) {
-		case dr_normal:
-			doorpage = DOORWALL;
-			break;
-		case dr_lock1:
-		case dr_lock2:
-		case dr_lock3:
-		case dr_lock4:
-			doorpage = DOORWALL+6;
-			break;
-		case dr_elevator:
-			doorpage = DOORWALL+4;
-			break;
-	}
-
-//	wall = PM_GetPage(doorpage);
-	ray->postsource = PM_GetTexture(doorpage) + texture;
-//	ray->postx=postx;
-	ScalePost(postx, ray->postsource);
-}
-
-static void inline HitVertWallNew(int postx, ray_struc *ray)
+static inline void HitHorizPWall(int postx, ray_struc *ray)
 {
 	int wallpic;
-	unsigned texture;
-//	byte *wall;
-
-	texture = (ray->yintercept>>4)&0xfc0;
+	unsigned texture, offset;
 	
-	if (ray->xtilestep == -1) {
+	texture = (ray->xintercept >> 4) & 0xfc0;
+	
+	offset = pwallpos << 10;
+	
+	if (ray->ytilestep == -1)
+		ray->yintercept += TILEGLOBAL-offset;
+	else {
 		texture = 0xfc0-texture;
-		ray->xintercept += TILEGLOBAL;
+		ray->yintercept += offset;
 	}
-	
-	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
 
-	if (ray->tilehit & 0x40) { // check for adjacent doors
-		ray->ytile = ray->yintercept>>TILESHIFT;
-		if (tilemap[ray->xtile-ray->xtilestep][ray->ytile] & 0x80)
-			wallpic = DOORWALL+3;
-		else
-			wallpic = vertwall[ray->tilehit & ~0x40];
-	} else
-		wallpic = vertwall[ray->tilehit];
-		
-//	wall = PM_GetPage(wallpic);
+	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
+	wallpic = horizwall[ray->tilehit&63];
 	ray->postsource = PM_GetTexture(wallpic) + texture;
-//	ray->postx=postx;
 	ScalePost(postx, ray->postsource);
 }
 
@@ -1333,34 +1211,34 @@ static inline void HitVertPWall(int postx, ray_struc *ray)
 	ScalePost(postx, ray->postsource);
 }
 
-static inline void HitVertDoorNew(int postx, ray_struc *ray)
+static inline int samex(int xtilestep, int intercept, int tile)
 {
-	unsigned texture, doorpage = 0, doornum;
+    if (xtilestep > 0) {
+        if ((intercept>>TILESHIFT) >= tile)
+            return 0;
+        else
+            return 1;
+    } else {
+        if ((intercept>>TILESHIFT) <= tile)
+            return 0;
+        else
+            return 1;
+    }
+}
 
-	doornum = ray->tilehit&0x7f;
-	texture = ((ray->yintercept-doorposition[doornum]) >> 4) & 0xfc0;
-
-	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
-
-	switch(doorobjlist[doornum].lock) {
-		case dr_normal:
-			doorpage = DOORWALL;
-			break;
-		case dr_lock1:
-		case dr_lock2:
-		case dr_lock3:
-		case dr_lock4:
-			doorpage = DOORWALL+6;
-			break;
-		case dr_elevator:
-			doorpage = DOORWALL+4;
-			break;
-	}
-
-//	wall = PM_GetPage(doorpage+1);
-	ray->postsource = PM_GetTexture(doorpage+1) + texture;
-//	ray->postx=postx;
-	ScalePost(postx, ray->postsource);
+static inline int samey(int ytilestep, int intercept, int tile)
+{
+    if (ytilestep > 0) {
+        if ((intercept>>TILESHIFT) >= tile)
+            return 0;
+        else
+            return 1;
+    } else {
+        if ((intercept>>TILESHIFT) <= tile)
+            return 0;
+        else
+            return 1;
+    }
 }
 
 static void AsmRefresh()
@@ -1373,16 +1251,8 @@ static void AsmRefresh()
 	int midangle;
 	int focaltx, focalty;
 	int xstep, ystep;
-
-    int viewangle = player->angle;
-
-    viewsin = sintable[viewangle];
-    viewcos = costable[viewangle];
-    viewx = player->x - FixedMul(focallength, viewcos);
-    viewy = player->y + FixedMul(focallength, viewsin);
-
 	
-	midangle = viewangle*(FINEANGLES/ANGLES);
+	midangle = player->angle*(FINEANGLES/ANGLES);
 	xpartialdown = (viewx&(TILEGLOBAL-1));
 	xpartialup = TILEGLOBAL-xpartialdown;
 	ypartialdown = (viewy&(TILEGLOBAL-1));
@@ -1567,16 +1437,16 @@ static void AsmRefreshSlave()
 	int midangle;
 	int focaltx, focalty;
 	int xstep, ystep;
-
+/*
     int viewangle = player->angle;
 
     viewsin = sintable[viewangle];
     viewcos = costable[viewangle];
     viewx = player->x - FixedMul(focallength, viewcos);
     viewy = player->y + FixedMul(focallength, viewsin);
-
+*/
 	
-	midangle = viewangle*(FINEANGLES/ANGLES);
+	midangle = player->angle*(FINEANGLES/ANGLES);
 	xpartialdown = (viewx&(TILEGLOBAL-1));
 	xpartialup = TILEGLOBAL-xpartialdown;
 	ypartialdown = (viewy&(TILEGLOBAL-1));
@@ -2915,18 +2785,26 @@ passhoriz:
 inline void WallRefresh (void)
 {
 //	slCashPurge();
+#ifdef EMBEDDED
+    int viewangle = player->angle;
+
+    viewsin = sintable[viewangle];
+    viewcos = costable[viewangle];
+    viewx = player->x - FixedMul(focallength, viewcos);
+    viewy = player->y + FixedMul(focallength, viewsin);
+#endif
+
 #ifdef USE_SLAVE	
 	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
 #endif	
 	AsmRefresh();
 }
-
+#ifndef EMBEDDED
 inline void CalcViewVariables()
 {
     int viewangle = player->angle;
-#ifndef EMBEDDED
     midangle = viewangle*(FINEANGLES/ANGLES);
-#endif	
+
     viewsin = sintable[viewangle];
     viewcos = costable[viewangle];
     viewx = player->x - FixedMul(focallength,viewcos);
@@ -2938,7 +2816,7 @@ inline void CalcViewVariables()
 //    viewtx = (short)(player->x >> TILESHIFT);
 //    viewty = (short)(player->y >> TILESHIFT);
 }
-
+#endif
 //==========================================================================
 
 /*
@@ -2954,13 +2832,15 @@ void    ThreeDRefresh (void)
 //
 // clear out the traced array
 //
-    memset(spotvis,0,maparea);
+    memset(spotvis,0,sizeof(spotvis));
     spotvis[player->tilex][player->tiley] = 1;       // Detect all sprites over player fix
 #ifndef USE_SPRITES
     byte *vbuf = (byte *)screenBuffer->pixels;
     vbuf += screenofs;
-#endif	
+#endif
+#ifndef EMBEDDED
     CalcViewVariables();
+#endif	
 //
 // follow the walls from there to the right, drawing as we go
 //
