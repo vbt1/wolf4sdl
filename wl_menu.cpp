@@ -1373,6 +1373,7 @@ HandleMenu (CP_iteminfo * item_i, CP_itemtype * items, void (*routine) (int w))
         //
         // SEE IF ANY KEYS ARE PRESSED FOR INITIAL CHAR FINDING
         //
+/*
         key = LastASCII;
         if (key)
         {
@@ -1408,7 +1409,7 @@ HandleMenu (CP_iteminfo * item_i, CP_itemtype * items, void (*routine) (int w))
                     }
             }
         }
-
+*/
         //
         // GET INPUT
         //

@@ -1,6 +1,6 @@
 #include "wl_def.h"
 
-#define LOADADDR 0x00238000
+#define LOADADDR 0x0023A000
 #define NB_WALL_HWRAM 50
 //#define NB_WALL_HWRAM 39
 
@@ -70,7 +70,6 @@ void PM_Startup()
 
     pageOffsets[ChunksInFile] = fileSize;
 
-/*
     uint32_t dataStart = pageOffsets[0];
     // Check that all pageOffsets are valid
     for(i = 0; i < ChunksInFile; i++)
@@ -80,7 +79,7 @@ void PM_Startup()
             Quit("Illegal page offset for page %i: %u (filesize: %u)",
                     i, pageOffsets[i], fileSize);
     }	
-*/
+
 	Chunks=(Uint8*)LOADADDR;	
     // Load pages and initialize PMPages pointers
 	
@@ -169,6 +168,8 @@ uint8_t * PM_DecodeSprites2(unsigned int start,unsigned int endi,uint8_t *ptr,ui
 		cmdptr = shape->dataofs;
 		int count_00=63;
 
+//if (i>=SPR_SS_PAIN_1 && i<=SPR_SS_SHOOT3)count_00=1;
+
 		for (unsigned int x = (shape->leftpix); x <= (shape->rightpix); x++)
 		{
 			sprdata = (unsigned short *)((unsigned char  *)shape+*cmdptr);
@@ -189,7 +190,7 @@ uint8_t * PM_DecodeSprites2(unsigned int start,unsigned int endi,uint8_t *ptr,ui
 
 		cmdptr = shape->dataofs;		
 
-		for (unsigned int x = (shape->leftpix); x <= (shape->rightpix); x++)
+		for (int x = (shape->leftpix); x <= (shape->rightpix); x++)
 		{
 			sprdata = (unsigned short *)((unsigned char  *)shape+*cmdptr);
 			bmpptr = (byte *)bmpbuff+x;
@@ -200,7 +201,7 @@ uint8_t * PM_DecodeSprites2(unsigned int start,unsigned int endi,uint8_t *ptr,ui
 //				if (min_y<count_00)
 //					min_y=count_00;
 				
-				for (unsigned int y = SWAP_BYTES_16(sprdata[2])/2; y < SWAP_BYTES_16(*sprdata)/2; y++)
+				for (int y = SWAP_BYTES_16(sprdata[2])/2; y < SWAP_BYTES_16(*sprdata)/2; y++)
 				{
 /*
 char toto[100];

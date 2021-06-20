@@ -609,11 +609,11 @@ enum
     SPR_MACHINEGUNATK4,
 
     SPR_CHAINREADY,SPR_CHAINATK1,SPR_CHAINATK2,SPR_CHAINATK3,
-    SPR_CHAINATK4, SPR_NULLSPRITE, SPR_TOTAL
+    SPR_CHAINATK4, SPR_NULLSPRITE
 // vbt ajout, vient de wolf32x
 };
 // vbt ajout, vient de wolf32x
-//static byte *spritegfx[SPR_TOTAL];
+//static byte *spritegfx[SPR_NULLSPRITE];
 /*
 =============================================================================
 

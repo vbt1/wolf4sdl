@@ -15,8 +15,8 @@ extern fixed MTH_Atan(fixed y, fixed x);
 unsigned int position_vram=((SATURN_WIDTH+64)*32);
 //unsigned int static_items=0;
 extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
-extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
-unsigned char texture_list[SPR_TOTAL];
+extern TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
+unsigned char texture_list[SPR_NULLSPRITE];
 #endif
 
 #ifdef EMBEDDED
@@ -542,7 +542,8 @@ slIntFunction(VblIn) ;
 // copy the wall data to a data segment array
 //
     memset (tilemap,0,sizeof(tilemap));
-    memset (actorat,0,sizeof(objtype));
+    memset (actorat,0,sizeof(actorat));
+	
     map = mapsegs[0];
     for (y=0;y<mapheight;y++)
     {
@@ -608,7 +609,7 @@ slIntFunction(VblIn) ;
     }
 // vbt : on recharge la vram
 #ifdef USE_SPRITES
-	memset(texture_list,0xff,SPR_TOTAL);
+	memset(texture_list,0xff,SPR_NULLSPRITE);
 	position_vram=(SATURN_WIDTH+64)*32;
 
 	if(viewheight == screenHeight)
@@ -774,6 +775,7 @@ void DrawPlayBorder (void)
     VWB_BarScaledCoord (xl,yl,viewwidth,viewheight,0);
 
     if(xl != 0)
+//    if(viewsize == 19)
     {
 		SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
 		(*sys_clip).XC = (xl+viewwidth)-1;

@@ -10,8 +10,8 @@ void heapWalk();
 #ifdef USE_SPRITES
 unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 SPRITE user_walls[SATURN_WIDTH];
-extern 	TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
-extern unsigned char texture_list[SPR_TOTAL];
+extern 	TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
+extern unsigned char texture_list[SPR_NULLSPRITE];
 extern unsigned int position_vram;
 #endif
 
@@ -284,7 +284,7 @@ int CalcHeight(int xintercept, int yintercept)
 inline void loadActorTexture(int texture,unsigned int height,unsigned char *surfacePtr);
 
 #ifdef USE_SPRITES
-TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
+TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
 
 inline void loadActorTexture(int texture,unsigned int height,unsigned char *surfacePtr)
 {
@@ -487,7 +487,9 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 	for(; y <= viewheight+viewscreeny; y++)
 		Line_Color_Pal0[y] = floorColor;
 
-	start=RGB(0,0,0);
+//	start=RGB(0,0,0);
+	start = 0x8000 | RGB((*curpal).r>>3,(*curpal).g>>3,(*curpal).b>>3);
+
 	for(; y < 240; y++)
 		Line_Color_Pal0[y] = start;
 	
@@ -552,7 +554,6 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
 
 
 #ifdef USE_SPRITES
-
 	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
 	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
 	unsigned int height=(nextSurfacePtr-surfacePtr)>>6;
@@ -2009,13 +2010,13 @@ void AsmRefresh()
 
         do
         {
-			if (!samey(my_ray.ytilestep, my_ray.yintercept, my_ray.ytile))        goto horizentry;
-/*			
+//			if (!samey(my_ray.ytilestep, my_ray.yintercept, my_ray.ytile))        goto horizentry;
+			
             if(my_ray.ytilestep==-1 && (my_ray.yintercept>>16)<=my_ray.ytile) goto horizentry;
             if(my_ray.ytilestep==1 && (my_ray.yintercept>>16)>=my_ray.ytile) goto horizentry;
-*/			
+			
 vertentry:
-/*            if((uint32_t)my_ray.yintercept>mapheight*65536-1 || (word)my_ray.xtile>=mapwidth)
+            if((uint32_t)my_ray.yintercept>mapheight*65536-1 || (word)my_ray.xtile>=mapwidth)
             {
                 if(my_ray.xtile<0) my_ray.xintercept=0, my_ray.xtile=0;
                 else if(my_ray.xtile>=mapwidth) my_ray.xintercept=mapwidth<<TILESHIFT, my_ray.xtile=mapwidth-1;
@@ -2028,7 +2029,7 @@ vertentry:
                 break;
             }
             if(xspot>=maparea) break;
-*/			
+			
             my_ray.tilehit=((byte *)tilemap)[xspot];
             if(my_ray.tilehit)
             {
@@ -2164,14 +2165,13 @@ passvert:
 
         do
         {
-			if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))        goto vertentry;			
-/*			
+//			if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))        goto vertentry;			
+			
             if(my_ray.xtilestep==-1 && (my_ray.xintercept>>16)<=my_ray.xtile) goto vertentry;
             if(my_ray.xtilestep==1 && (my_ray.xintercept>>16)>=my_ray.xtile) goto vertentry;
-*/	
 
 horizentry:
- /*           if((uint32_t)my_ray.xintercept>mapwidth*65536-1 || (word)my_ray.ytile>=mapheight)
+            if((uint32_t)my_ray.xintercept>mapwidth*65536-1 || (word)my_ray.ytile>=mapheight)
             {
                 if(my_ray.ytile<0) my_ray.yintercept=0, my_ray.ytile=0;
                 else if(my_ray.ytile>=mapheight) my_ray.yintercept=mapheight<<TILESHIFT, my_ray.ytile=mapheight-1;
@@ -2184,7 +2184,7 @@ horizentry:
                 break;
             }
             if(yspot>=maparea) break;
-*/			
+			
             my_ray.tilehit=((byte *)tilemap)[yspot];
             if(my_ray.tilehit)
             {
@@ -2446,13 +2446,12 @@ void AsmRefreshSlave()
 
         do
         {
-			if (!samey(my_ray.ytilestep, my_ray.yintercept, my_ray.ytile))        goto horizentry;
-/*			
+//			if (!samey(my_ray.ytilestep, my_ray.yintercept, my_ray.ytile))        goto horizentry;
+			
             if(my_ray.ytilestep==-1 && (my_ray.yintercept>>16)<=my_ray.ytile) goto horizentry;
             if(my_ray.ytilestep==1 && (my_ray.yintercept>>16)>=my_ray.ytile) goto horizentry;
-*/			
 vertentry:
-/*            if((uint32_t)my_ray.yintercept>mapheight*65536-1 || (word)my_ray.xtile>=mapwidth)
+            if((uint32_t)my_ray.yintercept>mapheight*65536-1 || (word)my_ray.xtile>=mapwidth)
             {
                 if(my_ray.xtile<0) my_ray.xintercept=0, my_ray.xtile=0;
                 else if(my_ray.xtile>=mapwidth) my_ray.xintercept=mapwidth<<TILESHIFT, my_ray.xtile=mapwidth-1;
@@ -2464,7 +2463,7 @@ vertentry:
                 HitHorizBorder(pixx,texdelta,&my_ray);
                 break;
             }
- */         if(xspot>=maparea) break;
+			if(xspot>=maparea) break;
 			
             my_ray.tilehit=((byte *)tilemap)[xspot];
             if(my_ray.tilehit)
@@ -2600,13 +2599,13 @@ passvert:
 
         do
         {
-			if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))        goto vertentry;			
-/*			
+//			if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))        goto vertentry;			
+			
             if(my_ray.xtilestep==-1 && (my_ray.xintercept>>16)<=my_ray.xtile) goto vertentry;
             if(my_ray.xtilestep==1 && (my_ray.xintercept>>16)>=my_ray.xtile) goto vertentry;
-*/			
+		
 horizentry:
-/*            if((uint32_t)my_ray.xintercept>mapwidth*65536-1 || (word)my_ray.ytile>=mapheight)
+            if((uint32_t)my_ray.xintercept>mapwidth*65536-1 || (word)my_ray.ytile>=mapheight)
             {
                 if(my_ray.ytile<0) my_ray.yintercept=0, my_ray.ytile=0;
                 else if(my_ray.ytile>=mapheight) my_ray.yintercept=mapheight<<TILESHIFT, my_ray.ytile=mapheight-1;
@@ -2618,7 +2617,7 @@ horizentry:
                 HitVertBorder(pixx,texdelta,&my_ray);
                 break;
             }
-*/
+
             if(yspot>=maparea) break;
 			
             my_ray.tilehit=((byte *)tilemap)[yspot];
@@ -2906,7 +2905,7 @@ void    ThreeDRefresh (void)
 //		memcpy((void *)(SpriteVRAM + cgaddress),(void *)&wall_buffer[0],(SATURN_WIDTH+64) * 64);
 		if(position_vram>0x38000)
 		{
-			memset(texture_list,0xFF,SPR_TOTAL);
+			memset(texture_list,0xFF,SPR_NULLSPRITE);
 //			position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
 			position_vram = (SATURN_WIDTH+64)*32;
 		}

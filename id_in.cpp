@@ -38,7 +38,7 @@
 // 	Global variables
 volatile boolean    Keyboard[SDLK_LAST];
 volatile boolean	Paused;
-volatile char		LastASCII;
+//volatile char		LastASCII;
 volatile ScanCode	LastScan;
 
 //KeyboardDef	KbdDefs = {0x1d,0x38,0x47,0x48,0x49,0x4b,0x4d,0x4f,0x50,0x51};
@@ -61,6 +61,7 @@ static KeyboardDef KbdDefs = {
 
 =============================================================================
 */
+/*
 byte        ASCIINames[] =		// Unshifted ASCII for scan codes       // TODO: keypad
 {
 //	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
@@ -97,7 +98,7 @@ byte SpecialNames[] =	// ASCII for 0xe0 prefixed codes
 	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
 	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0   	// 7
 };
-
+*/
 
 static	boolean		IN_Started;
 
@@ -146,7 +147,7 @@ static void processEvent(SDL_Event *event)
             }
 			//LastScan = SDLK_RETURN;
 
-            int sym = LastScan;
+//            int sym = LastScan;
            /* if(sym >= 'a' && sym <= 'z')
                 sym -= 32;  // convert to uppercase
 		  */
@@ -155,11 +156,11 @@ static void processEvent(SDL_Event *event)
                 if(sym < lengthof(ShiftNames) && ShiftNames[sym])
                     LastASCII = ShiftNames[sym];
             }
-            else*/
+            else
             {
                 if(sym < lengthof(ASCIINames) && ASCIINames[sym])
                     LastASCII = ASCIINames[sym];
-            }
+            }*/
             if(LastScan<SDLK_LAST)
                 Keyboard[LastScan] = 1;
             if(LastScan == SDLK_PAUSE)
@@ -265,7 +266,7 @@ void
 IN_ClearKeysDown(void)
 {
 	LastScan = sc_None;
-	LastASCII = key_None;
+//	LastASCII = key_None;
 	memset ((void *) Keyboard,0,sizeof(Keyboard));
 }
 

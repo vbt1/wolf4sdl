@@ -27,7 +27,7 @@ void /* slave SH Initialize (RUNS on main SH) */
 
 //
 #ifdef USE_SPRITES
-extern TEXTURE tex_spr[SPR_TOTAL+SATURN_WIDTH];
+extern TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
 #endif
 extern unsigned char hz;
 

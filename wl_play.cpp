@@ -89,7 +89,7 @@ extern unsigned int position_vram;
 extern unsigned int static_items;
 extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 extern SPRITE user_walls[SATURN_WIDTH*2];
-extern char texture_list[SPR_TOTAL];
+extern char texture_list[SPR_NULLSPRITE];
 #endif
 //===========================================================================
 
