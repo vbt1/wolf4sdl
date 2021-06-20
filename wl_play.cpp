@@ -590,8 +590,8 @@ void CheckKeys (void)
 		}
         if (!startgame)
             ContinueMusic (lastoffs);
-//        if (loadedgame)
-//            playstate = ex_abort;
+        if (loadedgame)
+            playstate = ex_abort;
         lasttimecount = GetTimeCount();
         return;
     }
@@ -650,7 +650,7 @@ next element.
 =========================
 */
 
-int objcount;
+//int objcount;
 
 void InitActorList (void)
 {
@@ -670,7 +670,7 @@ void InitActorList (void)
     objfreelist = &objlist[0];
     lastobj = NULL;
 
-    objcount = 0;
+//    objcount = 0;
 
 //
 // give the player the first free spots
@@ -712,7 +712,7 @@ void GetNewActor (void)
     newobj->active = ac_no;
     lastobj = newobj;
 
-    objcount++;
+//    objcount++;
 }
 
 //===========================================================================
@@ -754,7 +754,7 @@ void RemoveObj (objtype * gone)
     gone->prev = objfreelist;
     objfreelist = gone;
 
-    objcount--;
+//    objcount--;
 }
 
 /*

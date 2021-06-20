@@ -178,7 +178,7 @@ static void ScanInfoPlane(void)
 // P wall
 //
                 case 98:
-                ////    if (!loadedgame)
+                    if (!loadedgame)
                         gamestate.secrettotal++;
                     break;
 
@@ -503,7 +503,7 @@ void SetupGameLevel (void)
 
 slIntFunction(VblIn) ;
 
-//    if (!loadedgame)
+    if (!loadedgame)
     {
         gamestate.TimeCount
             = gamestate.secrettotal
@@ -1138,7 +1138,7 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
-gamestate.mapon = 1;	
+//gamestate.mapon = 1;	
 //gamestate.mapon = 8;	
 //GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	
@@ -1160,7 +1160,7 @@ restartgame:
     died = false;
     do
     {
-    //    if (!loadedgame)
+        if (!loadedgame)
             gamestate.score = gamestate.oldscore;
         if(!died || viewsize != 21) 
 		{
@@ -1168,7 +1168,7 @@ restartgame:
 			DrawScore();
 		}
         startgame = false;
-    //    if (!loadedgame)
+        if (!loadedgame)
 		{
 			//slPrint("SetupGameLevel",slLocate(10,10));
             SetupGameLevel ();

@@ -4031,28 +4031,28 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
         case en_guard:
             SpawnNewObj (tilex,tiley,&s_grdstand);
             newobj->speed = SPDPATROL;
-//            if (!loadedgame)
+            if (!loadedgame)
                 gamestate.killtotal++;
             break;
 
         case en_officer:
             SpawnNewObj (tilex,tiley,&s_ofcstand);
             newobj->speed = SPDPATROL;
-//            if (!loadedgame)
+            if (!loadedgame)
                 gamestate.killtotal++;
             break;
 
         case en_mutant:
             SpawnNewObj (tilex,tiley,&s_mutstand);
             newobj->speed = SPDPATROL;
-//            if (!loadedgame)
+            if (!loadedgame)
                 gamestate.killtotal++;
             break;
 
         case en_ss:
             SpawnNewObj (tilex,tiley,&s_ssstand);
             newobj->speed = SPDPATROL;
-//            if (!loadedgame)
+            if (!loadedgame)
                 gamestate.killtotal++;
             break;
     }
@@ -4125,7 +4125,7 @@ void SpawnBoss (int tilex, int tiley)
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_boss];
     newobj->dir = nodir;
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -4146,7 +4146,7 @@ void SpawnGretel (int tilex, int tiley)
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_gretel];
     newobj->dir = nodir;
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 #endif
@@ -4166,35 +4166,35 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
         case en_guard:
             SpawnNewObj (tilex,tiley,&s_grdpath1);
             newobj->speed = SPDPATROL;
-//            if (!loadedgame)
+            if (!loadedgame)
                 gamestate.killtotal++;
             break;
 
         case en_officer:
             SpawnNewObj (tilex,tiley,&s_ofcpath1);
             newobj->speed = SPDPATROL;
-//            if (!loadedgame)
+            if (!loadedgame)
                 gamestate.killtotal++;
             break;
 
         case en_ss:
             SpawnNewObj (tilex,tiley,&s_sspath1);
             newobj->speed = SPDPATROL;
-//            if (!loadedgame)
+            if (!loadedgame)
                 gamestate.killtotal++;
             break;
 
         case en_mutant:
             SpawnNewObj (tilex,tiley,&s_mutpath1);
             newobj->speed = SPDPATROL;
-//            if (!loadedgame)
+            if (!loadedgame)
                 gamestate.killtotal++;
             break;
 
         case en_dog:
             SpawnNewObj (tilex,tiley,&s_dogpath1);
             newobj->speed = SPDDOG;
-//            if (!loadedgame)
+            if (!loadedgame)
                 gamestate.killtotal++;
             break;
     }
@@ -4438,7 +4438,7 @@ void SpawnTrans (int tilex, int tiley)
     newobj->obclass = transobj;
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_trans];
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -4517,7 +4517,7 @@ void SpawnUber (int tilex, int tiley)
     newobj->obclass = uberobj;
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_uber];
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -4614,7 +4614,7 @@ void SpawnWill (int tilex, int tiley)
     newobj->obclass = willobj;
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_will];
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -4791,7 +4791,7 @@ void SpawnDeath (int tilex, int tiley)
     newobj->obclass = deathobj;
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_death];
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -4983,7 +4983,7 @@ void SpawnAngel (int tilex, int tiley)
     newobj->obclass = angelobj;
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_angel];
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -5095,7 +5095,7 @@ void SpawnSpectre (int tilex, int tiley)
     newobj->obclass = spectreobj;
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_spectre];
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_BONUS; // |FL_NEVERMARK|FL_NONMARK;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -5192,7 +5192,7 @@ void SpawnGhosts (int which, int tilex, int tiley)
 
     newobj->dir = east;
     newobj->flags |= FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
     {
         gamestate.killtotal++;
         gamestate.killcount++;
@@ -5402,7 +5402,7 @@ void SpawnSchabbs (int tilex, int tiley)
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_schabbs];
     newobj->dir = nodir;
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -5429,7 +5429,7 @@ void SpawnGift (int tilex, int tiley)
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_gift];
     newobj->dir = nodir;
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -5456,7 +5456,7 @@ void SpawnFat (int tilex, int tiley)
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_fat];
     newobj->dir = nodir;
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -6022,7 +6022,7 @@ void SpawnFakeHitler (int tilex, int tiley)
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_fake];
     newobj->dir = nodir;
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 
@@ -6050,7 +6050,7 @@ void SpawnHitler (int tilex, int tiley)
     newobj->hitpoints = starthitpoints[gamestate.difficulty][en_hitler];
     newobj->dir = nodir;
     newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-//    if (!loadedgame)
+    if (!loadedgame)
         gamestate.killtotal++;
 }
 

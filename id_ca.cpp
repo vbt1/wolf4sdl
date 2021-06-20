@@ -168,8 +168,8 @@ huffnode *grhuffman;
 huffnode grhuffman[255];
 #endif
 
-int    grhandle = -1;               // handle to EGAGRAPH
-int    maphandle = -1;              // handle to MAPTEMP / GAMEMAPS
+static long   grhandle = -1;               // handle to EGAGRAPH
+static long   maphandle = -1;              // handle to MAPTEMP / GAMEMAPS
 //int    audiohandle = -1;            // handle to AUDIOT / AUDIO
 
 static int32_t GRFILEPOS(const size_t idx)
@@ -234,6 +234,7 @@ static void CAL_HuffExpand(byte *source, byte *dest, int32_t length, huffnode *h
         Quit("length or dest is null!");
         return;
     }
+
     headptr = hufftable+254;        // head node is always node 254
 
     int written = 0;
@@ -262,7 +263,6 @@ static void CAL_HuffExpand(byte *source, byte *dest, int32_t length, huffnode *h
             *dest++ = (byte) nodeval;
             written++;
             huffptr = headptr;
-
             if(dest>=end) break;
         }
         else
@@ -290,11 +290,12 @@ void CAL_CarmackExpand (byte *source, word *dest, int length)
     word ch,chhigh,count,offset;
     byte *inptr;
     word *copyptr, *outptr;
+
     length/=2;
 
     inptr = (byte *) source;
     outptr = dest;
-//ch |= *inptr++;"     -> "ch |= (*inptr++) << 8;
+
     while (length>0)
     {
         ch = READWORD(inptr);
@@ -305,8 +306,7 @@ void CAL_CarmackExpand (byte *source, word *dest, int length)
             if (!count)
             {                               // have to insert a word containing the tag byte
                 ch |= *inptr++;
-                *outptr = ch;
-				outptr++;
+                *outptr++ = ch;
                 length--;
             }
             else
@@ -314,14 +314,9 @@ void CAL_CarmackExpand (byte *source, word *dest, int length)
                 offset = *inptr++;
                 copyptr = outptr - offset;
                 length -= count;
-
                 if(length<0) return;
                 while (count--)
-				{
-                    *outptr = *copyptr;
-					outptr++;
-					copyptr++;
-				}
+                    *outptr++ = *copyptr++;
             }
         }
         else if (chhigh == FARTAG)
@@ -329,9 +324,8 @@ void CAL_CarmackExpand (byte *source, word *dest, int length)
             count = ch&0xff;
             if (!count)
             {                               // have to insert a word containing the tag byte
-                 ch |= *inptr++;
-                *outptr = ch;
-				outptr++;
+                ch |= *inptr++;
+                *outptr++ = ch;
                 length --;
             }
             else
@@ -341,17 +335,12 @@ void CAL_CarmackExpand (byte *source, word *dest, int length)
                 length -= count;
                 if(length<0) return;
                 while (count--)
-				{
-                    *outptr = *copyptr;
-					outptr++;
-					copyptr++;
-				}
+                    *outptr++ = *copyptr++;
             }
         }
         else
         {
-            *outptr = ch;
-			outptr++;
+            *outptr++ = ch;
             length --;
         }
     }
@@ -505,7 +494,7 @@ void CAL_SetupGrFile (void)
 
 	fileId = GFS_NameToId((Sint8*)fname);
 //	fileSize = GetFileSize(fileId);
-	compseg=(Uint8 *)0x002C0000;
+	compseg=(Uint8 *)SATURN_CHUNK_ADDR+0xF000;
 //	CHECKMALLOCRESULT(vbtHuff);
 
 	GFS_Load(fileId, 0, (void *)compseg, sizeof(grhuffman));
@@ -607,7 +596,7 @@ void CAL_SetupGrFile (void)
     CHECKMALLOCRESULT(pictable);
     int32_t   chunkcomplen = CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
 //	compseg =(byte*)malloc((chunkcomplen));
-	compseg =(byte*)0x002C0000;
+	compseg =(byte*)SATURN_CHUNK_ADDR;
 //	CHECKMALLOCRESULT(compseg);
 	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen));
 //    CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
@@ -661,7 +650,7 @@ void CAL_SetupMapFile (void)
 //        CA_CannotOpen(fname);
     length = NUMMAPS*4+2; // used to be "filelength(handle);"
 //    mapfiletype *tinf=(mapfiletype *) malloc(sizeof(mapfiletype));
-	mapfiletype *tinf=(mapfiletype *)0x002C0000;
+	mapfiletype *tinf=(mapfiletype *)SATURN_CHUNK_ADDR;
 //    CHECKMALLOCRESULT(tinf);
 	GFS_Load(fileId, 0, (void *)tinf, length);
     //read(handle, tinf, length);
@@ -704,12 +693,13 @@ void CAL_SetupMapFile (void)
     if (maphandle == -1)
         CA_CannotOpen(fname);
 #endif
+
 //
 // load all map header
 //
 	uint8_t *maphandleptr;
-//	maphandleptr = (Uint8*)malloc(fileSize);
-	maphandleptr = (uint8_t*)(0x002D0000);
+	maphandleptr = (Uint8*)malloc(fileSize);
+//	maphandleptr = (uint8_t*)(SATURN_CHUNK_ADDR);
 //	CHECKMALLOCRESULT(maphandleptr);
 	GFS_Load(maphandle, 0, (void *)maphandleptr, fileSize);
 
@@ -717,7 +707,7 @@ void CAL_SetupMapFile (void)
     {
         pos = tinf->headeroffsets[i];
         if (pos<0)                          // $FFFFFFFF start is a sparse map
-            continue;	   
+            continue;
 
         mapheaderseg[i]=(maptype *) malloc(sizeof(maptype));
         CHECKMALLOCRESULT(mapheaderseg[i]);
@@ -733,7 +723,7 @@ void CAL_SetupMapFile (void)
 		mapheaderseg[i]->width=SWAP_BYTES_16(mapheaderseg[i]->width);
 		mapheaderseg[i]->height=SWAP_BYTES_16(mapheaderseg[i]->height);
     }
-//	free(maphandleptr);
+	free(maphandleptr);
 	maphandleptr = NULL;	
 //    free(tinf);
 	tinf = NULL;
@@ -742,8 +732,9 @@ void CAL_SetupMapFile (void)
 //
     for (i=0;i<MAPPLANES;i++)
     {
-        mapsegs[i]=(word *) malloc(maparea*2);
-        CHECKMALLOCRESULT(mapsegs[i]);
+		mapsegs[i]=(word *)SATURN_MAPSEG_ADDR+(0x2000*i);
+//        mapsegs[i]=(word *) malloc(maparea*2);
+//        CHECKMALLOCRESULT(mapsegs[i]);
     }
 }
 
@@ -766,6 +757,7 @@ void CA_Startup (void)
     unlink ("PROFILE.TXT");
     profilehandle = open("PROFILE.TXT", O_CREAT | O_WRONLY | O_TEXT);
 #endif
+
     CAL_SetupMapFile ();
     CAL_SetupGrFile ();
     //CAL_SetupAudioFile ();
@@ -835,6 +827,7 @@ void CA_Shutdown (void)
 void CAL_ExpandGrChunk (int chunk, int32_t *source)
 {
     int32_t    expanded;
+
     if (chunk >= STARTTILE8 && chunk < STARTEXTERNS)
     {
         //
@@ -843,6 +836,7 @@ void CAL_ExpandGrChunk (int chunk, int32_t *source)
 
 #define BLOCK           64
 #define MASKBLOCK       128
+
         if (chunk<STARTTILE8M)          // tile 8s are all in one chunk!
             expanded = BLOCK*NUMTILE8;
         else if (chunk<STARTTILE16)
@@ -862,15 +856,15 @@ void CAL_ExpandGrChunk (int chunk, int32_t *source)
         // everything else has an explicit size longword
         //
         expanded = *source++;
-	expanded=SWAP_BYTES_32(expanded); 
+		expanded=SWAP_BYTES_32(expanded); 
     }
+
     //
     // allocate final space, decompress it, and free bigbuffer
     // Sprites need to have shifts made and various other junk
     //
     grsegs[chunk]=(byte *) malloc(expanded);
     CHECKMALLOCRESULT(grsegs[chunk]);
-	 
     CAL_HuffExpand((byte *) source, grsegs[chunk], expanded, grhuffman);
 }
 
@@ -901,12 +895,13 @@ void CA_CacheGrChunk (int chunk)
 // a larger buffer
 //
     pos = GRFILEPOS(chunk);
-
     if (pos<0)                              // $FFFFFFFF start is a sparse tile
         return;
+
     next = chunk +1;
     while (GRFILEPOS(next) == -1)           // skip past any sparse tiles
         next++;
+
     compressed = GRFILEPOS(next)-pos;
     //lseek(grhandle,pos,SEEK_SET);
 		uint8_t *Chunks;
@@ -968,18 +963,19 @@ void CA_CacheGrChunk (int chunk)
 =
 ======================
 */
+
 void CA_CacheScreen (int chunk)
 {
     int32_t    pos,compressed,expanded;
     memptr  bigbufferseg;
     int32_t    *source;
     int             next;
+
 //
 // load the chunk into a buffer
 //
     pos = GRFILEPOS(chunk);
     next = chunk +1;
-
     while (GRFILEPOS(next) == -1)           // skip past any sparse tiles
         next++;
     compressed = GRFILEPOS(next)-pos;
@@ -995,8 +991,8 @@ void CA_CacheScreen (int chunk)
 	uint32_t delta2;
 	delta = (uint16_t)(pos/2048);
 	delta2 = (pos - delta*2048); 
-	Chunks=(uint8_t*)0x002F0000;
-	bigbufferseg=(uint8_t*)0x002E0000;
+	Chunks=(uint8_t*)SATURN_CHUNK_ADDR+0x4000;
+	bigbufferseg=(uint8_t*)screen->pixels;
 	GFS_Load(grhandle, delta, (void *)Chunks, compressed+delta2);
 	memcpy(bigbufferseg,(const void *)&Chunks[delta2],compressed);
 	Chunks = NULL;
@@ -1011,10 +1007,10 @@ void CA_CacheScreen (int chunk)
 // Sprites need to have shifts made and various other junk
 //
 //    byte *pic = (byte *) malloc(64000);
-	byte *pic = (byte *)0x002F0000;
+	byte *pic = (byte *)SATURN_CHUNK_ADDR;
     CAL_HuffExpand((byte *) source, (byte *)pic, expanded, grhuffman);
-    byte *vbuf = LOCK();
-//				byte *vbufptr= (byte *)vbuf;
+
+	byte *vbuf = LOCK();
 
     for(unsigned int y = 0; y < 200; y++)
     {
@@ -1032,6 +1028,7 @@ void CA_CacheScreen (int chunk)
         }
     }
     UNLOCK();
+	
 	pic = NULL;
 	bigbufferseg = NULL;
 #ifdef HEAP_WALK	
