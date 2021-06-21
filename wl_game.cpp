@@ -501,7 +501,7 @@ void SetupGameLevel (void)
     word *map;
     word tile;
 
-slIntFunction(VblIn) ;
+	slIntFunction(VblIn) ;
 
     if (!loadedgame)
     {
@@ -821,26 +821,6 @@ void DrawPlayScreen (void)
 	VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
     DrawPlayBorder ();
-/*	
-  	//		slPrint("DrawFace",slLocate(10,12));
-    DrawFace ();
-	
-  	//		slPrint("DrawHealth",slLocate(10,13));
-    DrawHealth ();
-  	//		slPrint("DrawLives",slLocate(10,14));
-    DrawLives ();
-  	//		slPrint("DrawLevel",slLocate(10,15));
-    DrawLevel ();
-  	//		slPrint("DrawAmmo",slLocate(10,16));
-    DrawAmmo ();
-  	//		slPrint("DrawKeys",slLocate(10,17));
-    DrawKeys ();
-  	//		slPrint("DrawWeapon",slLocate(10,18));
- //   DrawWeapon ();
-  	//		slPrint("DrawScore",slLocate(10,19));
-    DrawScore ();
-  	//		slPrint("DrawScore",slLocate(10,30));
-*/	
 }
 
 void DrawStatusBar (void)

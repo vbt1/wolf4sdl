@@ -124,7 +124,7 @@ typedef struct
 =============================================================================
 */
 
-#define BUFFERSIZE 0x800
+#define BUFFERSIZE 0x1000
 static int32_t bufferseg[BUFFERSIZE/4];
 
 int     mapon;
@@ -461,7 +461,7 @@ void CAL_SetupGrFile (void)
 {
     char fname[13];
     //int handle;
-	unsigned int i=0;
+	unsigned int j=0;
     byte *compseg;
 	long fileSize;
 	Sint32 fileId;
@@ -480,10 +480,10 @@ void CAL_SetupGrFile (void)
     strcpy(fname,gdictname);
     strcat(fname,extension);
 
-	while (fname[i])
+	while (fname[j])
 	{
-		fname[i]= toupper(fname[i]);
-		i++;
+		fname[j]= toupper(fname[j]);
+		j++;
 	}
 //	i=0;
 
@@ -507,7 +507,7 @@ void CAL_SetupGrFile (void)
 		grhuffmanptr++;
 		compseg+=4;
 	}	
-	i=0;
+	j=0;
 
     //read(handle, grhuffman, sizeof(grhuffman));
     //close(handle);
@@ -516,12 +516,12 @@ void CAL_SetupGrFile (void)
     strcpy(fname,gheadname);
     strcat(fname,extension);
 
-	while (fname[i])
+	while (fname[j])
 	{
-		fname[i]= toupper(fname[i]);
-		i++;
+		fname[j]= toupper(fname[j]);
+		j++;
 	}
-	i=0;
+	j=0;
 
     //handle = open(fname, O_RDONLY | O_BINARY);
     //if (handle == -1)
@@ -575,12 +575,12 @@ void CAL_SetupGrFile (void)
     strcpy(fname,gfilename);
     strcat(fname,extension);
 
-	while (fname[i])
+	while (fname[j])
 	{
-		fname[i]= toupper(fname[i]);
-		i++;
+		fname[j]= toupper(fname[j]);
+		j++;
 	}
-	i=0;
+	j=0;
 
     //grhandle = open(fname, O_RDONLY | O_BINARY);
     //if (grhandle == -1)
@@ -602,10 +602,10 @@ void CAL_SetupGrFile (void)
 //    CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
     CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
 
-	for(unsigned long j=0;j<NUMPICS;j++)
+	for(unsigned long k=0;k<NUMPICS;k++)
 	{
-		pictable[j].height=SWAP_BYTES_16(pictable[j].height);
-		pictable[j].width=SWAP_BYTES_16(pictable[j].width);
+		pictable[k].height=SWAP_BYTES_16(pictable[k].height);
+		pictable[k].width=SWAP_BYTES_16(pictable[k].width);
 	} 
 	compseg = NULL;
 	// VBT correct
@@ -698,8 +698,8 @@ void CAL_SetupMapFile (void)
 // load all map header
 //
 	uint8_t *maphandleptr;
-	maphandleptr = (Uint8*)malloc(fileSize);
-//	maphandleptr = (uint8_t*)(SATURN_CHUNK_ADDR);
+//	maphandleptr = (Uint8*)malloc(fileSize);
+	maphandleptr = (uint8_t*)(SATURN_CHUNK_ADDR+0x400);
 //	CHECKMALLOCRESULT(maphandleptr);
 	GFS_Load(maphandle, 0, (void *)maphandleptr, fileSize);
 
@@ -723,7 +723,7 @@ void CAL_SetupMapFile (void)
 		mapheaderseg[i]->width=SWAP_BYTES_16(mapheaderseg[i]->width);
 		mapheaderseg[i]->height=SWAP_BYTES_16(mapheaderseg[i]->height);
     }
-	free(maphandleptr);
+//	free(maphandleptr);
 	maphandleptr = NULL;	
 //    free(tinf);
 	tinf = NULL;
@@ -1061,15 +1061,19 @@ void CA_CacheMap (int mapnum)
     word     *buffer2seg;
     int32_t   expanded;
 #endif
-
+slPrintHex(mapnum,slLocate(10,18));
     mapon = mapnum;
 
 //
 // load the planes into the allready allocated buffers
 //
     size = maparea*2;
+//	long fileSize = 0x6b21;//GetFileSize(maphandle);
 	long fileSize = GetFileSize(maphandle);
+//	slSynch();
 	uint8_t *Chunks=(uint8_t*)SATURN_CHUNK_ADDR;   // écrase les sons
+//slPrintHex(maphandle,slLocate(10,19));
+//slPrintHex(fileSize,slLocate(10,20));
 
 	GFS_Load(maphandle, 0, (void *)Chunks, fileSize);
 	
@@ -1078,6 +1082,9 @@ void CA_CacheMap (int mapnum)
         pos = mapheaderseg[mapnum]->planestart[plane];
         compressed = mapheaderseg[mapnum]->planelength[plane];
         dest = mapsegs[plane];
+
+//slPrintHex(compressed,slLocate(10,22+plane));
+//slPrintHex(pos,slLocate(20,22+plane));
 
         //lseek(maphandle,pos,SEEK_SET);
         if (compressed<=BUFFERSIZE)
@@ -1094,7 +1101,6 @@ void CA_CacheMap (int mapnum)
         //read(maphandle,source,compressed);
 #ifdef CARMACIZED
 
-
         //
         // unhuffman, then unRLEW
         // The huffman'd chunk has a two byte expanded length first
@@ -1107,7 +1113,9 @@ void CA_CacheMap (int mapnum)
 		source++;
  //       buffer2seg = (word *) SATURN_CHUNK_ADDR-0X4000;
         buffer2seg = (word *) malloc(expanded);
-
+		
+//	int *val = (int *)buffer2seg;		
+//slPrintHex((int)val,slLocate(10,21));
         CHECKMALLOCRESULT(buffer2seg);
         CAL_CarmackExpand((byte *) source, buffer2seg,expanded);
 		// VBT valeur perdue ?????

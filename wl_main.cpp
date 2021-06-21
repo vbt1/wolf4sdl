@@ -1522,6 +1522,7 @@ static void DemoLoop()
 #endif
         if (startgame)
         {
+//			slIntFunction(VblIn) ;
             GameLoop ();
             if(!param_nowait)
             {

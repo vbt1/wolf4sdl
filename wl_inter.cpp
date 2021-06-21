@@ -185,7 +185,7 @@ Victory (void)
 
     Write (TIMEX, TIMEY - 2, STR_TOTALTIME);
 
-    Write (12, RATIOY - 2, "averagesxx");
+    Write (12, RATIOY - 2, "averages");
 
 #ifdef SPANISH
     Write (RATIOX + 2, RATIOY, STR_RATKILL);
@@ -739,7 +739,6 @@ LevelCompleted (void)
 #endif			
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
-            BJ_Breathe ();
 
             if (IN_CheckAck ())
                 goto done;
