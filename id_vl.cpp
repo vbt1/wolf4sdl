@@ -111,25 +111,29 @@ void	VL_SetVGAPlaneMode (void)
         SYS_Exit(1);
     }
 
-    screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth, screenHeight, 8, 0, 0, 0, 0);
-    if(!screenBuffer)
-    {
-//        printf("Unable to create screen buffer surface: %s\n", SDL_GetError());
-        SYS_Exit(1);
-    }
 
-//    SDL_ShowCursor(SDL_DISABLE);
-    curSurface = screenBuffer;
-    curPitch = screenBuffer->pitch;
+	if(screenBuffer==NULL)
+	{
+		screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth, screenHeight, 8, 0, 0, 0, 0);
+		if(!screenBuffer)
+		{
+	//        printf("Unable to create screen buffer surface: %s\n", SDL_GetError());
+			SYS_Exit(1);
+		}
+
+	//    SDL_ShowCursor(SDL_DISABLE);
+		curSurface = screenBuffer;
+		curPitch = screenBuffer->pitch;
+	}
 //    SDL_SetColors(screen, gamepal, 0, 256);
     SDL_SetColors(curSurface, gamepal, 0, 256);
     memcpyl(curpal, gamepal, sizeof(SDL_Color) * 256);
 
     scaleFactor = screenWidth/SATURN_WIDTH;
     if(screenHeight/200 < scaleFactor) scaleFactor = screenHeight/200;
-    pixelangle = (short *) malloc(screenWidth * sizeof(short));
+    if(pixelangle==NULL) pixelangle = (short *) malloc(screenWidth * sizeof(short));
     CHECKMALLOCRESULT(pixelangle);
-    wallheight = (short *) malloc(screenWidth * sizeof(short));
+    if(wallheight==NULL) wallheight = (short *) malloc(screenWidth * sizeof(short));
     CHECKMALLOCRESULT(wallheight);
 }
 

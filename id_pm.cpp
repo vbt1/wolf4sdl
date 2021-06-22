@@ -1,6 +1,6 @@
 #include "wl_def.h"
 
-#define LOADADDR 0x0023A000
+#define LOADADDR 0x00242000
 #define NB_WALL_HWRAM 50
 //#define NB_WALL_HWRAM 39
 

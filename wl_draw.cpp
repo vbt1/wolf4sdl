@@ -291,7 +291,7 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];
 #if 1	
 	*txptr = TEXDEF(64, (height>>6), position_vram);
-	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)surfacePtr,height);
+	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)surfacePtr,height);
 	texture_list[texture]=position_vram/height/2;
 	position_vram+=height/2;	
 #else	
@@ -672,7 +672,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 		
 	if (old_texture!=shapenum)
 	{
-		memcpyl((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)surfacePtr,height);
+		memcpy((void *)(wall_buffer + (SATURN_WIDTH<<6)),(void *)surfacePtr,height);
 		old_texture=shapenum;
 	}
 	height>>=6;

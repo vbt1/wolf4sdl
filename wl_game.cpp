@@ -762,10 +762,17 @@ void DrawPlayBorder (void)
     else
     {
         const int statusborderw = (screenWidth-px*SATURN_WIDTH)/2;
+#if SATURN_WIDTH==352		
+        VWB_BarScaledCoord (0, screenHeight-px*STATUSLINES,
+            8+statusborderw+px*8, px*STATUSLINES, bordercol);
+        VWB_BarScaledCoord (screenWidth-8-statusborderw-px*8, screenHeight-px*STATUSLINES,
+            8+statusborderw+px*8, px*STATUSLINES, bordercol);
+#else
         VWB_BarScaledCoord (0, screenHeight-px*STATUSLINES,
             statusborderw+px*8, px*STATUSLINES, bordercol);
         VWB_BarScaledCoord (screenWidth-statusborderw-px*8, screenHeight-px*STATUSLINES,
             statusborderw+px*8, px*STATUSLINES, bordercol);
+#endif
     }
 
     VWB_BarScaledCoord (0,0,screenWidth,screenHeight-px*STATUSLINES,bordercol);
@@ -803,6 +810,7 @@ void DrawPlayBorder (void)
         // Just paint a lower border line
         VWB_BarScaledCoord(0, yl+viewheight, viewwidth, px, bordercol-2);       // lower border
     }
+
 }
 
 
@@ -818,7 +826,11 @@ void DrawPlayScreen (void)
 {
 	//vbt à remettre
   	//		slPrint("VWB_DrawPicScaledCoord",slLocate(10,10));
+#if SATURN_WIDTH == 352
+	VWB_DrawPicScaledCoord (16+(screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
+#else
 	VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
+#endif	
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
     DrawPlayBorder ();
 }

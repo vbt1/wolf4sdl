@@ -259,14 +259,24 @@ void LatchDrawPicScaledCoordIndirect (unsigned scx, unsigned scy, unsigned picnu
 
 void StatusDrawPic (unsigned x, unsigned y, unsigned picnum)
 {
+#if SATURN_WIDTH == 352
+    LatchDrawPicScaledCoord (2+(screenWidth-scaleFactor*SATURN_WIDTH)/16 + scaleFactor*x,
+        screenHeight-scaleFactor*(STATUSLINES-y),picnum);
+#else
     LatchDrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/16 + scaleFactor*x,
         screenHeight-scaleFactor*(STATUSLINES-y),picnum);
+#endif
 }
 
 inline void StatusDrawPicIndirect (unsigned x, unsigned y, unsigned picnum)
 {
-    LatchDrawPicScaledCoordIndirect ((screenWidth-scaleFactor*SATURN_WIDTH)/16 + scaleFactor*x,
+#if SATURN_WIDTH == 352	
+    LatchDrawPicScaledCoordIndirect (2+(screenWidth-scaleFactor*SATURN_WIDTH)/16 + scaleFactor*x,
+        screenHeight-scaleFactor*(STATUSLINES-y),picnum);    
+#else	
+	LatchDrawPicScaledCoordIndirect ((screenWidth-scaleFactor*SATURN_WIDTH)/16 + scaleFactor*x,
         screenHeight-scaleFactor*(STATUSLINES-y),picnum);
+#endif		
 }
 
 void StatusDrawFace(unsigned picnum)
