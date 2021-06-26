@@ -91,8 +91,12 @@ void    ThreeDRefresh (void);
 #ifndef EMBEDDED
 short   midangle;
 int viewangle;
-#endif
 word horizwall[MAXWALLTILES],vertwall[MAXWALLTILES];
+#else
+#define horizwall(x) ((x)-1)*2
+#define vertwall(x) ((x)-1)*2+1
+#endif
+
 
 /*
 ============================================================================
@@ -1126,9 +1130,9 @@ static void inline HitVertWallNew(int postx, ray_struc *ray)
 		if (tilemap[ray->xtile-ray->xtilestep][ray->ytile] & 0x80)
 			wallpic = DOORWALL+3;
 		else
-			wallpic = vertwall[ray->tilehit & ~0x40];
+			wallpic = vertwall(ray->tilehit & ~0x40);
 	} else
-		wallpic = vertwall[ray->tilehit];
+		wallpic = vertwall(ray->tilehit);
 		
 //	wall = PM_GetPage(wallpic);
 	ray->postsource = PM_GetTexture(wallpic) + texture;
@@ -1155,9 +1159,9 @@ static inline void HitHorizWallNew(int postx, ray_struc *ray)
 		if (tilemap[ray->xtile][ray->ytile-ray->ytilestep] & 0x80)
 			wallpic = DOORWALL+2;
 		else
-			wallpic = horizwall[ray->tilehit & ~0x40];
+			wallpic = horizwall(ray->tilehit & ~0x40);
 	} else
-		wallpic = horizwall[ray->tilehit];
+		wallpic = horizwall(ray->tilehit);
 
 //	wall = PM_GetPage(wallpic);
 	ray->postsource = PM_GetTexture(wallpic) + texture;
@@ -1182,7 +1186,7 @@ static inline void HitHorizPWall(int postx, ray_struc *ray)
 	}
 
 	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
-	wallpic = horizwall[ray->tilehit&63];
+	wallpic = horizwall(ray->tilehit&63);
 	ray->postsource = PM_GetTexture(wallpic) + texture;
 	ScalePost(postx, ray->postsource);
 }
@@ -1204,7 +1208,7 @@ static inline void HitVertPWall(int postx, ray_struc *ray)
 
 	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
 	
-	wallpic = vertwall[ray->tilehit&63];
+	wallpic = vertwall(ray->tilehit&63);
 
 //	wall = PM_GetPage(wallpic);
 	ray->postsource = PM_GetTexture(wallpic) + texture;

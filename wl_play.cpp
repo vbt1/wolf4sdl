@@ -40,7 +40,7 @@ byte spotvis[MAPSIZE][MAPSIZE];
 #ifdef EMBEDDED
 int	    actorat[MAPSIZE][MAPSIZE];
 unsigned	farmapylookup[MAPSIZE];
-
+mapbitmap		objactor;
 #else
 objtype *actorat[MAPSIZE][MAPSIZE];
 #endif
@@ -1029,7 +1029,7 @@ void FinishPaletteShifts (void)
 =====================
 */
 
-void DoActor(objtype *ob)
+static void DoActor(objtype *ob)
 {
 	void (*think)(objtype *);
 

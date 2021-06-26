@@ -63,7 +63,6 @@ int      shootdelta;           // pixels away from centerx a target can be
 fixed    scale;
 int32_t  heightnumerator;
 
-
 void    Quit (const char *error,...);
 
 boolean startgame;
@@ -531,6 +530,7 @@ const float radtoint = (float)(FINEANGLES/2/PI);
 
 void BuildTables (void)
 {
+#ifndef EMBEDDED2
     //
     // calculate fine tangents
     //
@@ -563,6 +563,73 @@ void BuildTables (void)
 #if defined(USE_STARSKY) || defined(USE_RAIN) || defined(USE_SNOW)
     Init3DPoints();
 #endif
+
+#else
+	int i;
+	long    intang;
+	int     halfview;
+	double tang, angle, anglestep, facedist;
+	fixed value;
+	fixed scale;
+
+	/* FIXME: Use linear interpolation to reduce size of trig tables. */
+/* calculate fine tangents */
+
+	angle = 0.0;
+	anglestep = PI/2.0/ANGLEQUAD;
+
+    for(i=0; i<ANGLEQUAD; i++)
+    {
+        fixed value=(int32_t)(GLOBAL1*sin(angle));
+        sintable[i]=sintable[i+ANGLES]=sintable[ANGLES/2-i]=value;
+        sintable[ANGLES-i]=sintable[ANGLES/2+i]=-value;
+        angle+=anglestep;
+    }
+    sintable[ANGLEQUAD] = 65536;
+    sintable[3*ANGLEQUAD] = -65536;
+
+	finetangent[0] = 0;
+	for (i = 1; i < FINEANGLES/8; i++) {
+		tang = tan((double)i/radtoint);
+		finetangent[i] = tang*TILEGLOBAL;
+		finetangent[FINEANGLES/4-1-i] = TILEGLOBAL/tang;
+	}
+	
+	/* fight off asymptotic behaviour at 90 degrees */
+	finetangent[FINEANGLES/4-1] = finetangent[FINEANGLES/4-2]+1;
+	
+//
+// costable overlays sintable with a quarter phase shift
+// ANGLES is assumed to be divisable by four
+//
+
+	angle = 0.0;
+	anglestep = PI/2.0/ANGLEQUAD;
+
+	for (i = 0; i < ANGLEQUAD; i++) {
+	    value = GLOBAL1*sin(angle);
+	    angle += anglestep;
+	}
+
+	facedist = 0x5800+MINDIST;
+	halfview = 64;               /* half view in pixels */
+
+/*
+ calculate scale value for vertical height calculations
+ and sprite x calculations
+*/
+	scale = halfview*facedist/(VIEWGLOBAL/2);
+
+/* calculate the angle offset from view angle of each pixel's ray */
+	for (i = 0; i < halfview; i++) 
+	{
+		tang = ((double)i)*VIEWGLOBAL/128/facedist;
+		angle = atan(tang);
+		intang = angle*radtoint;
+		pixelangle[halfview-1-i] = intang;
+		pixelangle[halfview+i] = -intang;
+	}
+#endif
 }
 
 //===========================================================================
@@ -585,13 +652,18 @@ double FastArcTan(double x)
 
 inline void CalcProjection (int32_t focal)
 {
+#ifdef EMBEDDED2
+	long facedist;
+#else	
     int     i;
     int    intang;
     //float   angle;
     //double  tang;
-    int     halfview;
     //double  facedist;
-	double  angle, tang, facedist;
+	double  angle, tang;
+	double facedist;
+#endif
+    int     halfview;
 
     focallength = focal;
     facedist = focal+MINDIST;
@@ -612,7 +684,7 @@ inline void CalcProjection (int32_t focal)
     //
     // calculate the angle offset from view angle of each pixel's ray
     //
-
+#ifndef EMBEDDED2
     for (i=0;i<halfview;i++)
     {
         // start 1/2 pixel over, so viewangle bisects two middle pixels
@@ -627,6 +699,7 @@ inline void CalcProjection (int32_t focal)
         pixelangle[halfview-1-i] = intang;
         pixelangle[halfview+i] = -intang;
     }
+#endif	
 }
 
 
@@ -642,7 +715,7 @@ inline void CalcProjection (int32_t focal)
 =
 ===================
 */
-
+#ifndef EMBEDDED
 void SetupWalls (void)
 {
     int     i;
@@ -656,7 +729,7 @@ void SetupWalls (void)
         vertwall[i]=(i-1)*2+1;
     }
 }
-
+#endif
 //===========================================================================
 
 /*
@@ -1151,7 +1224,9 @@ static void InitGame()
 //	slTVOff();
    LoadLatchMem ();	   
    BuildTables ();          // trig tables
+#ifndef EMBEDDED   
     SetupWalls ();
+#endif	
     NewViewSize (viewsize);
 
 //		slTVOn();
@@ -1231,7 +1306,7 @@ void ShowViewSize (int width)
     else
     {
         viewwidth = width*16*screenWidth/SATURN_WIDTH;
-        viewheight = (int) (width*16*HEIGHTRATIO*screenHeight/200);
+        viewheight = (int) (width_to_height(width*16)*screenHeight/200);
         DrawPlayBorder ();
     }
 
@@ -1248,7 +1323,7 @@ void NewViewSize (int width)
     else if(viewsize == 20)
         SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
     else
-        SetViewSize(width*16*screenWidth/SATURN_WIDTH, (unsigned) (width*16*HEIGHTRATIO*screenHeight/200));
+        SetViewSize(width*16*screenWidth/SATURN_WIDTH, (unsigned) (width_to_height(width*16)*screenHeight/200));
 // xxx	VGAClearScreen ();
 }
 

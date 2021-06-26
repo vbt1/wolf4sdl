@@ -11,6 +11,8 @@ extern "C"{
 //extern fixed slAtan(fixed y, fixed x);
 extern fixed MTH_Atan(fixed y, fixed x);
 }
+short atan2fix(fixed x, fixed y);
+
 #ifdef USE_SPRITES
 unsigned int position_vram=((SATURN_WIDTH+64)*32);
 //unsigned int static_items=0;
@@ -979,8 +981,6 @@ void PlayDemo (int demonumber)
 
 void Died (void)
 {
-   float   fangle;
-//    int   fangle;
     int32_t dx,dy;
     int     iangle,curangle,clockwise,counter,change;
 
@@ -1001,13 +1001,7 @@ void Died (void)
         dx = killerobj->x - player->x;
         dy = player->y - killerobj->y;
 
-//        fangle = (float) atan2((float) dy, (float) dx);     // returns -pi to pi
-		fangle = (slAtan ((dy<<16), (dx<<16)))>>16;
-        if (fangle<0)
-            fangle = (float) (M_PI*2+fangle);
-//            fangle = (int) (M_PI*2+fangle);
-
-        iangle = (int) (fangle/(M_PI*2)*ANGLES);
+		iangle = atan2fix(dy,dx);
     }
     else
     {

@@ -183,7 +183,19 @@ void NewState (objtype *ob, statetype *state)
 =
 ==================================
 */
+#ifdef EMBEDDED
+#define CHECKDIAG(x,y)								\
+{                                               \
+	if (any_actor_at(x, y))                                       \
+	{                                               \
+		if (!obj_actor_at(x, y))                               \
+			return false;                           \
+		if (objlist[get_actor_at(x, y)].flags & FL_SHOOTABLE)  \
+			return false;                           \
+	}                                               \
+}
 
+#else
 #define CHECKDIAG(x,y)                              \
 {                                                   \
     temp=(uintptr_t)actorat[x][y];                  \
@@ -195,6 +207,7 @@ void NewState (objtype *ob, statetype *state)
             return false;                           \
     }                                               \
 }
+#endif
 
 #ifdef PLAYDEMOLIKEORIGINAL
     #define DOORCHECK                                   \
@@ -215,6 +228,23 @@ void NewState (objtype *ob, statetype *state)
             return true;
 #endif
 
+#ifdef EMBEDDED
+
+#define CHECKSIDE(x,y)								\
+{                                               \
+	if (any_actor_at(x, y))                                       \
+	{                                               \
+		if (wall_actor_at(x, y))                               \
+			return false;                           \
+		if (!obj_actor_at(x, y))                               \
+			doornum = get_actor_at(x, y);                      \
+		else if (objlist[get_actor_at(x, y)].flags & FL_SHOOTABLE) \
+			return false;                           \
+	}                                               \
+}
+
+#else
+
 #define CHECKSIDE(x,y)                                  \
 {                                                       \
     temp=(uintptr_t)actorat[x][y];                      \
@@ -230,162 +260,164 @@ void NewState (objtype *ob, statetype *state)
             return false;                               \
     }                                                   \
 }
-
-
-boolean TryWalk (objtype *ob)
-{
-    int       doornum = -1;
-    uintptr_t temp;
-
-    if (ob->obclass == inertobj)
-    {
-        switch (ob->dir)
-        {
-            case north:
-                ob->tiley--;
-                break;
-
-            case northeast:
-                ob->tilex++;
-                ob->tiley--;
-                break;
-
-            case east:
-                ob->tilex++;
-                break;
-
-            case southeast:
-                ob->tilex++;
-                ob->tiley++;
-                break;
-
-            case south:
-                ob->tiley++;
-                break;
-
-            case southwest:
-                ob->tilex--;
-                ob->tiley++;
-                break;
-
-            case west:
-                ob->tilex--;
-                break;
-
-            case northwest:
-                ob->tilex--;
-                ob->tiley--;
-                break;
-        }
-    }
-    else
-    {
-        switch (ob->dir)
-        {
-            case north:
-                if (ob->obclass == dogobj || ob->obclass == fakeobj
-                    || ob->obclass == ghostobj || ob->obclass == spectreobj)
-                {
-                    CHECKDIAG(ob->tilex,ob->tiley-1);
-                }
-                else
-                {
-                    CHECKSIDE(ob->tilex,ob->tiley-1);
-                }
-                ob->tiley--;
-                break;
-
-            case northeast:
-                CHECKDIAG(ob->tilex+1,ob->tiley-1);
-                CHECKDIAG(ob->tilex+1,ob->tiley);
-                CHECKDIAG(ob->tilex,ob->tiley-1);
-                ob->tilex++;
-                ob->tiley--;
-                break;
-
-            case east:
-                if (ob->obclass == dogobj || ob->obclass == fakeobj
-                    || ob->obclass == ghostobj || ob->obclass == spectreobj)
-                {
-                    CHECKDIAG(ob->tilex+1,ob->tiley);
-                }
-                else
-                {
-                    CHECKSIDE(ob->tilex+1,ob->tiley);
-                }
-                ob->tilex++;
-                break;
-
-            case southeast:
-                CHECKDIAG(ob->tilex+1,ob->tiley+1);
-                CHECKDIAG(ob->tilex+1,ob->tiley);
-                CHECKDIAG(ob->tilex,ob->tiley+1);
-                ob->tilex++;
-                ob->tiley++;
-                break;
-
-            case south:
-                if (ob->obclass == dogobj || ob->obclass == fakeobj
-                    || ob->obclass == ghostobj || ob->obclass == spectreobj)
-                {
-                    CHECKDIAG(ob->tilex,ob->tiley+1);
-                }
-                else
-                {
-                    CHECKSIDE(ob->tilex,ob->tiley+1);
-                }
-                ob->tiley++;
-                break;
-
-            case southwest:
-                CHECKDIAG(ob->tilex-1,ob->tiley+1);
-                CHECKDIAG(ob->tilex-1,ob->tiley);
-                CHECKDIAG(ob->tilex,ob->tiley+1);
-                ob->tilex--;
-                ob->tiley++;
-                break;
-
-            case west:
-                if (ob->obclass == dogobj || ob->obclass == fakeobj
-                    || ob->obclass == ghostobj || ob->obclass == spectreobj)
-                {
-                    CHECKDIAG(ob->tilex-1,ob->tiley);
-                }
-                else
-                {
-                    CHECKSIDE(ob->tilex-1,ob->tiley);
-                }
-                ob->tilex--;
-                break;
-
-            case northwest:
-                CHECKDIAG(ob->tilex-1,ob->tiley-1);
-                CHECKDIAG(ob->tilex-1,ob->tiley);
-                CHECKDIAG(ob->tilex,ob->tiley-1);
-                ob->tilex--;
-                ob->tiley--;
-                break;
-
-            case nodir:
-                return false;
-
-            default:
-                Quit ("Walk: Bad dir");
-        }
-    }
-
-#ifdef PLAYDEMOLIKEORIGINAL
-    if (DEMOCOND_ORIG && doornum != -1)
-    {
-        OpenDoor(doornum);
-        ob->distance = -doornum-1;
-        return true;
-    }
 #endif
+
+boolean TryWalk(objtype *ob)
+{
+	int doornum;
+	int tilex, tiley;
+
+	doornum = -1;
+
+	tilex = ob->tilex;
+	tiley = ob->tiley;
+	if (ob->obclass == inertobj)
+	{
+		switch (ob->dir)
+		{
+		case north:
+			tiley--;
+			break;
+
+		case northeast:
+			tilex++;
+			tiley--;
+			break;
+
+		case east:
+			tilex++;
+			break;
+
+		case southeast:
+			tilex++;
+			tiley++;
+			break;
+
+		case south:
+			tiley++;
+			break;
+
+		case southwest:
+			tilex--;
+			tiley++;
+			break;
+
+		case west:
+			tilex--;
+			break;
+
+		case northwest:
+			tilex--;
+			tiley--;
+			break;
+			
+		default:
+			break;
+		}
+	}
+	else
+		switch (ob->dir)
+		{
+		case north:
+			if (ob->obclass == dogobj || ob->obclass == fakeobj)
+			{
+				CHECKDIAG(tilex,tiley-1);
+			}
+			else
+			{
+				CHECKSIDE(tilex,tiley-1);
+			}
+			tiley--;
+			break;
+
+		case northeast:
+			CHECKDIAG(tilex+1,tiley-1);
+			CHECKDIAG(tilex+1,tiley);
+			CHECKDIAG(tilex,tiley-1);
+			tilex++;
+			tiley--;
+			break;
+
+		case east:
+			if (ob->obclass == dogobj || ob->obclass == fakeobj)
+			{
+				CHECKDIAG(tilex+1,tiley);
+			}
+			else
+			{
+				CHECKSIDE(tilex+1,tiley);
+			}
+			tilex++;
+			break;
+
+		case southeast:
+			CHECKDIAG(tilex+1,tiley+1);
+			CHECKDIAG(tilex+1,tiley);
+			CHECKDIAG(tilex,tiley+1);
+			tilex++;
+			tiley++;
+			break;
+
+		case south:
+			if (ob->obclass == dogobj || ob->obclass == fakeobj)
+			{
+				CHECKDIAG(tilex,tiley+1);
+			}
+			else
+			{
+				CHECKSIDE(tilex,tiley+1);
+			}
+			tiley++;
+			break;
+
+		case southwest:
+			CHECKDIAG(tilex-1,tiley+1);
+			CHECKDIAG(tilex-1,tiley);
+			CHECKDIAG(tilex,tiley+1);
+			tilex--;
+			tiley++;
+			break;
+
+		case west:
+			if (ob->obclass == dogobj || ob->obclass == fakeobj)
+			{
+				CHECKDIAG(tilex-1,tiley);
+			}
+			else
+			{
+				CHECKSIDE(tilex-1,tiley);
+			}
+			tilex--;
+			break;
+
+		case northwest:
+			CHECKDIAG(tilex-1,tiley-1);
+			CHECKDIAG(tilex-1,tiley);
+			CHECKDIAG(tilex,tiley-1);
+			tilex--;
+			tiley--;
+			break;
+
+		case nodir:
+			return false;
+
+		default:
+			Quit ("Walk: Bad dir");
+		}
+
+	ob->tilex = tilex;
+	ob->tiley = tiley;
+	if (doornum != -1)
+	{
+		OpenDoor (doornum);
+		ob->distance = -doornum-1;
+		return true;
+	}
+
 
 #ifdef EMBEDDED
 	ob->areanumber =
-		*(mapsegs[0] + farmapylookup[ob->tiley]+ob->tilex) - AREATILE;
+		*(mapsegs[0] + farmapylookup[tiley]+tilex) - AREATILE;
 #else
     ob->areanumber =
         *(mapsegs[0] + (ob->tiley<<mapshift)+ob->tilex) - AREATILE;
@@ -715,109 +747,74 @@ void SelectRunDir (objtype *ob)
 =================
 */
 
-void MoveObj (objtype *ob, int32_t move)
+void MoveObj (objtype *ob, long move)
 {
-    int32_t    deltax,deltay;
+	long	deltax,deltay;
+	long	x, y;
 
-    switch (ob->dir)
-    {
-        case north:
-            ob->y -= move;
-            break;
-        case northeast:
-            ob->x += move;
-            ob->y -= move;
-            break;
-        case east:
-            ob->x += move;
-            break;
-        case southeast:
-            ob->x += move;
-            ob->y += move;
-            break;
-        case south:
-            ob->y += move;
-            break;
-        case southwest:
-            ob->x -= move;
-            ob->y += move;
-            break;
-        case west:
-            ob->x -= move;
-            break;
-        case northwest:
-            ob->x -= move;
-            ob->y -= move;
-            break;
+	x = ob->x;
+	y = ob->y;
+	switch (ob->dir)
+	{
+	case north:
+		y -= move;
+		break;
+	case northeast:
+		x += move;
+		y -= move;
+		break;
+	case east:
+		x += move;
+		break;
+	case southeast:
+		x += move;
+		y += move;
+		break;
+	case south:
+		y += move;
+		break;
+	case southwest:
+		x -= move;
+		y += move;
+		break;
+	case west:
+		x -= move;
+		break;
+	case northwest:
+		x -= move;
+		y -= move;
+		break;
 
-        case nodir:
-            return;
+	case nodir:
+		return;
 
-        default:
-            Quit ("MoveObj: bad dir!");
-    }
+	default:
+		Quit ("MoveObj: bad dir!");
+	}
 
-    //
-    // check to make sure it's not on top of player
-    //
-    if (areabyplayer[ob->areanumber])
-    {
-        deltax = ob->x - player->x;
-        if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
-            goto moveok;
-        deltay = ob->y - player->y;
-        if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
-            goto moveok;
+//
+// check to make sure it's not on top of player
+//
+//	if (getareabyplayer(ob->areanumber))
+	if (areabyplayer[ob->areanumber])	
+	{
+		deltax = x - player->x;
+		if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
+			goto moveok;
+		deltay = y - player->y;
+		if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
+			goto moveok;
 
-        if (ob->hidden)          // move closer until he meets CheckLine
-            goto moveok;
+		if (ob->obclass == ghostobj || ob->obclass == spectreobj)
+			TakeDamage (tics*2,ob);
 
-        if (ob->obclass == ghostobj || ob->obclass == spectreobj)
-            TakeDamage (tics*2,ob);
-
-        //
-        // back up
-        //
-        switch (ob->dir)
-        {
-            case north:
-                ob->y += move;
-                break;
-            case northeast:
-                ob->x -= move;
-                ob->y += move;
-                break;
-            case east:
-                ob->x -= move;
-                break;
-            case southeast:
-                ob->x -= move;
-                ob->y -= move;
-                break;
-            case south:
-                ob->y -= move;
-                break;
-            case southwest:
-                ob->x += move;
-                ob->y -= move;
-                break;
-            case west:
-                ob->x += move;
-                break;
-            case northwest:
-                ob->x += move;
-                ob->y += move;
-                break;
-
-            case nodir:
-                return;
-        }
-        return;
-    }
+		return;
+	}
 moveok:
-    ob->distance -=move;
+	ob->x = x;
+	ob->y = y;
+	ob->distance -=move;
 }
-
 /*
 =============================================================================
 
@@ -838,6 +835,8 @@ moveok:
 void KillActor (objtype *ob)
 {
 	int	tilex,tiley;
+	int	points;
+	int	newstate;
 
 	tilex = ob->tilex = ob->x >> TILESHIFT;		// drop item on center
 	tiley = ob->tiley = ob->y >> TILESHIFT;
@@ -845,26 +844,26 @@ void KillActor (objtype *ob)
 	switch (ob->obclass)
 	{
 	case guardobj:
-		GivePoints (100);
-		NewState (ob,s_grddie1);
+		points = 100;
+		newstate = s_grddie1;
 		PlaceItemType (bo_clip2,tilex,tiley);
 		break;
 
 	case officerobj:
-		GivePoints (400);
-		NewState (ob,s_ofcdie1);
+		points = 400;
+		newstate = s_ofcdie1;
 		PlaceItemType (bo_clip2,tilex,tiley);
 		break;
 
 	case mutantobj:
-		GivePoints (700);
-		NewState (ob,s_mutdie1);
+		points = 700;
+		newstate = s_mutdie1;
 		PlaceItemType (bo_clip2,tilex,tiley);
 		break;
 
 	case ssobj:
-		GivePoints (500);
-		NewState (ob,s_ssdie1);
+		points = 500;
+		newstate = s_ssdie1;
 		if (gamestate.bestweapon < wp_machinegun)
 			PlaceItemType (bo_machinegun,tilex,tiley);
 		else
@@ -872,102 +871,108 @@ void KillActor (objtype *ob)
 		break;
 
 	case dogobj:
-		GivePoints (200);
-		NewState (ob,s_dogdie1);
+		points = 200;
+		newstate = s_dogdie1;
 		break;
 
 #ifndef SPEAR
 	case bossobj:
-		GivePoints (5000);
-		NewState (ob,s_bossdie1);
+		points = 5000;
+		newstate = s_bossdie1;
 		PlaceItemType (bo_key1,tilex,tiley);
 		break;
 
 	case gretelobj:
-		GivePoints (5000);
-		NewState (ob,s_greteldie1);
+		points = 5000;
+		newstate = s_greteldie1;
 		PlaceItemType (bo_key1,tilex,tiley);
 		break;
 
 	case giftobj:
-		GivePoints (5000);
+		points = 5000;
 		gamestate.killx = player->x;
 		gamestate.killy = player->y;
-		NewState (ob,s_giftdie1);
+		newstate = s_giftdie1;
 		break;
 
 	case fatobj:
-		GivePoints (5000);
+		points = 5000;
 		gamestate.killx = player->x;
 		gamestate.killy = player->y;
-		NewState (ob,s_fatdie1);
+		newstate = s_fatdie1;
 		break;
 
 	case schabbobj:
-		GivePoints (5000);
+		points = 5000;
 		gamestate.killx = player->x;
 		gamestate.killy = player->y;
-		NewState (ob,s_schabbdie1);
+		newstate = s_schabbdie1;
 		A_DeathScream(ob);
 		break;
 	case fakeobj:
-		GivePoints (2000);
-		NewState (ob,s_fakedie1);
+		points = 2000;
+		newstate = s_fakedie1;
 		break;
 
 	case mechahitlerobj:
-		GivePoints (5000);
-		NewState (ob,s_mechadie1);
+		points = 5000;
+		newstate = s_mechadie1;
 		break;
 	case realhitlerobj:
-		GivePoints (5000);
+		points = 5000;
 		gamestate.killx = player->x;
 		gamestate.killy = player->y;
-		NewState (ob,s_hitlerdie1);
+		newstate = s_hitlerdie1;
 		A_DeathScream(ob);
 		break;
 #else
 	case spectreobj:
-		GivePoints (200);
-		NewState (ob,s_spectredie1);
+		points = 200;
+		newstate = s_spectredie1;
 		break;
 
 	case angelobj:
-		GivePoints (5000);
-		NewState (ob,s_angeldie1);
+		points = 5000;
+		newstate = s_angeldie1;
 		break;
 
 	case transobj:
-		GivePoints (5000);
-		NewState (ob,s_transdie0);
+		points = 5000;
+		newstate = s_transdie0;
 		PlaceItemType (bo_key1,tilex,tiley);
 		break;
 
 	case uberobj:
-		GivePoints (5000);
-		NewState (ob,s_uberdie0);
+		points = 5000;
+		newstate = s_uberdie0;
 		PlaceItemType (bo_key1,tilex,tiley);
 		break;
 
 	case willobj:
-		GivePoints (5000);
-		NewState (ob,s_willdie1);
+		points = 5000;
+		newstate = s_willdie1;
 		PlaceItemType (bo_key1,tilex,tiley);
 		break;
 
 	case deathobj:
-		GivePoints (5000);
-		NewState (ob,s_deathdie1);
+		points = 5000;
+		newstate = s_deathdie1;
 		PlaceItemType (bo_key1,tilex,tiley);
 		break;
 #endif
 	default:
+		points = 0;
+		newstate = ob->state;
 		break;
 	}
 
+	GivePoints(points);
+	NewState (ob, newstate);
+#ifdef ENABLE_STATS
 	gamestate.killcount++;
+#endif
 	ob->flags &= ~FL_SHOOTABLE;
-	actorat[ob->tilex][ob->tiley] = 0;
+	clear_actor(ob->tilex, ob->tiley);
 	ob->flags |= FL_NONMARK;
 }
 #else

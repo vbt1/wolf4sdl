@@ -786,6 +786,53 @@ static const int starthitpoints[4][NUMENEMIES] =
 	  1600	// en_death
 }};
 
+short atan2fix(fixed x, fixed y)
+{
+    boolean negative;
+    long long quot;
+    fixed tang;
+    int offset;
+    int res;
+    if (x < 0) {
+	x = -x;
+	negative = true;
+	offset = 180;
+    } else {
+	negative = false;
+	offset = 0;
+    }
+    if (y < 0) {
+	y = -y;
+	negative = !negative;
+	if (negative)
+	    offset = 360;
+    }
+    if (x == 0)
+      return negative ? 270 : 90;
+    if (y == 0)
+      return offset;
+    quot = ((long long)y << 32) / x;
+    tang = (fixed)quot;
+    if (quot != tang) {
+	/* Overflow.  */
+	res = 90;
+    } else {
+	int low = 0;
+	int high = FINEANGLES / 4 - 1;
+
+	while (low + 1 < high) {
+	    res = (low + high) >> 1;
+	    if (finetangent[res] < tang)
+		high = res;
+	    else
+		low = res;
+	}
+	res = res / (FINEANGLES / ANGLES);
+    }
+    if (negative)
+	res = -res;
+    return res + offset;
+}
 
 /*
 =================
@@ -1685,31 +1732,11 @@ void SpawnDeath(int tilex, int tiley)
 void T_Launch(objtype *ob)
 {
 	long deltax, deltay;
-	float angle;
 	int iangle;
 
 	deltax = player->x - ob->x;
 	deltay = ob->y - player->y;
-	angle = atan2 (deltay,deltax);
-	if (angle<0)
-		angle = PI*2+angle;
-	iangle = angle/(PI*2)*ANGLES;
-	if (ob->obclass == deathobj)
-	{
-		T_Shoot (ob);
-		if (ob->state == s_deathshoot2)
-		{
-			iangle-=4;
-			if (iangle<0)
-				iangle+=ANGLES;
-		}
-		else
-		{
-			iangle+=4;
-			if (iangle>=ANGLES)
-				iangle-=ANGLES;
-		}
-	}
+	iangle = atan2fix (deltay,deltax);
 
 	GetNewActor();
 	newobj->state = s_rocket;
@@ -2071,15 +2098,11 @@ void SpawnFat (int tilex, int tiley)
 void T_SchabbThrow (objtype *ob)
 {
 	long	deltax,deltay;
-	float	angle;
 	int		iangle;
 
 	deltax = player->x - ob->x;
 	deltay = ob->y - player->y;
-	angle = atan2 (deltay,deltax);
-	if (angle<0)
-		angle = PI*2+angle;
-	iangle = angle/(PI*2)*ANGLES;
+	iangle = atan2fix (deltay,deltax);
 
 	GetNewActor ();
 	newobj->state = s_needle1;
@@ -2111,15 +2134,11 @@ void T_SchabbThrow (objtype *ob)
 void T_GiftThrow(objtype *ob)
 {
 	long deltax,deltay;
-	float angle;
 	int iangle;
 
 	deltax = player->x - ob->x;
 	deltay = ob->y - player->y;
-	angle = atan2 (deltay,deltax);
-	if (angle<0)
-		angle = PI*2+angle;
-	iangle = angle/(PI*2)*ANGLES;
+	iangle = atan2fix (deltay,deltax);
 
 	GetNewActor ();
 	newobj->state = s_rocket;
@@ -2536,15 +2555,11 @@ void A_Slurpie(objtype *ob)
 void T_FakeFire (objtype *ob)
 {
 	long	deltax,deltay;
-	float	angle;
 	int		iangle;
 
 	deltax = player->x - ob->x;
 	deltay = ob->y - player->y;
-	angle = atan2 (deltay,deltax);
-	if (angle<0)
-		angle = PI*2+angle;
-	iangle = angle/(PI*2)*ANGLES;
+	iangle = atan2fix (deltay,deltax);
 
 	GetNewActor ();
 	newobj->state = s_fire1;
@@ -3081,7 +3096,6 @@ boolean	CheckPosition(objtype *ob)
 void A_StartDeathCam(objtype *ob)
 {
 	long	dx,dy;
-	float	fangle;
 	long    xmove,ymove;
 	long	dist;
 
@@ -3124,11 +3138,7 @@ void A_StartDeathCam(objtype *ob)
 	dx = ob->x - player->x;
 	dy = player->y - ob->y;
 
-	fangle = atan2(dy, dx);			/* returns -pi to pi */
-	if (fangle<0)
-		fangle = PI*2+fangle;
-
-	player->angle = fangle/(PI*2)*ANGLES;
+	player->angle = atan2fix(dy, dx);
 
 /* try to position as close as possible without being in a wall */
 	dist = 0x14000l;

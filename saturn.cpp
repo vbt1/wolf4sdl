@@ -17,28 +17,12 @@ extern "C" {
 //#endif
 
 }
-//#define VBT
-
-void /* Slave SH2 main loop (RUNS on slave SH) */
-  SPR_SlaveSHmain(void);
-void /* slave SH Initialize (RUNS on main SH) */
-  SPR_InitSlaveSH(void);  
-
 
 //
 #ifdef USE_SPRITES
 extern TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
 #endif
 extern unsigned char hz;
-
-#ifdef VBT
-int CdUnlock();
-#define SYS_CDINIT1(i) \
-((**(void(**)(int))0x60002dc)(i))
-
-#define SYS_CDINIT2() \
-((**(void(**)(void))0x600029c)())
-#endif
 
 extern "C" {
 	extern void DMA_ScuInit(void);
@@ -1267,33 +1251,6 @@ Uint32 SWAP_BYTES_32(Uint32 a) {
 
 }
 //-------------------------------------------------------------------------------------------------------------------------------------
-extern "C" {
-void CSH_Purge(void *adrs, Uint32 P_size)
-{
-#if 0	
-	typedef Uint32 LineX[0x10/sizeof(Uint32)];	/* ???C???? 0x10 ?o?C?g?P?? */
-	LineX *ptr, *end;
-	Uint32 zero = 0;
-
-	ptr = (LineX*)(((Uint32)adrs & 0x1fffffff) | 0x40000000);	/* ?L???b?V???p?[?W?¨? */
-	end = (LineX*)((Uint32)ptr + P_size - 0x10);	/* ?I???|?C???^?i-0x10 ??|?X?g?C???N???????g?¨?j */
-	ptr = (LineX*)((Uint32)ptr & -sizeof(LineX));	/* ???C???A???C?????g????? */
-	do {
-		(*ptr)[0] = zero;			/* ?L???b?V???p?[?W */
-	} while (ptr++ < end);			/* ?|?X?g?C???N???????g??f?B???C?X???b?g???p?¨? */
-#endif	
-    void *ea;                                    /*    ?I???A?h???X            */
-
-    adrs = (void *)((Uint32)adrs
-     & 0x1ffffff0 | 0x40000000);                /*    ?????????i?????    */
-    ea = (void *)((Uint32)adrs + P_size);        /*    ?I???A?h???X?{?P?Z?o    */
-    while ((Uint32)adrs < (Uint32)ea) {            /*    ?????C?????J????    */
-        *(Uint32 *)adrs = 0;                    /*    ?C???o???f?[?g            */
-        adrs = (void *)((Uint32)adrs + 16);        /*    ???????                */
-    }                                            /*    end    while                */
-}
-}
-//-------------------------------------------------------------------------------------------------------------------------------------
 
 /*
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -1388,128 +1345,6 @@ SDL_RWops *SDL_RWFromFile(const char *file, const char *mode)
 }*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 
-#ifdef VBT
-
-
-
-int CdUnlock (void)
-{
-
-Sint32 ret;
-CdcStat stat;
-volatile int delay;
-unsigned int vbt=0;
-SYS_CDINIT1(3);
-
-SYS_CDINIT2();
-
-do {
-
-for(delay = 100000; delay; delay--);
-
-ret = CDC_GetCurStat(&stat);
-} while ((ret != 0) || (CDC_STAT_STATUS(&stat) == 0xff));
-
-
-return (int) CDC_STAT_STATUS(&stat);
-
-}
-
-
-
-#endif
-#endif
-
-
- #if 0
-
-volatile void **SPR_SlaveSHEntry
-/*  = (void **)0x6000250; 			 95-7-27	*/
-  = (volatile void **)0x6000250;  /* 95-7-27  BOOT ROMs dispatch address */
-
-volatile Uint8 *SPR_SMPC_COM = (Uint8 *)0x2010001F;   /* SMPC command register */
-volatile Uint8 *SPR_SMPC_RET = (Uint8 *)0x2010005f;   /* SMPC result register */
-volatile Uint8 *SPR_SMPC_SF  = (Uint8 *)0x20100063;   /* SMPC status flag */
-
-const Uint8 SPR_SMPC_SSHON  = 0x02;          /* SMPC slave SH on command */
-const Uint8 SPR_SMPC_SSHOFF = 0x03;          /* SMPC slave SH off command */
-
-typedef void PARA_RTN(void *parm);
-
-Uint32
-  *SPR_SlaveCommand  = (Uint32 *)0;          /* MASTER to SLAVE command AREA */
-
-Uint32
-  SPR_SlaveState    = (Uint32)0;             /* SLAVE to MASTER state  AREA */
-
-Uint32
-  SPR_SlaveParam    = (Uint32)0;             /* MASTER to SLAVE parameter  AREA */
- 
-void /* Slave SH2 main loop (RUNS on slave SH) */
-  SPR_SlaveSHmain(void)
-{
-/*    const Uint32 RUNNING = 1;		95-7-27	unuse
-    const Uint32 WAITING = 0;
-*/
-
-    /* Wait until SlaveSHReqCode is set */
-    /* then call function for SlaveSHReqCode */
-    set_imask(0xf);
-    *(volatile Uint16 *)0xfffffee2 = 0x0000;  /* IPRA int disable */
-    *(volatile Uint16 *)0xfffffe60 = 0x0000;  /* IPRB int disable */
-    *(volatile Uint8 *)0xfffffe10  = 0x01;    /* TIER FRT INT disable */
-    while(1){
-	/* Use "FRT InputCaptureFlag" Poling for wait command from Master */
-        if((*(volatile Uint8 *)0xfffffe11 & 0x80) == 0x80){
-	   *(Uint8 *)0xfffffe11 = 0x00; /* FTCSR clear */
-	   if((*(void (*)(void*))*(void **)((Uint32)&SPR_SlaveCommand+0x20000000)))
-           {
-             /* chache parse all */
-             *(volatile Uint16 *)0xfffffe92 |= 0x10;
-	     (*(void (*)(void*))*(void **)((Uint32)&SPR_SlaveCommand+0x20000000))
-                                                         ((void*)SPR_SlaveParam);
-             /* frt inp to master */
-             *(volatile Uint16 *)0x21800000 = 0xffff;
-	   }
-	}
-    }
-}
- 
-  
-void  SPR_RunSlaveSH(PARA_RTN *routine, void *parm)
-{
-    SPR_SlaveCommand = (Uint32*)routine;
-    SPR_SlaveParam   = (Uint32)parm;
-    *(volatile Uint16 *)0x21000000 = 0xffff;
-}
-
-
-void  SPR_WaitEndSlaveSH(void)
-{
-    while((*(volatile Uint8 *)0xfffffe11 & 0x80) != 0x80);
-    *(volatile Uint8 *)0xfffffe11 = 0x00; /* FTCSR clear */
-    *(volatile Uint16 *)0xfffffe92 |= 0x10; /* chache parse all */
-}
-
-void /* slave SH Initialize (RUNS on main SH) */
-  SPR_InitSlaveSH(void)
-{
-    volatile Uint16 i;
-
-    *(volatile Uint8 *)0xfffffe10  = 0x01;    /* TIER FRT INT disable */
-    SPR_SlaveState = 0;                /* set RUNNING state */
-    /* SlaveSH ???????????? */
-    while((*SPR_SMPC_SF & 0x01) == 0x01);
-    *SPR_SMPC_SF = 1;                 /* --- SMPC StatusFlag SET */
-    *SPR_SMPC_COM = SPR_SMPC_SSHOFF;      /* --- Slave SH OFF SET */
-    while((*SPR_SMPC_SF & 0x01) == 0x01);
-    for(i = 0 ; i < 1000; i++);   /* slave reset assert length */
-    *(void **)SPR_SlaveSHEntry = (void *)&SPR_SlaveSHmain; /* dispatch address set */
-    /* SlaveSH ???????????? */
-    *SPR_SMPC_SF = 1;                 /* --- SMPC StatusFlag SET */
-    *SPR_SMPC_COM = SPR_SMPC_SSHON;       /* --- Slave SH ON SET */
-    while((*SPR_SMPC_SF & 0x01) == 0x01);
-}
 #endif
 
 #if 0 // code pour faire le sol

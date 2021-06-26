@@ -162,7 +162,8 @@ void Quit(const char *errorStr, ...);
 
 #define SCREENBWIDE     80
 
-#define HEIGHTRATIO     0.50            // also defined in id_mm.c
+//#define HEIGHTRATIO     0.50            // also defined in id_mm.c
+#define width_to_height(x) (x >> 1)
 
 #define BORDERCOLOR     3
 #define FLASHCOLOR      5
@@ -250,6 +251,50 @@ void Quit(const char *errorStr, ...);
 
 #define STARTAMMO       8
 
+typedef uint64_t mapbitmap[MAPSIZE];
+static inline boolean getmapbit(mapbitmap m, int x, int y)
+{
+  return (m[x] & (1ull << y)) != 0;
+}
+
+extern mapbitmap objactor;
+
+static inline void clearmapbit(mapbitmap m, int x, int y)
+{
+  m[x] &= ~(1ull << y);
+}
+
+#define getactorflag(x, y) getmapbit(objactor, x, y)
+#define setactorflag(x, y) setmapbit(objactor, x, y)
+#define clearactorflag(x, y) clearmapbit(objactor, x, y)
+
+/* Record actor location.  */
+#define move_actor(o) do { \
+    setactorflag((o)->tilex, (o)->tiley); \
+    actorat[(o)->tilex][(o)->tiley] = obj_id(o); \
+    } while (0)
+
+/* Record Door location.  */
+#define set_door_actor(x, y, doornum) actorat[x][y] = doornum | 0x80
+/* Record wall location.  */
+#define set_wall_at(x, y, tile) actorat[x][y] = tile
+/* Clear location.  */
+#define clear_actor(x, y) do { \
+    actorat[x][y] = 0; \
+    clearactorflag(x, y); \
+    } while (0)
+/* nonzero if something other than a door is at given location.  */
+#define obj_actor_at(x, y) getactorflag(x, y)
+/* nonzero if a wall is at given location.  */
+#define wall_actor_at(x, y) (actorat[x][y] && actorat[x][y] < 128 \
+			    && !getactorflag(x, y))
+/* nonzero if a door or wall is at given location.  */
+#define solid_actor_at(x, y) (actorat[x][y] && !getactorflag(x, y))
+/* zero if given location is empty.  */
+#define any_actor_at(x, y) (actorat[x][y] != 0 || getactorflag(x, y))
+/* The id of the actor at given location.  */
+#define get_actor_at(x, y) \
+  (obj_actor_at(x, y) ? actorat[x][y] & 0xff : actorat[x][y] & 0x7f)
 
 // object flag values
 

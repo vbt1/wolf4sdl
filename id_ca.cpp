@@ -124,7 +124,7 @@ typedef struct
 =============================================================================
 */
 
-#define BUFFERSIZE 0x4000
+#define BUFFERSIZE 0x800
 static int32_t bufferseg[BUFFERSIZE/4];
 
 int     mapon;
@@ -621,7 +621,7 @@ void CAL_SetupGrFile (void)
 =
 ======================
 */
-
+/*
 void CAL_SetupMapFile (void)
 {
     int     i,j;
@@ -739,7 +739,7 @@ void CAL_SetupMapFile (void)
 //        CHECKMALLOCRESULT(mapsegs[i]);
     }
 }
-
+*/
 
 long CAL_SetupMapFile (int mapnum)
 {
@@ -803,7 +803,7 @@ long CAL_SetupMapFile (int mapnum)
 	uint8_t *maphandleptr = (uint8_t*)((SATURN_CHUNK_ADDR+sizeof(mapfiletype)+ (4 - 1)) & -4);
 	GFS_Load(maphandle, 0, (void *)maphandleptr, fileSize);
 
-slPrintHex(fileSize,slLocate(10,14));
+//slPrintHex(fileSize,slLocate(10,14));
 
 	pos = tinf->headeroffsets[mapnum];
 	if (pos<0)                          // $FFFFFFFF start is a sparse map
@@ -821,6 +821,7 @@ slPrintHex(fileSize,slLocate(10,14));
 		mapheaderseg[mapnum]->planestart[i]=SWAP_BYTES_32(mapheaderseg[mapnum]->planestart[i]);
 		mapheaderseg[mapnum]->planelength[i]=SWAP_BYTES_16(mapheaderseg[mapnum]->planelength[i]);		
 		mapsegs[i]=(word *)SATURN_MAPSEG_ADDR+(0x2000*i);
+//		mapsegs[i]=(word *) malloc(maparea*2);
     }
 	mapheaderseg[mapnum]->width=SWAP_BYTES_16(mapheaderseg[mapnum]->width);
 	mapheaderseg[mapnum]->height=SWAP_BYTES_16(mapheaderseg[mapnum]->height);
@@ -851,7 +852,7 @@ void CA_Startup (void)
     profilehandle = open("PROFILE.TXT", O_CREAT | O_WRONLY | O_TEXT);
 #endif
 
-    CAL_SetupMapFile ();
+//    CAL_SetupMapFile ();
     CAL_SetupGrFile ();
     //CAL_SetupAudioFile ();
 
@@ -1154,18 +1155,18 @@ void CA_CacheMap (int mapnum)
     word     *buffer2seg;
     int32_t   expanded;
 #endif
-slPrintHex(mapnum,slLocate(10,18));
     mapon = mapnum;
 
-//long fileSize = CAL_SetupMapFile(mapnum);
+	long fileSize = CAL_SetupMapFile(mapnum);
 //
 // load the planes into the allready allocated buffers
 //
     size = maparea*2;
-	long fileSize = 0x6b21;//GetFileSize(maphandle);
+//	long fileSize = 0x6b21;//GetFileSize(maphandle);
 //	long fileSize = GetFileSize(maphandle);
 //	slSynch();
 	uint8_t *Chunks=(uint8_t*)SATURN_CHUNK_ADDR;   // écrase les sons
+//	uint8_t *Chunks=(uint8_t*)malloc(fileSize);   // écrase les sons
 //slPrintHex(maphandle,slLocate(10,19));
 //slPrintHex(fileSize,slLocate(10,20));
 
@@ -1176,9 +1177,6 @@ slPrintHex(mapnum,slLocate(10,18));
         pos = mapheaderseg[mapnum]->planestart[plane];
         compressed = mapheaderseg[mapnum]->planelength[plane];
         dest = mapsegs[plane];
-
-slPrintHex(compressed,slLocate(10,22+plane));
-slPrintHex(pos,slLocate(20,22+plane));
 
         //lseek(maphandle,pos,SEEK_SET);
         if (compressed<=BUFFERSIZE)
@@ -1234,7 +1232,7 @@ slPrintHex((int)val,slLocate(10,21));
     }
 //	free(mapheaderseg[mapnum]);
 	mapheaderseg[mapnum]=NULL;
-
+//	free(Chunks);
 	Chunks = NULL;
 }
 
