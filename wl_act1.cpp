@@ -167,9 +167,10 @@ void SpawnStatic (int tilex, int tiley, int type)
         case    bo_bible:
         case    bo_crown:
         case    bo_fullheal:
-//            if (!loadedgame)
+//#ifdef ENABLE_STATS		
+//            //if (!loadedgame)
                 gamestate.treasuretotal++;
-
+//#endif
         case    bo_firstaid:
         case    bo_key1:
         case    bo_key2:
@@ -945,8 +946,9 @@ void PushWall(int checkx, int checky, int dir)
 		actorat[checkx-1][checky] = tilemap[checkx-1][checky] = oldtile;
 		break;
 	}
-
+//#ifdef ENABLE_STATS
 	gamestate.secretcount++;
+//#endif	
 	pwallx = checkx;
 	pwally = checky;
 	pwalldir = dir;
@@ -1078,8 +1080,9 @@ void PushWall (int checkx, int checky, int dir)
         return;
     }
     actorat[checkx+dx][checky+dy] = (objtype *)(uintptr_t) (tilemap[checkx+dx][checky+dy] = oldtile);
-
+//#ifdef ENABLE_STATS
     gamestate.secretcount++;
+//#endif	
     pwallx = checkx;
     pwally = checky;
     pwalldir = dir;

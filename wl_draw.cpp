@@ -414,7 +414,7 @@ void ScalePost(int postx,byte *postsource)
 #endif	
 }
 
-byte vgaCeiling[]=
+static const byte vgaCeiling[]=
 {
 #ifndef SPEAR
  0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0xbf,
@@ -458,7 +458,7 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 #endif
 
 #else
-	extern byte vgaCeiling[];
+//	extern byte vgaCeiling[];
 	extern SDL_Color curpal[256];
 	unsigned char y;
 	Uint16	*Line_Color_Pal0	=(Uint16 *)LINE_COLOR_TABLE;
@@ -946,7 +946,7 @@ static void DrawScaleds (void)
 ==============
 */
 
-static int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
+static short weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
     SPR_MACHINEGUNREADY, SPR_CHAINREADY};
 
 #ifdef USE_SPRITES

@@ -22,7 +22,7 @@ unsigned char texture_list[SPR_NULLSPRITE];
 #endif
 
 #ifdef EMBEDDED
-boolean loadedgame;
+//boolean loadedgame;
 extern boolean startgame;
 #endif
 
@@ -180,7 +180,7 @@ static void ScanInfoPlane(void)
 // P wall
 //
                 case 98:
-                    if (!loadedgame)
+                    //if (!loadedgame)
                         gamestate.secrettotal++;
                     break;
 
@@ -505,7 +505,7 @@ void SetupGameLevel (void)
 
 	slIntFunction(VblIn) ;
 
-    if (!loadedgame)
+    //if (!loadedgame)
     {
         gamestate.TimeCount
             = gamestate.secrettotal
@@ -1146,7 +1146,7 @@ restartgame:
     died = false;
     do
     {
-        if (!loadedgame)
+        //if (!loadedgame)
             gamestate.score = gamestate.oldscore;
         if(!died || viewsize != 21) 
 		{
@@ -1154,7 +1154,7 @@ restartgame:
 			DrawScore();
 		}
         startgame = false;
-        if (!loadedgame)
+        //if (!loadedgame)
 		{
 			//slPrint("SetupGameLevel",slLocate(10,10));
             SetupGameLevel ();

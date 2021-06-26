@@ -968,9 +968,9 @@ void KillActor (objtype *ob)
 
 	GivePoints(points);
 	NewState (ob, newstate);
-#ifdef ENABLE_STATS
+//#ifdef ENABLE_STATS
 	gamestate.killcount++;
-#endif
+//#endif
 	ob->flags &= ~FL_SHOOTABLE;
 	clear_actor(ob->tilex, ob->tiley);
 	ob->flags |= FL_NONMARK;

@@ -124,13 +124,17 @@ typedef struct
 =============================================================================
 */
 
-#define BUFFERSIZE 0x800
+#define BUFFERSIZE 0x2000
 static int32_t bufferseg[BUFFERSIZE/4];
 
 int     mapon;
 
 word    *mapsegs[MAPPLANES];
+#ifndef EMBEDDED
 static maptype* mapheaderseg[NUMMAPS];
+#else
+static maptype mapheaderseg;
+#endif
 //byte    *audiosegs[NUMSNDCHUNKS];
 byte    *grsegs[NUMCHUNKS];
 
@@ -740,7 +744,6 @@ void CAL_SetupMapFile (void)
     }
 }
 */
-
 long CAL_SetupMapFile (int mapnum)
 {
     int     i,j;
@@ -808,11 +811,13 @@ long CAL_SetupMapFile (int mapnum)
 	pos = tinf->headeroffsets[mapnum];
 	if (pos<0)                          // $FFFFFFFF start is a sparse map
 		return fileSize;
-	if(mapheaderseg[mapnum]==NULL)	mapheaderseg[mapnum]=(maptype *) malloc(sizeof(maptype));
-//	mapheaderseg[mapnum]=(maptype *) ((SATURN_CHUNK_ADDR+sizeof(mapfiletype)+fileSize + (8 - 1)) & -4);
+//	if(mapheaderseg[mapnum]==NULL)	mapheaderseg[mapnum]=(maptype *) malloc(sizeof(maptype));
+#ifndef EMBEDDED
+	mapheaderseg[mapnum]=(maptype *) ((SATURN_CHUNK_ADDR+sizeof(mapfiletype)+fileSize + (8 - 1)) & -4);
 //	CHECKMALLOCRESULT(mapheaderseg[mapnum]);
 	//read (maphandle,(memptr)mapheaderseg[i],sizeof(maptype));
 	memcpy((memptr)mapheaderseg[mapnum],&maphandleptr[pos],sizeof(maptype));
+
 //
 // allocate space for 3 64*64 planes
 //
@@ -824,14 +829,30 @@ long CAL_SetupMapFile (int mapnum)
 //		mapsegs[i]=(word *) malloc(maparea*2);
     }
 	mapheaderseg[mapnum]->width=SWAP_BYTES_16(mapheaderseg[mapnum]->width);
-	mapheaderseg[mapnum]->height=SWAP_BYTES_16(mapheaderseg[mapnum]->height);
+	mapheaderseg[mapnum]->height=SWAP_BYTES_16(mapheaderseg[mapnum]->height);	
+#else
+	memcpy((memptr)&mapheaderseg,&maphandleptr[pos],sizeof(maptype));
+	
+//
+// allocate space for 3 64*64 planes
+//
+    for (i=0;i<MAPPLANES;i++)
+    {
+		mapheaderseg.planestart[i]=SWAP_BYTES_32(mapheaderseg.planestart[i]);
+		mapheaderseg.planelength[i]=SWAP_BYTES_16(mapheaderseg.planelength[i]);		
+		mapsegs[i]=(word *)SATURN_MAPSEG_ADDR+(0x2000*i);
+//		mapsegs[i]=(word *) malloc(maparea*2);
+    }
+	mapheaderseg.width=SWAP_BYTES_16(mapheaderseg.width);
+	mapheaderseg.height=SWAP_BYTES_16(mapheaderseg.height);	
+#endif
+
 
 	maphandleptr = NULL;	
 	tinf = NULL;
 	
 	return fileSize;
 }
-
 
 //==========================================================================
 
@@ -1174,8 +1195,13 @@ void CA_CacheMap (int mapnum)
 	
     for (plane = 0; plane<MAPPLANES; plane++)
     {
+#ifndef EMBEDDED		
         pos = mapheaderseg[mapnum]->planestart[plane];
         compressed = mapheaderseg[mapnum]->planelength[plane];
+#else
+        pos = mapheaderseg.planestart[plane];
+        compressed = mapheaderseg.planelength[plane];
+#endif
         dest = mapsegs[plane];
 
         //lseek(maphandle,pos,SEEK_SET);
@@ -1205,7 +1231,7 @@ void CA_CacheMap (int mapnum)
 		source+=2;
 //      source++;
 //		source++;
-//       buffer2seg = (word *) (SATURN_MAPSEG_ADDR-0X10000);
+//       buffer2seg = (word *) (SATURN_MAPSEG_ADDR-0X8000);
         buffer2seg = (word *) malloc(expanded);
 		
 	int *val = (int *)buffer2seg;		
@@ -1224,14 +1250,17 @@ slPrintHex((int)val,slLocate(10,21));
         CA_RLEWexpand (source+1,dest,size,RLEWtag);
 #endif
 
-        if (compressed>BUFFERSIZE)
+//        if (compressed>BUFFERSIZE)
+		if(bigbufferseg!=NULL)
 		{
             free(bigbufferseg);
 			bigbufferseg = NULL;
 		}
     }
 //	free(mapheaderseg[mapnum]);
+#ifndef EMBEDDED
 	mapheaderseg[mapnum]=NULL;
+#endif	
 //	free(Chunks);
 	Chunks = NULL;
 }

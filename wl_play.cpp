@@ -590,8 +590,8 @@ void CheckKeys (void)
 		}
         if (!startgame)
             ContinueMusic (lastoffs);
-        if (loadedgame)
-            playstate = ex_abort;
+//        if (loadedgame)
+//            playstate = ex_abort;
         lasttimecount = GetTimeCount();
         return;
     }
