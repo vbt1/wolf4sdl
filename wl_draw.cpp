@@ -17,7 +17,7 @@ extern unsigned int position_vram;
 
 typedef struct
 {
-	byte *postsource;	
+//	byte *postsource;	
 #ifndef EMBEDDED	
 	int postx;
 	int lasttilehit;
@@ -56,7 +56,7 @@ ray_struc __attribute__ ((aligned (4)));
 
 int32_t    lasttimecount;
 
-short *wallheight;
+//short *wallheight;
 #ifndef EMBEDDED
 int min_wallheight;
 #endif
@@ -319,7 +319,7 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 */
 //extern int 					nb_unlock;
 
-void ScalePost(int postx,byte *postsource)
+void ScalePost(int postx, short wallheight, byte *postsource)
 {
 #ifdef USE_SPRITES	
 //--------------------------------------------------------------------------------------------
@@ -341,7 +341,7 @@ void ScalePost(int postx,byte *postsource)
 		user_wall->SIZE=0x801;
 
 		user_wall->XD=postx-(viewwidth/2);
-		user_wall->YC=(wallheight[postx] / 8);
+		user_wall->YC=(wallheight / 8);
 		user_wall->YD=-user_wall->YC;
 		user_wall->XC=user_wall->XD;
 	//	user_wall->YC=(wallheight[postx] / 8);
@@ -1057,7 +1057,7 @@ static inline void HitHorizDoorNew(int postx, ray_struc *ray)
 	doornum = ray->tilehit&0x7f;
 	texture = ((ray->xintercept-doorposition[doornum]) >> 4) & 0xfc0;
 
-	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
+	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 
 	switch(doorobjlist[doornum].lock) {
 		case dr_normal:
@@ -1075,9 +1075,9 @@ static inline void HitHorizDoorNew(int postx, ray_struc *ray)
 	}
 
 //	wall = PM_GetPage(doorpage);
-	ray->postsource = PM_GetTexture(doorpage) + texture;
+	byte *postsource = PM_GetTexture(doorpage) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, ray->postsource);
+	ScalePost(postx, wallheight, postsource);
 }
 
 static inline void HitVertDoorNew(int postx, ray_struc *ray)
@@ -1087,7 +1087,7 @@ static inline void HitVertDoorNew(int postx, ray_struc *ray)
 	doornum = ray->tilehit&0x7f;
 	texture = ((ray->yintercept-doorposition[doornum]) >> 4) & 0xfc0;
 
-	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
+	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 
 	switch(doorobjlist[doornum].lock) {
 		case dr_normal:
@@ -1105,9 +1105,9 @@ static inline void HitVertDoorNew(int postx, ray_struc *ray)
 	}
 
 //	wall = PM_GetPage(doorpage+1);
-	ray->postsource = PM_GetTexture(doorpage+1) + texture;
+	byte *postsource = PM_GetTexture(doorpage+1) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, ray->postsource);
+	ScalePost(postx, wallheight, postsource);
 }
 
 static void inline HitVertWallNew(int postx, ray_struc *ray)
@@ -1123,7 +1123,7 @@ static void inline HitVertWallNew(int postx, ray_struc *ray)
 		ray->xintercept += TILEGLOBAL;
 	}
 	
-	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
+	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 
 	if (ray->tilehit & 0x40) { // check for adjacent doors
 		ray->ytile = ray->yintercept>>TILESHIFT;
@@ -1135,9 +1135,9 @@ static void inline HitVertWallNew(int postx, ray_struc *ray)
 		wallpic = vertwall(ray->tilehit);
 		
 //	wall = PM_GetPage(wallpic);
-	ray->postsource = PM_GetTexture(wallpic) + texture;
+	byte *postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, ray->postsource);
+	ScalePost(postx, wallheight, postsource);
 }
 
 static inline void HitHorizWallNew(int postx, ray_struc *ray)
@@ -1152,7 +1152,7 @@ static inline void HitHorizWallNew(int postx, ray_struc *ray)
 	else
 		texture = 0xfc0 - texture;
 		
-	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
+	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 
 	if (ray->tilehit & 0x40) { // check for adjacent doors
 		ray->xtile = ray->xintercept>>TILESHIFT;
@@ -1164,9 +1164,9 @@ static inline void HitHorizWallNew(int postx, ray_struc *ray)
 		wallpic = horizwall(ray->tilehit);
 
 //	wall = PM_GetPage(wallpic);
-	ray->postsource = PM_GetTexture(wallpic) + texture;
+	byte *postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, ray->postsource);
+	ScalePost(postx, wallheight, postsource);
 }
 
 static inline void HitHorizPWall(int postx, ray_struc *ray)
@@ -1185,10 +1185,10 @@ static inline void HitHorizPWall(int postx, ray_struc *ray)
 		ray->yintercept += offset;
 	}
 
-	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
+	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 	wallpic = horizwall(ray->tilehit&63);
-	ray->postsource = PM_GetTexture(wallpic) + texture;
-	ScalePost(postx, ray->postsource);
+	byte *postsource = PM_GetTexture(wallpic) + texture;
+	ScalePost(postx, wallheight, postsource);
 }
 
 static inline void HitVertPWall(int postx, ray_struc *ray)
@@ -1206,14 +1206,14 @@ static inline void HitVertPWall(int postx, ray_struc *ray)
 	} else
 		ray->xintercept += offset;
 
-	wallheight[postx] = CalcHeight(ray->xintercept,ray->yintercept);
+	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 	
 	wallpic = vertwall(ray->tilehit&63);
 
 //	wall = PM_GetPage(wallpic);
-	ray->postsource = PM_GetTexture(wallpic) + texture;
+	byte *postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, ray->postsource);
+	ScalePost(postx, wallheight, postsource);
 }
 
 static inline int samex(int xtilestep, int intercept, int tile)

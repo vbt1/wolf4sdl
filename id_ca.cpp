@@ -840,7 +840,8 @@ long CAL_SetupMapFile (int mapnum)
     {
 		mapheaderseg.planestart[i]=SWAP_BYTES_32(mapheaderseg.planestart[i]);
 		mapheaderseg.planelength[i]=SWAP_BYTES_16(mapheaderseg.planelength[i]);		
-		mapsegs[i]=(word *)SATURN_MAPSEG_ADDR+(0x2000*i);
+//		mapsegs[i]=(word *)SATURN_MAPSEG_ADDR+(0x2000*i);
+		if(mapsegs[i]==NULL) mapsegs[i]=(word *) malloc(maparea*2);
 //		mapsegs[i]=(word *) malloc(maparea*2);
     }
 	mapheaderseg.width=SWAP_BYTES_16(mapheaderseg.width);
