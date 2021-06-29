@@ -1199,7 +1199,7 @@ extern  short *pixelangle;
 extern  int32_t finetangent[FINEANGLES/4];
 extern  fixed sintable[];
 extern  fixed *costable;
-extern  short *wallheight;
+//extern  short *wallheight;
 extern  word horizwall[],vertwall[];
 extern  int32_t    lasttimecount;
 extern  int32_t    frameon;

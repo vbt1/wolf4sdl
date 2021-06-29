@@ -17,7 +17,11 @@ extern unsigned int position_vram;
 
 typedef struct
 {
-//	byte *postsource;	
+//	byte *postsource;
+	byte *tilemapaddr;
+	int id;
+	int samex;
+	int samey;	
 #ifndef EMBEDDED	
 	int postx;
 	int lasttilehit;
@@ -318,39 +322,60 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 ===================
 */
 //extern int 					nb_unlock;
+int tutu=0;
 
-void ScalePost(int postx, short wallheight, byte *postsource)
+void ScalePost(int postx, short wallheight, byte *postsource, byte *tilemapaddr, ray_struc *ray)
 {
 #ifdef USE_SPRITES	
 //--------------------------------------------------------------------------------------------
 //	if(postx>=0 && postx<=SATURN_WIDTH)
-	{
+//	{
 		memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
+		SPRITE *user_wall;
 //		nb_unlock+=64;
 //		slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);
 //	slTransferEntry((void *)postsource,(void *)(wall_buffer + (postx<<6)),64);		
 
+slPrintHex((int)ray->id,slLocate(10,21));
+//ray->id=postx;
+
+//	if((uintptr_t)postsource!=(uintptr_t)(ray->postsource+64))
+//	if(ray->id<10)
+//	if ((uintptr_t)postsource!=(uintptr_t)(ray->postsource+64))
+	if(tilemapaddr!=ray->tilemapaddr) // && !ray->samey)
+	{
+		ray->id++;
 	//  a           b          c             d
 	// top left, top right, bottom right, bottom left
-		SPRITE *user_wall = &user_walls[postx];
+//		SPRITE *user_wall2 = &user_walls[ray->id];	
+		SPRITE *user_wall = &user_walls[ray->id];
+//		SPRITE *user_wall = user_walls+postx;
 		user_wall->CTRL=FUNC_Texture | _ZmCC;
 		user_wall->PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
 
 		user_wall->SRCA=0x2000|(postx*8);
 		user_wall->COLR=256;
-		user_wall->SIZE=0x801;
-
-		user_wall->XD=postx-(viewwidth/2);
+		user_wall->XC=postx-(viewwidth/2);
+		user_wall->XD=user_wall->XC;
 		user_wall->YC=(wallheight / 8);
 		user_wall->YD=-user_wall->YC;
-		user_wall->XC=user_wall->XD;
-	//	user_wall->YC=(wallheight[postx] / 8);
 		user_wall->XA=user_wall->XD;
 		user_wall->YA=user_wall->YD;
 		user_wall->XB=user_wall->XA;
 		user_wall->YB=user_wall->YC;
-	//    user_wall->GRDA=0;
+		user_wall->SIZE=0x801;
+		ray->tilemapaddr=tilemapaddr;
 	}
+	else
+	{
+		SPRITE *user_wall = &user_walls[ray->id];
+		user_wall->SIZE++;
+		user_wall->XC=postx-(viewwidth/2);
+		user_wall->XD=user_wall->XC;		
+		user_wall->YC=(wallheight / 8);
+		user_wall->YD=-user_wall->YC;
+	}
+
 //--------------------------------------------------------------------------------------------
 #else
     byte *vbuf = LOCK()+screenofs;	
@@ -1049,7 +1074,7 @@ void CalcTics (void)
 #define DEG270  2700
 #define DEG360  3600
 
-static inline void HitHorizDoorNew(int postx, ray_struc *ray)
+static inline void HitHorizDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
 {
 	unsigned texture, doorpage = 0, doornum;
 //	byte *wall;
@@ -1076,11 +1101,10 @@ static inline void HitHorizDoorNew(int postx, ray_struc *ray)
 
 //	wall = PM_GetPage(doorpage);
 	byte *postsource = PM_GetTexture(doorpage) + texture;
-//	ray->postx=postx;
-	ScalePost(postx, wallheight, postsource);
+	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
 }
 
-static inline void HitVertDoorNew(int postx, ray_struc *ray)
+static inline void HitVertDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
 {
 	unsigned texture, doorpage = 0, doornum;
 
@@ -1107,10 +1131,10 @@ static inline void HitVertDoorNew(int postx, ray_struc *ray)
 //	wall = PM_GetPage(doorpage+1);
 	byte *postsource = PM_GetTexture(doorpage+1) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, wallheight, postsource);
+	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
 }
 
-static void inline HitVertWallNew(int postx, ray_struc *ray)
+static void inline HitVertWallNew(int postx, byte *tilemapaddr, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture;
@@ -1137,10 +1161,10 @@ static void inline HitVertWallNew(int postx, ray_struc *ray)
 //	wall = PM_GetPage(wallpic);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, wallheight, postsource);
+	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
 }
 
-static inline void HitHorizWallNew(int postx, ray_struc *ray)
+static inline void HitHorizWallNew(int postx, byte *tilemapaddr, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture;
@@ -1166,10 +1190,10 @@ static inline void HitHorizWallNew(int postx, ray_struc *ray)
 //	wall = PM_GetPage(wallpic);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, wallheight, postsource);
+	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
 }
 
-static inline void HitHorizPWall(int postx, ray_struc *ray)
+static inline void HitHorizPWall(int postx, byte *tilemapaddr, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture, offset;
@@ -1188,10 +1212,10 @@ static inline void HitHorizPWall(int postx, ray_struc *ray)
 	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 	wallpic = horizwall(ray->tilehit&63);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
-	ScalePost(postx, wallheight, postsource);
+	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
 }
 
-static inline void HitVertPWall(int postx, ray_struc *ray)
+static inline void HitVertPWall(int postx, byte *tilemapaddr, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture, offset;
@@ -1213,7 +1237,7 @@ static inline void HitVertPWall(int postx, ray_struc *ray)
 //	wall = PM_GetPage(wallpic);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, wallheight, postsource);
+	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
 }
 
 static inline int samex(int xtilestep, int intercept, int tile)
@@ -1246,7 +1270,7 @@ static inline int samey(int ytilestep, int intercept, int tile)
     }
 }
 
-static void AsmRefresh()
+static unsigned int AsmRefresh()
 {
 	static	ray_struc my_ray;	
 	unsigned xpartialup, xpartialdown, ypartialup, ypartialdown;
@@ -1265,9 +1289,14 @@ static void AsmRefresh()
 
 	focaltx = viewx>>TILESHIFT;
 	focalty = viewy>>TILESHIFT;
+	my_ray.id = 0;
+//	my_ray.samex = 0;
+//	my_ray.samey = 0;	
+	byte *tilemapaddr;
 
 #ifdef USE_SLAVE
-for (int postx = 0; postx < (viewwidth/2); postx++) 
+//for (int postx = 0; postx < (viewwidth/2); postx++) 
+for (int postx = 0; postx < (viewwidth); postx++) 
 #else
 for (int postx = 0; postx < viewwidth; postx++) 
 #endif	
@@ -1331,10 +1360,15 @@ for (int postx = 0; postx < viewwidth; postx++)
 vertcheck:
 // int ytilestep, int intercept, int tile)
 	if (!samey(my_ray.ytilestep, my_ray.yintercept, my_ray.ytile))
+//	{
+//		my_ray.samey=0;
 		goto horizentry;
+//	}
+//	my_ray.samey=1;
 		
 vertentry:
-	my_ray.tilehit = tilemap[my_ray.xtile][TILE(my_ray.yintercept)];
+	tilemapaddr = &tilemap[my_ray.xtile][TILE(my_ray.yintercept)];
+	my_ray.tilehit = *tilemapaddr;
 	/* printf("vert: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", postx, tilehit, xtile, ytile, xintercept, yintercept, xpartialup, xpartialdown, ypartialup, ypartialdown, xpartial, ypartial, doorhit, angle, midangle, focaltx, focalty, xstep, ystep); */
 	
 	if (my_ray.tilehit) {
@@ -1348,7 +1382,7 @@ vertentry:
 					
 				my_ray.yintercept = doorhit;
 				my_ray.xintercept = my_ray.xtile << TILESHIFT;
-				HitVertPWall(postx, &my_ray);
+				HitVertPWall(postx, tilemapaddr, &my_ray);
 			} else {
 				/* vertdoor */
 				doorhit = my_ray.yintercept + ystep / 2;
@@ -1362,11 +1396,11 @@ vertentry:
 				
 				my_ray.yintercept = doorhit;
 				my_ray.xintercept = (my_ray.xtile << TILESHIFT) + TILEGLOBAL/2;
-				HitVertDoorNew(postx, &my_ray);
+				HitVertDoorNew(postx, tilemapaddr, &my_ray);
 			}
 		} else {
 			my_ray.xintercept = my_ray.xtile << TILESHIFT;
-			HitVertWallNew(postx, &my_ray);
+			HitVertWallNew(postx, tilemapaddr, &my_ray);
 		}
 		continue;
 	}
@@ -1382,10 +1416,15 @@ horizcheck:
 	/* check intersections with horizontal walls */
 	
 	if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))
+//	{
+//		my_ray.samex=0;
 		goto vertentry;
+//	}
+//	my_ray.samex=1;
 
 horizentry:
-	my_ray.tilehit = tilemap[TILE(my_ray.xintercept)][my_ray.ytile];
+	tilemapaddr = &tilemap[TILE(my_ray.xintercept)][my_ray.ytile];
+	my_ray.tilehit = *tilemapaddr;
 	/* printf("horz: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", postx, tilehit, xtile, ytile, xintercept, yintercept, xpartialup, xpartialdown, ypartialup, ypartialdown, xpartial, ypartial, doorhit, angle, midangle, focaltx, focalty, xstep, ystep); */
 	
 	if (my_ray.tilehit) {
@@ -1399,7 +1438,7 @@ horizentry:
 				
 				my_ray.xintercept = doorhit;
 				my_ray.yintercept = my_ray.ytile << TILESHIFT; 
-				HitHorizPWall(postx, &my_ray);
+				HitHorizPWall(postx, tilemapaddr, &my_ray);
 			} else {
 				doorhit = my_ray.xintercept + xstep / 2;
 				
@@ -1412,11 +1451,11 @@ horizentry:
 				
 				my_ray.xintercept = doorhit;
 				my_ray.yintercept = (my_ray.ytile << TILESHIFT) + TILEGLOBAL/2;
-				HitHorizDoorNew(postx, &my_ray);
+				HitHorizDoorNew(postx, tilemapaddr, &my_ray);
 			}
 		} else {
 			my_ray.yintercept = my_ray.ytile << TILESHIFT;
-			HitHorizWallNew(postx, &my_ray);
+			HitHorizWallNew(postx, tilemapaddr, &my_ray);
 		}
 		continue;
 	}
@@ -1428,6 +1467,7 @@ passhoriz:
 	my_ray.xintercept += xstep;
 	goto horizcheck;
 }
+	return (my_ray.id+1);
 }
 
 #ifdef USE_SLAVE
@@ -1442,6 +1482,10 @@ static void AsmRefreshSlave()
 	int midangle;
 	int focaltx, focalty;
 	int xstep, ystep;
+	byte *tilemapaddr;
+
+	my_ray.samex = 0;
+	my_ray.samey = 0;		
 /*
     int viewangle = player->angle;
 
@@ -1459,7 +1503,8 @@ static void AsmRefreshSlave()
 
 	focaltx = viewx>>TILESHIFT;
 	focalty = viewy>>TILESHIFT;
-
+	my_ray.id = (viewwidth>>1);
+	
 for(int postx=viewwidth>>1;postx<viewwidth;postx++)
 {
 	angle = midangle + pixelangle[postx];
@@ -1521,10 +1566,19 @@ for(int postx=viewwidth>>1;postx<viewwidth;postx++)
 vertcheck:
 // int ytilestep, int intercept, int tile)
 	if (!samey(my_ray.ytilestep, my_ray.yintercept, my_ray.ytile))
+//	{
+//		my_ray.samey=0;
 		goto horizentry;
-		
+//	}
+/*	else
+	{
+		my_ray.samey=1;
+	}
+*/
+
 vertentry:
-	my_ray.tilehit = tilemap[my_ray.xtile][TILE(my_ray.yintercept)];
+	tilemapaddr = &tilemap[my_ray.xtile][TILE(my_ray.yintercept)];
+	my_ray.tilehit = *tilemapaddr;
 	/* printf("vert: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", postx, tilehit, xtile, ytile, xintercept, yintercept, xpartialup, xpartialdown, ypartialup, ypartialdown, xpartial, ypartial, doorhit, angle, midangle, focaltx, focalty, xstep, ystep); */
 	
 	if (my_ray.tilehit) {
@@ -1538,7 +1592,7 @@ vertentry:
 					
 				my_ray.yintercept = doorhit;
 				my_ray.xintercept = my_ray.xtile << TILESHIFT;
-				HitVertPWall(postx, &my_ray);
+				HitVertPWall(postx, tilemapaddr, &my_ray);
 			} else {
 				/* vertdoor */
 				doorhit = my_ray.yintercept + ystep / 2;
@@ -1552,11 +1606,11 @@ vertentry:
 				
 				my_ray.yintercept = doorhit;
 				my_ray.xintercept = (my_ray.xtile << TILESHIFT) + TILEGLOBAL/2;
-				HitVertDoorNew(postx, &my_ray);
+				HitVertDoorNew(postx, tilemapaddr, &my_ray);
 			}
 		} else {
 			my_ray.xintercept = my_ray.xtile << TILESHIFT;
-			HitVertWallNew(postx, &my_ray);
+			HitVertWallNew(postx, tilemapaddr, &my_ray);
 		}
 		continue;
 	}
@@ -1571,10 +1625,17 @@ horizcheck:
 	/* check intersections with horizontal walls */
 	
 	if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))
+//	{
+//		my_ray.samex=0;
 		goto vertentry;
-
+/*	}
+	else
+	{
+		my_ray.samex=0;
+	}*/
 horizentry:
-	my_ray.tilehit = tilemap[TILE(my_ray.xintercept)][my_ray.ytile];
+	tilemapaddr = &tilemap[TILE(my_ray.xintercept)][my_ray.ytile];
+	my_ray.tilehit = *tilemapaddr;
 	/* printf("horz: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", postx, tilehit, xtile, ytile, xintercept, yintercept, xpartialup, xpartialdown, ypartialup, ypartialdown, xpartial, ypartial, doorhit, angle, midangle, focaltx, focalty, xstep, ystep); */
 	
 	if (my_ray.tilehit) {
@@ -1588,7 +1649,7 @@ horizentry:
 				
 				my_ray.xintercept = doorhit;
 				my_ray.yintercept = my_ray.ytile << TILESHIFT; 
-				HitHorizPWall(postx, &my_ray);
+				HitHorizPWall(postx, tilemapaddr, &my_ray);
 			} else {
 				doorhit = my_ray.xintercept + xstep / 2;
 				
@@ -1601,11 +1662,11 @@ horizentry:
 				
 				my_ray.xintercept = doorhit;
 				my_ray.yintercept = (my_ray.ytile << TILESHIFT) + TILEGLOBAL/2;
-				HitHorizDoorNew(postx, &my_ray);
+				HitHorizDoorNew(postx, tilemapaddr, &my_ray);
 			}
 		} else {
 			my_ray.yintercept = my_ray.ytile << TILESHIFT;
-			HitHorizWallNew(postx, &my_ray);
+			HitHorizWallNew(postx, tilemapaddr, &my_ray);
 		}
 		continue;
 	}
@@ -1616,6 +1677,7 @@ passhoriz:
 	my_ray.xintercept += xstep;
 	goto horizcheck;
 }
+	tutu=my_ray.id;
 }
 
 
@@ -2785,7 +2847,7 @@ passhoriz:
 ====================
 */
 
-inline void WallRefresh (void)
+inline int WallRefresh (void)
 {
 //	slCashPurge();
 #ifdef EMBEDDED
@@ -2798,9 +2860,9 @@ inline void WallRefresh (void)
 #endif
 
 #ifdef USE_SLAVE	
-	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
+//	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
 #endif	
-	AsmRefresh();
+	return AsmRefresh();
 }
 #ifndef EMBEDDED
 inline void CalcViewVariables()
@@ -2854,7 +2916,7 @@ void    ThreeDRefresh (void)
         DrawStarSky(vbuf, vbufPitch);
 #endif
 
-    WallRefresh ();
+    unsigned int nb = WallRefresh ();
 
 #if defined(USE_FEATUREFLAGS) && defined(USE_PARALLAX)
     if(GetFeatureFlags() & FF_PARALLAXSKY)
@@ -2901,11 +2963,20 @@ void    ThreeDRefresh (void)
 	//	extern int vbt;
 		SPRITE *user_wall = user_walls;
 
+//		for(unsigned int pixx=0;pixx<nb;pixx++)
 		for(unsigned int pixx=0;pixx<viewwidth;pixx++)
 		{
 			slSetSprite(user_wall++, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre // murs
-//			user_wall++;
 		}
+/*		
+		user_wall = (SPRITE *)user_walls+(viewwidth>>1);
+		nb=tutu-(viewwidth>>1);
+
+		for(unsigned int pixx=0;pixx<nb;pixx++)
+		{
+			slSetSprite(user_wall++, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre // murs
+		}
+*/		
 //		memcpy((void *)(SpriteVRAM + cgaddress),(void *)&wall_buffer[0],(SATURN_WIDTH+64) * 64);
 		if(position_vram>0x38000)
 		{
