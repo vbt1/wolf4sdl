@@ -9,7 +9,8 @@
 void heapWalk();
 #ifdef USE_SPRITES
 unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
-SPRITE user_walls[SATURN_WIDTH];
+
+SPRITE user_walls[120];
 extern 	TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_NULLSPRITE];
 extern unsigned int position_vram;
@@ -20,8 +21,7 @@ typedef struct
 //	byte *postsource;
 	byte *tilemapaddr;
 	int id;
-	int samex;
-	int samey;	
+	int texture;
 #ifndef EMBEDDED	
 	int postx;
 	int lasttilehit;
@@ -324,31 +324,21 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 //extern int 					nb_unlock;
 int tutu=0;
 
-void ScalePost(int postx, short wallheight, byte *postsource, byte *tilemapaddr, ray_struc *ray)
+void ScalePost(int postx, short wallheight, int texture, byte *postsource, byte *tilemapaddr, ray_struc *ray)
 {
 #ifdef USE_SPRITES	
 //--------------------------------------------------------------------------------------------
-//	if(postx>=0 && postx<=SATURN_WIDTH)
-//	{
-		memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
-		SPRITE *user_wall;
-//		nb_unlock+=64;
-//		slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);
+	SPRITE *user_wall;
+//	slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);
 //	slTransferEntry((void *)postsource,(void *)(wall_buffer + (postx<<6)),64);		
+	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
 
-slPrintHex((int)ray->id,slLocate(10,21));
-//ray->id=postx;
-
-//	if((uintptr_t)postsource!=(uintptr_t)(ray->postsource+64))
-//	if(ray->id<10)
-//	if ((uintptr_t)postsource!=(uintptr_t)(ray->postsource+64))
-	if(tilemapaddr!=ray->tilemapaddr) // && !ray->samey)
+	if(tilemapaddr!=ray->tilemapaddr || texture!=ray->texture)
 	{
 		ray->id++;
 	//  a           b          c             d
 	// top left, top right, bottom right, bottom left
-//		SPRITE *user_wall2 = &user_walls[ray->id];	
-		SPRITE *user_wall = &user_walls[ray->id];
+		SPRITE *user_wall = (SPRITE *)user_walls+ray->id;
 //		SPRITE *user_wall = user_walls+postx;
 		user_wall->CTRL=FUNC_Texture | _ZmCC;
 		user_wall->PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
@@ -356,8 +346,8 @@ slPrintHex((int)ray->id,slLocate(10,21));
 		user_wall->SRCA=0x2000|(postx*8);
 		user_wall->COLR=256;
 		user_wall->XC=postx-(viewwidth/2);
-		user_wall->XD=user_wall->XC;
 		user_wall->YC=(wallheight / 8);
+		user_wall->XD=user_wall->XC;
 		user_wall->YD=-user_wall->YC;
 		user_wall->XA=user_wall->XD;
 		user_wall->YA=user_wall->YD;
@@ -365,10 +355,11 @@ slPrintHex((int)ray->id,slLocate(10,21));
 		user_wall->YB=user_wall->YC;
 		user_wall->SIZE=0x801;
 		ray->tilemapaddr=tilemapaddr;
+		ray->texture=texture;
 	}
 	else
 	{
-		SPRITE *user_wall = &user_walls[ray->id];
+		SPRITE *user_wall = (SPRITE *)user_walls+ray->id;
 		user_wall->SIZE++;
 		user_wall->XC=postx-(viewwidth/2);
 		user_wall->XD=user_wall->XC;		
@@ -1101,7 +1092,7 @@ static inline void HitHorizDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
 
 //	wall = PM_GetPage(doorpage);
 	byte *postsource = PM_GetTexture(doorpage) + texture;
-	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallheight, doorpage, postsource, tilemapaddr, ray);
 }
 
 static inline void HitVertDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
@@ -1131,7 +1122,7 @@ static inline void HitVertDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
 //	wall = PM_GetPage(doorpage+1);
 	byte *postsource = PM_GetTexture(doorpage+1) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallheight, doorpage+1, postsource, tilemapaddr, ray);
 }
 
 static void inline HitVertWallNew(int postx, byte *tilemapaddr, ray_struc *ray)
@@ -1161,7 +1152,7 @@ static void inline HitVertWallNew(int postx, byte *tilemapaddr, ray_struc *ray)
 //	wall = PM_GetPage(wallpic);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallheight, wallpic, postsource, tilemapaddr, ray);
 }
 
 static inline void HitHorizWallNew(int postx, byte *tilemapaddr, ray_struc *ray)
@@ -1190,7 +1181,7 @@ static inline void HitHorizWallNew(int postx, byte *tilemapaddr, ray_struc *ray)
 //	wall = PM_GetPage(wallpic);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallheight, wallpic, postsource, tilemapaddr, ray);
 }
 
 static inline void HitHorizPWall(int postx, byte *tilemapaddr, ray_struc *ray)
@@ -1212,7 +1203,7 @@ static inline void HitHorizPWall(int postx, byte *tilemapaddr, ray_struc *ray)
 	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 	wallpic = horizwall(ray->tilehit&63);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
-	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallheight, wallpic, postsource, tilemapaddr, ray);
 }
 
 static inline void HitVertPWall(int postx, byte *tilemapaddr, ray_struc *ray)
@@ -1237,7 +1228,7 @@ static inline void HitVertPWall(int postx, byte *tilemapaddr, ray_struc *ray)
 //	wall = PM_GetPage(wallpic);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
 //	ray->postx=postx;
-	ScalePost(postx, wallheight, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallheight, wallpic, postsource, tilemapaddr, ray);
 }
 
 static inline int samex(int xtilestep, int intercept, int tile)
@@ -1280,6 +1271,7 @@ static unsigned int AsmRefresh()
 	int midangle;
 	int focaltx, focalty;
 	int xstep, ystep;
+	byte *tilemapaddr;
 	
 	midangle = player->angle*(FINEANGLES/ANGLES);
 	xpartialdown = (viewx&(TILEGLOBAL-1));
@@ -1289,14 +1281,12 @@ static unsigned int AsmRefresh()
 
 	focaltx = viewx>>TILESHIFT;
 	focalty = viewy>>TILESHIFT;
-	my_ray.id = 0;
-//	my_ray.samex = 0;
-//	my_ray.samey = 0;	
-	byte *tilemapaddr;
+	my_ray.texture = my_ray.id = -1;
+	my_ray.tilehit = NULL;
 
 #ifdef USE_SLAVE
-//for (int postx = 0; postx < (viewwidth/2); postx++) 
-for (int postx = 0; postx < (viewwidth); postx++) 
+for (int postx = 0; postx < (viewwidth/2); postx++) 
+//for (int postx = 0; postx < (viewwidth); postx++) 
 #else
 for (int postx = 0; postx < viewwidth; postx++) 
 #endif	
@@ -1416,11 +1406,7 @@ horizcheck:
 	/* check intersections with horizontal walls */
 	
 	if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))
-//	{
-//		my_ray.samex=0;
 		goto vertentry;
-//	}
-//	my_ray.samex=1;
 
 horizentry:
 	tilemapaddr = &tilemap[TILE(my_ray.xintercept)][my_ray.ytile];
@@ -1467,7 +1453,7 @@ passhoriz:
 	my_ray.xintercept += xstep;
 	goto horizcheck;
 }
-	return (my_ray.id+1);
+	return my_ray.id;
 }
 
 #ifdef USE_SLAVE
@@ -1483,9 +1469,6 @@ static void AsmRefreshSlave()
 	int focaltx, focalty;
 	int xstep, ystep;
 	byte *tilemapaddr;
-
-	my_ray.samex = 0;
-	my_ray.samey = 0;		
 /*
     int viewangle = player->angle;
 
@@ -1503,7 +1486,8 @@ static void AsmRefreshSlave()
 
 	focaltx = viewx>>TILESHIFT;
 	focalty = viewy>>TILESHIFT;
-	my_ray.id = (viewwidth>>1);
+	my_ray.id = 59;
+	my_ray.texture = -1;
 	
 for(int postx=viewwidth>>1;postx<viewwidth;postx++)
 {
@@ -1564,17 +1548,8 @@ for(int postx=viewwidth>>1;postx<viewwidth;postx++)
 
 	/* check intersections with vertical walls */
 vertcheck:
-// int ytilestep, int intercept, int tile)
 	if (!samey(my_ray.ytilestep, my_ray.yintercept, my_ray.ytile))
-//	{
-//		my_ray.samey=0;
 		goto horizentry;
-//	}
-/*	else
-	{
-		my_ray.samey=1;
-	}
-*/
 
 vertentry:
 	tilemapaddr = &tilemap[my_ray.xtile][TILE(my_ray.yintercept)];
@@ -1625,14 +1600,8 @@ horizcheck:
 	/* check intersections with horizontal walls */
 	
 	if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))
-//	{
-//		my_ray.samex=0;
 		goto vertentry;
-/*	}
-	else
-	{
-		my_ray.samex=0;
-	}*/
+
 horizentry:
 	tilemapaddr = &tilemap[TILE(my_ray.xintercept)][my_ray.ytile];
 	my_ray.tilehit = *tilemapaddr;
@@ -2860,7 +2829,7 @@ inline int WallRefresh (void)
 #endif
 
 #ifdef USE_SLAVE	
-//	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
+	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
 #endif	
 	return AsmRefresh();
 }
@@ -2960,24 +2929,23 @@ void    ThreeDRefresh (void)
 //		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
 		slTransferEntry((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
 
-	//	extern int vbt;
 		SPRITE *user_wall = user_walls;
 
-//		for(unsigned int pixx=0;pixx<nb;pixx++)
-		for(unsigned int pixx=0;pixx<viewwidth;pixx++)
+		for(unsigned int pixx=0;pixx<=nb;pixx++)
 		{
-			slSetSprite(user_wall++, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre // murs
+			int depth = (user_wall->YB+user_wall->YC)/2;
+			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
 		}
-/*		
-		user_wall = (SPRITE *)user_walls+(viewwidth>>1);
-		nb=tutu-(viewwidth>>1);
+		
+		user_wall = (SPRITE *)user_walls+60;
+		nb=tutu-60;
 
-		for(unsigned int pixx=0;pixx<nb;pixx++)
+		for(unsigned int pixx=0;pixx<=nb;pixx++)
 		{
-			slSetSprite(user_wall++, toFIXED(0+(SATURN_SORT_VALUE-user_wall->YC)));	// à remettre // murs
+			int depth = (user_wall->YB+user_wall->YC)/2;			
+			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
 		}
-*/		
-//		memcpy((void *)(SpriteVRAM + cgaddress),(void *)&wall_buffer[0],(SATURN_WIDTH+64) * 64);
+	
 		if(position_vram>0x38000)
 		{
 			memset(texture_list,0xFF,SPR_NULLSPRITE);
