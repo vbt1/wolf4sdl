@@ -219,7 +219,6 @@ typedef enum {
 
 	/* Numeric keypad */
 	SDLK_KP0		= 256,
-#endif	
 	SDLK_KP1		= 257,
 	SDLK_KP2		= 258,
 	SDLK_KP3		= 259,
@@ -228,7 +227,6 @@ typedef enum {
 	SDLK_KP6		= 262,
 	SDLK_KP7		= 263,
 	SDLK_KP8		= 264,
-#if 0	
 	SDLK_KP9		= 265,
 
 	SDLK_KP_PERIOD		= 266,

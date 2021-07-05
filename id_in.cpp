@@ -132,7 +132,7 @@ static void processEvent(SDL_Event *event)
             else if(LastScan == SDLK_RSHIFT) LastScan = SDLK_LSHIFT;
             else if(LastScan == SDLK_RALT) LastScan = SDLK_LALT;
             else if(LastScan == SDLK_RCTRL) LastScan = SDLK_LCTRL;
-            else
+/*            else
             {
 //                if((mod & KMOD_NUM) == 0)
                 {
@@ -145,6 +145,7 @@ static void processEvent(SDL_Event *event)
                     }
                 }
             }
+*/			
 			//LastScan = SDLK_RETURN;
 
 //            int sym = LastScan;
@@ -175,7 +176,7 @@ static void processEvent(SDL_Event *event)
             else if(key == SDLK_RSHIFT) key = SDLK_LSHIFT;
             else if(key == SDLK_RALT) key = SDLK_LALT;
             else if(key == SDLK_RCTRL) key = SDLK_LCTRL;			   
-            else
+ /*           else
             {
 //                if((SDL_GetModState() & KMOD_NUM) == 0)
                 {
@@ -188,7 +189,7 @@ static void processEvent(SDL_Event *event)
                     }
                 }
             } 
-
+*/
             if(key<SDLK_LAST)
                 Keyboard[key] = 0;
             break;

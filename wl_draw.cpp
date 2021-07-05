@@ -8,9 +8,9 @@
 
 void heapWalk();
 #ifdef USE_SPRITES
-unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
+static unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 
-SPRITE user_walls[120];
+static SPRITE user_walls[120];
 extern 	TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_NULLSPRITE];
 extern unsigned int position_vram;
@@ -322,7 +322,7 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 ===================
 */
 //extern int 					nb_unlock;
-int tutu=0;
+static int tutu=0;
 
 void ScalePost(int postx, short wallheight, int texture, byte *postsource, byte *tilemapaddr, ray_struc *ray)
 {
@@ -338,7 +338,7 @@ void ScalePost(int postx, short wallheight, int texture, byte *postsource, byte 
 		ray->id++;
 	//  a           b          c             d
 	// top left, top right, bottom right, bottom left
-		SPRITE *user_wall = (SPRITE *)user_walls+ray->id;
+		user_wall = (SPRITE *)user_walls+ray->id;
 //		SPRITE *user_wall = user_walls+postx;
 		user_wall->CTRL=FUNC_Texture | _ZmCC;
 		user_wall->PMOD=CL256Bnk | ECdis | SPdis | 0x0800; // sans transparence
@@ -359,7 +359,7 @@ void ScalePost(int postx, short wallheight, int texture, byte *postsource, byte 
 	}
 	else
 	{
-		SPRITE *user_wall = (SPRITE *)user_walls+ray->id;
+		user_wall = (SPRITE *)user_walls+ray->id;
 		user_wall->SIZE++;
 		user_wall->XC=postx-(viewwidth/2);
 		user_wall->XD=user_wall->XC;		
@@ -2937,15 +2937,6 @@ void    ThreeDRefresh (void)
 			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
 		}
 		
-		user_wall = (SPRITE *)user_walls+60;
-		nb=tutu-60;
-
-		for(unsigned int pixx=0;pixx<=nb;pixx++)
-		{
-			int depth = (user_wall->YB+user_wall->YC)/2;			
-			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
-		}
-	
 		if(position_vram>0x38000)
 		{
 			memset(texture_list,0xFF,SPR_NULLSPRITE);
@@ -2984,6 +2975,20 @@ void    ThreeDRefresh (void)
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
 #endif
-DrawPlayerWeapon ();    // draw player's hands
+		DrawPlayerWeapon ();    // draw player's hands
+
+		user_wall = (SPRITE *)user_walls+60;
+		
+//		while(tutu==0);
+		
+		
+		nb=tutu-60;
+
+		for(unsigned int pixx=0;pixx<=nb;pixx++)
+		{
+			int depth = (user_wall->YB+user_wall->YC)/2;			
+			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
+		}
+//		tutu=0;
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
 }

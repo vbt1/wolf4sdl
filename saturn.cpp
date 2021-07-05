@@ -800,21 +800,21 @@ int SDL_PollEvent(SDL_Event *event)
 			break;	
 
 			case 3:/*PER_DGT_KL: */
-				event->key.keysym.sym = SDLK_KP4;
+				event->key.keysym.sym = SDLK_LEFT;
 			break;	
 
 			case 2:/*PER_DGT_KR: */
-				event->key.keysym.sym = SDLK_KP6;
+				event->key.keysym.sym = SDLK_RIGHT;
 			break;	
 
 			case 1:/*PER_DGT_KD: */
 				////slPrint("gros ggggg",slLocate(3,20));
-			event->key.keysym.sym = SDLK_KP2;
+			event->key.keysym.sym = SDLK_DOWN;
 			break;	
 
 			case 0:/*PER_DGT_KU: */
 				////slPrint("gros ggggg",slLocate(3,20));
-			event->key.keysym.sym = SDLK_KP8;
+			event->key.keysym.sym = SDLK_UP;
 			break;	
 
 			default:

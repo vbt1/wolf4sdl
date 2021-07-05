@@ -792,11 +792,11 @@ typedef void (* statefunc) (void *);
 #ifdef EMBEDDED
 typedef struct statestruct
 {
-	boolean	rotate;
-	int shapenum; /* a shapenum of -1 means get from ob->temp1 */
-	int tictime;
+	boolean	rotate:2;
+	int shapenum:10; /* a shapenum of -1 means get from ob->temp1 */
+	int tictime:10;
 	void (*think)(), (*action)();
-	int next; /* stateenum */
+	int next:10; /* stateenum */
 } statetype;
 #else
 typedef struct statestruct
@@ -854,9 +854,9 @@ typedef struct doorstruct
 
 typedef struct objstruct
 {
-    activetype  active;
+    activetype  active:2;
     short       ticcount;
-    classtype   obclass;
+    classtype   obclass:5;
 #ifndef EMBEDDED	
     statetype   *state;
 #else
@@ -866,7 +866,7 @@ typedef struct objstruct
     uint32_t    flags;              // FL_SHOOTABLE, etc
 
     int32_t     distance;           // if negative, wait for that door to open
-    dirtype     dir;
+    dirtype     dir:4;
 
     fixed       x,y;
     word        tilex,tiley;
