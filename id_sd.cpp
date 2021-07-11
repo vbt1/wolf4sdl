@@ -175,8 +175,8 @@ SD_Startup(void)
   desired.freq = ORIGSAMPLERATE;
   desired.format = AUDIO_U8;
   desired.channels = 1;
-  desired.samples = 1024;
-  desired.userdata = NULL;
+//  desired.samples = 1024;
+//  desired.userdata = NULL;
 
   SDL_OpenAudio(&desired, &obtained);
 }

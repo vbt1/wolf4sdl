@@ -2975,8 +2975,6 @@ void    ThreeDRefresh (void)
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
 #endif
-		DrawPlayerWeapon ();    // draw player's hands
-
 		user_wall = (SPRITE *)user_walls+60;
 		
 //		while(tutu==0);
@@ -2987,8 +2985,10 @@ void    ThreeDRefresh (void)
 		for(unsigned int pixx=0;pixx<=nb;pixx++)
 		{
 			int depth = (user_wall->YB+user_wall->YC)/2;			
-			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
+			slSetSprite(user_wall, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
+			user_wall++;
 		}
-//		tutu=0;
+
+		DrawPlayerWeapon ();    // draw player's hands
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
 }

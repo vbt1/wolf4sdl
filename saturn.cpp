@@ -574,13 +574,13 @@ char * SDL_GetError(void)
 //--------------------------------------------------------------------------------------------------------------------------------------
 const SDL_VideoInfo * SDL_GetVideoInfo(void)
 {
-		 SDL_VideoInfo *vidInfo;
-		 vidInfo = (SDL_VideoInfo *)malloc(sizeof(SDL_VideoInfo));
-         CHECKMALLOCRESULT(vidInfo);
-		 vidInfo->vfmt = (SDL_PixelFormat*)malloc(sizeof(SDL_PixelFormat));
-         CHECKMALLOCRESULT(vidInfo->vfmt);
-		 vidInfo->vfmt->BitsPerPixel = 8;
-		 return vidInfo;
+		 SDL_VideoInfo vidInfo;
+//		 vidInfo = (SDL_VideoInfo *)malloc(sizeof(SDL_VideoInfo));
+//         CHECKMALLOCRESULT(vidInfo);
+		 vidInfo.vfmt = (SDL_PixelFormat*)malloc(sizeof(SDL_PixelFormat));
+         CHECKMALLOCRESULT(vidInfo.vfmt);
+		 vidInfo.vfmt->BitsPerPixel = 8;
+		 return &vidInfo;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 SDL_Rect ** SDL_ListModes(SDL_PixelFormat *format, Uint32 flags)

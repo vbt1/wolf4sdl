@@ -52,7 +52,7 @@ SDL_Color curpal[256];
 
 #define CASSERT(x) extern int ASSERT_COMPILE[((x) != 0) * 2 - 1];
 #undef RGB
-#define RGB(r, g, b) {(r)*255/63, (g)*255/63, (b)*255/63, 0}
+#define RGB(r, g, b) {(r)*255/63, (g)*255/63, (b)*255/63}
 //#define RGB(r, g, b) (r<<2,g<<2,b<<2,0)
 
 SDL_Color gamepal[]={
@@ -184,7 +184,6 @@ void VL_FillPalette (int red, int green, int blue)
 	    palo[i].g = green;
 	    palo[i].b = blue;
 	}
-
 	VL_SetPalette(palo);
 }
 
