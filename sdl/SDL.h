@@ -340,7 +340,7 @@ typedef struct {
 #define SDL_BlitSurface SDL_UpperBlit
 
 extern int SDL_WaitEvent(SDL_Event *event);
-extern int SDL_PollEvent(SDL_Event *event);
+extern int SDL_PollEvent(int start,int end, SDL_Event *event);
 //extern void SDL_Delay(int delay);
 extern void SDL_WM_SetCaption(const char *title, const char *icon);
 extern const SDL_VideoInfo * SDL_GetVideoInfo(void);

@@ -645,7 +645,7 @@ void BuildTables (void)
 ====================
 */
 
-double FastArcTan(double x)
+inline double FastArcTan(double x)
 {
     return M_PI_4*x - x*(fabs(x) - 1)*(0.2447 + 0.0663*fabs(x));
 }
@@ -952,7 +952,7 @@ void InitDigiMap (void)
         DigiMap[map[0]] = map[1];
     }
 #endif	
-    for (int i = 0; i<46; i++)
+    for (int i = 0; i<47; i++)
     {
         SD_PrepareSound(i);
     }

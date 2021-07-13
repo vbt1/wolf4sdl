@@ -1184,9 +1184,6 @@ void CA_CacheMap (int mapnum)
 // load the planes into the allready allocated buffers
 //
     size = maparea*2;
-//	long fileSize = 0x6b21;//GetFileSize(maphandle);
-//	long fileSize = GetFileSize(maphandle);
-//	slSynch();
 	uint8_t *Chunks=(uint8_t*)SATURN_CHUNK_ADDR;   // écrase les sons
 //	uint8_t *Chunks=(uint8_t*)malloc(fileSize);   // écrase les sons
 //slPrintHex(maphandle,slLocate(10,19));

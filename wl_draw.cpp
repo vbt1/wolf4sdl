@@ -477,13 +477,12 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 //	extern byte vgaCeiling[];
 	extern SDL_Color curpal[256];
 	unsigned char y;
-	Uint16	*Line_Color_Pal0	=(Uint16 *)LINE_COLOR_TABLE;
 
 	SDL_Color *sdlCeilingColor = (SDL_Color *)&curpal[vgaCeiling[gamestate.episode*10+mapon]];
-	Uint16 ceilingColor = 0x8000 | RGB((*sdlCeilingColor).r>>3,(*sdlCeilingColor).g>>3,(*sdlCeilingColor).b>>3);
+	Uint16 ceilingColor = RGB((*sdlCeilingColor).r>>3,(*sdlCeilingColor).g>>3,(*sdlCeilingColor).b>>3);
 
 	SDL_Color *sdlFloorColor = (SDL_Color *)&curpal[25];
-	Uint16 floorColor = 0x8000 | RGB((*sdlFloorColor).r>>3,(*sdlFloorColor).g>>3,(*sdlFloorColor).b>>3);
+	Uint16 floorColor = RGB((*sdlFloorColor).r>>3,(*sdlFloorColor).g>>3,(*sdlFloorColor).b>>3);
 	
 	unsigned int start=0,end=0;
 
@@ -500,18 +499,19 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 		start=viewscreeny;
 		end =(viewheight+start*2)/2;
 	}	
+	Uint16	*Line_Color_Pal0	=(Uint16 *)LINE_COLOR_TABLE+start;
 
 	for(y = start; y < end; y++)
-		Line_Color_Pal0[y] = ceilingColor;
+		*Line_Color_Pal0++ = ceilingColor;
 	
 	for(; y <= viewheight+viewscreeny; y++)
-		Line_Color_Pal0[y] = floorColor;
+		*Line_Color_Pal0++ = floorColor;
 
 //	start=RGB(0,0,0);
-	start = 0x8000 | RGB((*curpal).r>>3,(*curpal).g>>3,(*curpal).b>>3);
+	start = RGB((*curpal).r>>3,(*curpal).g>>3,(*curpal).b>>3);
 
 	for(; y < 240; y++)
-		Line_Color_Pal0[y] = start;
+		*Line_Color_Pal0++ = start;
 	
 	slBackColTable((void *)LINE_COLOR_TABLE);
 #endif

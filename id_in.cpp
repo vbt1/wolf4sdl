@@ -210,23 +210,24 @@ static void processEvent(SDL_Event *event)
 void IN_WaitAndProcessEvents()
 {
     SDL_Event event;
-	SDL_PollEvent(&event);
+	SDL_PollEvent(0,13,&event);
 //    if(!SDL_WaitEvent(&event)) return;
 //    do
     {
         processEvent(&event);
     }
 //    while(SDL_PollEvent(&event));
+	IN_ClearKeysDown();
 }
 
 void IN_ProcessEvents()
 {
-    SDL_Event event;
-	SDL_PollEvent(&event);
-    //while (SDL_PollEvent(&event))
-    {
-        processEvent(&event);
-    }
+    SDL_Event event1,event2;
+
+	SDL_PollEvent(4,13,&event1);
+    processEvent(&event1);
+	SDL_PollEvent(0,4,&event2);
+    processEvent(&event2);
 }
 
 

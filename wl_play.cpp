@@ -263,7 +263,7 @@ int songs[] = {
 
 void PollKeyboardButtons (void)
 {
-    int i;
+   unsigned int i;
 
     for (i = 0; i < NUMBUTTONS; i++)
         if (Keyboard[buttonscan[i]])
@@ -387,7 +387,6 @@ void PollControls (void)
         controly = min;
 
 }
-
 
 
 //==========================================================================

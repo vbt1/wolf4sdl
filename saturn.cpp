@@ -55,8 +55,8 @@ Sint32 GetFileSize(int file_id);
  debug
 */
 //Uint32 frame = 0;
-static unsigned char vbt_event[13][2];
-static int current_event=0;
+static unsigned char vbt_event[13];
+//static int current_event=0;
 static Uint32 previouscount=0;
 static Uint16 previousmillis=0;
 //PCM m_dat[4];
@@ -207,7 +207,7 @@ int SDL_SetColors(SDL_Surface *surface, 	SDL_Color *colors, int firstcolor, int 
 
 	for(int i=0;i<ncolors;i++)
 	{
-		palo[i] = 0x8000 | RGB(colors[i].r>>3,colors[i].g>>3,colors[i].b>>3);
+		palo[i] = RGB(colors[i].r>>3,colors[i].g>>3,colors[i].b>>3);
 	}
 	Pal2CRAM(palo , (void *)NBG1_COL_ADR , ncolors);
 	Pal2CRAM(palo+14 , (void *)NBG0_COL_ADR , ncolors);  
@@ -215,10 +215,10 @@ int SDL_SetColors(SDL_Surface *surface, 	SDL_Color *colors, int firstcolor, int 
 	return 1;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-int SDL_SetColorKey	(SDL_Surface *surface, Uint32 flag, Uint32 key)
+/*int SDL_SetColorKey	(SDL_Surface *surface, Uint32 flag, Uint32 key)
 {
 	return 0;
-}
+}*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 static unsigned char initcddone=0;
 int SDL_Init(Uint32 flags)
@@ -407,7 +407,7 @@ int SDL_LockSurface(SDL_Surface *surface)
 //--------------------------------------------------------------------------------------------------------------------------------------
 /*Uint32 SDL_MapRGB (SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b)
 {
-	return 0x8000 | RGB(r>>3,g>>3,b>>3);
+	return RGB(r>>3,g>>3,b>>3);
 }*/
 //--------------------------------------------------------------------------------------------------------------------------------------
 //int nb_unlock =0;
@@ -529,7 +529,8 @@ int SDL_FillRect (SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color)
 		{
 	//		slBMBoxFill(dstrect->x, dstrect->y, dstrect->x + dstrect->w - 1, dstrect->y + dstrect->h - 1, color);
 			Uint8*d = (Uint8*)dst->pixels + dstrect->x + dstrect->y*screenWidth; 
-
+			int w = dstrect->w;
+			int p = dst->pitch;
 			for( Sint16 i=0;i<dstrect->h;i++)
 			{
 				memset(d,color,dstrect->w);
@@ -639,127 +640,86 @@ void SDL_WM_SetIcon(SDL_Surface *icon, Uint8 *mask)
 sc_1, sc_2, sc_3, sc_4
 */
 
-int SDL_PollEvent(SDL_Event *event)
+int SDL_PollEvent(int start,int end, SDL_Event *event)
 {
-	Uint16 /*push = 0,*/ data = 0;
+	Uint16 data = 0;
 	Uint8 i,found=0;
- 				 //LastScan=0;
-	//event->type = SDL_NOEVENT;
-	//event->key.keysym.sym = SDLK_FIRST;	  
-//slPrint("SDL_PollEvent       ",slLocate(3,22));	
+
 	if(Per_Connect1) {
 //		push = ~Smpc_Peripheral[0].push;
 		data = ~Smpc_Peripheral[0].data;
 	}
-/*	if(Per_Connect2) {
-		push |= ~Smpc_Peripheral[15].push;
-		data |= ~Smpc_Peripheral[15].data;
-	}		*/
-	/*
-	 quit?
-	*/
-			
+
 	if(data & PER_DGT_ST && data & PER_DGT_TA && data & PER_DGT_TB && data & PER_DGT_TC) 
 	{
 		event->type = SDL_QUIT;
 		return 1;
 	}
+	unsigned char *evt=(unsigned char *)vbt_event+start;
 
-	for (i=0;i <13; i++)
+	for (i=start;i <end; i++)
 	{
 		if(data & pad_asign[i])
 		{
-			if(vbt_event[i][0]!=SDL_KEYDOWN)
+			if(*evt!=SDL_KEYDOWN)
 			{
-				vbt_event[i][0]=SDL_KEYDOWN;
-				vbt_event[i][1]=1;
+				*evt=SDL_KEYDOWN;
+				found=1;
+				break;
 			}
 		}
-		else/* if(push & pad_asign[i])		 */
+		else
 		{
-			
-			if(vbt_event[i][0]==SDL_KEYDOWN)
+			if(*evt==SDL_KEYDOWN)
 			{
-				vbt_event[i][0]=SDL_KEYUP;
-				vbt_event[i][1]=1;
-				 //control_status =0;
-				 //LastScan=0;
-			}/*		  
-			else	 if(vbt_event[i][0]==SDL_KEYUP)
-			{
-				vbt_event[i][0]=0;
-				vbt_event[i][1]=0;
-				 //LastScan=0;
-			}			*/
-			else
-			{
-			  	vbt_event[i][1]=0;				 
-				vbt_event[i][0]=0;
-				 //LastScan=0;
+				*evt=SDL_KEYUP;
+				found=1;
+				break;
 			}
+			*evt=0;
 		}
+		evt++;
 	}	  
-	for (i=0;i <13; i++)
+
+	if(start==0)
 	{
-		if (vbt_event[i][1]==1)
+		if(data & pad_asign[0])
 		{
-			////slPrintHex(i,slLocate(3,21));
-			current_event=i;
-			found=1;
-			break;
+			if(! (data & pad_asign[2]))
+			Keyboard[sc_RightArrow]=0;
+
+			if(! (data & pad_asign[3]))
+			Keyboard[sc_LeftArrow]=0;
 		}
+
+		if(data & pad_asign[1])
+		{
+			if(! (data & pad_asign[2]))
+			Keyboard[sc_RightArrow]=0;
+
+			if(! (data & pad_asign[3]))
+			Keyboard[sc_LeftArrow]=0;
+		}
+
+		if(data & pad_asign[2])
+			Keyboard[sc_RightArrow]=1;
+
+		if(data & pad_asign[3])
+			Keyboard[sc_LeftArrow]=1;
+	//	IN_ClearKeysDown();
 	}
-
-/*
-	PER_DGT_KU,
-	PER_DGT_KD,
-	PER_DGT_KR,
-	PER_DGT_KL,
-	PER_DGT_TA,
-	PER_DGT_TB,
-	PER_DGT_TC,
-	*/
-
-	
-	if(data & pad_asign[0])
-    {
-		if(! (data & pad_asign[2]))
-		Keyboard[sc_RightArrow]=0;//vbt_event[2][1]=0;
-
-		if(! (data & pad_asign[3]))
-		Keyboard[sc_LeftArrow]=0;//vbt_event[3][1]=0;
-    }
-
-	if(data & pad_asign[1])
-    {
-		if(! (data & pad_asign[2]))
-		Keyboard[sc_RightArrow]=0;//vbt_event[2][1]=0;
-
-		if(! (data & pad_asign[3]))
-		Keyboard[sc_LeftArrow]=0;//vbt_event[3][1]=0;
-    }
-
-	if(data & pad_asign[2])
-		Keyboard[sc_RightArrow]=1;
-
-	if(data & pad_asign[3])
-		Keyboard[sc_LeftArrow]=1;
-	//IN_ClearKeysDown();
 
 	if(found)
 	{
-		/*char toto[500];
-		sprintf(toto,"evt %d action %d key %d",vbt_event[current_event][0],vbt_event[current_event][1],event->key.keysym.sym );
-				//slPrint(toto,slLocate(3,25));	 */
-		event->type = 	 vbt_event[current_event][0];
-		if(vbt_event[current_event][0]==SDL_KEYUP)
+		event->type = *evt;
+		if(*evt==SDL_KEYUP)
 		{
-			vbt_event[current_event][0] = SDL_NOEVENT;
-			vbt_event[i][1]=0;
+			*evt = SDL_NOEVENT;
+//			vbt_event[i][1]=0;
 		}
 		//event->type = SDL_KEYDOWN;
 
-		switch(current_event)
+		switch(i)
 		{
 			case 4:/*PER_DGT_TA: */
 			event->key.keysym.sym = SDLK_KP_ENTER;
@@ -783,19 +743,16 @@ int SDL_PollEvent(SDL_Event *event)
 			break;	
 
 			case 11:/*PER_DGT_TL: */
-			//event->key.keysym.sym = 
 			buttonstate[bt_prevweapon] = true;
 			CheckWeaponChange ();
 			break;	
 
 			case 12:/*PER_DGT_TR: */
-			//event->key.keysym.sym = 
 			buttonstate[bt_nextweapon] = true;
 			CheckWeaponChange ();
 			break;	
 
 			case 7:/*PER_DGT_ST: */
-				////slPrint("gros ...",slLocate(3,24));
 			event->key.keysym.sym = SDLK_ESCAPE;
 			break;	
 
@@ -808,48 +765,23 @@ int SDL_PollEvent(SDL_Event *event)
 			break;	
 
 			case 1:/*PER_DGT_KD: */
-				////slPrint("gros ggggg",slLocate(3,20));
 			event->key.keysym.sym = SDLK_DOWN;
 			break;	
 
 			case 0:/*PER_DGT_KU: */
-				////slPrint("gros ggggg",slLocate(3,20));
 			event->key.keysym.sym = SDLK_UP;
 			break;	
 
 			default:
-				////slPrint("pas trouv?",slLocate(3,20));
-				//event->key.keysym.sym =999;
-				//event->type = SDL_NOEVENT;
-				event->key.keysym.sym = SDLK_LAST;//SDLK_FIRST;	  
-				break;
+			event->key.keysym.sym = SDLK_LAST;//SDLK_FIRST;
+			break;
 		}
 		return 1;
 	}
-	//else
-	//{
-//slPrint("IN_ClearKeysDown       ",slLocate(3,22));	
-		
-	IN_ClearKeysDown();
-			event->type = SDL_KEYUP;
-			//vbt_event[current_event][0] = SDL_NOEVENT;
-			//vbt_event[i][1]=0;
-			//event->key.keysym.sym = SDLK_LAST;	
-	//}
-	for (i=0;i <13; i++)
-	{
-	//	if (vbt_event[i][1]==1)
-		{
-				vbt_event[i][0]=0;
-				vbt_event[i][1]=0;
-		}
-	}
-	//control_status =0;
-	//LastScan=0;
-	//event->type = SDL_KEYUP;
-	//event->key.keysym.sym = SDLK_LAST;	  
-//slPrint("SDL_PollEvent end       ",slLocate(3,22));		
-	return 0;
+	//IN_ClearKeysDown();
+	event->type = SDL_KEYUP;
+
+	return found;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
 int SDL_WaitEvent(SDL_Event *event)
