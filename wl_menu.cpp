@@ -1632,7 +1632,6 @@ void
 DrawMenu (CP_iteminfo * item_i, CP_itemtype * items)
 {
     int i, which = item_i->curpos;
-	//slPrint("DrawMenu",slLocate(10,16));
 
     WindowX = PrintX = item_i->x + item_i->indent;
     WindowY = PrintY = item_i->y;
@@ -1642,7 +1641,6 @@ DrawMenu (CP_iteminfo * item_i, CP_itemtype * items)
     for (i = 0; i < item_i->amount; i++)
     {
         SetTextColor (items + i, which == i);
-		//slPrint((items + i)->string,slLocate(20,i+15));
         PrintY = item_i->y + i * 13;
         if ((items + i)->active)
             US_Print ((items + i)->string);

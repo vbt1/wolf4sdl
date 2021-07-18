@@ -992,7 +992,7 @@ extern  int32_t  heightnumerator;
 extern  fixed    scale;
 
 extern  int      shootdelta;
-extern  unsigned screenofs;
+//extern  unsigned screenofs;
 
 extern  boolean  startgame;
 //extern  char     str[80];
@@ -1001,9 +1001,9 @@ extern  boolean  startgame;
 //
 // Command line parameter variables
 //
-//extern  boolean  param_debugmode;
-extern  boolean  param_nowait;
 /*
+extern  boolean  param_debugmode;
+extern  boolean  param_nowait;
 extern  int      param_difficulty;
 extern  int      param_tedlevel;
 extern  int      param_joystickindex;
@@ -1012,9 +1012,8 @@ extern  int      param_samplerate;
 extern  int      param_audiobuffer;
 extern  int      param_mission;
 extern  boolean  param_goodtimes;
-*/
 extern  boolean  param_ignorenumchunks;
-
+*/
 void            NewGame (int difficulty,int episode);
 inline void     CalcProjection (int32_t focal);
 void            NewViewSize (int width);
@@ -1036,7 +1035,7 @@ void            ShutdownId (void);
 extern  gametype        gamestate;
 extern  byte            bordercol;
 extern  SDL_Surface     *latchpics[NUMLATCHPICS];
-extern  char            demoname[13];
+//extern  char            demoname[13];
 
 void    SetupGameLevel (void);
 void    GameLoop (void);
@@ -1118,16 +1117,16 @@ extern  int         godmode;
 
 extern  boolean     demoplayback;
 extern  int8_t      *demoptr, *lastdemoptr;
-extern  memptr      demobuffer;
+//extern  memptr      demobuffer;
 
 //
 // control info
 //
-extern  boolean     mouseenabled,joystickenabled;
+//extern  boolean     mouseenabled,joystickenabled;
 extern  int         dirscan[4];
 extern  int         buttonscan[NUMBUTTONS];
-extern  int         buttonmouse[4];
-extern  int         buttonjoy[32];
+//extern  int         buttonmouse[4];
+//extern  int         buttonjoy[32];
 
 void    InitActorList (void);
 void    GetNewActor (void);
@@ -1153,7 +1152,7 @@ extern  int32_t     funnyticount;           // FOR FUNNY BJ FACE
 extern  objtype     *objfreelist;     // *obj,*player,*lastobj,
 
 extern  boolean     /*noclip,*/ammocheat;
-extern  int         singlestep, extravbls;
+//extern  int         singlestep, extravbls;
 
 /*
 =============================================================================

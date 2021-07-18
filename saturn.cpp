@@ -640,14 +640,17 @@ void SDL_WM_SetIcon(SDL_Surface *icon, Uint8 *mask)
 sc_1, sc_2, sc_3, sc_4
 */
 
-int SDL_PollEvent(int start,int end, SDL_Event *event)
+void SDL_PollEvent(int start,int end, SDL_Event *event)
 {
 	Uint16 data = 0;
 	Uint8 i,found=0;
 
 	if(Per_Connect1) {
 //		push = ~Smpc_Peripheral[0].push;
-		data = ~Smpc_Peripheral[0].data;
+		if(start==0)
+			data = ~Smpc_Peripheral[0].data;
+		else
+			data = ~Smpc_Peripheral[0].push;
 	}
 
 	if(data & PER_DGT_ST && data & PER_DGT_TA && data & PER_DGT_TB && data & PER_DGT_TC) 
@@ -715,10 +718,7 @@ int SDL_PollEvent(int start,int end, SDL_Event *event)
 		if(*evt==SDL_KEYUP)
 		{
 			*evt = SDL_NOEVENT;
-//			vbt_event[i][1]=0;
 		}
-		//event->type = SDL_KEYDOWN;
-
 		switch(i)
 		{
 			case 4:/*PER_DGT_TA: */
@@ -776,18 +776,18 @@ int SDL_PollEvent(int start,int end, SDL_Event *event)
 			event->key.keysym.sym = SDLK_LAST;//SDLK_FIRST;
 			break;
 		}
-		return 1;
+		return;
 	}
 	//IN_ClearKeysDown();
 	event->type = SDL_KEYUP;
 
-	return found;
+//	return found;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
+#if 0
 int SDL_WaitEvent(SDL_Event *event)
 {
 	//event->type = SDL_NOEVENT;
-#if 0
 	if (event->type== SDL_KEYUP) {
 		event->type = SDL_NOEVENT;
 		event->key.keysym.sym = SDLK_FIRST;	
@@ -921,9 +921,9 @@ int SDL_WaitEvent(SDL_Event *event)
 			return 1;
 		}
 	} while(event->type == SDL_NOEVENT);
-#endif
 	return 0;
 }
+#endif
 /*
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_DestroyMutex(SDL_mutex *mutex)

@@ -32,16 +32,12 @@
 //
 // configuration variables
 //
-//boolean MousePresent;
-
 
 // 	Global variables
 volatile boolean    Keyboard[SDLK_LAST];
 volatile boolean	Paused;
-//volatile char		LastASCII;
 volatile ScanCode	LastScan;
 
-//KeyboardDef	KbdDefs = {0x1d,0x38,0x47,0x48,0x49,0x4b,0x4d,0x4f,0x50,0x51};
 static KeyboardDef KbdDefs = {
     sc_Control,             // button0
     sc_Alt,                 // button1

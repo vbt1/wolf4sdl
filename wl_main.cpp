@@ -54,7 +54,6 @@ extern byte signon[];
 // proejection variables
 //
 fixed    focallength;
-unsigned screenofs;
 int      viewscreenx, viewscreeny;
 int      viewwidth;
 int      viewheight;
@@ -72,13 +71,13 @@ boolean startgame;
 // Command line parameter variables
 //
 
-boolean param_nowait = true;
+static boolean param_nowait = true;
 int     param_difficulty = 1;           // default is "normal"
 //int     param_tedlevel = -1;            // default is not to start a level
 
 int     param_mission = 1;
 boolean param_goodtimes = false;
-boolean param_ignorenumchunks = false;
+//boolean param_ignorenumchunks = false;
 
 //#ifndef REMDEBUG
 unsigned frame_x=0,frame_y=0;
@@ -1263,12 +1262,11 @@ boolean SetViewSize (unsigned width, unsigned height)
     centerx = viewwidth/2-1;
     shootdelta = viewwidth/10;
     if((unsigned) viewheight == screenHeight)
-        viewscreenx = viewscreeny = screenofs = 0;
+        viewscreenx = viewscreeny = 0;
     else
     {
         viewscreenx = (screenWidth-viewwidth) / 2;
         viewscreeny = (screenHeight-scaleFactor*STATUSLINES-viewheight)/2;
-        screenofs = viewscreeny*screenWidth+viewscreenx;
     }
 // calculate trace angles and projection constants
 //

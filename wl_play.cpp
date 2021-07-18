@@ -75,7 +75,7 @@ boolean buttonheld[NUMBUTTONS];
 
 boolean demoplayback;
 int8_t *demoptr, *lastdemoptr;
-memptr demobuffer;
+//memptr demobuffer;
 
 //
 // current user input

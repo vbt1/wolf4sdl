@@ -538,7 +538,7 @@ void CAL_SetupGrFile (void)
     long headersize = fileSize;//lseek(handle, 0, SEEK_END);
     //lseek(handle, 0, SEEK_SET);
 //headersize= 157*3;
-    if(!param_ignorenumchunks && headersize / 3 != (long) (lengthof(grstarts) - numEpisodesMissing))
+    if(headersize / 3 != (long) (lengthof(grstarts) - numEpisodesMissing))
 	{
 /*        Quit("Wolf4SDL was not compiled for these data files:\n"
             "        %s contains a wrong number of offsets                          (%i instead of %i)!\n\n"

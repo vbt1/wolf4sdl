@@ -16,10 +16,11 @@ extern unsigned char texture_list[SPR_NULLSPRITE];
 extern unsigned int position_vram;
 #endif
 
+//remplacer byte *tilemapaddr par ray->tilehit!!!!!! ... à réfléchir
+
 typedef struct
 {
 //	byte *postsource;
-	byte *tilemapaddr;
 	int id;
 	int texture;
 #ifndef EMBEDDED	
@@ -27,12 +28,13 @@ typedef struct
 	int lasttilehit;
 	word lastside;
 	word lastintercept;
-	word lasttexture;	
-#endif	
-	int tilehit;
-	int xintercept,yintercept;
-	short xtile,ytile;	
+	word lasttexture;
 	short xtilestep,ytilestep;
+#endif	
+	unsigned tilehit;
+	fixed xintercept,yintercept;
+	int xtile,ytile;
+	byte *tilemapaddr;
 // wall optimization variables	
 } 
 ray_struc __attribute__ ((aligned (4)));
@@ -256,7 +258,7 @@ static boolean inline TransformTile (int tx, int ty, short *dispx, short *disphe
 ====================
 */
 #ifdef EMBEDDED
-static int CalcHeight(int xintercept, int yintercept)
+static int CalcHeight(fixed xintercept, fixed yintercept)
 {
 	fixed gxt,gyt,nx,gx,gy;
 
@@ -324,14 +326,15 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 //extern int 					nb_unlock;
 static int tutu=0;
 
-void ScalePost(int postx, short wallheight, int texture, byte *postsource, byte *tilemapaddr, ray_struc *ray)
+void ScalePost(int postx, int texture, byte *postsource, byte *tilemapaddr, ray_struc *ray)
 {
 #ifdef USE_SPRITES	
 //--------------------------------------------------------------------------------------------
 	SPRITE *user_wall;
-//	slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);
+	slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);
 //	slTransferEntry((void *)postsource,(void *)(wall_buffer + (postx<<6)),64);		
-	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
+//	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
+	int wallheight = CalcHeight(ray->xintercept,ray->yintercept)/8;
 
 	if(tilemapaddr!=ray->tilemapaddr || texture!=ray->texture)
 	{
@@ -345,15 +348,17 @@ void ScalePost(int postx, short wallheight, int texture, byte *postsource, byte 
 
 		user_wall->SRCA=0x2000|(postx*8);
 		user_wall->COLR=256;
+		user_wall->SIZE=0x801;
+		
 		user_wall->XC=postx-(viewwidth/2);
-		user_wall->YC=(wallheight / 8);
-		user_wall->XD=user_wall->XC;
-		user_wall->YD=-user_wall->YC;
-		user_wall->XA=user_wall->XD;
+		user_wall->YC=wallheight;
+		user_wall->YB=wallheight;
+//		user_wall->XD=user_wall->XC;
+		user_wall->YD=-wallheight;
+		user_wall->XA=user_wall->XC;
 		user_wall->YA=user_wall->YD;
 		user_wall->XB=user_wall->XA;
-		user_wall->YB=user_wall->YC;
-		user_wall->SIZE=0x801;
+		
 		ray->tilemapaddr=tilemapaddr;
 		ray->texture=texture;
 	}
@@ -362,10 +367,11 @@ void ScalePost(int postx, short wallheight, int texture, byte *postsource, byte 
 		user_wall = (SPRITE *)user_walls+ray->id;
 		user_wall->SIZE++;
 		user_wall->XC=postx-(viewwidth/2);
-		user_wall->XD=user_wall->XC;		
-		user_wall->YC=(wallheight / 8);
-		user_wall->YD=-user_wall->YC;
+//		user_wall->XD=user_wall->XC;		
+		user_wall->YC=wallheight;
+		user_wall->YD=-wallheight;
 	}
+	user_wall->XD=user_wall->XC;
 
 //--------------------------------------------------------------------------------------------
 #else
@@ -860,6 +866,56 @@ static void DrawScaleds (void)
 //
 // place active objects
 //
+#ifdef EMBEDDED222
+	for (obj = player->next;obj;obj=obj->next)
+	{
+		uint32_t spotmask;
+		uint32_t spota;
+		uint32_t spotb;
+		uint32_t spotc;
+		if (!(visptr->shapenum = gamestates[obj->state].shapenum))
+			continue;  // no shape
+
+		spotloc = (obj->tilex << 6) + obj->tiley;
+		tilespot = &tilemap[0][0] + spotloc;
+		spota = spotvis[0][obj->tilex-1];
+		spotb = spotvis[0][obj->tilex];
+		spotc = spotvis[0][obj->tilex+1];
+		spotmask = 1ull << obj->tiley;
+
+		//
+		// could be in any of the nine surrounding tiles
+		//
+		if ((spotb & spotmask)
+		|| ((spotb & (spotmask >> 1)) && !*(tilespot-1))
+		|| ((spotb & (spotmask << 1)) && !*(tilespot+1))
+		|| ((spota & (spotmask >> 1)) && !*(tilespot-65))
+		|| ((spota & spotmask) && !*(tilespot-64))
+		|| ((spota & (spotmask << 1)) && !*(tilespot-63))
+		|| ((spotc & (spotmask >> 1)) && !*(tilespot+63))
+		|| ((spotc & spotmask) && !*(tilespot+64))
+		|| ((spotc & (spotmask << 1)) && !*(tilespot+65)))
+		{
+			obj->active = ac_yes;
+			TransformActor(obj);
+			if (!obj->viewheight)
+				continue;						// too close or far away
+
+			visptr->viewx = obj->viewx;
+			visptr->viewheight = obj->viewheight;
+			if (visptr->shapenum == -1)
+				visptr->shapenum = obj->temp1;	// special shape
+
+			if (gamestates[obj->state].rotate)
+				visptr->shapenum += CalcRotate(obj);
+
+			if (visptr < &vislist[MAXVISABLE-1])	/* don't let it overflow */
+				visptr++;
+			obj->flags |= FL_VISABLE;
+		} else
+			obj->flags &= ~FL_VISABLE;
+	}
+#else
     for (obj = player->next;obj;obj=obj->next)
     {
 #ifdef EMBEDDED
@@ -917,6 +973,7 @@ static void DrawScaleds (void)
             obj->flags &= ~FL_VISABLE;
 		}
     }
+#endif
 //
 // draw from back to front
 //
@@ -1068,12 +1125,9 @@ void CalcTics (void)
 static inline void HitHorizDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
 {
 	unsigned texture, doorpage = 0, doornum;
-//	byte *wall;
 
 	doornum = ray->tilehit&0x7f;
 	texture = ((ray->xintercept-doorposition[doornum]) >> 4) & 0xfc0;
-
-	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 
 	switch(doorobjlist[doornum].lock) {
 		case dr_normal:
@@ -1090,9 +1144,8 @@ static inline void HitHorizDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
 			break;
 	}
 
-//	wall = PM_GetPage(doorpage);
 	byte *postsource = PM_GetTexture(doorpage) + texture;
-	ScalePost(postx, wallheight, doorpage, postsource, tilemapaddr, ray);
+	ScalePost(postx, doorpage, postsource, tilemapaddr, ray);
 }
 
 static inline void HitVertDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
@@ -1102,8 +1155,6 @@ static inline void HitVertDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
 	doornum = ray->tilehit&0x7f;
 	texture = ((ray->yintercept-doorposition[doornum]) >> 4) & 0xfc0;
 
-	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
-
 	switch(doorobjlist[doornum].lock) {
 		case dr_normal:
 			doorpage = DOORWALL;
@@ -1119,72 +1170,61 @@ static inline void HitVertDoorNew(int postx, byte *tilemapaddr, ray_struc *ray)
 			break;
 	}
 
-//	wall = PM_GetPage(doorpage+1);
 	byte *postsource = PM_GetTexture(doorpage+1) + texture;
-//	ray->postx=postx;
-	ScalePost(postx, wallheight, doorpage+1, postsource, tilemapaddr, ray);
+	ScalePost(postx, doorpage+1, postsource, tilemapaddr, ray);
 }
 
-static void inline HitVertWallNew(int postx, byte *tilemapaddr, ray_struc *ray)
+static void inline HitVertWallNew(int postx, short xtilestep, byte *tilemapaddr, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture;
-//	byte *wall;
 
 	texture = (ray->yintercept>>4)&0xfc0;
 	
-	if (ray->xtilestep == -1) {
+	if (xtilestep == -1) {
 		texture = 0xfc0-texture;
 		ray->xintercept += TILEGLOBAL;
 	}
 	
-	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
-
 	if (ray->tilehit & 0x40) { // check for adjacent doors
 		ray->ytile = ray->yintercept>>TILESHIFT;
-		if (tilemap[ray->xtile-ray->xtilestep][ray->ytile] & 0x80)
+		if (tilemap[ray->xtile-xtilestep][ray->ytile] & 0x80)
 			wallpic = DOORWALL+3;
 		else
 			wallpic = vertwall(ray->tilehit & ~0x40);
 	} else
 		wallpic = vertwall(ray->tilehit);
-		
-//	wall = PM_GetPage(wallpic);
+	
 	byte *postsource = PM_GetTexture(wallpic) + texture;
-//	ray->postx=postx;
-	ScalePost(postx, wallheight, wallpic, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallpic, postsource, tilemapaddr, ray);
 }
 
-static inline void HitHorizWallNew(int postx, byte *tilemapaddr, ray_struc *ray)
+static inline void HitHorizWallNew(int postx, short ytilestep, byte *tilemapaddr,ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture;
 
 	texture = (ray->xintercept >> 4) & 0xfc0;
 	
-	if (ray->ytilestep == -1)
+	if (ytilestep == -1)
 		ray->yintercept += TILEGLOBAL;
 	else
 		texture = 0xfc0 - texture;
 		
-	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
-
 	if (ray->tilehit & 0x40) { // check for adjacent doors
 		ray->xtile = ray->xintercept>>TILESHIFT;
-		if (tilemap[ray->xtile][ray->ytile-ray->ytilestep] & 0x80)
+		if (tilemap[ray->xtile][ray->ytile-ytilestep] & 0x80)
 			wallpic = DOORWALL+2;
 		else
 			wallpic = horizwall(ray->tilehit & ~0x40);
 	} else
 		wallpic = horizwall(ray->tilehit);
 
-//	wall = PM_GetPage(wallpic);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
-//	ray->postx=postx;
-	ScalePost(postx, wallheight, wallpic, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallpic, postsource, tilemapaddr, ray);
 }
 
-static inline void HitHorizPWall(int postx, byte *tilemapaddr, ray_struc *ray)
+static inline void HitHorizPWall(int postx, short ytilestep, byte *tilemapaddr, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture, offset;
@@ -1193,42 +1233,35 @@ static inline void HitHorizPWall(int postx, byte *tilemapaddr, ray_struc *ray)
 	
 	offset = pwallpos << 10;
 	
-	if (ray->ytilestep == -1)
+	if (ytilestep == -1)
 		ray->yintercept += TILEGLOBAL-offset;
 	else {
 		texture = 0xfc0-texture;
 		ray->yintercept += offset;
 	}
 
-	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
 	wallpic = horizwall(ray->tilehit&63);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
-	ScalePost(postx, wallheight, wallpic, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallpic, postsource, tilemapaddr, ray);
 }
 
-static inline void HitVertPWall(int postx, byte *tilemapaddr, ray_struc *ray)
+static inline void HitVertPWall(int postx, short xtilestep, byte *tilemapaddr, ray_struc *ray)
 {
 	int wallpic;
 	unsigned texture, offset;
-//	byte *wall;
 	
 	texture = (ray->yintercept >> 4) & 0xfc0;
 	offset = pwallpos << 10;
 	
-	if (ray->xtilestep == -1) {
+	if (xtilestep == -1) {
 		ray->xintercept += TILEGLOBAL-offset;
 		texture = 0xfc0-texture;
 	} else
 		ray->xintercept += offset;
 
-	short wallheight = CalcHeight(ray->xintercept,ray->yintercept);
-	
 	wallpic = vertwall(ray->tilehit&63);
-
-//	wall = PM_GetPage(wallpic);
 	byte *postsource = PM_GetTexture(wallpic) + texture;
-//	ray->postx=postx;
-	ScalePost(postx, wallheight, wallpic, postsource, tilemapaddr, ray);
+	ScalePost(postx, wallpic, postsource, tilemapaddr, ray);
 }
 
 static inline int samex(int xtilestep, int intercept, int tile)
@@ -1261,19 +1294,20 @@ static inline int samey(int ytilestep, int intercept, int tile)
     }
 }
 
-static unsigned int AsmRefresh()
+static unsigned int AsmRefresh(int midangle)
 {
 	static	ray_struc my_ray;	
 	unsigned xpartialup, xpartialdown, ypartialup, ypartialdown;
 	unsigned xpartial, ypartial;
 	int doorhit;
 	int angle;    /* ray angle through postx */
-	int midangle;
+//	int midangle;
 	int focaltx, focalty;
 	int xstep, ystep;
+	short xtilestep, ytilestep;
 	byte *tilemapaddr;
 	
-	midangle = player->angle*(FINEANGLES/ANGLES);
+//	midangle = player->angle*(FINEANGLES/ANGLES);
 	xpartialdown = (viewx&(TILEGLOBAL-1));
 	xpartialup = TILEGLOBAL-xpartialdown;
 	ypartialdown = (viewy&(TILEGLOBAL-1));
@@ -1300,24 +1334,24 @@ for (int postx = 0; postx < viewwidth; postx++)
 	} else if (angle < DEG90) {
 		/* 0-89 degree arc */
 	entry90:
-		my_ray.xtilestep = 1;
-		my_ray.ytilestep = -1;
+		xtilestep = 1;
+		ytilestep = -1;
 		xstep = finetangent[DEG90-1-angle];
 		ystep = -finetangent[angle];
 		xpartial = xpartialup;
 		ypartial = ypartialdown;
 	} else if (angle < DEG180) {
 		/* 90-179 degree arc */
-		my_ray.xtilestep = -1;
-		my_ray.ytilestep = -1;
+		xtilestep = -1;
+		ytilestep = -1;
 		xstep = -finetangent[angle-DEG90];
 		ystep = -finetangent[DEG180-1-angle];
 		xpartial = xpartialdown;
 		ypartial = ypartialdown;
 	} else if (angle < DEG270) {
 		/* 180-269 degree arc */
-		my_ray.xtilestep = -1;
-		my_ray.ytilestep = 1;
+		xtilestep = -1;
+		ytilestep = 1;
 		xstep = -finetangent[DEG270-1-angle];
 		ystep = finetangent[angle-DEG180];
 		xpartial = xpartialdown;
@@ -1325,8 +1359,8 @@ for (int postx = 0; postx < viewwidth; postx++)
 	} else if (angle < DEG360) {
 		/* 270-359 degree arc */
 	entry360:
-		my_ray.xtilestep = 1;
-		my_ray.ytilestep = 1;
+		xtilestep = 1;
+		ytilestep = 1;
 		xstep = finetangent[angle-DEG270];
 		ystep = finetangent[DEG360-1-angle];
 		xpartial = xpartialup;
@@ -1337,10 +1371,10 @@ for (int postx = 0; postx < viewwidth; postx++)
 	}
 	
 	my_ray.yintercept = viewy + FixedMul(xpartial, ystep); // + xtilestep;
-	my_ray.xtile = focaltx + my_ray.xtilestep;
+	my_ray.xtile = focaltx + xtilestep;
 
 	my_ray.xintercept = viewx + FixedMul(ypartial, xstep); // + ytilestep;
-	my_ray.ytile = focalty + my_ray.ytilestep;
+	my_ray.ytile = focalty + ytilestep;
 
 /* CORE LOOP */
 
@@ -1349,7 +1383,7 @@ for (int postx = 0; postx < viewwidth; postx++)
 	/* check intersections with vertical walls */
 vertcheck:
 // int ytilestep, int intercept, int tile)
-	if (!samey(my_ray.ytilestep, my_ray.yintercept, my_ray.ytile))
+	if (!samey(ytilestep, my_ray.yintercept, my_ray.ytile))
 //	{
 //		my_ray.samey=0;
 		goto horizentry;
@@ -1372,7 +1406,7 @@ vertentry:
 					
 				my_ray.yintercept = doorhit;
 				my_ray.xintercept = my_ray.xtile << TILESHIFT;
-				HitVertPWall(postx, tilemapaddr, &my_ray);
+				HitVertPWall(postx, xtilestep, tilemapaddr, &my_ray);
 			} else {
 				/* vertdoor */
 				doorhit = my_ray.yintercept + ystep / 2;
@@ -1390,7 +1424,7 @@ vertentry:
 			}
 		} else {
 			my_ray.xintercept = my_ray.xtile << TILESHIFT;
-			HitVertWallNew(postx, tilemapaddr, &my_ray);
+			HitVertWallNew(postx, xtilestep, tilemapaddr, &my_ray);
 		}
 		continue;
 	}
@@ -1398,14 +1432,14 @@ passvert:
 //	*((byte *)spotvis+xspot)=1;
 //	setspotvis(my_ray.xtile,TILE(my_ray.yintercept));
 	spotvis[my_ray.xtile][TILE(my_ray.yintercept)] = 1;
-	my_ray.xtile += my_ray.xtilestep;
+	my_ray.xtile += xtilestep;
 	my_ray.yintercept += ystep;
 	goto vertcheck;
 	
 horizcheck:
 	/* check intersections with horizontal walls */
 	
-	if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))
+	if (!samex(xtilestep, my_ray.xintercept, my_ray.xtile))
 		goto vertentry;
 
 horizentry:
@@ -1424,7 +1458,7 @@ horizentry:
 				
 				my_ray.xintercept = doorhit;
 				my_ray.yintercept = my_ray.ytile << TILESHIFT; 
-				HitHorizPWall(postx, tilemapaddr, &my_ray);
+				HitHorizPWall(postx, ytilestep, tilemapaddr, &my_ray);
 			} else {
 				doorhit = my_ray.xintercept + xstep / 2;
 				
@@ -1441,7 +1475,7 @@ horizentry:
 			}
 		} else {
 			my_ray.yintercept = my_ray.ytile << TILESHIFT;
-			HitHorizWallNew(postx, tilemapaddr, &my_ray);
+			HitHorizWallNew(postx, ytilestep, tilemapaddr, &my_ray);
 		}
 		continue;
 	}
@@ -1449,7 +1483,7 @@ passhoriz:
 //    *((byte *)spotvis+yspot)=1;
 //	setspotvis(TILE(my_ray.xintercept), my_ray.ytile);
 	spotvis[TILE(my_ray.xintercept)][my_ray.ytile] = 1;
-	my_ray.ytile += my_ray.ytilestep;
+	my_ray.ytile += ytilestep;
 	my_ray.xintercept += xstep;
 	goto horizcheck;
 }
@@ -1458,27 +1492,20 @@ passhoriz:
 
 #ifdef USE_SLAVE
 
-static void AsmRefreshSlave()
+static void AsmRefreshSlave(int *midangle)
 {
 	static	ray_struc my_ray;	
 	unsigned xpartialup, xpartialdown, ypartialup, ypartialdown;
 	unsigned xpartial, ypartial;
 	int doorhit;
 	int angle;    /* ray angle through postx */
-	int midangle;
+//	int midangle;
 	int focaltx, focalty;
 	int xstep, ystep;
+	short xtilestep, ytilestep;
 	byte *tilemapaddr;
-/*
-    int viewangle = player->angle;
-
-    viewsin = sintable[viewangle];
-    viewcos = costable[viewangle];
-    viewx = player->x - FixedMul(focallength, viewcos);
-    viewy = player->y + FixedMul(focallength, viewsin);
-*/
 	
-	midangle = player->angle*(FINEANGLES/ANGLES);
+//	midangle = player->angle*(FINEANGLES/ANGLES);
 	xpartialdown = (viewx&(TILEGLOBAL-1));
 	xpartialup = TILEGLOBAL-xpartialdown;
 	ypartialdown = (viewy&(TILEGLOBAL-1));
@@ -1491,7 +1518,7 @@ static void AsmRefreshSlave()
 	
 for(int postx=viewwidth>>1;postx<viewwidth;postx++)
 {
-	angle = midangle + pixelangle[postx];
+	angle = *midangle + pixelangle[postx];
 
 	if (angle < 0) {
 		/* -90 - -1 degree arc */
@@ -1500,24 +1527,24 @@ for(int postx=viewwidth>>1;postx<viewwidth;postx++)
 	} else if (angle < DEG90) {
 		/* 0-89 degree arc */
 	entry90:
-		my_ray.xtilestep = 1;
-		my_ray.ytilestep = -1;
+		xtilestep = 1;
+		ytilestep = -1;
 		xstep = finetangent[DEG90-1-angle];
 		ystep = -finetangent[angle];
 		xpartial = xpartialup;
 		ypartial = ypartialdown;
 	} else if (angle < DEG180) {
 		/* 90-179 degree arc */
-		my_ray.xtilestep = -1;
-		my_ray.ytilestep = -1;
+		xtilestep = -1;
+		ytilestep = -1;
 		xstep = -finetangent[angle-DEG90];
 		ystep = -finetangent[DEG180-1-angle];
 		xpartial = xpartialdown;
 		ypartial = ypartialdown;
 	} else if (angle < DEG270) {
 		/* 180-269 degree arc */
-		my_ray.xtilestep = -1;
-		my_ray.ytilestep = 1;
+		xtilestep = -1;
+		ytilestep = 1;
 		xstep = -finetangent[DEG270-1-angle];
 		ystep = finetangent[angle-DEG180];
 		xpartial = xpartialdown;
@@ -1525,8 +1552,8 @@ for(int postx=viewwidth>>1;postx<viewwidth;postx++)
 	} else if (angle < DEG360) {
 		/* 270-359 degree arc */
 	entry360:
-		my_ray.xtilestep = 1;
-		my_ray.ytilestep = 1;
+		xtilestep = 1;
+		ytilestep = 1;
 		xstep = finetangent[angle-DEG270];
 		ystep = finetangent[DEG360-1-angle];
 		xpartial = xpartialup;
@@ -1537,10 +1564,10 @@ for(int postx=viewwidth>>1;postx<viewwidth;postx++)
 	}
 	
 	my_ray.yintercept = viewy + FixedMul(xpartial, ystep); // + xtilestep;
-	my_ray.xtile = focaltx + my_ray.xtilestep;
+	my_ray.xtile = focaltx + xtilestep;
 
 	my_ray.xintercept = viewx + FixedMul(ypartial, xstep); // + ytilestep;
-	my_ray.ytile = focalty + my_ray.ytilestep;
+	my_ray.ytile = focalty + ytilestep;
 
 /* CORE LOOP */
 
@@ -1548,7 +1575,7 @@ for(int postx=viewwidth>>1;postx<viewwidth;postx++)
 
 	/* check intersections with vertical walls */
 vertcheck:
-	if (!samey(my_ray.ytilestep, my_ray.yintercept, my_ray.ytile))
+	if (!samey(ytilestep, my_ray.yintercept, my_ray.ytile))
 		goto horizentry;
 
 vertentry:
@@ -1567,7 +1594,7 @@ vertentry:
 					
 				my_ray.yintercept = doorhit;
 				my_ray.xintercept = my_ray.xtile << TILESHIFT;
-				HitVertPWall(postx, tilemapaddr, &my_ray);
+				HitVertPWall(postx, xtilestep, tilemapaddr, &my_ray);
 			} else {
 				/* vertdoor */
 				doorhit = my_ray.yintercept + ystep / 2;
@@ -1585,21 +1612,21 @@ vertentry:
 			}
 		} else {
 			my_ray.xintercept = my_ray.xtile << TILESHIFT;
-			HitVertWallNew(postx, tilemapaddr, &my_ray);
+			HitVertWallNew(postx, xtilestep, tilemapaddr, &my_ray);
 		}
 		continue;
 	}
 passvert:
 //	setspotvis(my_ray.xtile,TILE(my_ray.yintercept));
 	spotvis[my_ray.xtile][TILE(my_ray.yintercept)] = 1;
-	my_ray.xtile += my_ray.xtilestep;
+	my_ray.xtile += xtilestep;
 	my_ray.yintercept += ystep;
 	goto vertcheck;
 	
 horizcheck:
 	/* check intersections with horizontal walls */
 	
-	if (!samex(my_ray.xtilestep, my_ray.xintercept, my_ray.xtile))
+	if (!samex(xtilestep, my_ray.xintercept, my_ray.xtile))
 		goto vertentry;
 
 horizentry:
@@ -1618,7 +1645,7 @@ horizentry:
 				
 				my_ray.xintercept = doorhit;
 				my_ray.yintercept = my_ray.ytile << TILESHIFT; 
-				HitHorizPWall(postx, tilemapaddr, &my_ray);
+				HitHorizPWall(postx, ytilestep, tilemapaddr, &my_ray);
 			} else {
 				doorhit = my_ray.xintercept + xstep / 2;
 				
@@ -1635,14 +1662,14 @@ horizentry:
 			}
 		} else {
 			my_ray.yintercept = my_ray.ytile << TILESHIFT;
-			HitHorizWallNew(postx, tilemapaddr, &my_ray);
+			HitHorizWallNew(postx, ytilestep, tilemapaddr, &my_ray);
 		}
 		continue;
 	}
 passhoriz:
 	spotvis[TILE(my_ray.xintercept)][my_ray.ytile] = 1;
 //	setspotvis(TILE(my_ray.xintercept), my_ray.ytile);
-	my_ray.ytile += my_ray.ytilestep;
+	my_ray.ytile += ytilestep;
 	my_ray.xintercept += xstep;
 	goto horizcheck;
 }
@@ -2368,14 +2395,14 @@ passhoriz:
 #ifdef USE_SLAVE
 //==========================================================================
 
-void AsmRefreshSlave()
+void AsmRefreshSlave(int *midangle)xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 {
 // vbt :moins de variable globale
 	longword xpartialup,xpartialdown,ypartialup,ypartialdown;
 //	word tilehit;
 	int texdelta;
 	word xspot,yspot;
-	
+xxxxxxxxxxxxxxxxxx	
     xpartialdown = viewx&(TILEGLOBAL-1);
     xpartialup = TILEGLOBAL-xpartialdown;
     ypartialdown = viewy&(TILEGLOBAL-1);
@@ -2392,7 +2419,7 @@ void AsmRefreshSlave()
 
     for(int pixx=viewwidth>>1;pixx<viewwidth;pixx++)
     {
-        short angl=midangle+pixelangle[pixx];
+        short angl=*midangle+pixelangle[pixx];
         if(angl<0) angl+=FINEANGLES;
         if(angl>=3600) angl-=FINEANGLES;
         if(angl<900)
@@ -2821,7 +2848,7 @@ inline int WallRefresh (void)
 //	slCashPurge();
 #ifdef EMBEDDED
     int viewangle = player->angle;
-
+	int midangle = viewangle*(FINEANGLES/ANGLES);
     viewsin = sintable[viewangle];
     viewcos = costable[viewangle];
     viewx = player->x - FixedMul(focallength, viewcos);
@@ -2829,9 +2856,12 @@ inline int WallRefresh (void)
 #endif
 
 #ifdef USE_SLAVE	
-	slSlaveFunc(AsmRefreshSlave,(void*)NULL);
+	extern void AsmRefreshSlave(int *midangle);
+
+	slSlaveFunc(AsmRefreshSlave,(void *)&midangle);
+//	AsmRefreshSlave(&midangle);
 #endif	
-	return AsmRefresh();
+	return AsmRefresh(midangle);
 }
 #ifndef EMBEDDED
 inline void CalcViewVariables()
@@ -2970,7 +3000,6 @@ void    ThreeDRefresh (void)
 #ifndef USE_SPRITES		
 	else
 	{
-
         SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
