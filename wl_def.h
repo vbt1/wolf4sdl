@@ -256,6 +256,10 @@ static inline boolean getmapbit(mapbitmap m, int x, int y)
 {
   return (m[x] & (1ull << y)) != 0;
 }
+static inline void setmapbit(mapbitmap m, int x, int y)
+{
+  m[x] |= (1ull << y);
+}
 
 extern mapbitmap objactor;
 
@@ -263,7 +267,7 @@ static inline void clearmapbit(mapbitmap m, int x, int y)
 {
   m[x] &= ~(1ull << y);
 }
-
+#define obj_id(ob) ((ob) - objlist)
 #define getactorflag(x, y) getmapbit(objactor, x, y)
 #define setactorflag(x, y) setmapbit(objactor, x, y)
 #define clearactorflag(x, y) clearmapbit(objactor, x, y)
@@ -687,8 +691,8 @@ typedef enum {
 typedef enum {
     ac_badobject = -1,
     ac_no,
-    ac_yes,
-    ac_allways
+    ac_yes //,
+ //   ac_allways
 } activetype;
 
 typedef enum {
@@ -899,7 +903,7 @@ enum
     bt_nextweapon,
     bt_prevweapon,
     bt_esc,
-    bt_pause,
+//    bt_pause,
     bt_strafeleft,
     bt_straferight,
     bt_moveforward,

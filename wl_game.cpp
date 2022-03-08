@@ -557,7 +557,8 @@ void SetupGameLevel (void)
                 // solid wall
                 tilemap[x][y] = (byte) tile;
 #ifdef EMBEDDED
-				actorat[x][y] = tile;
+//				actorat[x][y] = tile;
+				set_wall_at(x, y, tile);
 #else
                 actorat[x][y] = (objtype *)(uintptr_t) tile;
 #endif				
@@ -635,8 +636,10 @@ void SetupGameLevel (void)
             if (tile == AMBUSHTILE)
             {
                 tilemap[x][y] = 0;
-                if ( (unsigned)(uintptr_t)actorat[x][y] == AMBUSHTILE)
-                    actorat[x][y] = NULL;
+//                if ( (unsigned)(uintptr_t)actorat[x][y] == AMBUSHTILE)
+//                    actorat[x][y] = NULL;
+				if (get_actor_at(x, y) == AMBUSHTILE)
+					clear_actor(x, y);
 
                 if (*map >= AREATILE)
                     tile = *map;

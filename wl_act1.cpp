@@ -154,7 +154,8 @@ void SpawnStatic (int tilex, int tiley, int type)
     {
         case block:
 #ifdef EMBEDDED		
-			actorat[tilex][tiley] = 1;	// consider it a blocking tile		
+//			actorat[tilex][tiley] = 1;	// consider it a blocking tile
+			set_wall_at(tilex, tiley, 1);	// consider it a blocking tile
 #else		
             actorat[tilex][tiley] = (objtype *) 64;          // consider it a blocking tile
 #endif
@@ -377,7 +378,8 @@ void SpawnDoor(int tilex, int tiley, boolean vertical, int lock)
 	lastdoorobj->lock = lock;
 	lastdoorobj->action = dr_closed;
 
-	actorat[tilex][tiley] = doornum | 0x80;	// consider it a solid wall
+//	actorat[tilex][tiley] = doornum | 0x80;	// consider it a solid wall
+	set_door_actor(tilex, tiley, doornum);	// consider it a solid wall
 
 //
 // make the door tile a special tile, and mark the adjacent tiles
@@ -421,7 +423,7 @@ void CloseDoor(int door)
 	tilex = doorobjlist[door].tilex;
 	tiley = doorobjlist[door].tiley;
 
-	if (actorat[tilex][tiley])
+	if (any_actor_at(tilex, tiley))
 		return;
 
 	if (player->tilex == tilex && player->tiley == tiley)
@@ -437,16 +439,16 @@ void CloseDoor(int door)
 				return;
 		}
 
-		if (actorat[tilex-1][tiley] & 0x8000)
-			check = &objlist[actorat[tilex-1][tiley] & ~0x8000];
+		if (obj_actor_at(tilex-1, tiley))
+			check = &objlist[get_actor_at(tilex-1, tiley)];
 		else
 			check = NULL;
 
 		if (check && ((check->x+MINDIST) >> TILESHIFT) == tilex)
 			return;
 		
-		if (actorat[tilex+1][tiley] & 0x8000)
-			check = &objlist[actorat[tilex+1][tiley] & ~0x8000];
+		if (obj_actor_at(tilex+1, tiley))
+			check = &objlist[get_actor_at(tilex+1, tiley)];
 		else
 			check = NULL;
 
@@ -463,23 +465,22 @@ void CloseDoor(int door)
 				return;
 		}
 		
-		if (actorat[tilex][tiley-1] & 0x8000)
-			check = &objlist[actorat[tilex][tiley-1] & ~0x8000];
+		if (obj_actor_at(tilex, tiley-1))
+			check = &objlist[get_actor_at(tilex, tiley-1)];
 		else
 			check = NULL;
 
 		if (check && ((check->y+MINDIST) >> TILESHIFT) == tiley )
 			return;
 		
-		if (actorat[tilex][tiley+1] & 0x8000)
-			check = &objlist[actorat[tilex][tiley+1] & ~0x8000];
+		if (obj_actor_at(tilex, tiley+1))
+			check = &objlist[get_actor_at(tilex, tiley+1)];
 		else
 			check = NULL;
 		
 		if (check && ((check->y-MINDIST) >> TILESHIFT) == tiley )
 			return;
 	}
-
 
 //
 // play door sound if in a connected area
@@ -495,7 +496,8 @@ void CloseDoor(int door)
 //
 // make the door space solid
 //
-	actorat[tilex][tiley] = door | 0x80;
+//	actorat[tilex][tiley] = door | 0x80;
+	set_door_actor(tilex, tiley, door);
 }
 #else
 void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
@@ -512,7 +514,8 @@ void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
     lastdoorobj->lock = lock;
     lastdoorobj->action = dr_closed;
 
-    actorat[tilex][tiley] = (objtype *)(uintptr_t)(doornum | 0x80);   // consider it a solid wall
+//    actorat[tilex][tiley] = (objtype *)(uintptr_t)(doornum | 0x80);   // consider it a solid wall
+	set_door_actor(tilex, tiley, doornum);	// consider it a solid wall
 
     //
     // make the door tile a special tile, and mark the adjacent tiles
@@ -751,7 +754,8 @@ void DoorOpening (int door)
         position = 0xffff;
         doorobjlist[door].ticcount = 0;
         doorobjlist[door].action = dr_open;
-        actorat[doorobjlist[door].tilex][doorobjlist[door].tiley] = 0;
+//        actorat[doorobjlist[door].tilex][doorobjlist[door].tiley] = 0;
+		clear_actor(doorobjlist[door].tilex, doorobjlist[door].tiley);
     }
 
     doorposition[door] = (word) position;
@@ -776,7 +780,8 @@ void DoorClosing (int door)
     tilex = doorobjlist[door].tilex;
     tiley = doorobjlist[door].tiley;
 
-    if ( ((int)(uintptr_t)actorat[tilex][tiley] != (door | 0x80))
+//    if ( ((int)(uintptr_t)actorat[tilex][tiley] != (door | 0x80))
+	if (obj_actor_at(tilex, tiley)
         || (player->tilex == tilex && player->tiley == tiley) )
     {                       // something got inside the door
         OpenDoor (door);
@@ -911,7 +916,8 @@ void PushWall(int checkx, int checky, int dir)
 	switch (dir)
 	{
 	case di_north:
-		if (actorat[checkx][checky-1])
+//		if (actorat[checkx][checky-1])
+		if (any_actor_at(checkx, checky-1))
 		{
 			SD_PlaySound(NOWAYSND);
 			return;
@@ -920,7 +926,8 @@ void PushWall(int checkx, int checky, int dir)
 		break;
 
 	case di_east:
-		if (actorat[checkx+1][checky])
+//		if (actorat[checkx+1][checky])
+		if (any_actor_at(checkx+1, checky))		
 		{
 			SD_PlaySound(NOWAYSND);
 			return;
@@ -929,7 +936,8 @@ void PushWall(int checkx, int checky, int dir)
 		break;
 
 	case di_south:
-		if (actorat[checkx][checky+1])
+//		if (actorat[checkx][checky+1])
+		if (any_actor_at(checkx, checky+1))
 		{
 			SD_PlaySound(NOWAYSND);
 			return;
@@ -938,7 +946,8 @@ void PushWall(int checkx, int checky, int dir)
 		break;
 
 	case di_west:
-		if (actorat[checkx-1][checky])
+//		if (actorat[checkx-1][checky])
+		if (any_actor_at(checkx-1, checky))
 		{
 			SD_PlaySound(NOWAYSND);
 			return;
@@ -988,7 +997,8 @@ void MovePWalls()
 		// the tile can now be walked into
 		//
 		tilemap[pwallx][pwally] = 0;
-		actorat[pwallx][pwally] = 0;
+//		actorat[pwallx][pwally] = 0;
+		clear_actor(pwallx, pwally);
 		*(mapsegs[0]+farmapylookup[pwally]+pwallx) = player->areanumber+AREATILE;
 
 		//
@@ -1008,7 +1018,8 @@ void MovePWalls()
 			{
 			case di_north:
 				pwally--;
-				if (actorat[pwallx][pwally-1])
+//				if (actorat[pwallx][pwally-1])
+				if (any_actor_at(pwallx, pwally-1))
 				{
 					pwallstate = 0;
 					return;
@@ -1019,7 +1030,8 @@ void MovePWalls()
 
 			case di_east:
 				pwallx++;
-				if (actorat[pwallx+1][pwally])
+//				if (actorat[pwallx+1][pwally])
+				if (any_actor_at(pwallx+1, pwally))
 				{
 					pwallstate = 0;
 					return;
@@ -1030,7 +1042,8 @@ void MovePWalls()
 
 			case di_south:
 				pwally++;
-				if (actorat[pwallx][pwally+1])
+//				if (actorat[pwallx][pwally+1])
+				if (any_actor_at(pwallx, pwally+1))
 				{
 					pwallstate = 0;
 					return;
@@ -1041,7 +1054,8 @@ void MovePWalls()
 
 			case di_west:
 				pwallx--;
-				if (actorat[pwallx-1][pwally])
+//				if (actorat[pwallx-1][pwally])
+				if (any_actor_at(pwallx-1, pwally))
 				{
 					pwallstate = 0;
 					return;

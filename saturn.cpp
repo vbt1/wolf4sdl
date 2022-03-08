@@ -296,6 +296,8 @@ int SDL_InitSubSystem(Uint32 flags)
 #ifdef PONY
 	sound_external_audio_enable(5, 5);
 	load_drv(ADX_MASTER_768);
+	
+//	add_raw_pcm_buffer(0,SOUNDRATE,nBurnSoundLen*20);
 #else		
 		
 		char sound_map[] =  {0xff,0xff,0xff,0xff};//,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
@@ -647,7 +649,7 @@ void SDL_PollEvent(int start,int end, SDL_Event *event)
 
 	if(Per_Connect1) {
 //		push = ~Smpc_Peripheral[0].push;
-		if(start==0)
+		if(start!=8)
 			data = ~Smpc_Peripheral[0].data;
 		else
 			data = ~Smpc_Peripheral[0].push;
@@ -683,7 +685,7 @@ void SDL_PollEvent(int start,int end, SDL_Event *event)
 		}
 		evt++;
 	}	  
-
+/*
 	if(start==0)
 	{
 		if(data & pad_asign[0])
@@ -711,7 +713,7 @@ void SDL_PollEvent(int start,int end, SDL_Event *event)
 			Keyboard[sc_LeftArrow]=1;
 	//	IN_ClearKeysDown();
 	}
-
+*/
 	if(found)
 	{
 		event->type = *evt;
@@ -730,30 +732,41 @@ void SDL_PollEvent(int start,int end, SDL_Event *event)
 			break;	
 			
 			case 6:/*PER_DGT_TC: */
-			case 10:/*PER_DGT_TZ: */
 			event->key.keysym.sym = SDLK_RCTRL;
-			break;	
+			break;			
+	
+			case 7:/*PER_DGT_ST: */
+			event->key.keysym.sym = SDLK_ESCAPE;
+			break;
 
 			case 8:/*PER_DGT_TX: */
-			event->key.keysym.sym = SDLK_RALT;
+//			event->key.keysym.sym = SDLK_RALT;
+			buttonstate[bt_prevweapon] = true;
+			CheckWeaponChange ();
+			event->type = SDL_NOEVENT;			
 			break;
 			
 			case 9:/*PER_DGT_TY: */
-			event->key.keysym.sym = SDLK_RSHIFT;
+//			event->key.keysym.sym = SDLK_RSHIFT;
+			buttonstate[bt_nextweapon] = true;
+			CheckWeaponChange ();
+			event->type = SDL_NOEVENT;			
 			break;	
 
+			case 10:/*PER_DGT_TZ: */
+			event->key.keysym.sym = SDLK_RSHIFT; // speed
+			break;
+
 			case 11:/*PER_DGT_TL: */
-			buttonstate[bt_prevweapon] = true;
-			CheckWeaponChange ();
+			event->key.keysym.sym = SDLK_RALT;	// strafe		
+//			buttonstate[bt_prevweapon] = true;
+//			CheckWeaponChange ();
 			break;	
 
 			case 12:/*PER_DGT_TR: */
-			buttonstate[bt_nextweapon] = true;
-			CheckWeaponChange ();
-			break;	
-
-			case 7:/*PER_DGT_ST: */
-			event->key.keysym.sym = SDLK_ESCAPE;
+			event->key.keysym.sym = SDLK_RALT;	// strafe		
+//			buttonstate[bt_nextweapon] = true;
+//			CheckWeaponChange ();
 			break;	
 
 			case 3:/*PER_DGT_KL: */

@@ -858,7 +858,8 @@ boolean TryMove (objtype *ob)
 	for (y=yl;y<=yh;y++)
 		for (x=xl;x<=xh;x++)
 		{
-			if (actorat[x][y] && !(actorat[x][y] & 0x8000))
+//			if (actorat[x][y] && !(actorat[x][y] & 0x8000))
+			if (solid_actor_at(x, y))
 				return false;
 		}
 #else
@@ -915,7 +916,9 @@ boolean TryMove (objtype *ob)
         for (x=xl;x<=xh;x++)
         {
 #ifdef EMBEDDED
-			check = &objlist[actorat[x][y]];
+//			check = &objlist[actorat[x][y]];
+			check = &objlist[get_actor_at(x, y)];
+			
 			if (check->flags & FL_SHOOTABLE)			
 #else
             check = actorat[x][y];

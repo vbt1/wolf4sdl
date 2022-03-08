@@ -331,9 +331,9 @@ void ScalePost(int postx, int texture, byte *postsource, byte *tilemapaddr, ray_
 #ifdef USE_SPRITES	
 //--------------------------------------------------------------------------------------------
 	SPRITE *user_wall;
-	slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);
+//	slDMACopy((void *)postsource, (void *)(wall_buffer + (postx<<6)), 64);  // vérifier si ca coule les perfs
 //	slTransferEntry((void *)postsource,(void *)(wall_buffer + (postx<<6)),64);		
-//	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
+	memcpyl((void *)(wall_buffer + (postx<<6)),(void *)postsource,64);
 	int wallheight = CalcHeight(ray->xintercept,ray->yintercept)/8;
 
 	if(tilemapaddr!=ray->tilemapaddr || texture!=ray->texture)

@@ -533,7 +533,7 @@ void CheckKeys (void)
 //
 // pause key weirdness can't be checked as a scan code
 //
-    if(buttonstate[bt_pause]) Paused = true;
+/*    if(buttonstate[bt_pause]) Paused = true;
     if(Paused)
     {
         int lastoffs = StopMusic();
@@ -547,7 +547,7 @@ void CheckKeys (void)
         lasttimecount = GetTimeCount();
         return;
     }
-
+*/
 //
 // F1-F7/ESC to enter control panel
 //
@@ -1035,8 +1035,14 @@ static void DoActor(objtype *ob)
 	if (!ob->active && !areabyplayer[ob->areanumber])
 		return;
 
+//	if (!(ob->flags & (FL_NONMARK|FL_NEVERMARK)))
+//		actorat[ob->tilex][ob->tiley] = 0;
+
+//	if (!ob->active && !getareabyplayer(ob->areanumber))
+//		return;
+
 	if (!(ob->flags & (FL_NONMARK|FL_NEVERMARK)))
-		actorat[ob->tilex][ob->tiley] = 0;
+		clear_actor(ob->tilex, ob->tiley);
 
 //
 // non transitional object
@@ -1061,7 +1067,9 @@ static void DoActor(objtype *ob)
 		if ((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
 			return;
 
-		actorat[ob->tilex][ob->tiley] = ob->id | 0x8000;
+//		actorat[ob->tilex][ob->tiley] = ob->id | 0x8000;
+//        actorat[ob->tilex][ob->tiley] = ob;
+		move_actor(ob);
 		return;
 	}
 
@@ -1120,7 +1128,8 @@ think:
 	if ((ob->flags&FL_NONMARK) && actorat[ob->tilex][ob->tiley])
 		return;
 
-	actorat[ob->tilex][ob->tiley] = ob->id | 0x8000;
+//	actorat[ob->tilex][ob->tiley] = ob->id | 0x8000;
+	move_actor(ob);
 }
 
 #else

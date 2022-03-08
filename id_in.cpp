@@ -50,6 +50,7 @@ static KeyboardDef KbdDefs = {
     sc_DownArrow,           // down
     sc_PgDn                 // downright
 };
+
 /*
 =============================================================================
 
@@ -86,8 +87,8 @@ static void processEvent(SDL_Event *event)
 
             if(LastScan<SDLK_LAST)
                 Keyboard[LastScan] = 1;
-            if(LastScan == SDLK_PAUSE)
-                Paused = true;
+//            if(LastScan == SDLK_PAUSE)
+//                Paused = true;
             break;
 		}
 
@@ -131,12 +132,17 @@ void IN_WaitAndProcessEvents()
 
 void IN_ProcessEvents()
 {
-    SDL_Event event1,event2;
+    SDL_Event event1,event2,event3,event4;
 
-	SDL_PollEvent(4,13,&event1);
+	SDL_PollEvent(10,13,&event1);
     processEvent(&event1);
-	SDL_PollEvent(0,4,&event2);
+	SDL_PollEvent(4,8,&event3);
+    processEvent(&event3);
+	SDL_PollEvent(0,4,&event4);
+    processEvent(&event4);
+	SDL_PollEvent(8,10,&event2);
     processEvent(&event2);
+//	IN_ClearKeysDown();
 }
 
 

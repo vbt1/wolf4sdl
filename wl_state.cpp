@@ -86,6 +86,7 @@ boolean CheckSight (objtype *ob);
 #ifdef EMBEDDED
 void SpawnNewObj(unsigned tilex, unsigned tiley, int state) /* stateenum */
 {
+	
 	GetNewActor();
 	
 	newobj->state = state;
@@ -103,6 +104,22 @@ void SpawnNewObj(unsigned tilex, unsigned tiley, int state) /* stateenum */
 	actorat[tilex][tiley] = newobj->id | 0x8000;
 	newobj->areanumber =
 		*(mapsegs[0] + farmapylookup[newobj->tiley]+newobj->tilex) - AREATILE;
+/*
+	GetNewActor();
+	
+	newobj->state = state;
+	if (gamestates[state].tictime)
+		newobj->ticcount = US_RndT () % gamestates[state].tictime;
+	else
+		newobj->ticcount = 0;
+
+	newobj->tilex = tilex;
+	newobj->tiley = tiley;
+	newobj->x = ((long)tilex<<TILESHIFT)+TILEGLOBAL/2;
+	newobj->y = ((long)tiley<<TILESHIFT)+TILEGLOBAL/2;
+	newobj->dir = nodir;
+
+	move_actor(newobj);
 }
 #else
 void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
@@ -125,6 +142,7 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
     actorat[tilex][tiley] = newobj;
     newobj->areanumber =
         *(mapsegs[0] + (newobj->tiley<<mapshift)+newobj->tilex) - AREATILE;
+*/		
 }
 #endif
 
@@ -316,6 +334,8 @@ boolean TryWalk(objtype *ob)
 		}
 	}
 	else
+	{
+//slPrint("active object     ",slLocate(10,10));	
 		switch (ob->dir)
 		{
 		case north:
@@ -404,6 +424,7 @@ boolean TryWalk(objtype *ob)
 		default:
 			Quit ("Walk: Bad dir");
 		}
+	}
 
 	ob->tilex = tilex;
 	ob->tiley = tiley;
@@ -972,7 +993,8 @@ void KillActor (objtype *ob)
 	gamestate.killcount++;
 //#endif
 	ob->flags &= ~FL_SHOOTABLE;
-	clear_actor(ob->tilex, ob->tiley);
+//	clear_actor(ob->tilex, ob->tiley);
+	actorat[ob->tilex][ob->tiley] = NULL;
 	ob->flags |= FL_NONMARK;
 }
 #else
