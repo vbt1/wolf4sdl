@@ -2,6 +2,8 @@
 //#define USE_SPRITES 1
 #include "wl_def.h"
 
+#define USE_SLAVE 1
+
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
 #include "wl_shade.h"
@@ -299,7 +301,7 @@ TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
 inline void loadActorTexture(int texture,unsigned int height,unsigned char *surfacePtr)
 {
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];
-#if 1	
+#if 1
 	*txptr = TEXDEF(64, (height>>6), position_vram);
 	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)surfacePtr,height);
 	texture_list[texture]=position_vram/height/2;
@@ -2982,7 +2984,6 @@ void    ThreeDRefresh (void)
 //
 // show screen and time last cycle
 //
-
     if (fizzlein)
     {
 //		SDL_Rect destrect = { viewscreenx, viewscreeny, viewwidth, viewheight }; 
@@ -3004,6 +3005,7 @@ void    ThreeDRefresh (void)
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
 #endif
+
 		user_wall = (SPRITE *)user_walls+60;
 		
 //		while(tutu==0);
@@ -3018,6 +3020,8 @@ void    ThreeDRefresh (void)
 			user_wall++;
 		}
 
+		
 		DrawPlayerWeapon ();    // draw player's hands
+		
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
 }

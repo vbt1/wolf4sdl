@@ -116,7 +116,9 @@ extern  boolean         //AdLibPresent,
 extern  SDMode          SoundMode;
 extern  SDSMode         DigiMode;
 //extern  SMMode          MusicMode;
-//extern  int             DigiMap[];
+#ifndef USE_ADX	
+extern  int             DigiMap[];
+#endif
 //extern  int             DigiChannel[];
 
 #define GetTimeCount()  ((SDL_GetTicks()*7)/100)

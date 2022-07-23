@@ -77,7 +77,7 @@ void SD_PrepareSound(int which)
 //		if(fileSize>8192 && fileSize<20000)
 		{
 #ifndef USE_ADX				
-			load_8bit_pcm((Sint8*)filename, ORIGSAMPLERATE);
+//			load_8bit_pcm((Sint8*)filename, ORIGSAMPLERATE);
 #else
 			load_adx((Sint8*)filename);
 #endif			

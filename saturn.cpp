@@ -658,7 +658,7 @@ void SDL_PollEvent(int start,int end, SDL_Event *event)
 	if(data & PER_DGT_ST && data & PER_DGT_TA && data & PER_DGT_TB && data & PER_DGT_TC) 
 	{
 		event->type = SDL_QUIT;
-		return 1;
+		return ;
 	}
 	unsigned char *evt=(unsigned char *)vbt_event+start;
 
