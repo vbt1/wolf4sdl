@@ -59,7 +59,7 @@ void VWB_DrawPropString(const char* string)
 =
 =================
 */
-#if 0
+#if 1
 void VL_MungePic (byte *source, unsigned width, unsigned height)
 {
 	unsigned x,y,plane,size,pwidth;

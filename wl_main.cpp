@@ -742,9 +742,23 @@ void SetupWalls (void)
 void SignonScreen (void)                        // VGA version
 {
     VL_SetVGAPlaneMode ();
+#define	SDDRV_ADDR	0x00202000
+	GFS_Load(GFS_NameToId((Sint8*)"BOOTPAL.BIN"),0,(void *) SDDRV_ADDR,512);
+//	VL_SetPalette ((SDL_Color *)SDDRV_ADDR);
+//    SDL_SetColors(curSurface, SDDRV_ADDR, 0, 256);
+extern void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
+//	Pal2CRAM(SDDRV_ADDR , (void *)NBG1_COL_ADR , 256);
+	Uint16 *Pal_Data  = (Uint16 *)SDDRV_ADDR;
+	Uint16 *VRAM = (Uint16 *)NBG1_COL_ADR;
+	
+	for(unsigned int  i = 0; i < 256; i++ )
+		*(VRAM++) = *(Pal_Data++);
 
-//    VL_MungePic (signon,320,200);
+	GFS_Load(GFS_NameToId((Sint8*)"BOOT.BIN"),0,(void *) SDDRV_ADDR,64000);
+
+    VL_MungePic ((void *) SDDRV_ADDR,320,200);
 //    VL_MemToScreen (signon,320,200,0,0);
+    VL_MemToScreen ((byte*)SDDRV_ADDR,320,200,0,0);
 }
 
 
@@ -1175,7 +1189,8 @@ static void InitGame()
         }
     }
 #endif
-	//ajout VBT
+
+//VL_SetPalette (gamepal);
 //param_nowait = true;
 ////slPrint((char *)"VH_Startup     ",slLocate(10,12));
     VH_Startup ();
@@ -1230,6 +1245,9 @@ static void InitGame()
 
 //		slTVOn();
 		slSynch();
+//ajout VBT
+slTVOff();
+SDL_SetColors(curSurface, gamepal, 0, 256);
 //	//slPrint("C4 - 2008-2009     www.rockin-b.de",slLocate(2,29));
 //
 // initialize variables
@@ -1527,7 +1545,7 @@ static void DemoLoop()
 //slPrint((char*)"CA_CacheScreen1",slLocate(10,22));	
             CA_CacheScreen (TITLEPIC);
 //slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
-
+slTVOn();
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #endif

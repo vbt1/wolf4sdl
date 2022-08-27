@@ -52,7 +52,7 @@ SDL_Color curpal[256];
 
 #define CASSERT(x) extern int ASSERT_COMPILE[((x) != 0) * 2 - 1];
 #undef RGB
-#define RGB(r, g, b) {(r)*255/63, (g)*255/63, 0x100 | (b)*255/63}
+#define RGB(r, g, b) {(r)*255/63, (g)*255/63, (b)*255/63}
 //#define RGB(r, g, b) (r<<2,g<<2,b<<2,0)
 
 SDL_Color gamepal[]={

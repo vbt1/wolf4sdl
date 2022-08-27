@@ -2860,7 +2860,8 @@ inline int WallRefresh (void)
 #ifdef USE_SLAVE	
 	extern void AsmRefreshSlave(int *midangle);
 
-	slSlaveFunc(AsmRefreshSlave,(void *)&midangle);
+
+	slSlaveFunc(AsmRefreshSlave,&midangle);
 //	AsmRefreshSlave(&midangle);
 #endif	
 	return AsmRefresh(midangle);

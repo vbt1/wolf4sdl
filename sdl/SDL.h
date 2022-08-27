@@ -210,10 +210,10 @@ typedef struct {
 } SDL_Screen;
 
 typedef struct {
+//	Uint8 unused;
 	Uint8 r;
 	Uint8 g;
 	Uint8 b;
-//	Uint8 unused;
 } SDL_Color;
 
 //typedef Uint16 SDL_Color;
