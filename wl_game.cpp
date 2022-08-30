@@ -503,8 +503,6 @@ void SetupGameLevel (void)
     word *map;
     word tile;
 
-	slIntFunction(VblIn) ;
-
     //if (!loadedgame)
     {
         gamestate.TimeCount

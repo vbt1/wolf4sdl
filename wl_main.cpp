@@ -1167,7 +1167,7 @@ static void InitGame()
 	SDL_SetVideoMode  (screenWidth, screenHeight, screenBits, NULL);
 	SDL_Init(SDL_INIT_AUDIO);
 //#ifndef REMDEBUG
-	slIntFunction(VblIn) ;
+
 //#endif
 //    atexit(SDL_Quit);
     SignonScreen ();
@@ -1242,7 +1242,7 @@ static void InitGame()
     SetupWalls ();
 #endif	
     NewViewSize (viewsize);
-
+	slIntFunction(VblIn) ;
 //		slTVOn();
 		slSynch();
 //ajout VBT
