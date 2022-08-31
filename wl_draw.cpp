@@ -232,6 +232,41 @@ static boolean inline TransformTile (int tx, int ty, short *dispx, short *disphe
     else
         return false;
 }
+
+/*
+=====================
+=
+= CalcRotate
+=
+=====================
+*/
+
+inline int CalcRotate (objtype *ob)
+{
+    int angle;
+
+    // this isn't exactly correct, as it should vary by a trig value,
+    // but it is close enough with only eight rotations
+
+    int viewangle = player->angle + (centerx - ob->viewx)/8;
+
+    if (ob->obclass == rocketobj || ob->obclass == hrocketobj)
+        angle = (viewangle-180) - ob->angle;
+    else
+        angle = (viewangle-180) - dirangle[ob->dir];
+
+    angle+=ANGLES/16;
+    while (angle>=ANGLES)
+        angle-=ANGLES;
+    while (angle<0)
+        angle+=ANGLES;
+
+    if (gamestates[ob->state].rotate == 2)  // 2 rotation pain frame
+        return 4*(angle/(ANGLES/2));        // pain with shooting frame bugfix
+
+    return angle/(ANGLES/8);
+}
+
 /*
 ====================
 =
@@ -496,40 +531,6 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 }
 
 //==========================================================================
-
-/*
-=====================
-=
-= CalcRotate
-=
-=====================
-*/
-
-inline int CalcRotate (objtype *ob)
-{
-    int angle;
-
-    // this isn't exactly correct, as it should vary by a trig value,
-    // but it is close enough with only eight rotations
-
-    int viewangle = player->angle + (centerx - ob->viewx)/8;
-
-    if (ob->obclass == rocketobj || ob->obclass == hrocketobj)
-        angle = (viewangle-180) - ob->angle;
-    else
-        angle = (viewangle-180) - dirangle[ob->dir];
-
-    angle+=ANGLES/16;
-    while (angle>=ANGLES)
-        angle-=ANGLES;
-    while (angle<0)
-        angle+=ANGLES;
-
-    if (gamestates[ob->state].rotate == 2)  // 2 rotation pain frame
-        return 0;               // pain with shooting frame bugfix
-
-    return angle/(ANGLES/8);
-}
 
 inline void ScaleShape (int xcenter, int shapenum, unsigned width)
 {
@@ -846,9 +847,9 @@ static void DrawScaleds (void)
 
 		spotloc = (obj->tilex << 6) + obj->tiley;
 		tilespot = &tilemap[0][0] + spotloc;
-		spota = spotvis[0][obj->tilex-1];
-		spotb = spotvis[0][obj->tilex];
-		spotc = spotvis[0][obj->tilex+1];
+		spota = spotvis[obj->tilex-1];
+		spotb = spotvis[obj->tilex];
+		spotc = spotvis[obj->tilex+1];
 		spotmask = 1ull << obj->tiley;
 
 		//

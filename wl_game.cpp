@@ -543,6 +543,11 @@ void SetupGameLevel (void)
 //
     memset (tilemap,0,sizeof(tilemap));
     memset (actorat,0,sizeof(actorat));
+	memset(objactor, 0, sizeof(objactor));	
+
+	InitActorList();	/* start spawning things with a clean slate */
+	InitDoorList();
+	InitStaticList();
 	
     map = mapsegs[0];
     for (y=0;y<mapheight;y++)
