@@ -1,7 +1,7 @@
 #include "wl_def.h"
 
 #define LOADADDR 0x00242000
-#define NB_WALL_HWRAM 52
+#define NB_WALL_HWRAM 50
 //#define NB_WALL_HWRAM 39
 
 int PMSpriteStart;
@@ -85,6 +85,7 @@ void PM_Startup()
 	
 	uint8_t *ptr = (uint8_t *)wallData;
 	
+///------------------------ début murs
     for(i = 0; i < NB_WALL_HWRAM; i++)
     {
         PMPages[i] = ptr;
@@ -106,6 +107,8 @@ void PM_Startup()
 		memcpyl(ptr,&Chunks[pageOffsets[i]],0x1000);
 		ptr+=0x1000;
 	}
+///------------------------ fin murs
+	
 	ptr = (uint8_t *)0x00202000;
 	ptr = PM_DecodeSprites2(PMSpriteStart,PMSpriteStart+SPR_NULLSPRITE,ptr,pageOffsets,pageLengths,Chunks);
 

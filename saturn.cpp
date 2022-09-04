@@ -1161,9 +1161,9 @@ void	satPlayMusic( Uint8 track ){
 		tno[0]=0;
 	}
   
-//	char toto[50];
-//	sprintf(toto,"start track **%d\n%d\n**new start  : %d**",tno[0],track,track+tno[0])  ;
-//slPrintHex(track + tno[0],slLocate(10,8));
+	char toto[50];
+	sprintf(toto,"start track **%d\n%d\n**new start  : %d**",tno[0],track,track+tno[0])  ;
+	slPrintHex(track + tno[0],slLocate(10,8));
 //	FNT_Print256_2bpp((volatile Uint8 *)SCL_VDP2_VRAM_B1,(Uint8 *)toto,84,100,2,8,9,0);
 
 //    CDC_PLY_PMODE(&playdata) = CDC_PTYPE_NOCHG;//CDC_PM_DFL + 30;	// Play Mode. 

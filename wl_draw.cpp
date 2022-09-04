@@ -305,12 +305,21 @@ TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
 
 inline void loadActorTexture(int texture,unsigned int height,unsigned char *surfacePtr)
 {
+	
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];
 #if 1
+	slPrintHex(texture,slLocate(10,18));
+	slPrintHex(position_vram,slLocate(10,19));
+//if (position_vram<0x36000)
+{
 	*txptr = TEXDEF(64, (height>>6), position_vram);
 	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)surfacePtr,height);
-	texture_list[texture]=position_vram/height/2;
-	position_vram+=height/2;	
+//	memset((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),texture,height);
+	texture_list[texture]=1;//position_vram/height/2;
+//	position_vram+=height/2;	
+	position_vram+=height;	
+//	position_vram+=0x800;
+}
 #else	
 	*txptr = TEXDEF(64, 64, position_vram);
 	memcpyl((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)PM_GetSprite(texture),0x1000);
@@ -319,6 +328,7 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 	texture_list[texture]=position_vram/0x800;
 	position_vram+=0x800;	
 #endif
+
 //	slDMAWait();
 }
 #endif
@@ -530,6 +540,8 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 #endif
 }
 
+int tempx=0;
+
 //==========================================================================
 
 inline void ScaleShape (int xcenter, int shapenum, unsigned width)
@@ -552,9 +564,18 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
 	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
 	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
 	unsigned int height=(nextSurfacePtr-surfacePtr)>>6;
-	
-	if(texture_list[shapenum]==0xff)
-		loadActorTexture(shapenum,height<<6,surfacePtr);
+
+
+//	if(tempx <60)
+	{
+//		slPrintHex(tempx,slLocate(10,12));
+		
+		if(!texture_list[shapenum])
+		{
+			loadActorTexture(shapenum,height<<6,surfacePtr);
+//			tempx++;
+		}
+	}
 //--------------------------------------------------------------------------------------------
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+shapenum]; 
 // correct on touche pas		
@@ -686,6 +707,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
     user_sprite.GRDA=0;
 	
 	slSetSprite(&user_sprite, toFIXED(10));// à remettre	// arme
+	
 //--------------------------------------------------------------------------------------------	
 #else
 	unsigned pixheight=scale*SPRITESCALEFACTOR;
@@ -1750,7 +1772,7 @@ void    ThreeDRefresh (void)
 		
 		if(position_vram>0x38000)
 		{
-			memset(texture_list,0xFF,SPR_NULLSPRITE);
+			memset(texture_list,0x00,SPR_NULLSPRITE);
 //			position_vram = (SATURN_WIDTH+64)*32+static_items*0x800;
 			position_vram = (SATURN_WIDTH+64)*32;
 		}
