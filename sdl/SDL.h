@@ -12,10 +12,19 @@ extern "C" {
 #include "sega_gfs.h"
 #include "sega_tim.h"
 //#ifdef __cplusplus
+
+ void SYS_CHGSCUIM_NR(Uint32 AndMask,Uint32 OrMask);
 }
 //#endif
 
+#undef cgaddress
+#undef pal
+#undef TEXDEF
 
+#define	cgaddress	0x8000 //SpriteBufSize
+#define	cgaddress8	cgaddress/8
+#define pal COL_256
+#define TEXDEF(h,v,presize)		{h,v,(cgaddress+(((presize)*4)>>(pal)))/8,(((h)&0x1f8)<<5 | (v))}
 
 //#include "images.h"
 #include "SDL_keysym.h"
@@ -37,15 +46,15 @@ extern "C" {
 #define PCM_CALC_OCT(smpling_rate) 											\
 		((Sint32)logtbl[PCM_SCSP_FREQUENCY / ((smpling_rate) + 1)])
 
-/* ƒVƒtƒgŠî€Žü”g”‚ÌŒvŽZ */
+/* ?V?t?g?õT???g????v?Z */
 #define PCM_CALC_SHIFT_FREQ(oct)											\
 		(PCM_SCSP_FREQUENCY >> (oct))
 
-/* ‚e‚m‚r‚ÌŒvŽZ */
+/* ?e?m?r??v?Z */
 #define PCM_CALC_FNS(smpling_rate, shift_freq)								\
 		((((smpling_rate) - (shift_freq)) << 10) / (shift_freq))
 
-/* SATURN Sound Driver ƒpƒ‰ƒ[ƒ^Ý’è’l */
+/* SATURN Sound Driver ?p?????[?^???l */
 #define PCM_SET_STMNO(para)													\
 		((Uint8)PCM_MSK3((para)->pcm_stream_no))
 #define PCM_SET_LEVEL_PAN(para)												\
@@ -63,7 +72,7 @@ extern "C" {
 
 #ifndef ACTION_REPLAY
 #define MAX_OPEN        24 //a ne pas modifier
-#define MAX_DIR         64//384
+#define MAX_DIR         128//384
 #else
 #define MAX_OPEN        2
 #define MAX_DIR         1
@@ -210,10 +219,10 @@ typedef struct {
 } SDL_Screen;
 
 typedef struct {
-//	Uint8 unused;
 	Uint8 r;
 	Uint8 g;
 	Uint8 b;
+//	Uint8 unused;
 } SDL_Color;
 
 //typedef Uint16 SDL_Color;

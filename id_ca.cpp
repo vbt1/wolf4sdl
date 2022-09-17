@@ -1130,10 +1130,10 @@ void CA_CacheScreen (int chunk)
 
     for(unsigned int y = 0; y < 200; y++)
     {
-        for(unsigned int x = 0; x < SATURN_WIDTH; x++)
+        for(unsigned int x = 0; x < 320; x++)
         {
             byte col = pic[(y * 80 + (x >> 2)) + (x & 3) * 80 * 200];
-			byte *vbufptr= (byte *)(vbuf+(y* curPitch +x) *scaleFactor);
+			byte *vbufptr= (byte *)(vbuf+(y* curPitch +x) *scaleFactor)+16;
 
 			for(unsigned i = 0; i < scaleFactor; i++)
 			{

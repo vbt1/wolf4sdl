@@ -758,7 +758,7 @@ extern void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
 
     VL_MungePic ((void *) SDDRV_ADDR,320,200);
 //    VL_MemToScreen (signon,320,200,0,0);
-    VL_MemToScreen ((byte*)SDDRV_ADDR,320,200,0,0);
+    VL_MemToScreen ((byte*)SDDRV_ADDR,320,200,16,0);
 }
 
 
