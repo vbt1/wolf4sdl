@@ -306,6 +306,7 @@ TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
 inline void loadActorTexture(int texture,unsigned int height,unsigned char *surfacePtr)
 {
 	
+//	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];
 
 //	slPrintHex(texture,slLocate(10,18));
@@ -652,7 +653,16 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
             }
         }
     }
-#endif	
+#endif
+/*
+	if(shapenum>=SPR_DOG_W1_1 && shapenum <=SPR_DOG_JUMP3)
+	{
+slPrintHex(shapenum,slLocate(10,4));		
+slPrint("dog found !!!",slLocate(10,5));	
+		slSynch();
+		while(1);
+	}
+*/	
 }
 #ifdef USE_SPRITES
 int old_texture = -1;

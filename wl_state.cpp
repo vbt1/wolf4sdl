@@ -1160,6 +1160,7 @@ void DamageActor (objtype *ob, unsigned damage)
     if ( !(ob->flags & FL_ATTACKMODE) )
         damage <<= 1;
 
+//    ob->hitpoints= 1; //-= (short)damage;
     ob->hitpoints -= (short)damage;
 
     if (ob->hitpoints<=0)
@@ -1174,9 +1175,11 @@ void DamageActor (objtype *ob, unsigned damage)
             case guardobj:
                 if (ob->hitpoints&1)
 #ifdef EMBEDDED
+
                     NewState (ob,s_grdpain);
                 else
                     NewState (ob,s_grdpain1);
+				
 #else
                     NewState (ob,&s_grdpain);
                 else

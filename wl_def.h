@@ -797,7 +797,7 @@ typedef void (* statefunc) (void *);
 typedef struct statestruct
 {
 	boolean	rotate:2;
-	int shapenum:10; /* a shapenum of -1 means get from ob->temp1 */
+	int shapenum; /* a shapenum of -1 means get from ob->temp1 */
 	int tictime:10;
 	void (*think)(), (*action)();
 	int next:10; /* stateenum */
