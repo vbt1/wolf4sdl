@@ -48,8 +48,8 @@ void PM_Startup()
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
     CHECKMALLOCRESULT(PMPages);	
 
-	uint32_t* pageOffsets = (uint32_t *)SATURN_CHUNK_ADDR; 
-	word *pageLengths = (word *)SATURN_CHUNK_ADDR+(ChunksInFile + 1) * sizeof(int32_t);
+	uint32_t* pageOffsets = (uint32_t *)saturnChunk; 
+	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
  
 	for(i=0;i<ChunksInFile;i++)
 	{

@@ -73,7 +73,12 @@ void VL_MungePic (byte *source, unsigned width, unsigned height)
 //
 // copy the pic to a temp buffer
 //
-	temp=(byte *)SATURN_CHUNK_ADDR; //malloc(size);
+#ifdef USE_HWRAM_CHUNK
+	saturnChunk = (uint8_t *) malloc(0x9000);
+#else
+	saturnChunk = (uint8_t *) 0x002F0000;
+#endif
+	temp=(byte *)saturnChunk; //malloc(size);
 //	temp=(byte *)malloc(size);
     CHECKMALLOCRESULT(temp);
 	memcpy (temp,source,size);

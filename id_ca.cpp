@@ -153,10 +153,10 @@ int     numEpisodesMissing = 0;
 char extension[5]; // Need a string, not constant to change cache files
 //char graphext[5];
 //char audioext[5];
-static const char gheadname[] = "vgahead.";
-static const char gfilename[] = "vgagraph.";
-static const char gdictname[] = "vgadict.";
-static const char mheadname[] = "maphead.";
+static const char gheadname[] = "VGAHEAD.";
+static const char gfilename[] = "VGAGRAPH.";
+static const char gdictname[] = "VGADICT.";
+static const char mheadname[] = "MAPHEAD.";
 //static const char mfilename[] = "maptemp.";
 //static const char aheadname[] = "audiohed.";
 //static const char afilename[] = "audiot.";
@@ -209,8 +209,8 @@ int32_t CAL_GetGrChunkLength (int chunk)
 
 	uint8_t *Chunks;
 	uint16_t delta = (uint16_t)(GRFILEPOS(chunk)/2048);
-	uint32_t delta2 = (GRFILEPOS(chunk) - delta*2048); 
-	Chunks=(uint8_t*)SATURN_CHUNK_ADDR;
+	uint32_t delta2 = (GRFILEPOS(chunk) - delta*2048);
+	Chunks=(uint8_t*)saturnChunk;
 	
 //	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(grhandle, delta, (void *)Chunks, sizeof(chunkexplen)+delta2);
@@ -483,12 +483,12 @@ void CAL_SetupGrFile (void)
 
     strcpy(fname,gdictname);
     strcat(fname,extension);
-
+/*
 	while (fname[j])
 	{
 		fname[j]= toupper(fname[j]);
 		j++;
-	}
+	}*/
 //	i=0;
 
     //handle = open(fname, O_RDONLY | O_BINARY);
@@ -498,7 +498,7 @@ void CAL_SetupGrFile (void)
 
 	fileId = GFS_NameToId((Sint8*)fname);
 //	fileSize = GetFileSize(fileId);
-	compseg=(Uint8 *)SATURN_CHUNK_ADDR+0xF000;
+	compseg=(Uint8 *)saturnChunk+0x8000;
 //	CHECKMALLOCRESULT(vbtHuff);
 
 	GFS_Load(fileId, 0, (void *)compseg, sizeof(grhuffman));
@@ -600,7 +600,7 @@ void CAL_SetupGrFile (void)
     CHECKMALLOCRESULT(pictable);
     int32_t   chunkcomplen = CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
 //	compseg =(byte*)malloc((chunkcomplen));
-	compseg =(byte*)SATURN_CHUNK_ADDR;
+	compseg =(byte*)saturnChunk;
 //	CHECKMALLOCRESULT(compseg);
 	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen));
 //    CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
@@ -759,17 +759,17 @@ long CAL_SetupMapFile (int mapnum)
 
 	Sint32 fileId;
 	i=0;
-	while (fname[i])
+/*	while (fname[i])
 	{
 		fname[i]= toupper(fname[i]);
 		i++;
 	}	 
-	i=0;
+	i=0;*/
 	fileId = GFS_NameToId((Sint8*)fname);
 //	fileSize = GetFileSize(fileId); // utile
     length = NUMMAPS*4+2; // used to be "filelength(handle);"
 //    mapfiletype *tinf=(mapfiletype *) malloc(sizeof(mapfiletype));
-	mapfiletype *tinf=(mapfiletype *)SATURN_CHUNK_ADDR;
+	mapfiletype *tinf=(mapfiletype *)saturnChunk;
 	GFS_Load(fileId, 0, (void *)tinf, length);
     //read(handle, tinf, length);
 
@@ -781,14 +781,14 @@ long CAL_SetupMapFile (int mapnum)
 // open the data file
 //
 #ifdef CARMACIZED
-    strcpy(fname, "gamemaps.");
+    strcpy(fname, "GAMEMAPS.");
     strcat(fname, extension);
 
-	while (fname[i])
+/*	while (fname[i])
 	{
 		fname[i]= toupper(fname[i]);
 		i++;
-	}	 
+	}*/
 	maphandle = GFS_NameToId((Sint8*)fname);
 	fileSize = GetFileSize(maphandle);
 #else
@@ -803,7 +803,7 @@ long CAL_SetupMapFile (int mapnum)
 //
 // load all map header
 //
-	uint8_t *maphandleptr = (uint8_t*)((SATURN_CHUNK_ADDR+sizeof(mapfiletype)+ (4 - 1)) & -4);
+	uint8_t *maphandleptr = (uint8_t*)(((int)saturnChunk+sizeof(mapfiletype)+ (4 - 1)) & -4);
 	GFS_Load(maphandle, 0, (void *)maphandleptr, fileSize);
 
 //slPrintHex(fileSize,slLocate(10,14));
@@ -813,7 +813,7 @@ long CAL_SetupMapFile (int mapnum)
 		return fileSize;
 //	if(mapheaderseg[mapnum]==NULL)	mapheaderseg[mapnum]=(maptype *) malloc(sizeof(maptype));
 #ifndef EMBEDDED
-	mapheaderseg[mapnum]=(maptype *) ((SATURN_CHUNK_ADDR+sizeof(mapfiletype)+fileSize + (8 - 1)) & -4);
+	mapheaderseg[mapnum]=(maptype *) ((saturnChunk+sizeof(mapfiletype)+fileSize + (8 - 1)) & -4);
 //	CHECKMALLOCRESULT(mapheaderseg[mapnum]);
 	//read (maphandle,(memptr)mapheaderseg[i],sizeof(maptype));
 	memcpy((memptr)mapheaderseg[mapnum],&maphandleptr[pos],sizeof(maptype));
@@ -1025,9 +1025,9 @@ void CA_CacheGrChunk (int chunk)
 		uint32_t delta2;
 		Uint16 i,j=0;
 		delta = (uint16_t)(pos/2048);
-		delta2 = (pos - delta*2048); 
-
-	Chunks=(uint8_t*)SATURN_CHUNK_ADDR;  // déplacé pour pas écraser de son
+		delta2 = (pos - delta*2048);
+		
+	Chunks=(uint8_t*)saturnChunk;  // déplacé pour pas écraser de son
 //	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(grhandle, delta, (void *)Chunks, compressed+delta2);
 	Chunks+=delta2;
@@ -1107,7 +1107,8 @@ void CA_CacheScreen (int chunk)
 	uint32_t delta2;
 	delta = (uint16_t)(pos/2048);
 	delta2 = (pos - delta*2048); 
-	Chunks=(uint8_t*)SATURN_CHUNK_ADDR+0x4000;
+
+	Chunks=(uint8_t*)saturnChunk+0x4000;
 	bigbufferseg=(uint8_t*)screen->pixels;
 	GFS_Load(grhandle, delta, (void *)Chunks, compressed+delta2);
 	memcpy(bigbufferseg,(const void *)&Chunks[delta2],compressed);
@@ -1123,7 +1124,7 @@ void CA_CacheScreen (int chunk)
 // Sprites need to have shifts made and various other junk
 //
 //    byte *pic = (byte *) malloc(64000);
-	byte *pic = (byte *)SATURN_CHUNK_ADDR;
+	byte *pic = (byte *)saturnChunk;
     CAL_HuffExpand((byte *) source, (byte *)pic, expanded, grhuffman);
 
 	byte *vbuf = LOCK();
@@ -1184,7 +1185,7 @@ void CA_CacheMap (int mapnum)
 // load the planes into the allready allocated buffers
 //
     size = maparea*2;
-	uint8_t *Chunks=(uint8_t*)SATURN_CHUNK_ADDR;   // écrase les sons
+	uint8_t *Chunks=(uint8_t*)saturnChunk;   // écrase les sons
 //	uint8_t *Chunks=(uint8_t*)malloc(fileSize);   // écrase les sons
 //slPrintHex(maphandle,slLocate(10,19));
 //slPrintHex(fileSize,slLocate(10,20));
@@ -1212,7 +1213,7 @@ void CA_CacheMap (int mapnum)
 //            bigbufferseg=malloc(compressed);
 //            CHECKMALLOCRESULT(bigbufferseg);
 //            source = (byte *) bigbufferseg;
-			  source = (byte *) SATURN_CHUNK_ADDR+0X8000;
+			  source = (byte *) saturnChunk+0X8000;
         }
 		memcpy(source,&Chunks[pos],compressed);
         //read(maphandle,source,compressed);

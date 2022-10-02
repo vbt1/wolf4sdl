@@ -5,13 +5,14 @@
 #define PONY 1 
 #define USE_ADX 1
 #define USE_SLAVE 1
+//#define USE_HWRAM_CHUNK 1
 #define EMBEDDED 1
 #define SATURN_WIDTH 352
 #define SATURN_SORT_VALUE 240
-#define SATURN_MAPSEG_ADDR 0x2002EA000
-#define SATURN_CHUNK_ADDR 0x002F0000
 // 240 pour du 320, 264 pour du 352
 #define		LINE_COLOR_TABLE		(VDP2_VRAM_A0	+ 0x1f400)
+
+extern unsigned char *saturnChunk;
 
 extern "C" {
 #include <malloc.h>
@@ -796,11 +797,11 @@ typedef void (* statefunc) (void *);
 #ifdef EMBEDDED
 typedef struct statestruct
 {
-	boolean	rotate:2;
+	boolean	rotate;
 	int shapenum; /* a shapenum of -1 means get from ob->temp1 */
-	int tictime:10;
+	int tictime;
 	void (*think)(), (*action)();
-	int next:10; /* stateenum */
+	int next; /* stateenum */
 } statetype;
 #else
 typedef struct statestruct

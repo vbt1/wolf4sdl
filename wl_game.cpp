@@ -655,7 +655,7 @@ void SetupGameLevel (void)
         }
     }
 	//VGAClearScreen ();
-//	slPrint("slScrTransparent1",slLocate(1,17));	
+//	slPrint("slScrTransparent1",slLocate(1,17));
 	slScrTransparent(0);
 	slSynch();
 	extern const void * TransList;

@@ -30,6 +30,7 @@
 #define STR_GAME	"Game"
 #define STR_DEMO	"Demo"
 #define STR_LGC		"Load Game called\n\""
+/*
 #define STR_EMPTY	"empty"
 #define STR_CALIB	"Calibrate"
 #define STR_JOYST	"Joystick"
@@ -49,12 +50,12 @@
 #define	STR_GAMEPAD	"Gravis GamePad Enabled"
 #define	STR_SENS	"Mouse Sensitivity"
 #define	STR_CUSTOM	"Customize controls"
-
+*/
 #define	STR_DADDY	"Can I play, Daddy?"
 #define	STR_HURTME	"Don't hurt me."
 #define	STR_BRINGEM	"Bring 'em on!"
 #define	STR_DEATH	"I am Death incarnate!"
-
+/*
 #define	STR_MOUSEADJ	"Adjust Mouse Sensitivity"
 #define STR_SLOW	    "Slow"
 #define STR_FAST	    "Fast"
@@ -68,11 +69,12 @@
 #define	STR_RIGHT	"Right"
 #define	STR_FRWD	"Frwd"
 #define	STR_BKWD	"Bkwrd"
+*/
 #define	STR_THINK	"Thinking"
 
 #define STR_SIZE1	"Use arrows to size"
-#define STR_SIZE2	"ENTER to accept"
-#define STR_SIZE3	"ESC to cancel"
+#define STR_SIZE2	"A to accept"
+#define STR_SIZE3	"START to cancel"
 
 #define STR_YOUWIN	"you win!"
 

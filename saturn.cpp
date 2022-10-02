@@ -17,7 +17,7 @@ extern "C" {
 //#endif
 
 }
-
+unsigned char *saturnChunk;
 //
 #ifdef USE_SPRITES
 extern TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
