@@ -12,7 +12,7 @@ void heapWalk();
 #ifdef USE_SPRITES
 static unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
 
- SPRITE user_walls[120];
+ SPRITE user_walls[MAX_WALLS];
 extern 	TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
 extern unsigned char texture_list[SPR_NULLSPRITE];
 extern unsigned int position_vram;
@@ -1816,12 +1816,12 @@ void    ThreeDRefresh (void)
     }
 #endif
 
-		user_wall = (SPRITE *)user_walls+60;
+		user_wall = (SPRITE *)user_walls+(MAX_WALLS/2);
 		
 //		while(tutu==0);
 		
 		
-		nb=tutu-60;
+		nb=tutu-(MAX_WALLS/2);
 
 		for(unsigned int pixx=0;pixx<=nb;pixx++)
 		{

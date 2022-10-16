@@ -88,7 +88,7 @@ int lastgamemusicoffset = 0;
 extern unsigned int position_vram;
 extern unsigned int static_items;
 extern unsigned char wall_buffer[(SATURN_WIDTH+64)*64];
-extern SPRITE user_walls[SATURN_WIDTH];
+extern SPRITE user_walls[MAX_WALLS];
 extern char texture_list[SPR_NULLSPRITE];
 #endif
 //===========================================================================

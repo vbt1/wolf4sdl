@@ -43,7 +43,8 @@
 #define CENTERX         ((int) screenWidth / 2)
 #define CENTERY         ((int) screenHeight / 2)
 
-#define MENU_X  76
+#define SATURN_ADJUST (SATURN_WIDTH-320)/2
+#define MENU_X  76+SATURN_ADJUST
 #define MENU_Y  55
 #define MENU_W  178
 #ifndef SPEAR
@@ -56,7 +57,7 @@
 #define MENU_H  13*9+6
 #endif
 
-#define SM_X    48
+#define SM_X    48+SATURN_ADJUST
 #define SM_W    250
 
 #define SM_Y1   20
@@ -76,14 +77,14 @@
 #define LSM_W   175
 #define LSM_H   10*13+10
 
-#define NM_X    50
+#define NM_X    50 + SATURN_ADJUST
 #define NM_Y    100
 #define NM_W    225
 #define NM_H    13*4+15
 
 #define NE_X    10
 #define NE_Y    23
-#define NE_W    320-NE_X*2
+#define NE_W    SATURN_WIDTH-NE_X*2
 #define NE_H    200-NE_Y*2
 
 #define CST_X           20

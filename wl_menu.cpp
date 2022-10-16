@@ -503,9 +503,9 @@ DrawMainMenu (void)
 #else
     ClearMScreen ();
 
-    VWB_DrawPic (112, 184, C_MOUSELBACKPIC);
+    VWB_DrawPic (112+SATURN_ADJUST, 184, C_MOUSELBACKPIC);
     DrawStripes (10);
-    VWB_DrawPic (84, 0, C_OPTIONSPIC);
+    VWB_DrawPic (84+SATURN_ADJUST, 0, C_OPTIONSPIC);
 
 #ifdef SPANISH
     DrawWindow (MENU_X - 8, MENU_Y - 3, MENU_W + 8, MENU_H, BKGDCOLOR);
@@ -939,7 +939,7 @@ DrawNewEpisode (void)
     CA_CacheScreen (S_EPISODEPIC);
 #else
     ClearMScreen ();
-    VWB_DrawPic (112, 184, C_MOUSELBACKPIC);
+    VWB_DrawPic (112+SATURN_ADJUST, 184, C_MOUSELBACKPIC);
 
     DrawWindow (NE_X - 4, NE_Y - 4, NE_W + 8, NE_H + 8, BKGDCOLOR);
     SETFONTCOLOR (READHCOLOR, BKGDCOLOR);
@@ -976,7 +976,7 @@ DrawNewGame (void)
     CA_CacheScreen (S_SKILLPIC);
 #else
     ClearMScreen ();
-    VWB_DrawPic (112, 184, C_MOUSELBACKPIC);
+    VWB_DrawPic (112+SATURN_ADJUST, 184, C_MOUSELBACKPIC);
 
     SETFONTCOLOR (READHCOLOR, BKGDCOLOR);
     PrintX = NM_X + 20;
