@@ -1,7 +1,7 @@
 #include "wl_def.h"
 
 #define LOADADDR 0x00242000
-#define NB_WALL_HWRAM 50
+#define NB_WALL_HWRAM 56
 //#define NB_WALL_HWRAM 39
 
 int PMSpriteStart;
@@ -166,7 +166,6 @@ uint8_t * PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageO
 			shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
 		}
 
-//		static byte bmpbuff[0x1000];
 		byte *bmpptr,*sprdata8;
 		unsigned short  *cmdptr;
 
@@ -204,53 +203,25 @@ uint8_t * PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageO
 
 		cmdptr = shape->dataofs;		
 
-//char toto[100];
-
 		for (int x = (shape->leftpix); x <= (shape->rightpix); x++)
 		{
 			byte *sprdata8 = ((unsigned char  *)shape+*cmdptr);
 			bmpptr = (byte *)bmpbuff+x;
-/*
-sprintf(toto,"l %04x r %04x min %02d       ",shape->leftpix,shape->rightpix,count_00);//,count_01);
-//		if(i==SPR_STAT_0)
-slPrint(toto,slLocate(5,6));
-			
-sprintf(toto,"%03d str %04x end %04x  ",i-start,(sprdata8[4]|sprdata8[5]<<8)/2,(sprdata8[0]|sprdata8[1]<<8)/2);
-slPrint(toto,slLocate(5,9));
 
-//sprintf(toto,"%03d spdt %04x r %04x  ",i-start,SWAP_BYTES_16(sprdata[2]));
-sprintf(toto,"%03d dtofs %04x  sz %04x",i-start,*cmdptr,size);
-slPrint(toto,slLocate(5,11));
-*/
 			while ((sprdata8[0]|sprdata8[1]<<8) != 0)
 			{
 				for (int y = (sprdata8[4]|sprdata8[5]<<8)/2; y < (sprdata8[0]|sprdata8[1]<<8)/2; y++)
 //				for (int y = (sprdata8[4]|sprdata8[5]<<8)/2; y < count_01; y++)
 				{
-//					if(i-start!=186)
-					{
-						bmpptr[(y-count_00)<<6] = *sprptr++;
-						if(bmpptr[(y-count_00)<<6]==0) bmpptr[(y-count_00)<<6]=0xa0;					
-					}
+					bmpptr[(y-count_00)<<6] = *sprptr++;
+					if(bmpptr[(y-count_00)<<6]==0) bmpptr[(y-count_00)<<6]=0xa0;					
 				}
-/*		sprintf(toto,"%03d str %04x end %04x  ",i-start,(sprdata8[4]|sprdata8[5]<<8)/2,(sprdata8[0]|sprdata8[1]<<8)/2);
-slPrint(toto,slLocate(5,10));		*/
 				sprdata8 += 6;
 			}
 			cmdptr++;
 		}
-/*		sprintf(toto,"%03d memcpy  ",i-start);
-slPrint(toto,slLocate(5,11));*/
-
 		memcpyl((void *)ptr,bmpbuff,(64-count_00)<<6);
-
-/*		sprintf(toto,"%03d ptr++  ",i-start);
-slPrint(toto,slLocate(5,12));*/
-		
 		ptr+=((64-count_00)<<6);
-
-/*		sprintf(toto,"%03d end  ",i-start);
-slPrint(toto,slLocate(5,12));*/
 	}
 	return ptr;
 }

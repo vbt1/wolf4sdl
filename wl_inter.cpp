@@ -948,7 +948,7 @@ done:   itoa (kr, tempstr);
 =
 =================
 */
-
+#if 0
 boolean
 PreloadUpdate (unsigned current, unsigned total)
 {
@@ -976,7 +976,7 @@ PreloadUpdate (unsigned current, unsigned total)
 //      else
     return (false);
 }
-
+#endif
 void
 PreloadGraphics (void)
 {
@@ -1255,7 +1255,7 @@ CheckHighScore (int32_t score, word other)
     }
 }
 
-
+#if 0
 #ifndef UPLOAD
 #ifndef SPEAR
 #ifndef JAPAN
@@ -1475,7 +1475,7 @@ BackDoor (char *s)
     return 0;
 }
 
-#if 0
+
 void
 CopyProtection (void)
 {
