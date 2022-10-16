@@ -1052,15 +1052,15 @@ DrawHighScores (void)
     ClearMScreen ();
     DrawStripes (10);
 
-    VWB_DrawPic (48, 0, HIGHSCORESPIC);
+    VWB_DrawPic (48+ SATURN_ADJUST, 0, HIGHSCORESPIC);
     UNCACHEGRCHUNK (HIGHSCORESPIC);
 
 #ifndef APOGEE_1_0
-    VWB_DrawPic (4 * 8, 68, C_NAMEPIC);
-    VWB_DrawPic (20 * 8, 68, C_LEVELPIC);
-    VWB_DrawPic (28 * 8, 68, C_SCOREPIC);
+    VWB_DrawPic (SATURN_ADJUST + 4 * 8, 68, C_NAMEPIC);
+    VWB_DrawPic (SATURN_ADJUST + 20 * 8, 68, C_LEVELPIC);
+    VWB_DrawPic (SATURN_ADJUST + 28 * 8, 68, C_SCOREPIC);
 #else
-    VWB_DrawPic(35*8,68,C_CODEPIC);
+    VWB_DrawPic(SATURN_ADJUST + 35*8,68,C_CODEPIC);
 #endif
     fontnumber = 0;
 
@@ -1092,9 +1092,9 @@ DrawHighScores (void)
         // name
         //
 #ifndef SPEAR
-        PrintX = 4 * 8;
+        PrintX = SATURN_ADJUST + 4 * 8;
 #else
-        PrintX = 16;
+        PrintX = SATURN_ADJUST + 16;
 #endif
         US_Print (s->name);
 
@@ -1106,10 +1106,10 @@ DrawHighScores (void)
         for (str = buffer; *str; str++)
             *str = *str + (129 - '0');  // Used fixed-width numbers (129...)
         USL_MeasureString (buffer, &w, &h);
-        PrintX = (22 * 8) - w;
+        PrintX = SATURN_ADJUST + (22 * 8) - w;
 #else
         USL_MeasureString (buffer, &w, &h);
-        PrintX = 194 - w;
+        PrintX = SATURN_ADJUST + 194 - w;
 #endif
 
 #ifndef UPLOAD
@@ -1137,10 +1137,10 @@ DrawHighScores (void)
         for (str = buffer; *str; str++)
             *str = *str + (129 - '0');  // Used fixed-width numbers (129...)
         USL_MeasureString (buffer, &w, &h);
-        PrintX = (34 * 8) - 8 - w;
+        PrintX = SATURN_ADJUST + (34 * 8) - 8 - w;
 #else
         USL_MeasureString (buffer, &w, &h);
-        PrintX = 292 - w;
+        PrintX = SATURN_ADJUST + 292 - w;
 #endif
         US_Print (buffer);
 
