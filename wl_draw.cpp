@@ -554,7 +554,7 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
     if(!scalel) return;   // too close or far away
     pixwidth=scalel*SPRITESCALEFACTOR;
 
-
+//shapenum=SPR_DEMO+1;
 #ifdef USE_SPRITES
 	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
 	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);

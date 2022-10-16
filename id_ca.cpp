@@ -465,7 +465,7 @@ void CAL_SetupGrFile (void)
 {
     char fname[13];
     //int handle;
-	unsigned int j=0;
+//	unsigned int j=0;
     byte *compseg;
 	long fileSize;
 	Sint32 fileId;
@@ -500,18 +500,19 @@ void CAL_SetupGrFile (void)
 //	fileSize = GetFileSize(fileId);
 	compseg=(Uint8 *)saturnChunk+0x8000;
 //	CHECKMALLOCRESULT(vbtHuff);
-
+//slPrint((char *)"CAL_SetupGrFile1     ",slLocate(10,12));
 	GFS_Load(fileId, 0, (void *)compseg, sizeof(grhuffman));
 	huffnode *grhuffmanptr = (huffnode *)grhuffman;
 	
 	for(unsigned char x=0;x<255;x++)
 	{
+//	slPrint((char *)"CAL_SetupGrFile2     ",slLocate(10,12));	
 		grhuffmanptr->bit0=compseg[0] | (compseg[1]<<8);
 		grhuffmanptr->bit1=compseg[2] | (compseg[3]<<8);
 		grhuffmanptr++;
 		compseg+=4;
 	}	
-	j=0;
+//	j=0;
 
     //read(handle, grhuffman, sizeof(grhuffman));
     //close(handle);
@@ -519,20 +520,20 @@ void CAL_SetupGrFile (void)
     // load the data offsets from ???head.ext
     strcpy(fname,gheadname);
     strcat(fname,extension);
-
+/*
 	while (fname[j])
 	{
 		fname[j]= toupper(fname[j]);
 		j++;
 	}
-	j=0;
+	j=0;*/
 
     //handle = open(fname, O_RDONLY | O_BINARY);
     //if (handle == -1)
 //	if(stat(fname, NULL))
 //        CA_CannotOpen(fname);
 //slSynch();
-
+//slPrint((char *)"CAL_SetupGrFile3     ",slLocate(10,12));
 	fileId = GFS_NameToId((Sint8*)fname);
 	fileSize = GetFileSize(fileId);
     long headersize = fileSize;//lseek(handle, 0, SEEK_END);
@@ -556,7 +557,7 @@ void CAL_SetupGrFile (void)
 			slPrint((char *)msg,slLocate(1,3));
 						while(1);
 	}
-
+//slPrint((char *)"CAL_SetupGrFile4     ",slLocate(10,12));
     byte data[lengthof(grstarts) * 3];
 	//GFS_Load(fileId, 0, (void *)data, fileSize);
 	GFS_Load(fileId, 0, (void *)data, sizeof(data));
@@ -566,25 +567,26 @@ void CAL_SetupGrFile (void)
     const byte* d = data;
     for (int32_t* i = grstarts; i != endof(grstarts); ++i)
     {
+//	slPrint((char *)"CAL_SetupGrFile5     ",slLocate(10,12));	
         const int32_t val = d[0] | d[1] << 8 | d[2] << 16;
         *i = (val == 0x00FFFFFF ? -1 : val);
         d += 3;
     }
 
 #endif
-
+//slPrint((char *)"CAL_SetupGrFile6     ",slLocate(10,12));
 //
 // Open the graphics file, leaving it open until the game is finished
 //
     strcpy(fname,gfilename);
     strcat(fname,extension);
-
+/*
 	while (fname[j])
 	{
 		fname[j]= toupper(fname[j]);
 		j++;
 	}
-	j=0;
+	j=0;*/
 
     //grhandle = open(fname, O_RDONLY | O_BINARY);
     //if (grhandle == -1)
@@ -596,6 +598,7 @@ void CAL_SetupGrFile (void)
 //
 // load the pic and sprite headers into the arrays in the data segment
 //
+//slPrint((char *)"CAL_SetupGrFile7     ",slLocate(10,12));
     pictable=(pictabletype *) malloc(NUMPICS*sizeof(pictabletype));
     CHECKMALLOCRESULT(pictable);
     int32_t   chunkcomplen = CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
@@ -604,13 +607,16 @@ void CAL_SetupGrFile (void)
 //	CHECKMALLOCRESULT(compseg);
 	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen));
 //    CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
+//slPrint((char *)"CAL_SetupGrFile8     ",slLocate(10,12));
     CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
-
+//slPrint((char *)"CAL_SetupGrFile9     ",slLocate(10,12));
 	for(unsigned long k=0;k<NUMPICS;k++)
 	{
+//slPrint((char *)"CAL_SetupGrFile10     ",slLocate(10,12));		
 		pictable[k].height=SWAP_BYTES_16(pictable[k].height);
 		pictable[k].width=SWAP_BYTES_16(pictable[k].width);
 	} 
+//slPrint((char *)"CAL_SetupGrFile11     ",slLocate(10,12));	
 	compseg = NULL;
 	// VBT correct
 }

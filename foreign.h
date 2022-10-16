@@ -29,8 +29,9 @@
 
 #define STR_GAME	"Game"
 #define STR_DEMO	"Demo"
-#define STR_LGC		"Load Game called\n\""
 /*
+#define STR_LGC		"Load Game called\n\""
+
 #define STR_EMPTY	"empty"
 #define STR_CALIB	"Calibrate"
 #define STR_JOYST	"Joystick"
