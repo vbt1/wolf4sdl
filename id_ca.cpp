@@ -539,6 +539,7 @@ void CAL_SetupGrFile (void)
     long headersize = fileSize;//lseek(handle, 0, SEEK_END);
     //lseek(handle, 0, SEEK_SET);
 //headersize= 157*3;
+#if 0
     if(headersize / 3 != (long) (lengthof(grstarts) - numEpisodesMissing))
 	{
 /*        Quit("Wolf4SDL was not compiled for these data files:\n"
@@ -557,6 +558,7 @@ void CAL_SetupGrFile (void)
 			slPrint((char *)msg,slLocate(1,3));
 						while(1);
 	}
+#endif	
 //slPrint((char *)"CAL_SetupGrFile4     ",slLocate(10,12));
     byte data[lengthof(grstarts) * 3];
 	//GFS_Load(fileId, 0, (void *)data, fileSize);
@@ -1033,7 +1035,7 @@ void CA_CacheGrChunk (int chunk)
 		delta = (uint16_t)(pos/2048);
 		delta2 = (pos - delta*2048);
 		
-	Chunks=(uint8_t*)saturnChunk;  // déplacé pour pas écraser de son
+	Chunks=(uint8_t*)saturnChunk;  // d?plac? pour pas ?craser de son
 //	CHECKMALLOCRESULT(Chunks);
 	GFS_Load(grhandle, delta, (void *)Chunks, compressed+delta2);
 	Chunks+=delta2;
@@ -1191,8 +1193,8 @@ void CA_CacheMap (int mapnum)
 // load the planes into the allready allocated buffers
 //
     size = maparea*2;
-	uint8_t *Chunks=(uint8_t*)saturnChunk;   // écrase les sons
-//	uint8_t *Chunks=(uint8_t*)malloc(fileSize);   // écrase les sons
+	uint8_t *Chunks=(uint8_t*)saturnChunk;   // ?crase les sons
+//	uint8_t *Chunks=(uint8_t*)malloc(fileSize);   // ?crase les sons
 //slPrintHex(maphandle,slLocate(10,19));
 //slPrintHex(fileSize,slLocate(10,20));
 
@@ -1239,8 +1241,8 @@ void CA_CacheMap (int mapnum)
 //       buffer2seg = (word *) (SATURN_MAPSEG_ADDR-0X8000);
         buffer2seg = (word *) malloc(expanded);
 		
-	int *val = (int *)buffer2seg;		
-slPrintHex((int)val,slLocate(10,21));
+//	int *val = (int *)buffer2seg;		
+//slPrintHex((int)val,slLocate(10,21));
         CHECKMALLOCRESULT(buffer2seg);
         CAL_CarmackExpand((byte *) source, buffer2seg,expanded);
 		// VBT valeur perdue ?????

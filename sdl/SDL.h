@@ -72,7 +72,7 @@ extern "C" {
 
 #ifndef ACTION_REPLAY
 #define MAX_OPEN        24 //a ne pas modifier
-#define MAX_DIR         128//384
+#define MAX_DIR         96//384
 #else
 #define MAX_OPEN        2
 #define MAX_DIR         1

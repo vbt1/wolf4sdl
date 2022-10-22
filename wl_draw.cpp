@@ -659,15 +659,7 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
         }
     }
 #endif
-/*
-	if(shapenum>=SPR_DOG_W1_1 && shapenum <=SPR_DOG_JUMP3)
-	{
-slPrintHex(shapenum,slLocate(10,4));		
-slPrint("dog found !!!",slLocate(10,5));	
-		slSynch();
-		while(1);
-	}
-*/	
+
 }
 #ifdef USE_SPRITES
 int old_texture = -1;

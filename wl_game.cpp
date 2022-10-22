@@ -26,6 +26,9 @@ unsigned char texture_list[SPR_NULLSPRITE];
 extern boolean startgame;
 #endif
 
+
+void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
+
 #undef atan2
 //#define atan2(a,b) slAtan(a,b)
 #define atan2(a,b) MTH_Atan(a,b)
@@ -497,6 +500,8 @@ static void ScanInfoPlane(void)
 */
 void VblIn(void);
 
+	uint8_t *wallData = NULL;
+
 void SetupGameLevel (void)
 {
     int  x,y;
@@ -548,7 +553,63 @@ void SetupGameLevel (void)
 	InitActorList();	/* start spawning things with a clean slate */
 	InitDoorList();
 	InitStaticList();
+
+/*---------------------------------------------------------------*/
+#if 1
+    char fname[13] = "VSWAP.";
+//	Uint32 i=0;
+	Uint8 *Chunks;
+	long fileSize;
 	
+    strcat(fname,extension);
+	
+	Sint32 fileId;
+
+	fileId = GFS_NameToId((Sint8*)fname);
+	fileSize = GetFileSize(fileId);
+
+    int ChunksInFile = 0;
+
+	Chunks=(Uint8*)saturnChunk;
+	GFS_Load(fileId, 0, (void *)Chunks, 0x2000);
+	ChunksInFile=Chunks[0]|Chunks[1]<<8;
+//	slPrintHex(ChunksInFile,slLocate(3,3));	
+	PMSpriteStart=Chunks[2]|Chunks[3]<<8;
+
+// vbt : on ne charge pas les sons !	
+	ChunksInFile=Chunks[4]|Chunks[5]<<8;
+
+	if(wallData== NULL) wallData = (uint8_t *) malloc((50)*0x1000);
+
+	uint32_t* pageOffsets = (uint32_t *)saturnChunk+0x2000; 
+	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
+ 
+	for(int i=0;i<ChunksInFile;i++)
+	{
+		pageOffsets[i]=Chunks[6]<<0|Chunks[7]<<8|Chunks[8]<<16|Chunks[9]<<24;
+		Chunks+=4;
+	}
+
+	for(int i=PMSpriteStart;i<ChunksInFile;i++)
+	{
+		pageLengths[i-PMSpriteStart]=Chunks[6]|Chunks[7]<<8;
+		Chunks+=2;
+	}
+	
+    //fread(pageLengths, sizeof(word), ChunksInFile, file);
+    long pageDataSize = fileSize - pageOffsets[0];
+    if(pageDataSize > (size_t) -1)
+        Quit("The page file \"%s\" is too large!", fname);
+
+    pageOffsets[ChunksInFile] = fileSize;
+
+	uint8_t *ptr = (uint8_t *)wallData;	
+#endif
+
+	uint8_t *wallmap = (uint8_t *)saturnChunk+0x4000; 
+	memset(wallmap,0x00,AREATILE);
+
+/*---------------------------------------------------------------*/
     map = mapsegs[0];
     for (y=0;y<mapheight;y++)
     {
@@ -558,7 +619,9 @@ void SetupGameLevel (void)
             if (tile<AREATILE)
             {
                 // solid wall
+				wallmap[tile]=1;
                 tilemap[x][y] = (byte) tile;
+				
 #ifdef EMBEDDED
 				set_wall_at(x, y, tile);
 #else
@@ -575,6 +638,7 @@ void SetupGameLevel (void)
             }
         }
     }
+	
 //
 // spawn doors
 //
@@ -649,13 +713,50 @@ void SetupGameLevel (void)
                     tile = *(map-1+mapwidth);
                 if ( *(map-2) >= AREATILE)
                     tile = *(map-2);
-
                 *(map-1) = tile;
+				wallmap[tile]=1;
             }
         }
     }
+	
+//-----------------------------------------------------------------------------------	
+	// walls 0/1
+	PMPages[0]=ptr;
+	readChunks(fileId, 0x2000, &pageOffsets[0], Chunks+0x8000, ptr);
+	PMPages[1]=ptr+0x1000;
+	ptr+=0x2000;		
+	// walls 40/41
+	PMPages[42]=ptr;
+	readChunks(fileId, 0x2000, &pageOffsets[40], Chunks+0x8000, ptr);
+	PMPages[43]=ptr+0x1000;
+	ptr+=0x2000;
+	
+	// walls in map
+    for (y=1;y<32;y++)
+    {
+		if(wallmap[y+1]==1)
+		{
+			PMPages[(y*2)]=ptr;
+			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks+0x8000, ptr);
+			PMPages[(y*2)+1]=ptr+0x1000;
+			ptr+=0x2000;		
+		}
+	}
+   // doors
+    for (y=90;y<106;y++)
+    {
+        if(!pageOffsets[y])
+            continue;
+		
+		PMPages[y]=ptr;
+		readChunks(fileId, 0x1000, &pageOffsets[y], Chunks+0x8000, ptr);
+		ptr+=0x1000;
+	}
+	int *val = (int *)ptr;	
+	slPrintHex((int)val,slLocate(10,21));	
+//-----------------------------------------------------------------------------------	
+	
 	//VGAClearScreen ();
-//	slPrint("slScrTransparent1",slLocate(1,17));
 	slScrTransparent(0);
 	slSynch();
 	extern const void * TransList;
@@ -1127,8 +1228,8 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
+//gamestate.mapon = 4;	
 //gamestate.mapon = 1;	
-//gamestate.mapon = 8;	
 //GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	
 gamestate.keys = 3;
