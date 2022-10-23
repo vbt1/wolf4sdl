@@ -18,7 +18,7 @@
 extern void SYS_Exit(Sint32 code);
 
 //extern int lastgamemusicoffset;
-extern int numEpisodesMissing;
+//extern int numEpisodesMissing;
 
 //
 // PRIVATE PROTOTYPES
@@ -69,7 +69,7 @@ CP_itemtype MainMenu[] = {
     {1, "", CP_LoadGame},
     {0, "", CP_SaveGame},
     {1, "", CP_ChangeView},
-    {2, "", CP_ReadThis},
+    {2, "", 0}, //CP_ReadThis},
     {1, "", CP_ViewScores},
     {1, "", 0},
     {1, "", 0}
@@ -86,9 +86,9 @@ CP_itemtype MainMenu[] = {
 #ifndef SPEAR
 
 #ifdef SPANISH
-    {2, "Ve esto!", CP_ReadThis},
+    {2, "Ve esto!", 0}, //CP_ReadThis},
 #else
-    {2, "Read This!", CP_ReadThis},
+    {2, "Read This!", 0}, //CP_ReadThis},
 #endif
 
 #endif
@@ -272,7 +272,11 @@ int color_norml[] = {
     0x6b
 };
 
-int EpisodeSelect[6] = { 1 };
+#ifdef APOGEE_1_1
+int EpisodeSelect[6] = { 1 ,1,1};
+#else
+int EpisodeSelect[6] = {1};
+#endif
 
 static int StartGame;
 static int SoundStatus = 1;
@@ -2048,7 +2052,7 @@ CheckForEpisodes (void)
     if(!stat("vswap.wj1", &statbuf))
     {
         strcpy (extension, "wj1");
-        numEpisodesMissing = 5;
+//        numEpisodesMissing = 5;
 #else
     if(!stat("vswap.wj6", &statbuf))
     {
@@ -2071,7 +2075,7 @@ CheckForEpisodes (void)
     if(!stat("vswap.wl1", &statbuf))
     {
         strcpy (extension, "WL1");
-        numEpisodesMissing = 5;
+//        numEpisodesMissing = 5;
     }
     else
         Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
@@ -2093,7 +2097,7 @@ CheckForEpisodes (void)
         if(!stat("vswap.wl3", &statbuf))
         {
             strcpy (extension, "wl3");
-            numEpisodesMissing = 3;
+//            numEpisodesMissing = 3;
             NewEmenu[2].active = NewEmenu[4].active = EpisodeSelect[1] = EpisodeSelect[2] = 1;
         }
         else
@@ -2101,7 +2105,7 @@ CheckForEpisodes (void)
             if(!stat("VSWAP.WL1", &statbuf))
             {
                 strcpy (extension, "WL1");
-                numEpisodesMissing = 5;
+//                numEpisodesMissing = 5;
             }
             else
                 Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");

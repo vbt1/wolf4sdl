@@ -103,7 +103,7 @@ void SD_PrepareSound(int which)
 				lowsound = (lowsound + (4 - 1)) & -4;			
 		}
 		
-		GFS_Load(fileId, 0, mem_buf, fileSize);
+		GFS_Load(fileId, 0, mem_buf, fileSize); // lecture son
 		SoundChunks[which] = (Mix_Chunk*)malloc(sizeof(Mix_Chunk));
 		
 		SoundChunks[which]->abuf = mem_buf;

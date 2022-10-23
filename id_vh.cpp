@@ -291,12 +291,15 @@ void LoadLatchMem (void)
 //
 	start = LATCHPICS_LUMP_START;
 	end = LATCHPICS_LUMP_END;
-   
+
 	for (i=start;i<=end;i++)
 	{
 		width = pictable[i-STARTPICS].width;
 		height = pictable[i-STARTPICS].height;
-		
+
+//char toto[100];
+//sprintf (toto,"i%d w:%dh:%d                  ",i, width, height) ;
+//	slPrint(toto,slLocate(10,20));		
 		surf = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, 8, 0, 0, 0, 0);
         if(surf == NULL)
         {

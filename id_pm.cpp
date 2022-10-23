@@ -121,7 +121,7 @@ void PM_Startup()
 #endif
 	uint8_t *ptr;
 ///------------------------ fin murs
-	ptr = PM_DecodeSprites2(PMSpriteStart,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,fileId);
+//	ptr = PM_DecodeSprites2(PMSpriteStart,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,fileId);
 	
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr;

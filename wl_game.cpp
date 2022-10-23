@@ -548,7 +548,7 @@ void SetupGameLevel (void)
 //
     memset (tilemap,0,sizeof(tilemap));
     memset (actorat,0,sizeof(actorat));
-	memset(objactor, 0, sizeof(objactor));	
+	memset(objactor,0,sizeof(objactor));	
 
 	InitActorList();	/* start spawning things with a clean slate */
 	InitDoorList();
@@ -573,7 +573,6 @@ void SetupGameLevel (void)
 	Chunks=(Uint8*)saturnChunk;
 	GFS_Load(fileId, 0, (void *)Chunks, 0x2000);
 	ChunksInFile=Chunks[0]|Chunks[1]<<8;
-//	slPrintHex(ChunksInFile,slLocate(3,3));	
 	PMSpriteStart=Chunks[2]|Chunks[3]<<8;
 
 // vbt : on ne charge pas les sons !	

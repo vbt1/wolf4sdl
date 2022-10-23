@@ -94,7 +94,6 @@ extern GfsDirName dir_name[MAX_DIR];
 
 
 //enum {NONE, SDL_QUIT, SDL_KEYDOWN, SDL_KEYUP,SDLK_ESCAPE2, SDL_MOUSEBUTTONDOWN};
-
 /* Event enumerations */
 enum { SDL_NOEVENT = 0,			/* Unused (do not remove) */
        SDL_ACTIVEEVENT,			/* Application loses/gains visibility */
