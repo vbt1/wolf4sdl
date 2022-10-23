@@ -28,6 +28,7 @@ extern boolean startgame;
 
 
 void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
+uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
 
 #undef atan2
 //#define atan2(a,b) slAtan(a,b)
@@ -91,11 +92,15 @@ void GameLoop (void);
 ==========================
 */
 
-static void ScanInfoPlane(void)
+static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
 {
     unsigned x,y;
     int      tile;
     word     *start;
+
+//-----------------------------------------------------------------------------------
+	uint8_t *itemmap = (uint8_t *)saturnChunk+0x4200; // ne pas toucher
+//-----------------------------------------------------------------------------------
 
     start = mapsegs[1];
     for (y=0;y<mapheight;y++)
@@ -485,8 +490,33 @@ static void ScanInfoPlane(void)
                     break;
 #endif
             }
+	///		itemmap[tile]=1;
         }
     }
+	
+	
+#if 0
+//-----------------------------------------------------------------------------------
+	uint8_t *ptr = (uint8_t *)0x00202000;	
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	// sprites in map
+//    for (int y=SPR_DEMO;y<SPR_DEMO+1;y++)
+//    for (int y=PMSpriteStart;y<PMSpriteStart+SPR_NULLSPRITE;y++)
+    for (int y=PMSpriteStart;y<PMSpriteStart+10;y++)
+//    for (int y=PMSpriteStart;y<PMSpriteStart+10;y++)
+    {
+		if(itemmap[y]==1)
+		{
+			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+		}
+	}
+    // last page points after page buffer
+    PMPages[0x297] = ptr; // retourner l'adresse du pointeur
+
+	int *val = (int *)ptr;
+	slPrintHex((int)val,slLocate(10,20));	
+//-----------------------------------------------------------------------------------	
+#endif	
 }
 
 //==========================================================================
@@ -606,7 +636,7 @@ void SetupGameLevel (void)
 #endif
 
 	uint8_t *wallmap = (uint8_t *)saturnChunk+0x4000; 
-	memset(wallmap,0x00,AREATILE);
+	memset(wallmap,0x00,0x1000); // itemmap et wallmap communs, ne pas toucher à la taille du memset
 
 /*---------------------------------------------------------------*/
     map = mapsegs[0];
@@ -685,7 +715,7 @@ void SetupGameLevel (void)
 //
 // spawn actors
 //
-    ScanInfoPlane (); // on charge les persos
+    ScanInfoPlane (fileId, pageOffsets, pageLengths); // on charge les persos
 
 //
 // take out the ambush markers
@@ -753,8 +783,24 @@ void SetupGameLevel (void)
 	}
 	int *val = (int *)ptr;	
 	slPrintHex((int)val,slLocate(10,21));	
-//-----------------------------------------------------------------------------------	
 	
+	// items
+
+	ptr = (uint8_t *)0x00202000;	
+
+    for (int y=107;y<143;y++)
+    {
+		if(wallmap[y]==1)
+		{
+			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+		}
+	}
+    // last page points after page buffer
+    PMPages[0x297] = ptr; // retourner l'adresse du pointeur
+
+	val = (int *)ptr;
+	slPrintHex((int)val,slLocate(10,22));	
+//-----------------------------------------------------------------------------------	
 	//VGAClearScreen ();
 	slScrTransparent(0);
 	slSynch();

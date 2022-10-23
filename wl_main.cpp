@@ -1233,15 +1233,20 @@ static void InitGame()
 //
 // load in and lock down some basic chunks
 //
+//slPrint((char *)"CA_CacheGrChunk     ",slLocate(10,12));
     CA_CacheGrChunk(STARTFONT);
     CA_CacheGrChunk(STATUSBARPIC);
+//slPrint((char *)"LoadLatchMem     ",slLocate(10,12));	
 //	slTVOff();
    LoadLatchMem ();	   
+//slPrint((char *)"BuildTables     ",slLocate(10,12));   
    BuildTables ();          // trig tables
 #ifndef EMBEDDED   
     SetupWalls ();
-#endif	
+#endif
+//slPrint((char *)"NewViewSize     ",slLocate(10,12));   
     NewViewSize (viewsize);
+//slPrint((char *)"slIntFunction     ",slLocate(10,12));	
 	slIntFunction(VblIn) ;
 //		slTVOn();
 		slSynch();
@@ -1482,8 +1487,10 @@ static void DemoLoop()
         #ifndef GOODTIMES
         #ifndef SPEAR
         #ifndef JAPAN
+		#if 0
         if (!param_nowait)
             NonShareware();
+		#endif
         #endif
         #else
             #ifndef GOODTIMES
