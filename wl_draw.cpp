@@ -554,11 +554,12 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
     if(!scalel) return;   // too close or far away
     pixwidth=scalel*SPRITESCALEFACTOR;
 
-//shapenum=SPR_DEMO;
+//shapenum=SPR_DEMO+11;
 #ifdef USE_SPRITES
 	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
 	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
 	unsigned int height=(nextSurfacePtr-surfacePtr)>>6;
+//	unsigned int height=64;
 	
 	if(!texture_list[shapenum])
 	{

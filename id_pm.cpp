@@ -1,6 +1,5 @@
 #include "wl_def.h"
 
-#define LOADADDR 0x00242000
 #define NB_WALL_HWRAM 50
 //#define NB_WALL_HWRAM 39
 
@@ -90,7 +89,6 @@ void PM_Startup()
     }	
 #if 0
 	Chunks=(Uint8*)saturnChunk+0x8000;	
-//	Chunks=(Uint8*)LOADADDR;	
     // Load pages and initialize PMPages pointers
 
 	uint8_t *ptr=(uint8_t *)0x00202000;
@@ -102,7 +100,7 @@ void PM_Startup()
     {
 		ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
 	}
-
+xxxxxxxxxxxxxxxxxxxxxxxxxx
 	
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr;
@@ -122,15 +120,10 @@ uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOf
 {
 	uint8_t *Chunks   = (uint8_t *)saturnChunk+0x9000;
 	uint8_t *bmpbuff  = (uint8_t *)saturnChunk+0xA000;	//0x00202000;
-//	uint8_t *ptr      = (uint8_t *)0x00202000;	//0x00203000;
     uint32_t size;
-char toto[100];
 		
     for(unsigned int i = start; i < endi; i++)
     {
-
-		
-		
         PMPages[i] = ptr;
 	
         if(!pageOffsets[i])
@@ -141,10 +134,6 @@ char toto[100];
 
         if(!pageOffsets[i + 1]) size = pageLengths[i-PMSpriteStart];
         else size = pageOffsets[i + 1] - pageOffsets[i];
-
-sprintf (toto,"loading sprite %d %04x %04x sz%d st%d       ",i,pageOffsets[i],pageLengths[i-PMSpriteStart],size,PMSpriteStart);
-slPrint((char *)toto,slLocate(1,12));		
-
 
         if(!size)
             continue;

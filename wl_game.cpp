@@ -99,7 +99,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
     word     *start;
 
 //-----------------------------------------------------------------------------------
-	uint8_t *itemmap = (uint8_t *)saturnChunk+0x4200; // ne pas toucher
+	uint8_t *itemmap = (uint8_t *)saturnChunk+0x4000; // ne pas toucher
 //-----------------------------------------------------------------------------------
 
     start = mapsegs[1];
@@ -214,6 +214,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 110:
                 case 111:
                     SpawnStand(en_guard,x,y,tile-108);
+					for(int i=SPR_GRD_S_1;i<=SPR_GRD_SHOOT3;i++)
+					itemmap[i+PMSpriteStart]=1;					
                     break;
 
 
@@ -236,10 +238,13 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 114:
                 case 115:
                     SpawnPatrol(en_guard,x,y,tile-112);
+					for(int i=SPR_GRD_S_1;i<=SPR_GRD_SHOOT3;i++)
+					itemmap[i+PMSpriteStart]=1;					
                     break;
 
                 case 124:
                     SpawnDeadGuard (x,y);
+					itemmap[gamestates[s_grddie4].shapenum+PMSpriteStart]=1;
                     break;
 //
 // officer
@@ -263,6 +268,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 118:
                 case 119:
                     SpawnStand(en_officer,x,y,tile-116);
+					for(int i=SPR_OFC_S_1;i<=SPR_OFC_SHOOT3;i++)
+					itemmap[i+PMSpriteStart]=1;						
                     break;
 
 
@@ -285,6 +292,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 122:
                 case 123:
                     SpawnPatrol(en_officer,x,y,tile-120);
+					for(int i=SPR_OFC_S_1;i<=SPR_OFC_SHOOT3;i++)
+					itemmap[i+PMSpriteStart]=1;							
                     break;
 
 
@@ -310,6 +319,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 128:
                 case 129:
                     SpawnStand(en_ss,x,y,tile-126);
+					for(int i=SPR_SS_S_1;i<=SPR_SS_SHOOT3;i++)
+					itemmap[i+PMSpriteStart]=1;						
                     break;
 
 
@@ -332,6 +343,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 132:
                 case 133:
                     SpawnPatrol(en_ss,x,y,tile-130);
+					for(int i=SPR_SS_S_1;i<=SPR_SS_SHOOT3;i++)
+					itemmap[i+PMSpriteStart]=1;						
                     break;
 
 //
@@ -356,6 +369,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 136:
                 case 137:
                     SpawnStand(en_dog,x,y,tile-134);
+					for(int i=SPR_DOG_W1_1;i<=SPR_DOG_JUMP3;i++)
+					itemmap[i+PMSpriteStart]=1;						
                     break;
 
 
@@ -378,6 +393,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 140:
                 case 141:
                     SpawnPatrol(en_dog,x,y,tile-138);
+					for(int i=SPR_DOG_W1_1;i<=SPR_DOG_JUMP3;i++)
+					itemmap[i+PMSpriteStart]=1;						
                     break;
 
 //
@@ -386,24 +403,38 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
 #ifndef SPEAR
                 case 214:
                     SpawnBoss (x,y);
+					for(int i=SPR_BOSS_W1;i<=SPR_BOSS_DIE3;i++)
+					itemmap[i+PMSpriteStart]=1;		
                     break;
                 case 197:
                     SpawnGretel (x,y);
+					for(int i=SPR_GRETEL_W1;i<=SPR_GRETEL_DIE3;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 215:
                     SpawnGift (x,y);
+					for(int i=SPR_GIFT_W1;i<=SPR_GIFT_DEAD;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 179:
                     SpawnFat (x,y);
+					for(int i=SPR_FAT_W1;i<=SPR_FAT_DEAD;i++)
+					itemmap[i+PMSpriteStart]=1;					
                     break;
                 case 196:
                     SpawnSchabbs (x,y);
+					for(int i=SPR_SCHABB_W1;i<=SPR_HYPO4;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 160:
                     SpawnFakeHitler (x,y);
+					for(int i=SPR_FAKE_W1;i<=SPR_FAKE_DEAD;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 178:
                     SpawnHitler (x,y);
+					for(int i=SPR_MECHA_W1;i<=SPR_HITLER_DIE7;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
 #else
                 case 106:
@@ -434,6 +465,10 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 253:
                 case 254:
                 case 255:
+					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
+						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
+						itemmap[i+PMSpriteStart]=1;
+
                     if (gamestate.difficulty<gd_hard)
                         break;
                     tile -= 18;
@@ -441,6 +476,10 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 235:
                 case 236:
                 case 237:
+					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
+						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
+						itemmap[i+PMSpriteStart]=1;
+
                     if (gamestate.difficulty<gd_medium)
                         break;
                     tile -= 18;
@@ -448,6 +487,10 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 217:
                 case 218:
                 case 219:
+					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
+						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
+						itemmap[i+PMSpriteStart]=1;
+
                     SpawnStand(en_mutant,x,y,tile-216);
                     break;
 
@@ -455,6 +498,10 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 257:
                 case 258:
                 case 259:
+					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
+						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
+						itemmap[i+PMSpriteStart]=1;
+
                     if (gamestate.difficulty<gd_hard)
                         break;
                     tile -= 18;
@@ -462,6 +509,10 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 239:
                 case 240:
                 case 241:
+					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
+						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
+						itemmap[i+PMSpriteStart]=1;
+				
                     if (gamestate.difficulty<gd_medium)
                         break;
                     tile -= 18;
@@ -470,6 +521,9 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 222:
                 case 223:
                     SpawnPatrol(en_mutant,x,y,tile-220);
+					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
+						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
+						itemmap[i+PMSpriteStart]=1;
                     break;
 
 //
@@ -478,45 +532,32 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
 #ifndef SPEAR
                 case 224:
                     SpawnGhosts (en_blinky,x,y);
+					for(int i=SPR_BLINKY_W1;i<=SPR_BLINKY_W2;i++)
+					itemmap[i+PMSpriteStart]=1;					
                     break;
                 case 225:
                     SpawnGhosts (en_clyde,x,y);
+					for(int i=SPR_CLYDE_W1;i<=SPR_CLYDE_W2;i++)
+					itemmap[i+PMSpriteStart]=1;							
                     break;
                 case 226:
                     SpawnGhosts (en_pinky,x,y);
+					for(int i=SPR_PINKY_W1;i<=SPR_PINKY_W2;i++)
+					itemmap[i+PMSpriteStart]=1;							
                     break;
                 case 227:
                     SpawnGhosts (en_inky,x,y);
+					for(int i=SPR_INKY_W1;i<=SPR_INKY_W2;i++)
+					itemmap[i+PMSpriteStart]=1;							
                     break;
 #endif
             }
-	///		itemmap[tile]=1;
         }
     }
 	
-	
-#if 0
-//-----------------------------------------------------------------------------------
-	uint8_t *ptr = (uint8_t *)0x00202000;	
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	// sprites in map
-//    for (int y=SPR_DEMO;y<SPR_DEMO+1;y++)
-//    for (int y=PMSpriteStart;y<PMSpriteStart+SPR_NULLSPRITE;y++)
-    for (int y=PMSpriteStart;y<PMSpriteStart+10;y++)
-//    for (int y=PMSpriteStart;y<PMSpriteStart+10;y++)
-    {
-		if(itemmap[y]==1)
-		{
-			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
-		}
-	}
-    // last page points after page buffer
-    PMPages[0x297] = ptr; // retourner l'adresse du pointeur
-
-	int *val = (int *)ptr;
-	slPrintHex((int)val,slLocate(10,20));	
-//-----------------------------------------------------------------------------------	
-#endif	
+	if(gamestate.mapon == 8)
+		for(int i=SPR_BJ_W1;i<=SPR_BJ_JUMP4;i++)
+		itemmap[i+PMSpriteStart]=1;
 }
 
 //==========================================================================
@@ -636,7 +677,7 @@ void SetupGameLevel (void)
 #endif
 
 	uint8_t *wallmap = (uint8_t *)saturnChunk+0x4000; 
-	memset(wallmap,0x00,0x1000); // itemmap et wallmap communs, ne pas toucher à la taille du memset
+	memset(wallmap,0x00,0x2000); // itemmap et wallmap communs, ne pas toucher à la taille du memset
 
 /*---------------------------------------------------------------*/
     map = mapsegs[0];
@@ -645,10 +686,14 @@ void SetupGameLevel (void)
         for (x=0;x<mapwidth;x++)
         {
             tile = *map++;
+
+
+			
             if (tile<AREATILE)
             {
+				wallmap[tile]=1;				
                 // solid wall
-				wallmap[tile]=1;
+
                 tilemap[x][y] = (byte) tile;
 				
 #ifdef EMBEDDED
@@ -699,7 +744,6 @@ void SetupGameLevel (void)
                         SpawnDoor (x,y,0,(tile-91)/2);
                         break;
                 }
-				
             }
         }
     }
@@ -726,6 +770,7 @@ void SetupGameLevel (void)
         for (x=0;x<mapwidth;x++)
         {
             tile = *map++;
+			
             if (tile == AMBUSHTILE)
             {
                 tilemap[x][y] = 0;
@@ -743,11 +788,36 @@ void SetupGameLevel (void)
                 if ( *(map-2) >= AREATILE)
                     tile = *(map-2);
                 *(map-1) = tile;
-				wallmap[tile]=1;
             }
         }
     }
-	
+/*
+    word *start = mapsegs[1];
+    for (y=0;y<mapheight;y++)
+    {
+        for (x=0;x<mapwidth;x++)
+        {
+            tile = tilemap[x][y];
+            if (!tile)
+                continue;
+
+//            if (tile>=23 && tile <73)
+            {
+				wallmap[tile]=1;
+			}
+		}
+	}
+*/
+    int total = (int)(laststatobj-&statobjlist[0]);
+
+    for (int i=0;i<total;i++)
+    {
+        if (statobjlist[i].shapenum != -1)
+		{
+			wallmap[statobjlist[i].shapenum+PMSpriteStart]=1;
+		}
+    }
+//	   if (actorat[tilex][tiley])
 //-----------------------------------------------------------------------------------	
 	// walls 0/1
 	PMPages[0]=ptr;
@@ -772,7 +842,7 @@ void SetupGameLevel (void)
 		}
 	}
    // doors
-    for (y=90;y<106;y++)
+    for (y=90;y<AREATILE;y++)
     {
         if(!pageOffsets[y])
             continue;
@@ -783,18 +853,29 @@ void SetupGameLevel (void)
 	}
 	int *val = (int *)ptr;	
 	slPrintHex((int)val,slLocate(10,21));	
-	
-	// items
-
+	// floors
 	ptr = (uint8_t *)0x00202000;	
-
-    for (int y=107;y<143;y++)
+    for (int y=PMSpriteStart;y<PMSpriteStart+SPR_NULLSPRITE;y++)
+    {
+		if(wallmap[y]==1)
+			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+		else
+			PMPages[y] = ptr;
+	}
+	
+	
+//	    memset (tilemap,0,sizeof(tilemap));
+	
+	
+/*	
+						wallmap[PMSpriteStart+SPR_GRD_DEAD]=1;
+    for (int y=PMSpriteStart+SPR_GRD_S_1;y<PMSpriteStart+SPR_GRD_SHOOT1;y++)
     {
 		if(wallmap[y]==1)
 		{
-			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+		ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
 		}
-	}
+	}*/
     // last page points after page buffer
     PMPages[0x297] = ptr; // retourner l'adresse du pointeur
 
@@ -1273,7 +1354,7 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
-//gamestate.mapon = 4;	
+//gamestate.mapon = 8;	
 //gamestate.mapon = 1;	
 //GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	

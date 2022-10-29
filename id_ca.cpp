@@ -545,7 +545,7 @@ void CAL_SetupGrFile (void)
 //
 // load the pic and sprite headers into the arrays in the data segment
 //
-slPrint((char *)"CAL_SetupGrFile7     ",slLocate(10,12));
+//slPrint((char *)"CAL_SetupGrFile7     ",slLocate(10,12));
     pictable=(pictabletype *) malloc(NUMPICS*sizeof(pictabletype));
     CHECKMALLOCRESULT(pictable);
     int32_t   chunkcomplen = CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
@@ -554,16 +554,16 @@ slPrint((char *)"CAL_SetupGrFile7     ",slLocate(10,12));
 //	CHECKMALLOCRESULT(compseg);
 	GFS_Load(grhandle, 0, (void *)compseg, (chunkcomplen));
 //    CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
-slPrint((char *)"CAL_SetupGrFile8     ",slLocate(10,12));
+//slPrint((char *)"CAL_SetupGrFile8     ",slLocate(10,12));
     CAL_HuffExpand(&compseg[4], (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
 //slPrint((char *)"CAL_SetupGrFile9     ",slLocate(10,12));
 	for(unsigned long k=0;k<NUMPICS;k++)
 	{
-slPrint((char *)"CAL_SetupGrFile10     ",slLocate(10,12));		
+//slPrint((char *)"CAL_SetupGrFile10     ",slLocate(10,12));		
 		pictable[k].height=SWAP_BYTES_16(pictable[k].height);
 		pictable[k].width=SWAP_BYTES_16(pictable[k].width);
 	} 
-slPrint((char *)"CAL_SetupGrFile11     ",slLocate(10,12));	
+//slPrint((char *)"CAL_SetupGrFile11     ",slLocate(10,12));	
 	compseg = NULL;
 	// VBT correct
 }
