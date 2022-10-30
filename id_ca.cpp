@@ -24,6 +24,8 @@ loaded into the data segment
  */
 #include "wl_def.h"
 
+void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
+
 #define THREEBYTEGRSTARTS
 //#define HEAP_WALK 1
 
@@ -571,7 +573,7 @@ void CAL_SetupGrFile (void)
 //==========================================================================
 long CAL_SetupMapFile (int mapnum)
 {
-    int     i,j;
+    int     i;
     int32_t length,pos;
     char fname[13];
 	long fileSize;
@@ -628,20 +630,30 @@ long CAL_SetupMapFile (int mapnum)
 //
 // load all map header
 //
-	uint8_t *maphandleptr = (uint8_t*)(((int)saturnChunk+sizeof(mapfiletype)+ (4 - 1)) & -4);
-	GFS_Load(maphandle, 0, (void *)maphandleptr, fileSize); // lecture GAMEMAPS ou MAPHEAD
-
-//slPrintHex(fileSize,slLocate(10,14));
 
 	pos = tinf->headeroffsets[mapnum];
+slPrintHex(pos,slLocate(10,2));
+slPrintHex(fileSize,slLocate(10,3));	
 	if (pos<0)                          // $FFFFFFFF start is a sparse map
 		return fileSize;
-//	if(mapheaderseg[mapnum]==NULL)	mapheaderseg[mapnum]=(maptype *) malloc(sizeof(maptype));
+/*	if(pos&3)
+		pos+=2;		
+	if(pos&1)
+		pos-=2;
+*/
+
+	
+slPrintHex(pos,slLocate(10,2));	
+
+	uint8_t *maphandleptr = (uint8_t*)(((int)saturnChunk+ length + (4 - 1)) & -4);
+
+	readChunks(maphandle, sizeof(maptype), &pos, maphandleptr, (uint8_t*)&mapheaderseg);
+//	memcpy((memptr)&mapheaderseg,saturnChunk+0x500,sizeof(maptype));
 #ifndef EMBEDDED
 	mapheaderseg[mapnum]=(maptype *) ((saturnChunk+sizeof(mapfiletype)+fileSize + (8 - 1)) & -4);
 //	CHECKMALLOCRESULT(mapheaderseg[mapnum]);
 	//read (maphandle,(memptr)mapheaderseg[i],sizeof(maptype));
-	memcpy((memptr)mapheaderseg[mapnum],&maphandleptr[pos],sizeof(maptype));
+	memcpy((memptr)mapheaderseg[mapnum],maphandleptr,sizeof(maptype));
 
 //
 // allocate space for 3 64*64 planes
@@ -654,23 +666,55 @@ long CAL_SetupMapFile (int mapnum)
 //		mapsegs[i]=(word *) malloc(maparea*2);
     }
 	mapheaderseg[mapnum]->width=SWAP_BYTES_16(mapheaderseg[mapnum]->width);
-	mapheaderseg[mapnum]->height=SWAP_BYTES_16(mapheaderseg[mapnum]->height);	
+	mapheaderseg[mapnum]->height=SWAP_BYTES_16(mapheaderseg[mapnum]->height);
 #else
-	memcpy((memptr)&mapheaderseg,&maphandleptr[pos],sizeof(maptype));
-	
+
 //
 // allocate space for 3 64*64 planes
 //
+//	if(mapheaderseg.width>0xff)
+	{
     for (i=0;i<MAPPLANES;i++)
     {
 		mapheaderseg.planestart[i]=SWAP_BYTES_32(mapheaderseg.planestart[i]);
-		mapheaderseg.planelength[i]=SWAP_BYTES_16(mapheaderseg.planelength[i]);		
+		slPrintHex(mapheaderseg.planestart[i],slLocate(10,6+i*2));
+		mapheaderseg.planelength[i]=SWAP_BYTES_16(mapheaderseg.planelength[i]);
+		slPrintHex(mapheaderseg.planelength[i],slLocate(10,6+(i*2)+1));		
 //		mapsegs[i]=(word *)SATURN_MAPSEG_ADDR+(0x2000*i);
 		if(mapsegs[i]==NULL) mapsegs[i]=(word *) malloc(maparea*2);
 //		mapsegs[i]=(word *) malloc(maparea*2);
     }
 	mapheaderseg.width=SWAP_BYTES_16(mapheaderseg.width);
+slPrintHex(mapheaderseg.width,slLocate(10,4));	
+	mapheaderseg.height=SWAP_BYTES_16(mapheaderseg.height);
+	}
+slPrintHex(mapheaderseg.height,slLocate(10,5));	
+
+#if 1//def  READFULL
+
+	GFS_Load(maphandle, 0, (void *)maphandleptr, fileSize); // lecture GAMEMAPS ou MAPHEAD
+	memcpy((memptr)&mapheaderseg,&maphandleptr[pos],sizeof(maptype));
+
+    for (i=0;i<MAPPLANES;i++)
+    {
+		mapheaderseg.planestart[i]=SWAP_BYTES_32(mapheaderseg.planestart[i]);
+		slPrintHex(mapheaderseg.planestart[i],slLocate(20,6+i*2));		
+		mapheaderseg.planelength[i]=SWAP_BYTES_16(mapheaderseg.planelength[i]);	
+		slPrintHex(mapheaderseg.planelength[i],slLocate(20,6+(i*2)+1));			
+//		mapsegs[i]=(word *)SATURN_MAPSEG_ADDR+(0x2000*i);
+		if(mapsegs[i]==NULL) mapsegs[i]=(word *) malloc(maparea*2);
+//		mapsegs[i]=(word *) malloc(maparea*2);
+    }
+	mapheaderseg.width=SWAP_BYTES_16(mapheaderseg.width);
+slPrintHex(mapheaderseg.width,slLocate(20,4));	
 	mapheaderseg.height=SWAP_BYTES_16(mapheaderseg.height);	
+slPrintHex(mapheaderseg.height,slLocate(20,5));
+#endif
+
+
+
+
+
 #endif
 
 
