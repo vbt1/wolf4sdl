@@ -1,12 +1,6 @@
 #ifndef WL_DEF_H
 #define WL_DEF_H
 
-#define USE_SPRITES 1
-#define PONY 1 
-#define USE_ADX 1
-#define USE_SLAVE 1
-//#define USE_HWRAM_CHUNK 1
-#define EMBEDDED 1
 #define SATURN_WIDTH 352
 #define SATURN_SORT_VALUE 240
 #define MAX_WALLS 120
