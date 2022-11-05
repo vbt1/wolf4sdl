@@ -273,7 +273,7 @@ int color_norml[] = {
 };
 
 #ifdef APOGEE_1_1
-int EpisodeSelect[6] = { 1 ,1,1};
+int EpisodeSelect[6] = { 1 ,1, 1, 1, 1, 1};
 #else
 int EpisodeSelect[6] = {1};
 #endif

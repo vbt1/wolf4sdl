@@ -310,7 +310,7 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];
 
 //	slPrintHex(texture,slLocate(10,18));
-	slPrintHex(position_vram+cgaddress,slLocate(10,19));
+	slPrintHex(position_vram+cgaddress,slLocate(10,20));
 //if (position_vram<0x36000)
 {
 	*txptr = TEXDEF(64, (height>>6), position_vram);
@@ -670,8 +670,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 #endif
 {
 #ifdef USE_SPRITES	
-////slPrintHex(shapenum,slLocate(10,4));
-
+//slPrintHex(shapenum,slLocate(10,4));
 /*
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+2+shapenum]; 
 // correct on touche pas		
@@ -684,6 +683,7 @@ void SimpleScaleShape (byte *vbuf, int xcenter, int shapenum, unsigned height,un
 	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum);
 	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
 	int height=(nextSurfacePtr-surfacePtr);
+//slPrintHex(height,slLocate(10,5));
 		
 //TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1];
 		

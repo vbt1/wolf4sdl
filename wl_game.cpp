@@ -25,7 +25,7 @@ unsigned char texture_list[SPR_NULLSPRITE];
 //boolean loadedgame;
 extern boolean startgame;
 #endif
-
+    int ChunksInFile = 0;
 
 void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
 uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
@@ -639,11 +639,9 @@ void SetupGameLevel (void)
 	fileId = GFS_NameToId((Sint8*)fname);
 	fileSize = GetFileSize(fileId);
 
-    int ChunksInFile = 0;
-
 	Chunks=(Uint8*)saturnChunk;
 	GFS_Load(fileId, 0, (void *)Chunks, 0x2000);
-	ChunksInFile=Chunks[0]|Chunks[1]<<8;
+	ChunksInFile =Chunks[0]|Chunks[1]<<8;
 	PMSpriteStart=Chunks[2]|Chunks[3]<<8;
 
 // vbt : on ne charge pas les sons !	
@@ -791,23 +789,7 @@ void SetupGameLevel (void)
             }
         }
     }
-/*
-    word *start = mapsegs[1];
-    for (y=0;y<mapheight;y++)
-    {
-        for (x=0;x<mapwidth;x++)
-        {
-            tile = tilemap[x][y];
-            if (!tile)
-                continue;
 
-//            if (tile>=23 && tile <73)
-            {
-				wallmap[tile]=1;
-			}
-		}
-	}
-*/
     int total = (int)(laststatobj-&statobjlist[0]);
 
     for (int i=0;i<total;i++)
@@ -817,7 +799,6 @@ void SetupGameLevel (void)
 			wallmap[statobjlist[i].shapenum+PMSpriteStart]=1;
 		}
     }
-//	   if (actorat[tilex][tiley])
 //-----------------------------------------------------------------------------------	
 	// walls 0/1
 	PMPages[0]=ptr;
@@ -853,36 +834,25 @@ void SetupGameLevel (void)
 	}
 	int *val = (int *)ptr;	
 	slPrintHex((int)val,slLocate(10,21));	
-	// floors
-	ptr = (uint8_t *)0x00202000;	
-    for (int y=PMSpriteStart;y<PMSpriteStart+SPR_NULLSPRITE;y++)
+
+	ptr = (uint8_t *)0x00202000;
+	// weapons
+	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets+2,pageLengths+2,ptr,fileId);
+	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
+    // last page points after page buffer
+    PMPages[ChunksInFile] = ptr; // retourner l'adresse du pointeur
+	// ennemies
+    for (int y=PMSpriteStart;y<PMSpriteStart+SPR_KNIFEREADY;y++)
     {
 		if(wallmap[y]==1)
 			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
 		else
 			PMPages[y] = ptr;
 	}
-	
-	
-//	    memset (tilemap,0,sizeof(tilemap));
-	
-	
-/*	
-						wallmap[PMSpriteStart+SPR_GRD_DEAD]=1;
-    for (int y=PMSpriteStart+SPR_GRD_S_1;y<PMSpriteStart+SPR_GRD_SHOOT1;y++)
-    {
-		if(wallmap[y]==1)
-		{
-		ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
-		}
-	}*/
-    // last page points after page buffer
-    PMPages[0x297] = ptr; // retourner l'adresse du pointeur
 
 	val = (int *)ptr;
 	slPrintHex((int)val,slLocate(10,22));	
 //-----------------------------------------------------------------------------------	
-	//VGAClearScreen ();
 	slScrTransparent(0);
 	slSynch();
 	extern const void * TransList;
@@ -1355,7 +1325,8 @@ void GameLoop (void)
 {
 // vbt dernier niveau
 //gamestate.mapon = 8;	
-//gamestate.mapon = 1;	
+//gamestate.mapon = 6;
+//gamestate.episode=3;
 //GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	
 gamestate.keys = 3;

@@ -126,7 +126,7 @@ typedef struct
 =============================================================================
 */
 
-#define BUFFERSIZE 0x800
+#define BUFFERSIZE 0x2000
 static int32_t bufferseg[BUFFERSIZE/4];
 
 int     mapon;
@@ -633,7 +633,7 @@ long CAL_SetupMapFile (int mapnum)
 
 	pos = tinf->headeroffsets[mapnum];
 slPrintHex(pos,slLocate(10,2));
-slPrintHex(fileSize,slLocate(10,3));	
+//slPrintHex(fileSize,slLocate(10,3));	
 	if (pos<0)                          // $FFFFFFFF start is a sparse map
 		return fileSize;
 /*	if(pos&3)
@@ -690,7 +690,7 @@ slPrintHex(mapheaderseg.width,slLocate(10,4));
 	}
 slPrintHex(mapheaderseg.height,slLocate(10,5));	
 
-#if 1//def  READFULL
+#if 0//def  READFULL
 
 	GFS_Load(maphandle, 0, (void *)maphandleptr, fileSize); // lecture GAMEMAPS ou MAPHEAD
 	memcpy((memptr)&mapheaderseg,&maphandleptr[pos],sizeof(maptype));
@@ -1012,7 +1012,10 @@ void CA_CacheMap (int mapnum)
 //slPrintHex(maphandle,slLocate(10,19));
 //slPrintHex(fileSize,slLocate(10,20));
 
-	GFS_Load(maphandle, 0, (void *)Chunks, fileSize);
+//	GFS_Load(maphandle, 0, (void *)Chunks, fileSize);
+//	readChunks(maphandle, size, &pageOffsets[i], Chunks, ptr);
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	
     for (plane = 0; plane<MAPPLANES; plane++)
     {
@@ -1023,6 +1026,8 @@ void CA_CacheMap (int mapnum)
         pos = mapheaderseg.planestart[plane];
         compressed = mapheaderseg.planelength[plane];
 #endif
+		readChunks(maphandle, compressed, &pos, Chunks+0x4000, Chunks);
+
         dest = mapsegs[plane];
 
         //lseek(maphandle,pos,SEEK_SET);
@@ -1037,7 +1042,7 @@ void CA_CacheMap (int mapnum)
 //            source = (byte *) bigbufferseg;
 			  source = (byte *) saturnChunk+0X8000;
         }
-		memcpy(source,&Chunks[pos],compressed);
+		memcpy(source,Chunks,compressed);
         //read(maphandle,source,compressed);
 #ifdef CARMACIZED
 
