@@ -812,7 +812,7 @@ void SetupGameLevel (void)
 	ptr+=0x2000;
 	
 	// walls in map
-    for (y=1;y<32;y++)
+    for (y=1;y<48;y++)
     {
 		if(wallmap[y+1]==1)
 		{
