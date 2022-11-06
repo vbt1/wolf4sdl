@@ -1245,7 +1245,7 @@ CheckHighScore (int32_t score, word other)
 #endif		
         backcolor = 0x9c;
         fontcolor = 15;
-        US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130);
+//        US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130);
 #endif
     }
     else

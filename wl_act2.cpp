@@ -1910,14 +1910,7 @@ moveok:
 				continue;
 			tile = get_actor_at(x, y);
 			if (objlist[tile].flags & FL_SHOOTABLE)
-				return			
-//			tile = actorat[x][y];
-//			if (!tile)
-//				continue;
-//			if (tile < 256)
-//				return;
-//			if (objlist[tile & ~0x8000].flags & FL_SHOOTABLE)
-//				return;
+				return;			
 		}
 
 	ob->flags |= FL_AMBUSH | FL_SHOOTABLE;

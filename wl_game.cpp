@@ -554,10 +554,11 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
             }
         }
     }
-	
+#ifndef SPEAR	
 	if(gamestate.mapon == 8)
 		for(int i=SPR_BJ_W1;i<=SPR_BJ_JUMP4;i++)
 		itemmap[i+PMSpriteStart]=1;
+#endif	
 }
 
 //==========================================================================
@@ -647,7 +648,7 @@ void SetupGameLevel (void)
 // vbt : on ne charge pas les sons !	
 	ChunksInFile=Chunks[4]|Chunks[5]<<8;
 
-	if(wallData== NULL) wallData = (uint8_t *) malloc((50)*0x1000);
+	if(wallData== NULL) wallData = (uint8_t *) malloc((51)*0x1000);
 
 	uint32_t* pageOffsets = (uint32_t *)saturnChunk+0x2000; 
 	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
@@ -811,8 +812,19 @@ void SetupGameLevel (void)
 	PMPages[43]=ptr+0x1000;
 	ptr+=0x2000;
 	
+   // doors
+//    for (y=90;y<AREATILE;y++)
+    for (y=PMSpriteStart-8;y<PMSpriteStart;y++)
+    {
+        if(!pageOffsets[y])
+            continue;
+		
+		PMPages[y]=ptr;
+		readChunks(fileId, 0x1000, &pageOffsets[y], Chunks+0x8000, ptr);
+		ptr+=0x1000;
+	}	
 	// walls in map
-    for (y=1;y<48;y++)
+    for (y=1;y<50;y++)
     {
 		if(wallmap[y+1]==1)
 		{
@@ -822,20 +834,23 @@ void SetupGameLevel (void)
 			ptr+=0x2000;		
 		}
 	}
-   // doors
-    for (y=90;y<AREATILE;y++)
-    {
-        if(!pageOffsets[y])
-            continue;
-		
-		PMPages[y]=ptr;
-		readChunks(fileId, 0x1000, &pageOffsets[y], Chunks+0x8000, ptr);
-		ptr+=0x1000;
-	}
+
 	int *val = (int *)ptr;	
 	slPrintHex((int)val,slLocate(10,21));	
 
 	ptr = (uint8_t *)0x00202000;
+
+    for (y=50;y<55;y++)
+    {
+		if(wallmap[y+1]==1)
+		{
+			PMPages[(y*2)]=ptr;
+			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks+0x8000, ptr);
+			PMPages[(y*2)+1]=ptr+0x1000;
+			ptr+=0x2000;		
+		}
+	}
+
 	// weapons
 #ifdef APOGEE_1_1	
 	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets+2,pageLengths+2,ptr,fileId);

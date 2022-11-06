@@ -2072,7 +2072,7 @@ CheckForEpisodes (void)
 // ENGLISH
 //
 #ifdef UPLOAD
-    if(!stat("vswap.wl1", &statbuf))
+    if(!stat("VSWAP.WL1", &statbuf))
     {
         strcpy (extension, "WL1");
 //        numEpisodesMissing = 5;
@@ -2143,13 +2143,13 @@ CheckForEpisodes (void)
     strcpy (graphext, "sod");
 //    strcpy (audioext, "sod");
 #else
-    if(!stat("vswap.sdm", &statbuf))
+    if(!stat("VSWAP.SDM", &statbuf))
     {
-        strcpy (extension, "sdm");
+        strcpy (extension, "SDM");
     }
     else
         Quit ("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
-    strcpy (graphext, "sdm");
+//    strcpy (graphext, "sdm");
 //    strcpy (audioext, "sdm");
 #endif
 #else

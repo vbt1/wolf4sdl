@@ -1251,7 +1251,7 @@ static void InitGame()
 //		slTVOn();
 		slSynch();
 //ajout VBT
-slTVOff();
+//slTVOff();
 SDL_SetColors(curSurface, gamepal, 0, 256);
 //	//slPrint("C4 - 2008-2009     www.rockin-b.de",slLocate(2,29));
 //
@@ -1259,7 +1259,7 @@ SDL_SetColors(curSurface, gamepal, 0, 256);
 //
     InitRedShifts ();	
 #ifndef SPEARDEMO
-    if(!didjukebox)
+//    if(!didjukebox)
 #endif
         FinishSignon();
 #ifdef NOTYET
@@ -1454,7 +1454,9 @@ void Quit (const char *errorStr, ...)
 
 static void DemoLoop()
 {
+#ifndef SPEARDEMO
     int LastDemo = 0;
+#endif	
 //
 // check for launch from ted
 //
@@ -1544,7 +1546,9 @@ static void DemoLoop()
             CA_CacheGrChunk (TITLE2PIC);
             VWB_DrawPic (0,80,TITLE2PIC);
             UNCACHEGRCHUNK (TITLE2PIC);
+#ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#endif
             VL_FadeIn(0,255,pal,30);
 
             UNCACHEGRCHUNK (TITLEPALETTE);
