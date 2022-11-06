@@ -837,7 +837,11 @@ void SetupGameLevel (void)
 
 	ptr = (uint8_t *)0x00202000;
 	// weapons
+#ifdef APOGEE_1_1	
 	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets+2,pageLengths+2,ptr,fileId);
+#else
+	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,ptr,fileId);
+#endif
 	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr; // retourner l'adresse du pointeur
