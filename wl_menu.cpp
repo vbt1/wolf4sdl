@@ -370,7 +370,7 @@ US_ControlPanel (ScanCode scancode)
         //
         // EASTER EGG FOR SPEAR OF DESTINY!
         //
-        if (Keyboard[sc_I] && Keyboard[sc_D])
+        /*if (Keyboard[sc_I] && Keyboard[sc_D])
         {
             VW_FadeOut ();
             StartCPMusic (XJAZNAZI_MUS);
@@ -407,7 +407,7 @@ US_ControlPanel (ScanCode scancode)
             DrawMainMenu ();
             StartCPMusic (MENUSONG);
             MenuFadeIn ();
-        }
+        }*/
 #endif
 #endif
 
@@ -2117,13 +2117,14 @@ CheckForEpisodes (void)
 
 #ifdef SPEAR
 #ifndef SPEARDEMO
-    if(param_mission == 1)
+//    if(param_mission == 1)
     {
-        if(!stat("vswap.sod", &statbuf))
-            strcpy (extension, "sod");
+        if(!stat("VSWAP.SOD", &statbuf))
+            strcpy (extension, "SOD");
         else
             Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
     }
+/*
     else if(param_mission == 2)
     {
         if(!stat("vswap.sd2", &statbuf))
@@ -2138,9 +2139,11 @@ CheckForEpisodes (void)
         else
             Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
     }
+	
     else
         Quit ("UNSUPPORTED MISSION!");
-    strcpy (graphext, "sod");
+	*/
+//    strcpy (graphext, "sod");
 //    strcpy (audioext, "sod");
 #else
     if(!stat("VSWAP.SDM", &statbuf))

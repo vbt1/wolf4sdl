@@ -141,17 +141,25 @@ Victory (void)
 
     VWB_Bar (0, 0, SATURN_WIDTH, 200, VIEWCOLOR);
     VWB_DrawPic (124, 44, BJCOLLAPSE1PIC);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     VW_FadeIn ();
     VW_WaitVBL (2 * 70);
     VWB_DrawPic (124, 44, BJCOLLAPSE2PIC);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     VW_WaitVBL (105);
     VWB_DrawPic (124, 44, BJCOLLAPSE3PIC);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     VW_WaitVBL (105);
     VWB_DrawPic (124, 44, BJCOLLAPSE4PIC);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif
     VW_WaitVBL (3 * 70);
 
     UNCACHEGRCHUNK (BJCOLLAPSE1PIC);
