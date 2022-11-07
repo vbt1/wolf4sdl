@@ -3,6 +3,8 @@
 #include <math.h>
 #include "wl_def.h"
 //#include <SDL_mixer.h>
+#define NB_WALL_HWRAM 50/2
+//#define NB_WALL_HWRAM 39
 
 #ifdef MYPROFILE
 #include <TIME.H>
@@ -648,7 +650,7 @@ void SetupGameLevel (void)
 // vbt : on ne charge pas les sons !	
 	ChunksInFile=Chunks[4]|Chunks[5]<<8;
 
-	if(wallData== NULL) wallData = (uint8_t *) malloc((50)*0x1000);
+	if(wallData== NULL) wallData = (uint8_t *) malloc(((NB_WALL_HWRAM*2)+8)*0x1000);
 
 	uint32_t* pageOffsets = (uint32_t *)saturnChunk+0x2000; 
 	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
@@ -822,9 +824,10 @@ void SetupGameLevel (void)
 		PMPages[y]=ptr;
 		readChunks(fileId, 0x1000, &pageOffsets[y], Chunks+0x8000, ptr);
 		ptr+=0x1000;
-	}	
+	}
+
 	// walls in map
-    for (y=1;y<50;y++)
+    for (y=1;y<NB_WALL_HWRAM;y++)
     {
 		if(wallmap[y+1]==1)
 		{
@@ -840,7 +843,7 @@ void SetupGameLevel (void)
 
 	ptr = (uint8_t *)0x00202000;
 
-    for (y=50;y<64;y++)
+    for (y=NB_WALL_HWRAM;y<64;y++)
     {
 		if(wallmap[y+1]==1)
 		{
@@ -1344,7 +1347,7 @@ void GameLoop (void)
 {
 // vbt dernier niveau
 //gamestate.mapon = 8;	
-//gamestate.mapon = 6;
+gamestate.mapon = 3;
 //gamestate.episode=3;
 //GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	

@@ -1,8 +1,5 @@
 #include "wl_def.h"
 
-#define NB_WALL_HWRAM 50
-//#define NB_WALL_HWRAM 39
-
 int PMSpriteStart;
 //int PMSoundStart;
 
@@ -55,7 +52,7 @@ void PM_Startup()
 	ChunksInFile=PMSoundStart;
 
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
-    CHECKMALLOCRESULT(PMPages);	
+//    CHECKMALLOCRESULT(PMPages);	
 
 	uint32_t* pageOffsets = (uint32_t *)saturnChunk; 
 	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);

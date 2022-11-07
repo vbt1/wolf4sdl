@@ -25,7 +25,6 @@ loaded into the data segment
 #include "wl_def.h"
 
 void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
-
 #define THREEBYTEGRSTARTS
 //#define HEAP_WALK 1
 
@@ -126,7 +125,7 @@ typedef struct
 =============================================================================
 */
 
-#define BUFFERSIZE 0x1000
+#define BUFFERSIZE 0x800
 static int32_t bufferseg[BUFFERSIZE/4];
 
 int     mapon;
@@ -643,7 +642,7 @@ slPrintHex(pos,slLocate(10,2));
 */
 
 	
-slPrintHex(pos,slLocate(10,2));	
+//slPrintHex(pos,slLocate(10,2));	
 
 	uint8_t *maphandleptr = (uint8_t*)(((int)saturnChunk+ length + (4 - 1)) & -4);
 
@@ -677,18 +676,18 @@ slPrintHex(pos,slLocate(10,2));
     for (i=0;i<MAPPLANES;i++)
     {
 		mapheaderseg.planestart[i]=SWAP_BYTES_32(mapheaderseg.planestart[i]);
-		slPrintHex(mapheaderseg.planestart[i],slLocate(10,6+i*2));
+//		slPrintHex(mapheaderseg.planestart[i],slLocate(10,6+i*2));
 		mapheaderseg.planelength[i]=SWAP_BYTES_16(mapheaderseg.planelength[i]);
-		slPrintHex(mapheaderseg.planelength[i],slLocate(10,6+(i*2)+1));		
+//		slPrintHex(mapheaderseg.planelength[i],slLocate(10,6+(i*2)+1));		
 //		mapsegs[i]=(word *)SATURN_MAPSEG_ADDR+(0x2000*i);
 		if(mapsegs[i]==NULL) mapsegs[i]=(word *) malloc(maparea*2);
 //		mapsegs[i]=(word *) malloc(maparea*2);
     }
 	mapheaderseg.width=SWAP_BYTES_16(mapheaderseg.width);
-slPrintHex(mapheaderseg.width,slLocate(10,4));	
+//slPrintHex(mapheaderseg.width,slLocate(10,4));	
 	mapheaderseg.height=SWAP_BYTES_16(mapheaderseg.height);
 	}
-slPrintHex(mapheaderseg.height,slLocate(10,5));	
+//slPrintHex(mapheaderseg.height,slLocate(10,5));	
 
 #if 0//def  READFULL
 
@@ -698,17 +697,17 @@ slPrintHex(mapheaderseg.height,slLocate(10,5));
     for (i=0;i<MAPPLANES;i++)
     {
 		mapheaderseg.planestart[i]=SWAP_BYTES_32(mapheaderseg.planestart[i]);
-		slPrintHex(mapheaderseg.planestart[i],slLocate(20,6+i*2));		
+//		slPrintHex(mapheaderseg.planestart[i],slLocate(20,6+i*2));		
 		mapheaderseg.planelength[i]=SWAP_BYTES_16(mapheaderseg.planelength[i]);	
-		slPrintHex(mapheaderseg.planelength[i],slLocate(20,6+(i*2)+1));			
+//		slPrintHex(mapheaderseg.planelength[i],slLocate(20,6+(i*2)+1));			
 //		mapsegs[i]=(word *)SATURN_MAPSEG_ADDR+(0x2000*i);
 		if(mapsegs[i]==NULL) mapsegs[i]=(word *) malloc(maparea*2);
 //		mapsegs[i]=(word *) malloc(maparea*2);
     }
 	mapheaderseg.width=SWAP_BYTES_16(mapheaderseg.width);
-slPrintHex(mapheaderseg.width,slLocate(20,4));	
+//slPrintHex(mapheaderseg.width,slLocate(20,4));	
 	mapheaderseg.height=SWAP_BYTES_16(mapheaderseg.height);	
-slPrintHex(mapheaderseg.height,slLocate(20,5));
+//slPrintHex(mapheaderseg.height,slLocate(20,5));
 #endif
 
 
