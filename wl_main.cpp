@@ -1251,7 +1251,7 @@ static void InitGame()
 //		slTVOn();
 		slSynch();
 //ajout VBT
-//slTVOff();
+slTVOff();
 SDL_SetColors(curSurface, gamepal, 0, 256);
 //	//slPrint("C4 - 2008-2009     www.rockin-b.de",slLocate(2,29));
 //
@@ -1540,15 +1540,16 @@ static void DemoLoop()
             VL_ConvertPalette(grsegs[TITLEPALETTE], pal, 256);
 
             CA_CacheGrChunk (TITLE1PIC);
-            VWB_DrawPic (0,0,TITLE1PIC);
+            VWB_DrawPic (SATURN_ADJUST,0,TITLE1PIC);
             UNCACHEGRCHUNK (TITLE1PIC);
 
             CA_CacheGrChunk (TITLE2PIC);
-            VWB_DrawPic (0,80,TITLE2PIC);
+            VWB_DrawPic (SATURN_ADJUST,80,TITLE2PIC);
             UNCACHEGRCHUNK (TITLE2PIC);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #endif
+			slTVOn();
             VL_FadeIn(0,255,pal,30);
 
             UNCACHEGRCHUNK (TITLEPALETTE);
@@ -1556,11 +1557,11 @@ static void DemoLoop()
 //slPrint((char*)"CA_CacheScreen1",slLocate(10,22));	
             CA_CacheScreen (TITLEPIC);
 //slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
-slTVOn();
+
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #endif
-
+			slTVOn();
 //slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
             VW_FadeIn();
 		

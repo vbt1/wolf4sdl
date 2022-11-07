@@ -840,7 +840,7 @@ void SetupGameLevel (void)
 
 	ptr = (uint8_t *)0x00202000;
 
-    for (y=50;y<55;y++)
+    for (y=50;y<64;y++)
     {
 		if(wallmap[y+1]==1)
 		{
