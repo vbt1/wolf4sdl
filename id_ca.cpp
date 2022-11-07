@@ -126,7 +126,7 @@ typedef struct
 =============================================================================
 */
 
-#define BUFFERSIZE 0x2000
+#define BUFFERSIZE 0x1000
 static int32_t bufferseg[BUFFERSIZE/4];
 
 int     mapon;

@@ -648,7 +648,7 @@ void SetupGameLevel (void)
 // vbt : on ne charge pas les sons !	
 	ChunksInFile=Chunks[4]|Chunks[5]<<8;
 
-	if(wallData== NULL) wallData = (uint8_t *) malloc((51)*0x1000);
+	if(wallData== NULL) wallData = (uint8_t *) malloc((50)*0x1000);
 
 	uint32_t* pageOffsets = (uint32_t *)saturnChunk+0x2000; 
 	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);

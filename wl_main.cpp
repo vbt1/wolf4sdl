@@ -965,7 +965,7 @@ void InitDigiMap (void)
         DigiMap[map[0]] = map[1];
     }
 #endif	
-    for (int i = 0; i<47; i++)
+    for (int i = 0; i<73; i++)
     {
         SD_PrepareSound(i);
     }
