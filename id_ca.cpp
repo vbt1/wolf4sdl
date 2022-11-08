@@ -125,7 +125,7 @@ typedef struct
 =============================================================================
 */
 
-#define BUFFERSIZE 0x800
+#define BUFFERSIZE 0x2000
 static int32_t bufferseg[BUFFERSIZE/4];
 
 int     mapon;
@@ -635,12 +635,6 @@ slPrintHex(pos,slLocate(10,2));
 //slPrintHex(fileSize,slLocate(10,3));	
 	if (pos<0)                          // $FFFFFFFF start is a sparse map
 		return fileSize;
-/*	if(pos&3)
-		pos+=2;		
-	if(pos&1)
-		pos-=2;
-*/
-
 	
 //slPrintHex(pos,slLocate(10,2));	
 
