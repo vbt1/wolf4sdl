@@ -406,7 +406,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 214:
                     SpawnBoss (x,y);
 					for(int i=SPR_BOSS_W1;i<=SPR_BOSS_DIE3;i++)
-					itemmap[i+PMSpriteStart]=1;		
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 197:
                     SpawnGretel (x,y);
@@ -421,7 +421,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 179:
                     SpawnFat (x,y);
 					for(int i=SPR_FAT_W1;i<=SPR_FAT_DEAD;i++)
-					itemmap[i+PMSpriteStart]=1;					
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 196:
                     SpawnSchabbs (x,y);
@@ -441,23 +441,36 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
 #else
                 case 106:
                     SpawnSpectre (x,y);
+					for(int i=SPR_SPECTRE_W1;i<=SPR_SPECTRE_DEAD;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 107:
                     SpawnAngel (x,y);
+					for(int i=SPR_ANGEL_W1;i<=SPR_ANGEL_DEAD;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 125:
                     SpawnTrans (x,y);
+					for(int i=SPR_TRANS_W1;i<=SPR_TRANS_DEAD;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 142:
                     SpawnUber (x,y);
+					for(int i=SPR_UBER_W1;i<=SPR_UBER_DEAD;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 143:
                     SpawnWill (x,y);
+					for(int i=SPR_WILL_W1;i<=SPR_WILL_DEAD;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 161:
                     SpawnDeath (x,y);
+					for(int i=SPR_DEATH_W1;i<=SPR_DEATH_DEAD;i++)
+					itemmap[i+PMSpriteStart]=1;
+					for(int i=SPR_HROCKET_1;i<=SPR_SPARK4;i++)
+					itemmap[i+PMSpriteStart]=1;
                     break;
-
 #endif
 
 //
@@ -827,7 +840,7 @@ void SetupGameLevel (void)
 	}
 
 	// walls in map
-    for (y=1;y<NB_WALL_HWRAM;y++)
+    for (y=1;y<NB_WALL_HWRAM/2;y++)
     {
 		if(wallmap[y+1]==1)
 		{
@@ -843,7 +856,7 @@ void SetupGameLevel (void)
 
 	ptr = (uint8_t *)0x00202000;
 
-    for (y=NB_WALL_HWRAM;y<64;y++)
+    for (y=NB_WALL_HWRAM/2;y<64;y++)
     {
 		if(wallmap[y+1]==1)
 		{
@@ -1346,8 +1359,8 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
-//gamestate.mapon = 8;	
-gamestate.mapon = 3;
+gamestate.mapon = 8;	
+//gamestate.mapon = 3;
 //gamestate.episode=3;
 //GiveWeapon (gamestate.bestweapon+2);
 gamestate.ammo = 99;	
@@ -1567,7 +1580,6 @@ startplayloop:
                 VL_FadeOut (0,255,0,17,17,300);
 #endif
                 
-
                 Victory ();
 
                 
