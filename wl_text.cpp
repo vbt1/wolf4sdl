@@ -33,9 +33,9 @@ TEXT FORMATTING COMMANDS
 #define FONTHEIGHT      10
 #define TOPMARGIN       16
 #define BOTTOMMARGIN    32
-#define LEFTMARGIN      16
-#define RIGHTMARGIN     16
-#define PICMARGIN       8
+#define LEFTMARGIN      16 +SATURN_ADJUST
+#define RIGHTMARGIN     16 -SATURN_ADJUST
+#define PICMARGIN       8  +SATURN_ADJUST
 #define TEXTROWS        ((200-TOPMARGIN-BOTTOMMARGIN)/FONTHEIGHT)
 #define SPACEWIDTH      7
 #define SCREENPIXWIDTH  SATURN_WIDTH
@@ -177,7 +177,7 @@ void TimedPicCommand (void)
     //
     // draw pic
     //
-    VWB_DrawPic (picx&~7,picy,picnum);
+    VWB_DrawPic (SATURN_ADJUST+(picx&~7),picy,picnum);
 }
 
 
@@ -249,7 +249,7 @@ void HandleCommand (void)
 
         case 'G':               // ^Gyyy,xxx,ppp draws graphic
             ParsePicCommand ();
-            VWB_DrawPic (picx&~7,picy,picnum);
+            VWB_DrawPic (SATURN_ADJUST+(picx&~7),picy,picnum);
             picwidth = pictable[picnum-STARTPICS].width;
             picheight = pictable[picnum-STARTPICS].height;
             //
@@ -425,11 +425,11 @@ void PageLayout (boolean shownumber)
     //
     // clear the screen
     //
-    VWB_Bar (0,0,SATURN_WIDTH,200,BACKCOLOR);
-    VWB_DrawPic (0,0,H_TOPWINDOWPIC);
-    VWB_DrawPic (0,8,H_LEFTWINDOWPIC);
-    VWB_DrawPic (312,8,H_RIGHTWINDOWPIC);
-    VWB_DrawPic (8,176,H_BOTTOMINFOPIC);
+    VWB_Bar (SATURN_ADJUST,0,SATURN_WIDTH,200,BACKCOLOR);
+    VWB_DrawPic (SATURN_ADJUST,0,H_TOPWINDOWPIC);
+    VWB_DrawPic (SATURN_ADJUST,8,H_LEFTWINDOWPIC);
+    VWB_DrawPic (SATURN_ADJUST+312,8,H_RIGHTWINDOWPIC);
+    VWB_DrawPic (SATURN_ADJUST+8,176,H_BOTTOMINFOPIC);
 
 
     for (i=0; i<TEXTROWS; i++)
@@ -484,10 +484,10 @@ void PageLayout (boolean shownumber)
     {
 #ifdef SPANISH
         sprintf(str, "Hoja %d de %d", pagenum, numpages);
-        px = 208;
+        px = 208+SATURN_ADJUST;
 #else
         sprintf(str, "pg %d of %d", pagenum, numpages);
-        px = 213;
+        px = 213+SATURN_ADJUST;
 #endif
         py = 183;
         fontcolor = 0x4f;                          //12^BACKCOLOR;
