@@ -417,6 +417,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                     SpawnGift (x,y);
 					for(int i=SPR_GIFT_W1;i<=SPR_GIFT_DEAD;i++)
 					itemmap[i+PMSpriteStart]=1;
+					for(int i=SPR_ROCKET_1;i<=SPR_BOOM_3;i++)
+					itemmap[i+PMSpriteStart]=1;				
                     break;
                 case 179:
                     SpawnFat (x,y);
@@ -451,7 +453,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                     break;
                 case 125:
                     SpawnTrans (x,y);
-					for(int i=SPR_TRANS_W1;i<=SPR_TRANS_DEAD;i++)
+					for(int i=SPR_TRANS_W1;i<=SPR_TRANS_DIE3;i++)
 					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 142:
@@ -1364,7 +1366,7 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
-//gamestate.mapon = 8;	
+gamestate.mapon = 8;	
 //gamestate.mapon = 3;
 //gamestate.episode=3;
 //GiveWeapon (gamestate.bestweapon+2);
