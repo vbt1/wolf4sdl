@@ -424,6 +424,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                     SpawnFat (x,y);
 					for(int i=SPR_FAT_W1;i<=SPR_FAT_DEAD;i++)
 					itemmap[i+PMSpriteStart]=1;
+					for(int i=SPR_ROCKET_1;i<=SPR_BOOM_3;i++)
+					itemmap[i+PMSpriteStart]=1;				
                     break;
                 case 196:
                     SpawnSchabbs (x,y);
