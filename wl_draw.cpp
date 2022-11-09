@@ -310,7 +310,7 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+texture];
 
 //	slPrintHex(texture,slLocate(10,18));
-	slPrintHex(position_vram+cgaddress,slLocate(10,20));
+//	slPrintHex(position_vram+cgaddress,slLocate(10,20));
 //if (position_vram<0x36000)
 {
 	/*
@@ -599,9 +599,9 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
 //	unsigned int height=64;
 
 	int *val = (int *)surfacePtr;
-slPrintHex((int)val,slLocate(10,15));	
-	slPrintHex(height,slLocate(10,16));
-slPrintHex(shapenum,slLocate(10,17));
+//slPrintHex((int)val,slLocate(10,15));	
+//	slPrintHex(height,slLocate(10,16));
+//slPrintHex(shapenum,slLocate(10,17));
 	
 	if(!texture_list[shapenum])
 	{

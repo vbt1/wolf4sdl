@@ -3,7 +3,7 @@
 #include <math.h>
 #include "wl_def.h"
 //#include <SDL_mixer.h>
-#define NB_WALL_HWRAM 50/2
+//#define NB_WALL_HWRAM 50/2
 //#define NB_WALL_HWRAM 39
 
 #ifdef MYPROFILE
@@ -663,8 +663,6 @@ void SetupGameLevel (void)
 // vbt : on ne charge pas les sons !	
 	ChunksInFile=Chunks[4]|Chunks[5]<<8;
 
-	if(wallData== NULL) wallData = (uint8_t *) malloc(((NB_WALL_HWRAM*2)+8)*0x1000);
-
 	uint32_t* pageOffsets = (uint32_t *)saturnChunk+0x2000; 
 	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
  
@@ -687,11 +685,10 @@ void SetupGameLevel (void)
 
     pageOffsets[ChunksInFile] = fileSize;
 
-	uint8_t *ptr = (uint8_t *)wallData;	
 #endif
 
-	uint8_t *wallmap = (uint8_t *)saturnChunk+0x4000; 
-	memset(wallmap,0x00,0x2000); // itemmap et wallmap communs, ne pas toucher à la taille du memset
+	uint8_t *itemmap = (uint8_t *)saturnChunk+0x4000; 
+	memset(itemmap,0x00,0x2000); // itemmap et itemmap communs, ne pas toucher à la taille du memset
 
 /*---------------------------------------------------------------*/
     map = mapsegs[0];
@@ -705,7 +702,7 @@ void SetupGameLevel (void)
 			
             if (tile<AREATILE)
             {
-				wallmap[tile]=1;				
+				itemmap[tile]=1;				
                 // solid wall
 
                 tilemap[x][y] = (byte) tile;
@@ -812,10 +809,14 @@ void SetupGameLevel (void)
     {
         if (statobjlist[i].shapenum != -1)
 		{
-			wallmap[statobjlist[i].shapenum+PMSpriteStart]=1;
+			itemmap[statobjlist[i].shapenum+PMSpriteStart]=1;
 		}
     }
 //-----------------------------------------------------------------------------------	
+#if 0
+	if(wallData== NULL) wallData = (uint8_t *) malloc(((NB_WALL_HWRAM*2)+8)*0x1000);
+	uint8_t *ptr = (uint8_t *)wallData;	
+	
 	// walls 0/1
 	PMPages[0]=ptr;
 	readChunks(fileId, 0x2000, &pageOffsets[0], Chunks+0x8000, ptr);
@@ -842,7 +843,7 @@ void SetupGameLevel (void)
 	// walls in map
     for (y=1;y<NB_WALL_HWRAM/2;y++)
     {
-		if(wallmap[y+1]==1)
+		if(itemmap[y+1]==1)
 		{
 			PMPages[(y*2)]=ptr;
 			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks+0x8000, ptr);
@@ -858,7 +859,7 @@ void SetupGameLevel (void)
 
     for (y=NB_WALL_HWRAM/2;y<64;y++)
     {
-		if(wallmap[y+1]==1)
+		if(itemmap[y+1]==1)
 		{
 			PMPages[(y*2)]=ptr;
 			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks+0x8000, ptr);
@@ -870,9 +871,9 @@ void SetupGameLevel (void)
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr; // retourner l'adresse du pointeur
 	// ennemies
-    for (int y=PMSpriteStart;y<PMSpriteStart+SPR_KNIFEREADY;y++)
+    for (y=PMSpriteStart;y<PMSpriteStart+SPR_KNIFEREADY;y++)
     {
-		if(wallmap[y]==1)
+		if(itemmap[y]==1)
 			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
 		else
 			PMPages[y] = ptr;
@@ -888,6 +889,8 @@ void SetupGameLevel (void)
 
 	val = (int *)ptr;
 	slPrintHex((int)val,slLocate(10,22));	
+	
+#endif	
 //-----------------------------------------------------------------------------------	
 	slScrTransparent(0);
 	slSynch();
@@ -1409,7 +1412,7 @@ restartgame:
             ContinueMusic(lastgamemusicoffset);
             loadedgame = false;
         }
-        else*/ StartMusic ();
+        else*/ 
 
         if (!died)
             PreloadGraphics ();             // TODO: Let this do something useful!
@@ -1418,7 +1421,7 @@ restartgame:
             died = false;
             fizzlein = true;
         }
-
+		StartMusic ();
         DrawLevel ();
 	
 #ifdef SPEAR

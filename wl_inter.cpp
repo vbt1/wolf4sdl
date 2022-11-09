@@ -4,7 +4,10 @@
 
 LRstruct LevelRatios[LRpack];
 int32_t lastBreathTime = 0;
+extern uint8_t *wallData;
 
+uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
+void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
 void Write (int x, int y, const char *string);
 
 //==========================================================================
@@ -1003,6 +1006,105 @@ PreloadGraphics (void)
     VW_UpdateScreen ();
 #endif	
     VW_FadeIn ();
+
+
+#if 1
+//----------------------------------------------------------------------
+    char fname[13] = "VSWAP.";
+	Uint32 y;
+	extern int ChunksInFile;
+	
+    strcat(fname,extension);
+	
+	Sint32 fileId;
+
+	fileId = GFS_NameToId((Sint8*)fname);
+
+	word *pageLengths		= (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
+	uint32_t* pageOffsets	= (uint32_t*)saturnChunk+0x2000; 
+	uint8_t *itemmap 		= (uint8_t *)saturnChunk+0x4000;
+	Uint8 *Chunks	 		= (uint8_t *)saturnChunk+0xC000;
+	
+	if(wallData== NULL) wallData = (uint8_t *) malloc(((NB_WALL_HWRAM*2)+8)*0x1000);
+	uint8_t *ptr = (uint8_t *)wallData;	
+	
+	// walls 0/1
+	PMPages[0]=ptr;
+	readChunks(fileId, 0x2000, &pageOffsets[0], Chunks, ptr);
+	PMPages[1]=ptr+0x1000;
+	ptr+=0x2000;		
+	// walls 40/41
+	PMPages[42]=ptr;
+	readChunks(fileId, 0x2000, &pageOffsets[40], Chunks, ptr);
+	PMPages[43]=ptr+0x1000;
+	ptr+=0x2000;
+	
+   // doors
+    for (y=PMSpriteStart-8;y<PMSpriteStart;y++)
+    {
+        if(!pageOffsets[y])
+            continue;
+		
+		PMPages[y]=ptr;
+		readChunks(fileId, 0x1000, &pageOffsets[y], Chunks, ptr);
+		ptr+=0x1000;
+	}
+
+	// walls in map
+    for (y=1;y<NB_WALL_HWRAM/2;y++)
+    {
+		if(itemmap[y+1]==1)
+		{
+			PMPages[(y*2)]=ptr;
+			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks, ptr);
+			PMPages[(y*2)+1]=ptr+0x1000;
+			ptr+=0x2000;		
+		}
+	}
+
+	int *val = (int *)ptr;	
+	slPrintHex((int)val,slLocate(10,21));	
+
+	ptr = (uint8_t *)0x00202000;
+
+    for (y=NB_WALL_HWRAM/2;y<64;y++)
+    {
+		if(itemmap[y+1]==1)
+		{
+			PMPages[(y*2)]=ptr;
+			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks, ptr);
+			PMPages[(y*2)+1]=ptr+0x1000;
+			ptr+=0x2000;		
+		}
+	}
+
+    // last page points after page buffer
+    PMPages[ChunksInFile] = ptr; // retourner l'adresse du pointeur
+	// ennemies
+    for (y=PMSpriteStart;y<PMSpriteStart+SPR_KNIFEREADY;y++)
+    {
+		if(itemmap[y]==1)
+			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+		else
+			PMPages[y] = ptr;
+	}
+
+	// weapons  doit être après les ennemis
+#ifdef APOGEE_1_1	
+	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets+2,pageLengths+2,ptr,fileId);
+#else
+	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,ptr,fileId);
+#endif
+	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
+
+	val = (int *)ptr;
+	slPrintHex((int)val,slLocate(10,22));	
+//----------------------------------------------------------------------
+#endif
+
+
+
+
 
 //      PM_Preload (PreloadUpdate);
 //    PreloadUpdate (10, 10);
