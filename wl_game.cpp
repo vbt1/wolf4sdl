@@ -1190,6 +1190,7 @@ void PlayDemo (int demonumber)
     startgame = false;
     demoplayback = true;
     SetupGameLevel ();
+	PreloadGraphics();
     StartMusic ();
 
     PlayLoop ();
