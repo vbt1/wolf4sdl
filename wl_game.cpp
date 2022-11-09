@@ -441,7 +441,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
 #else
                 case 106:
                     SpawnSpectre (x,y);
-					for(int i=SPR_SPECTRE_W1;i<=SPR_SPECTRE_DEAD;i++)
+					for(int i=SPR_SPECTRE_W1;i<=SPR_SPECTRE_F4;i++)
 					itemmap[i+PMSpriteStart]=1;
                     break;
                 case 107:
@@ -807,8 +807,6 @@ void SetupGameLevel (void)
     }
 
     int total = (int)(laststatobj-&statobjlist[0]);
-// on charge toujours deathcam
-//	wallmap[PMSpriteStart+1]=1;
 
     for (int i=0;i<=total;i++)
     {
@@ -1362,7 +1360,7 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
-gamestate.mapon = 8;	
+//gamestate.mapon = 8;	
 //gamestate.mapon = 3;
 //gamestate.episode=3;
 //GiveWeapon (gamestate.bestweapon+2);

@@ -547,7 +547,34 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 }
 
 //==========================================================================
+inline void ScaleShapeDemo (int xcenter, int shapenum, unsigned width)
+{
+	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
+	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
+	unsigned int height=(nextSurfacePtr-surfacePtr)>>6;
+	
+	if(!texture_list[shapenum])
+	{
+		loadActorTexture(shapenum,height<<6,surfacePtr);
+	}
+//--------------------------------------------------------------------------------------------
+	TEXTURE *txptr = &tex_spr[SATURN_WIDTH+1+shapenum]; 
+// correct on touche pas		
+    SPRITE user_sprite;
+    user_sprite.CTRL = FUNC_Sprite | _ZmCC;
+    user_sprite.PMOD=CL256Bnk| ECdis;// | ECenb | SPdis;  // pas besoin pour les sprites
+    user_sprite.SRCA=((txptr->CGadr));
+    user_sprite.COLR=256;
 
+    user_sprite.SIZE=0x800+height;
+	user_sprite.XA=(xcenter-centerx);
+	user_sprite.YA=width*(32-height/2)/64;
+	user_sprite.XB=width;
+	user_sprite.YB=width*height/64;
+    user_sprite.GRDA=0;
+	slSetSprite(&user_sprite, toFIXED(10));	// à remettre // ennemis et objets
+//--------------------------------------------------------------------------------------------	
+}
 inline void ScaleShape (int xcenter, int shapenum, unsigned width)
 {
     unsigned scalel,pixwidth;
@@ -563,12 +590,18 @@ inline void ScaleShape (int xcenter, int shapenum, unsigned width)
     if(!scalel) return;   // too close or far away
     pixwidth=scalel*SPRITESCALEFACTOR;
 
-//shapenum=SPR_DEMO+11;
+//shapenum=SPR_DEMO+45;
+//shapenum=SPR_STAT_49-1;
 #ifdef USE_SPRITES
 	unsigned char *surfacePtr = (unsigned char*)PM_GetSprite(shapenum); // + ((0) * source->pitch) + 0;
 	unsigned char *nextSurfacePtr = (unsigned char*)PM_GetSprite(shapenum+1);
 	unsigned int height=(nextSurfacePtr-surfacePtr)>>6;
 //	unsigned int height=64;
+
+	int *val = (int *)surfacePtr;
+slPrintHex((int)val,slLocate(10,15));	
+	slPrintHex(height,slLocate(10,16));
+slPrintHex(shapenum,slLocate(10,17));
 	
 	if(!texture_list[shapenum])
 	{
@@ -1035,20 +1068,11 @@ void DrawPlayerWeapon (byte *vbuf)
 #else
         SimpleScaleShape(vbuf,viewwidth/2,shapenum,viewheight+1,curPitch);
 #endif
-/*
-unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0);
-
-//		SimpleScaleShape((byte *)curSurface->pixels,viewwidth/2,shapenum,viewheight+1,curPitch);
-//		memset((byte *)nbg1Ptr,0x11,64*128);
- // version sur nbg1
-		SimpleScaleShape((byte *)nbg1Ptr,viewwidth/2,shapenum,viewheight+1,curPitch);
-	*/	
-//	while(1);	
     }
 
     if (demoplayback)
 #ifdef USE_SPRITES
-        SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1);
+		ScaleShapeDemo(viewwidth/2, SPR_DEMO, viewheight+1);
 #else
         SimpleScaleShape(vbuf,viewwidth/2,SPR_DEMO,viewheight+1,curPitch);
 #endif		
