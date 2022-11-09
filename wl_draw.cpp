@@ -313,8 +313,17 @@ inline void loadActorTexture(int texture,unsigned int height,unsigned char *surf
 	slPrintHex(position_vram+cgaddress,slLocate(10,20));
 //if (position_vram<0x36000)
 {
+	/*
+	Line  854: 	int *val = (int *)ptr;	
+	Line  855: 	slPrintHex((int)val,slLocate(10,21));	
+	*/
+	int *val = (int *)surfacePtr;
+//slPrintHex((int)val,slLocate(10,15));	
+//	slPrintHex(height,slLocate(10,16));
+//slPrintHex(texture,slLocate(10,17));	
 	*txptr = TEXDEF(64, (height>>6), position_vram);
-	memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)surfacePtr,height);
+//	if(height<=64*64)
+		memcpy((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),(void *)surfacePtr,height);
 //	memset((void *)(SpriteVRAM + ((txptr->CGadr) << 3)),texture,height);
 	texture_list[texture]=1;//position_vram/height/2;
 //	position_vram+=height/2;	

@@ -564,8 +564,6 @@ LevelCompleted (void)
     VWB_DrawPic (0, 0, C_INTERMISSIONPIC);
     UNCACHEGRCHUNK (C_INTERMISSIONPIC);
 #endif
-//   slPrint("VWB_DrawPic",slLocate(10,14));
-
     VWB_DrawPic (0, 16, L_GUYPIC);
 
 #ifndef SPEAR

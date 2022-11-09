@@ -100,7 +100,6 @@ void CheckWeaponChange (void)
     else if(joyx > 64)
         buttonstate[bt_nextweapon] = true;
 #endif
-	//slPrintHex(buttonstate[bt_nextweapon],slLocate(5,10));
     if(buttonstate[bt_nextweapon] && !buttonheld[bt_nextweapon])
     {
         newWeapon = gamestate.weapon + 1;

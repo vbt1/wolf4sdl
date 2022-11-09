@@ -3102,7 +3102,6 @@ void A_StartDeathCam(objtype *ob)
 	long	dx,dy;
 	long    xmove,ymove;
 	long	dist;
-
 	FinishPaletteShifts();
 
 	VW_WaitVBL(100);
@@ -3114,17 +3113,14 @@ void A_StartDeathCam(objtype *ob)
 	}
 
 	gamestate.victoryflag = true;
-
 //	FizzleFade(false, 70, 4);
     unsigned fadeheight = viewsize != 21 ? screenHeight-scaleFactor*STATUSLINES : screenHeight;
     VL_BarScaledCoord (0, 0, screenWidth, fadeheight, bordercol);
 	FizzleFade(screenBuffer, screen, 0, 0, screenWidth, fadeheight, 70, false);
-
 	IN_ClearKeysDown();
 
 	IN_UserInput(140);
 	SD_WaitSoundDone();
-
 	CacheLump(LEVELEND_LUMP_START, LEVELEND_LUMP_END);
 
 	Write(0, 7, STR_SEEAGAIN);
@@ -3165,9 +3161,9 @@ void A_StartDeathCam(objtype *ob)
 //
 // go back to the game
 //
-/*
-	DrawPlayBorder();
 
+	DrawPlayBorder();
+#ifndef SPEAR
 	switch (ob->obclass)
 	{
 	case schabbobj:
@@ -3184,9 +3180,8 @@ void A_StartDeathCam(objtype *ob)
 		break;
 	default:
 		break;
+#endif		
 	}
-	*/
-
 }
 
 #endif
@@ -7000,7 +6995,7 @@ void    A_StartDeathCam (objtype *ob)
     FinishPaletteShifts ();
 
     VW_WaitVBL (100);
-
+xxxxxxxxxxxxxx
     if (gamestate.victoryflag)
     {
         playstate = ex_victorious;                              // exit castle tile

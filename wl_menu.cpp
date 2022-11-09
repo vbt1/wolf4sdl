@@ -2081,9 +2081,9 @@ CheckForEpisodes (void)
         Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
 #else
 #ifndef SPEAR
-    if(!stat("vswap.wl6", &statbuf))
+    if(!stat("VSWAP.WL6", &statbuf))
     {
-        strcpy (extension, "wl6");
+        strcpy (extension, "WL6");
         NewEmenu[2].active =
             NewEmenu[4].active =
             NewEmenu[6].active =
@@ -2094,9 +2094,9 @@ CheckForEpisodes (void)
     }
     else
     {
-        if(!stat("vswap.wl3", &statbuf))
+        if(!stat("VSWAP.WL3", &statbuf))
         {
-            strcpy (extension, "wl3");
+            strcpy (extension, "WL3");
 //            numEpisodesMissing = 3;
             NewEmenu[2].active = NewEmenu[4].active = EpisodeSelect[1] = EpisodeSelect[2] = 1;
         }

@@ -807,8 +807,10 @@ void SetupGameLevel (void)
     }
 
     int total = (int)(laststatobj-&statobjlist[0]);
+// on charge toujours deathcam
+//	wallmap[PMSpriteStart+1]=1;
 
-    for (int i=0;i<total;i++)
+    for (int i=0;i<=total;i++)
     {
         if (statobjlist[i].shapenum != -1)
 		{
@@ -867,13 +869,6 @@ void SetupGameLevel (void)
 		}
 	}
 
-	// weapons
-#ifdef APOGEE_1_1	
-	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets+2,pageLengths+2,ptr,fileId);
-#else
-	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,ptr,fileId);
-#endif
-	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr; // retourner l'adresse du pointeur
 	// ennemies
@@ -884,6 +879,14 @@ void SetupGameLevel (void)
 		else
 			PMPages[y] = ptr;
 	}
+
+	// weapons  doit être après les ennemis
+#ifdef APOGEE_1_1	
+	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets+2,pageLengths+2,ptr,fileId);
+#else
+	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,ptr,fileId);
+#endif
+	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
 
 	val = (int *)ptr;
 	slPrintHex((int)val,slLocate(10,22));	

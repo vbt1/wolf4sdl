@@ -631,7 +631,7 @@ long CAL_SetupMapFile (int mapnum)
 //
 
 	pos = tinf->headeroffsets[mapnum];
-slPrintHex(pos,slLocate(10,2));
+//slPrintHex(pos,slLocate(10,2));
 //slPrintHex(fileSize,slLocate(10,3));	
 	if (pos<0)                          // $FFFFFFFF start is a sparse map
 		return fileSize;
