@@ -2084,13 +2084,13 @@ CheckForEpisodes (void)
     if(!stat("VSWAP.WL6", &statbuf))
     {
         strcpy (extension, "WL6");
-        NewEmenu[2].active =
+ /*       NewEmenu[2].active =
             NewEmenu[4].active =
             NewEmenu[6].active =
             NewEmenu[8].active =
             NewEmenu[10].active =
             EpisodeSelect[1] =
-            EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;
+            EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;*/
     }
     else
     {

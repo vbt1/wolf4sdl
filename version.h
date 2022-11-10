@@ -4,14 +4,15 @@
 #ifndef VERSIONALREADYCHOSEN              // used for batch compiling
 
 /* Defines used for different versions */
-
+ // demo wolf : upload + carmasized
+  //  wolf full : upload + carmasized + APOGEE_1_1 et fichiers en wl1
 //#define SPEAR
 //#define SPEARDEMO
 #define UPLOAD
-#define GOODTIMES
+//#define GOODTIMES
 #define CARMACIZED
 //#define APOGEE_1_0
-//#define APOGEE_1_1
+#define APOGEE_1_1
 //#define APOGEE_1_2
 
 /*

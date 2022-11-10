@@ -1084,7 +1084,13 @@ PreloadGraphics (void)
     for (y=PMSpriteStart;y<PMSpriteStart+SPR_KNIFEREADY;y++)
     {
 		if(itemmap[y]==1)
+#ifdef APOGEE_1_1				
+			if(y>=PMSpriteStart+SPR_BJ_W1-2 && y<=PMSpriteStart+SPR_BJ_JUMP4)
+			ptr=PM_DecodeSprites2(y,y+1,pageOffsets+2,pageLengths+2,ptr,fileId);
+			else
+#endif
 			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+	
 		else
 			PMPages[y] = ptr;
 	}

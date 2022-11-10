@@ -1233,8 +1233,9 @@ static void InitGame()
 //
 // load in and lock down some basic chunks
 //
-//slPrint((char *)"CA_CacheGrChunk     ",slLocate(10,12));
+//slPrint((char *)"CA_CacheGrChunk1     ",slLocate(10,12));
     CA_CacheGrChunk(STARTFONT);
+//slPrint((char *)"CA_CacheGrChunk2     ",slLocate(10,12));	
     CA_CacheGrChunk(STATUSBARPIC);
 //slPrint((char *)"LoadLatchMem     ",slLocate(10,12));	
 //	slTVOff();
@@ -1483,7 +1484,7 @@ static void DemoLoop()
 //
 
 #ifndef DEMOTEST
-
+/*
     #ifndef UPLOAD
 
         #ifndef GOODTIMES
@@ -1505,6 +1506,7 @@ static void DemoLoop()
         #endif
         #endif
     #endif
+	*/
     //StartCPMusic(INTROSONG);
 #ifndef JAPAN
 //slPrint((char*)"PG13 or StartCPMusic",slLocate(10,22));	
@@ -1577,13 +1579,16 @@ static void DemoLoop()
 //
 // credits page
 //
+//slPrint((char*)"CA_CacheScreen",slLocate(10,22));
             CA_CacheScreen (CREDITSPIC);
 #ifndef USE_SPRITES			
             VW_UpdateScreen();
-#endif			
+#endif
+//slPrint((char*)"VW_FadeIn2",slLocate(10,22));				
             VW_FadeIn ();
             if (IN_UserInput(TickBase*10))
                 break;
+//slPrint((char*)"VW_FadeOut2",slLocate(10,22));			
             VW_FadeOut ();
 //
 // high scores
@@ -1599,7 +1604,7 @@ static void DemoLoop()
 //
 // demo
 //
-
+//slPrint((char*)"VW_FadeOut2",slLocate(10,22));
             #ifndef SPEARDEMO
             PlayDemo (LastDemo++%4);
             #else

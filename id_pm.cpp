@@ -21,25 +21,26 @@ void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chun
 
 void PM_Startup()
 {
+	
 	unsigned int PMSoundStart;	
     char fname[13] = "VSWAP.";
 	Uint32 i=0;
 	Uint8 *Chunks;
-	long fileSize;
+//	long fileSize;
 	
     strcat(fname,extension);
 	
 	Sint32 fileId;
 
 	fileId = GFS_NameToId((Sint8*)fname);
-	fileSize = GetFileSize(fileId);
+//	fileSize = GetFileSize(fileId);
 
     int ChunksInFile = 0;
 //    fread(&ChunksInFile, sizeof(word), 1, file);
 
 	Chunks=(Uint8*)saturnChunk;
 //	CHECKMALLOCRESULT(Chunks);
-	GFS_Load(fileId, 0, (void *)Chunks, 0x8000);
+	GFS_Load(fileId, 0, (void *)Chunks, 0x80);
 	ChunksInFile=Chunks[0]|Chunks[1]<<8;
 //	slPrintHex(ChunksInFile,slLocate(10,18));	
 	
@@ -53,7 +54,7 @@ void PM_Startup()
 
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
 //    CHECKMALLOCRESULT(PMPages);	
-
+/*
 	uint32_t* pageOffsets = (uint32_t *)saturnChunk; 
 	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
  
@@ -86,7 +87,8 @@ void PM_Startup()
     }	
 	pageLengths = NULL;	
 	pageOffsets = NULL;		
-	Chunks = NULL;		
+	Chunks = NULL;
+*/	
 }	
 
 uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId)
