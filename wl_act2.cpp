@@ -3102,6 +3102,7 @@ void A_StartDeathCam(objtype *ob)
 	long	dx,dy;
 	long    xmove,ymove;
 	long	dist;
+	memset((byte *)curSurface->pixels, 0, screenWidth*screenHeight);		
 	FinishPaletteShifts();
 
 	VW_WaitVBL(100);
@@ -3112,18 +3113,37 @@ void A_StartDeathCam(objtype *ob)
 		return;
 	}
 
-	gamestate.victoryflag = true;
-//	FizzleFade(false, 70, 4);
+    gamestate.victoryflag = true;
     unsigned fadeheight = viewsize != 21 ? screenHeight-scaleFactor*STATUSLINES : screenHeight;
+//			VL_ClearScreen(bordercol);
+			
+	memset((byte *)curSurface->pixels, bordercol, screenWidth*screenHeight);
+	
     VL_BarScaledCoord (0, 0, screenWidth, fadeheight, bordercol);
-	FizzleFade(screenBuffer, screen, 0, 0, screenWidth, fadeheight, 70, false);
-	IN_ClearKeysDown();
-
-	IN_UserInput(140);
-	SD_WaitSoundDone();
-	CacheLump(LEVELEND_LUMP_START, LEVELEND_LUMP_END);
-
-	Write(0, 7, STR_SEEAGAIN);
+    FizzleFade(curSurface, screen, 0, 0, screenWidth, fadeheight, 70, false);
+//			VL_ClearScreen(bordercol);
+    VL_BarScaledCoord (0, 0, screenWidth, fadeheight, bordercol);
+    if (bordercol != VIEWCOLOR)
+    {
+        CA_CacheGrChunk (STARTFONT+1);
+        fontnumber = 1;
+        SETFONTCOLOR(15,bordercol);
+        PrintX = 68+SATURN_ADJUST; PrintY = 45;
+        US_Print (STR_SEEAGAIN);
+        UNCACHEGRCHUNK(STARTFONT+1);
+    }
+    else
+    {
+        CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
+#ifdef JAPAN
+#ifndef JAPDEMO
+        CA_CacheScreen(C_LETSSEEPIC);
+#endif
+#else
+        Write(0,7,STR_SEEAGAIN);
+#endif
+    }
+	
 #ifndef USE_SPRITES
 	VW_UpdateScreen();
 #endif
@@ -3163,6 +3183,8 @@ void A_StartDeathCam(objtype *ob)
 //
 
 	DrawPlayBorder();
+    fizzlein = true;
+	
 #ifndef SPEAR
 	switch (ob->obclass)
 	{

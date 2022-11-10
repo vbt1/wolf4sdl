@@ -1329,9 +1329,9 @@ CleanupControlPanel (void)
 int
 HandleMenu (CP_iteminfo * item_i, CP_itemtype * items, void (*routine) (int w))
 {
-    char key;
+//    char key;
     static int redrawitem = 1, lastitem = -1;
-    int i, x, y, basey, exit, which, shape;
+    int /*i,*/ x, y, basey, exit, which, shape;
     int32_t lastBlinkTime, timer;
     ControlInfo ci;
 
@@ -2084,7 +2084,7 @@ CheckForEpisodes (void)
     if(!stat("VSWAP.WL6", &statbuf))
     {
         strcpy (extension, "WL6");
- /*       NewEmenu[2].active =
+  /*      NewEmenu[2].active =
             NewEmenu[4].active =
             NewEmenu[6].active =
             NewEmenu[8].active =

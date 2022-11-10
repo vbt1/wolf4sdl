@@ -1083,7 +1083,7 @@ void DrawPlayerWeapon (byte *vbuf)
 #ifndef APOGEE_1_0
         if ((player->state == s_deathcam) && (GetTimeCount() & 32))
 #ifdef USE_SPRITES
-			SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1);
+			ScaleShapeDemo(viewwidth/2, SPR_DEATHCAM, viewheight+1);			
 #else
 			SimpleScaleShape(vbuf,viewwidth/2,SPR_DEATHCAM,viewheight+1,curPitch);
 #endif

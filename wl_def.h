@@ -12,7 +12,10 @@
 #define MAX_WALLS 120
 #define NB_WALL_HWRAM 50/2
 // 240 pour du 320, 264 pour du 352
-#define		LINE_COLOR_TABLE		(VDP2_VRAM_A0	+ 0x1f400)
+#define	LINE_COLOR_TABLE		(VDP2_VRAM_A0	+ 0x1f400)
+#define PRELOAD_ITEMS(START,STOP) \
+for(int i=START;i<=STOP;i++) \
+itemmap[i+PMSpriteStart]=1;
 
 extern unsigned char *saturnChunk;
 

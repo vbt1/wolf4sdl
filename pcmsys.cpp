@@ -382,6 +382,8 @@ short		load_adx(Sint8 * filename)
 	unsigned int working_address = (unsigned int)(scsp_load) + adx.offset2data + 4;
 	m68k_com->pcmCtrl[numberPCMs].hiAddrBits = (unsigned short)( (unsigned int)working_address >> 16);
 	m68k_com->pcmCtrl[numberPCMs].loAddrBits = (unsigned short)( (unsigned int)working_address & 0xFFFF);
+// vbt : reduce play speed	
+//	m68k_com->pcmCtrl[numberPCMs].pitchword = convert_bitrate_to_pitchword(adx.sample_rate/2);
 	m68k_com->pcmCtrl[numberPCMs].pitchword = convert_bitrate_to_pitchword(adx.sample_rate);
 	m68k_com->pcmCtrl[numberPCMs].playsize = (adx.sample_ct / 32);
 	short bpb = calculate_bytes_per_blank((int)adx.sample_rate, false, PCM_SYS_REGION); //Iniitalize as max volume

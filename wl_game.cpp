@@ -216,8 +216,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 110:
                 case 111:
                     SpawnStand(en_guard,x,y,tile-108);
-					for(int i=SPR_GRD_S_1;i<=SPR_GRD_SHOOT3;i++)
-					itemmap[i+PMSpriteStart]=1;					
+					if(itemmap[SPR_GRD_S_1+PMSpriteStart]==0)
+						PRELOAD_ITEMS (SPR_GRD_S_1,SPR_GRD_SHOOT3);
                     break;
 
 
@@ -240,8 +240,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 114:
                 case 115:
                     SpawnPatrol(en_guard,x,y,tile-112);
-					for(int i=SPR_GRD_S_1;i<=SPR_GRD_SHOOT3;i++)
-					itemmap[i+PMSpriteStart]=1;					
+					if(itemmap[SPR_GRD_S_1+PMSpriteStart]==0)
+						PRELOAD_ITEMS (SPR_GRD_S_1,SPR_GRD_SHOOT3);
                     break;
 
                 case 124:
@@ -270,8 +270,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 118:
                 case 119:
                     SpawnStand(en_officer,x,y,tile-116);
-					for(int i=SPR_OFC_S_1;i<=SPR_OFC_SHOOT3;i++)
-					itemmap[i+PMSpriteStart]=1;						
+					if(itemmap[SPR_OFC_S_1+PMSpriteStart]==0)
+						PRELOAD_ITEMS (SPR_OFC_S_1,SPR_OFC_SHOOT3);
                     break;
 
 
@@ -294,8 +294,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 122:
                 case 123:
                     SpawnPatrol(en_officer,x,y,tile-120);
-					for(int i=SPR_OFC_S_1;i<=SPR_OFC_SHOOT3;i++)
-					itemmap[i+PMSpriteStart]=1;							
+					if(itemmap[SPR_OFC_S_1+PMSpriteStart]==0)
+						PRELOAD_ITEMS (SPR_OFC_S_1,SPR_OFC_SHOOT3);
                     break;
 
 
@@ -321,8 +321,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 128:
                 case 129:
                     SpawnStand(en_ss,x,y,tile-126);
-					for(int i=SPR_SS_S_1;i<=SPR_SS_SHOOT3;i++)
-					itemmap[i+PMSpriteStart]=1;						
+					if(itemmap[SPR_SS_S_1+PMSpriteStart]==0)
+						PRELOAD_ITEMS (SPR_SS_S_1,SPR_SS_SHOOT3);
                     break;
 
 
@@ -345,8 +345,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 132:
                 case 133:
                     SpawnPatrol(en_ss,x,y,tile-130);
-					for(int i=SPR_SS_S_1;i<=SPR_SS_SHOOT3;i++)
-					itemmap[i+PMSpriteStart]=1;						
+					if(itemmap[SPR_SS_S_1+PMSpriteStart]==0)
+						PRELOAD_ITEMS (SPR_SS_S_1,SPR_SS_SHOOT3);
                     break;
 
 //
@@ -371,10 +371,8 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 136:
                 case 137:
                     SpawnStand(en_dog,x,y,tile-134);
-					for(int i=SPR_DOG_W1_1;i<=SPR_DOG_JUMP3;i++)
-					itemmap[i+PMSpriteStart]=1;						
+					PRELOAD_ITEMS (SPR_DOG_W1_1,SPR_DOG_JUMP3);
                     break;
-
 
                 case 210:
                 case 211:
@@ -395,8 +393,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 140:
                 case 141:
                     SpawnPatrol(en_dog,x,y,tile-138);
-					for(int i=SPR_DOG_W1_1;i<=SPR_DOG_JUMP3;i++)
-					itemmap[i+PMSpriteStart]=1;						
+					PRELOAD_ITEMS (SPR_DOG_W1_1,SPR_DOG_JUMP3);
                     break;
 
 //
@@ -405,75 +402,59 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
 #ifndef SPEAR
                 case 214:
                     SpawnBoss (x,y);
-					for(int i=SPR_BOSS_W1;i<=SPR_BOSS_DIE3;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_BOSS_W1,SPR_BOSS_DIE3);
                     break;
                 case 197:
                     SpawnGretel (x,y);
-					for(int i=SPR_GRETEL_W1;i<=SPR_GRETEL_DIE3;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_GRETEL_W1,SPR_GRETEL_DIE3);
                     break;
                 case 215:
                     SpawnGift (x,y);
-					for(int i=SPR_GIFT_W1;i<=SPR_GIFT_DEAD;i++)
-					itemmap[i+PMSpriteStart]=1;
-					for(int i=SPR_ROCKET_1;i<=SPR_BOOM_3;i++)
-					itemmap[i+PMSpriteStart]=1;				
+					PRELOAD_ITEMS (SPR_GIFT_W1,SPR_GIFT_DEAD);
+					PRELOAD_ITEMS (SPR_ROCKET_1,SPR_BOOM_3);
                     break;
                 case 179:
                     SpawnFat (x,y);
-					for(int i=SPR_FAT_W1;i<=SPR_FAT_DEAD;i++)
-					itemmap[i+PMSpriteStart]=1;
-					for(int i=SPR_ROCKET_1;i<=SPR_BOOM_3;i++)
-					itemmap[i+PMSpriteStart]=1;				
+					PRELOAD_ITEMS (SPR_FAT_W1,SPR_FAT_DEAD);
+					PRELOAD_ITEMS (SPR_ROCKET_1,SPR_BOOM_3);
                     break;
                 case 196:
                     SpawnSchabbs (x,y);
-					for(int i=SPR_SCHABB_W1;i<=SPR_HYPO4;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_SCHABB_W1,SPR_HYPO4);
                     break;
                 case 160:
                     SpawnFakeHitler (x,y);
-					for(int i=SPR_FAKE_W1;i<=SPR_FAKE_DEAD;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_FAKE_W1,SPR_FAKE_DEAD);
                     break;
                 case 178:
                     SpawnHitler (x,y);
-					for(int i=SPR_MECHA_W1;i<=SPR_HITLER_DIE7;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_MECHA_W1,SPR_HITLER_DIE7);
                     break;
 #else
                 case 106:
                     SpawnSpectre (x,y);
-					for(int i=SPR_SPECTRE_W1;i<=SPR_SPECTRE_F4;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_SPECTRE_W1,SPR_SPECTRE_F4);
                     break;
                 case 107:
                     SpawnAngel (x,y);
-					for(int i=SPR_ANGEL_W1;i<=SPR_ANGEL_DEAD;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_ANGEL_W1,SPR_ANGEL_DEAD);
                     break;
                 case 125:
                     SpawnTrans (x,y);
-					for(int i=SPR_TRANS_W1;i<=SPR_TRANS_DIE3;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_TRANS_W1,SPR_TRANS_DIE3);
                     break;
                 case 142:
                     SpawnUber (x,y);
-					for(int i=SPR_UBER_W1;i<=SPR_UBER_DEAD;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_UBER_W1,SPR_UBER_DEAD);
                     break;
                 case 143:
                     SpawnWill (x,y);
-					for(int i=SPR_WILL_W1;i<=SPR_WILL_DEAD;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_WILL_W1,SPR_WILL_DEAD);
                     break;
                 case 161:
                     SpawnDeath (x,y);
-					for(int i=SPR_DEATH_W1;i<=SPR_DEATH_DEAD;i++)
-					itemmap[i+PMSpriteStart]=1;
-					for(int i=SPR_HROCKET_1;i<=SPR_SPARK4;i++)
-					itemmap[i+PMSpriteStart]=1;
+					PRELOAD_ITEMS (SPR_DEATH_W1,SPR_DEATH_DEAD);
+					PRELOAD_ITEMS (SPR_HROCKET_1,SPR_SPARK4);
                     break;
 #endif
 
@@ -485,8 +466,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 254:
                 case 255:
 					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
-						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
-						itemmap[i+PMSpriteStart]=1;
+						PRELOAD_ITEMS (SPR_MUT_S_1,SPR_MUT_SHOOT4);
 
                     if (gamestate.difficulty<gd_hard)
                         break;
@@ -496,8 +476,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 236:
                 case 237:
 					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
-						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
-						itemmap[i+PMSpriteStart]=1;
+						PRELOAD_ITEMS (SPR_MUT_S_1,SPR_MUT_SHOOT4);
 
                     if (gamestate.difficulty<gd_medium)
                         break;
@@ -507,8 +486,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 218:
                 case 219:
 					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
-						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
-						itemmap[i+PMSpriteStart]=1;
+						PRELOAD_ITEMS (SPR_MUT_S_1,SPR_MUT_SHOOT4);
 
                     SpawnStand(en_mutant,x,y,tile-216);
                     break;
@@ -518,8 +496,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 258:
                 case 259:
 					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
-						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
-						itemmap[i+PMSpriteStart]=1;
+						PRELOAD_ITEMS (SPR_MUT_S_1,SPR_MUT_SHOOT4);
 
                     if (gamestate.difficulty<gd_hard)
                         break;
@@ -529,8 +506,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 240:
                 case 241:
 					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
-						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
-						itemmap[i+PMSpriteStart]=1;
+						PRELOAD_ITEMS (SPR_MUT_S_1,SPR_MUT_SHOOT4);
 				
                     if (gamestate.difficulty<gd_medium)
                         break;
@@ -541,8 +517,7 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
                 case 223:
                     SpawnPatrol(en_mutant,x,y,tile-220);
 					if(itemmap[SPR_MUT_S_1+PMSpriteStart]==0)
-						for(int i=SPR_MUT_S_1;i<=SPR_MUT_SHOOT4;i++)
-						itemmap[i+PMSpriteStart]=1;
+						PRELOAD_ITEMS (SPR_MUT_S_1,SPR_MUT_SHOOT4);
                     break;
 
 //
@@ -551,23 +526,19 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
 #ifndef SPEAR
                 case 224:
                     SpawnGhosts (en_blinky,x,y);
-					for(int i=SPR_BLINKY_W1;i<=SPR_BLINKY_W2;i++)
-					itemmap[i+PMSpriteStart]=1;					
+					PRELOAD_ITEMS (SPR_BLINKY_W1,SPR_BLINKY_W2);
                     break;
                 case 225:
                     SpawnGhosts (en_clyde,x,y);
-					for(int i=SPR_CLYDE_W1;i<=SPR_CLYDE_W2;i++)
-					itemmap[i+PMSpriteStart]=1;							
+					PRELOAD_ITEMS (SPR_CLYDE_W1,SPR_CLYDE_W2);
                     break;
                 case 226:
                     SpawnGhosts (en_pinky,x,y);
-					for(int i=SPR_PINKY_W1;i<=SPR_PINKY_W2;i++)
-					itemmap[i+PMSpriteStart]=1;							
+					PRELOAD_ITEMS (SPR_PINKY_W1,SPR_PINKY_W2);
                     break;
                 case 227:
                     SpawnGhosts (en_inky,x,y);
-					for(int i=SPR_INKY_W1;i<=SPR_INKY_W2;i++)
-					itemmap[i+PMSpriteStart]=1;							
+					PRELOAD_ITEMS (SPR_INKY_W1,SPR_INKY_W2);
                     break;
 #endif
             }
@@ -575,8 +546,10 @@ static void ScanInfoPlane(Sint32 fileId,uint32_t* pageOffsets,word *pageLengths)
     }
 #ifndef SPEAR	
 	if(gamestate.mapon == 8)
-		for(int i=SPR_BJ_W1;i<=SPR_BJ_JUMP4;i++)
-		itemmap[i+PMSpriteStart]=1;
+	{
+		itemmap[SPR_DEATHCAM+PMSpriteStart]=1;
+		PRELOAD_ITEMS (SPR_BJ_W1,SPR_BJ_JUMP4);
+	}
 #endif	
 }
 

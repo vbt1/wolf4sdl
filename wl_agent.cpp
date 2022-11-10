@@ -122,7 +122,7 @@ void CheckWeaponChange (void)
         }
     }
 
-    if(newWeapon != -1)
+    if(newWeapon != -1 && playstate == ex_stillplaying)
     {
         gamestate.weapon = gamestate.chosenweapon = (weapontype) newWeapon;
         DrawWeapon();
