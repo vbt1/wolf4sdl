@@ -146,7 +146,8 @@ Victory (void)
     VWB_DrawPic (124, 44, BJCOLLAPSE1PIC);
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
-#endif	
+#endif
+
     VW_FadeIn ();
     VW_WaitVBL (2 * 70);
     VWB_DrawPic (124, 44, BJCOLLAPSE2PIC);
@@ -180,7 +181,7 @@ Victory (void)
 #ifndef SPEAR
     CA_CacheGrChunk (C_TIMECODEPIC);
 #endif
-
+DrawPlayScreen(); // vbt ajout
     VWB_Bar (0, 0, SATURN_WIDTH, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
     if (bordercol != VIEWCOLOR)
         DrawStatusBorder (VIEWCOLOR);
@@ -293,8 +294,11 @@ Victory (void)
 #ifndef USE_SPRITES
     VW_UpdateScreen ();
 #endif	
-    VW_FadeIn ();
 
+DrawStatusBar(); // vbt ajout
+
+    VW_FadeIn ();
+//DrawPlayScreen(); // vbt ajout
     IN_Ack ();
 
     VW_FadeOut ();
