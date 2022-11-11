@@ -1242,7 +1242,7 @@ DrawHighScores (void)
 
     CacheLump (HIGHSCORES_LUMP_START, HIGHSCORES_LUMP_END);
     CA_CacheGrChunk (STARTFONT + 1);
-    VWB_DrawPic (0, 0, HIGHSCORESPIC);
+    VWB_DrawPic (0+SATURN_ADJUST, 0, HIGHSCORESPIC);
 
     fontnumber = 1;
 #endif
@@ -1263,7 +1263,7 @@ DrawHighScores (void)
 #ifndef SPEAR
         PrintX = SATURN_ADJUST + 4 * 8;
 #else
-        PrintX = 16;
+        PrintX = SATURN_ADJUST + 16;
 #endif
         US_Print (s->name);
 
@@ -1293,7 +1293,7 @@ DrawHighScores (void)
 
 #ifdef SPEAR
         if (s->completed == 21)
-            VWB_DrawPic (PrintX + 8, PrintY - 1, C_WONSPEARPIC);
+            VWB_DrawPic (SATURN_ADJUST + PrintX + 8, PrintY - 1, C_WONSPEARPIC);
         else
 #endif
             US_Print (buffer);

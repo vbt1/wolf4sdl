@@ -1209,9 +1209,9 @@ void
 ClearMScreen (void)
 {
 #ifndef SPEAR
-    VWB_Bar (0, 0, SATURN_WIDTH, 200, BORDCOLOR);
+    VWB_Bar (0+SATURN_ADJUST, 0, SATURN_WIDTH, 200, BORDCOLOR);
 #else
-    VWB_DrawPic (0, 0, C_BACKDROPPIC);
+    VWB_DrawPic (0+SATURN_ADJUST, 0, C_BACKDROPPIC);
 #endif
 }
 
