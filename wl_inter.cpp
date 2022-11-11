@@ -1009,8 +1009,8 @@ PreloadGraphics (void)
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
 #endif	
+	DrawStatusBar(); // vbt ajout
     VW_FadeIn ();
-
 
 #if 1
 //----------------------------------------------------------------------

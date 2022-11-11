@@ -1341,7 +1341,7 @@ void heapWalk();
 void GameLoop (void)
 {
 // vbt dernier niveau
-gamestate.mapon = 8;	
+//gamestate.mapon = 8;	
 //gamestate.mapon = 3;
 //gamestate.episode=3;
 //GiveWeapon (gamestate.bestweapon+2);
