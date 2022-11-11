@@ -155,7 +155,8 @@ void VWB_DrawPic (int x, int y, int chunknum)
 	width = pictable[picnum].width;
 	height = pictable[picnum].height;
 
-	VL_MemToScreen (grsegs[chunknum],width,height,x,y);
+//	VL_MemToScreen (grsegs[chunknum],width,height,x,y);
+    VL_MemToScreenScaledCoord(grsegs[chunknum], width, height, scaleFactor*x, scaleFactor*y);	
 }
 
 void VWB_DrawPicScaledCoord (int scx, int scy, int chunknum)

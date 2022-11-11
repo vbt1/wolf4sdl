@@ -394,6 +394,15 @@ BJ_Breathe (void)
     static int which = 0, max = 10;
     int pics[2] = { L_GUYPIC, L_GUY2PIC };
 
+	if(curSurface==screen)
+	{
+		curSurface = screenBuffer;
+
+		DrawStatusBar(); // vbt : ajout
+		curSurface = screen;
+	}
+	DrawStatusBar(); // vbt : ajout
+
     SDL_Delay(5);
 
     if ((int32_t) GetTimeCount () - lastBreathTime > max)
@@ -639,7 +648,22 @@ LevelCompleted (void)
         VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (sec % 10));
 #ifndef USE_SPRITES
         VW_UpdateScreen ();
+#else
+	if(curSurface==screen)
+	{
+		DrawStatusBar(); // vbt : ajout
+		curSurface = screenBuffer;
+		DrawStatusBar(); // vbt : ajout
+	}
+	else
+	{
+		DrawStatusBar(); // vbt : ajout
+//		curSurface = screen;
+//		DrawStatusBar(); // vbt : ajout		
+	}
+
 #endif		
+
         VW_FadeIn ();
 
         //
@@ -669,7 +693,9 @@ LevelCompleted (void)
                     SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES				
                 VW_UpdateScreen ();
-#endif				
+#else
+//		DrawStatusBar(); // vbt ajout				
+#endif
                 while (SD_SoundPlaying ())
                     BJ_Breathe ();
                 if (IN_CheckAck ())
@@ -677,7 +703,10 @@ LevelCompleted (void)
             }
 #ifndef USE_SPRITES
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif
+	
             SD_PlaySound (ENDBONUS2SND);
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
@@ -702,7 +731,10 @@ LevelCompleted (void)
                 SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
+	
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
 
@@ -719,6 +751,8 @@ LevelCompleted (void)
             Write (x, 7, tempstr);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             SD_PlaySound (PERCENT100SND);
         }
@@ -732,6 +766,8 @@ LevelCompleted (void)
             SD_PlaySound (ENDBONUS2SND);
 #ifndef USE_SPRITES
         VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout		
 #endif		
         while (SD_SoundPlaying ())
             BJ_Breathe ();
@@ -749,6 +785,8 @@ LevelCompleted (void)
                 SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
@@ -766,6 +804,8 @@ LevelCompleted (void)
             Write (x, 7, tempstr);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             SD_PlaySound (PERCENT100SND);
         }
@@ -779,6 +819,8 @@ LevelCompleted (void)
             SD_PlaySound (ENDBONUS2SND);
 #ifndef USE_SPRITES		
         VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout		
 #endif		
         while (SD_SoundPlaying ())
             BJ_Breathe ();
@@ -796,6 +838,8 @@ LevelCompleted (void)
                 SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
@@ -813,6 +857,8 @@ LevelCompleted (void)
             Write (x, 7, tempstr);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             SD_PlaySound (PERCENT100SND);
         }
@@ -826,6 +872,8 @@ LevelCompleted (void)
             SD_PlaySound (ENDBONUS2SND);
 #ifndef USE_SPRITES		
         VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout		
 #endif		
         while (SD_SoundPlaying ())
             BJ_Breathe ();
@@ -896,6 +944,8 @@ done:   itoa (kr, tempstr);
         Write (10, 16, "15000 bonus!");
 #ifndef USE_SPRITES
         VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout		
 #endif		
         VW_FadeIn ();
 
@@ -906,6 +956,8 @@ done:   itoa (kr, tempstr);
     DrawScore ();
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#else
+		DrawStatusBar(); // vbt ajout
 #endif
     lastBreathTime = GetTimeCount();
     IN_StartAck ();
@@ -946,7 +998,7 @@ done:   itoa (kr, tempstr);
 #endif
 
     VW_FadeOut ();
-    DrawPlayBorder();
+//    DrawPlayBorder();
 
     UnCacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
 	slBackColTable((void *)LINE_COLOR_TABLE);
