@@ -595,27 +595,27 @@ LevelCompleted (void)
         Write (14, 2, "floor\ncompleted");
 #endif
 
-        Write (14, 7, STR_BONUS "     0");
-        Write (16, 10, STR_TIME);
-        Write (16, 12, STR_PAR);
+        Write (14+ SATURN_ADJUST/8, 7, STR_BONUS "     0");
+        Write (16+ SATURN_ADJUST/8, 10, STR_TIME);
+        Write (16+ SATURN_ADJUST/8, 12, STR_PAR);
 
 #ifdef SPANISH
         Write (11, 14, STR_RAT2KILL);
         Write (11, 16, STR_RAT2SECRET);
         Write (11, 18, STR_RAT2TREASURE);
 #else
-        Write (9, 14, STR_RAT2KILL);
-        Write (5, 16, STR_RAT2SECRET);
-        Write (1, 18, STR_RAT2TREASURE);
+        Write (9+ SATURN_ADJUST/8, 14, STR_RAT2KILL);
+        Write (5+ SATURN_ADJUST/8, 16, STR_RAT2SECRET);
+        Write (1+ SATURN_ADJUST/8, 18, STR_RAT2TREASURE);
 #endif
 
-        Write (26, 2, itoa (gamestate.mapon + 1, tempstr, 10));
+        Write (26+ SATURN_ADJUST/8, 2, itoa (gamestate.mapon + 1, tempstr, 10));
 #endif
 
 #ifdef SPANISH
         Write (30, 12, parTimes[gamestate.episode * 10 + mapon].timestr);
 #else
-        Write (26, 12, parTimes[gamestate.episode * 10 + mapon].timestr);
+        Write (26+ SATURN_ADJUST/8, 12, parTimes[gamestate.episode * 10 + mapon].timestr);
 #endif
 
         //
@@ -1226,11 +1226,11 @@ DrawHighScores (void)
     UNCACHEGRCHUNK (HIGHSCORESPIC);
 
 #ifndef APOGEE_1_0
-    VWB_DrawPic (SATURN_ADJUST + 4 * 8, 68, C_NAMEPIC);
+    VWB_DrawPic (SATURN_ADJUST + 4  * 8, 68, C_NAMEPIC);
     VWB_DrawPic (SATURN_ADJUST + 20 * 8, 68, C_LEVELPIC);
     VWB_DrawPic (SATURN_ADJUST + 28 * 8, 68, C_SCOREPIC);
 #else
-    VWB_DrawPic(SATURN_ADJUST + 35*8,68,C_CODEPIC);
+    VWB_DrawPic (SATURN_ADJUST + 35 * 8, 68, C_CODEPIC);
 #endif
     fontnumber = 0;
 
@@ -1246,7 +1246,6 @@ DrawHighScores (void)
 
     fontnumber = 1;
 #endif
-
 
 #ifndef SPEAR
     SETFONTCOLOR (15, 0x29);
@@ -1264,7 +1263,7 @@ DrawHighScores (void)
 #ifndef SPEAR
         PrintX = SATURN_ADJUST + 4 * 8;
 #else
-        PrintX = SATURN_ADJUST + 16;
+        PrintX = 16;
 #endif
         US_Print (s->name);
 
