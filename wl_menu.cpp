@@ -711,7 +711,7 @@ CP_CheckQuick (ScanCode scancode)
                 Quit (NULL);
             }
 
-            DrawPlayBorder ();
+            DrawPlayScreen ();
             WindowH = 200;
             fontnumber = 0;
             return 1;

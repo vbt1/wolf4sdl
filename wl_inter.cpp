@@ -394,13 +394,13 @@ BJ_Breathe (void)
     static int which = 0, max = 10;
     int pics[2] = { L_GUYPIC, L_GUY2PIC };
 
-	if(curSurface==screen)
+	/*if(curSurface==screen)
 	{
 		curSurface = screenBuffer;
 
 		DrawStatusBar(); // vbt : ajout
 		curSurface = screen;
-	}
+	}*/
 	DrawStatusBar(); // vbt : ajout
 
     SDL_Delay(5);
@@ -649,13 +649,13 @@ LevelCompleted (void)
 #ifndef USE_SPRITES
         VW_UpdateScreen ();
 #else
-	if(curSurface==screen)
+	/*if(curSurface==screen)
 	{
 		DrawStatusBar(); // vbt : ajout
 		curSurface = screenBuffer;
 		DrawStatusBar(); // vbt : ajout
 	}
-	else
+	else*/
 	{
 		DrawStatusBar(); // vbt : ajout
 //		curSurface = screen;
@@ -1013,12 +1013,11 @@ done:   itoa (kr, tempstr);
 =
 =================
 */
-#if 0
-boolean
+#if 1
+void
 PreloadUpdate (unsigned current, unsigned total)
 {
     unsigned w = WindowW - scaleFactor * 10;
-
     VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
         w, scaleFactor * 2, BLACK);
     w = ((int32_t) w * current) / total;
@@ -1039,7 +1038,7 @@ PreloadUpdate (unsigned current, unsigned total)
 //              return(true);
 //      }
 //      else
-    return (false);
+//    return (false);
 }
 #endif
 void
@@ -1060,7 +1059,7 @@ PreloadGraphics (void)
     WindowH = scaleFactor * 48;
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
-#endif	
+#endif
 	DrawStatusBar(); // vbt ajout
     VW_FadeIn ();
 
@@ -1094,7 +1093,7 @@ PreloadGraphics (void)
 	readChunks(fileId, 0x2000, &pageOffsets[40], Chunks, ptr);
 	PMPages[43]=ptr+0x1000;
 	ptr+=0x2000;
-	
+PreloadUpdate (1, 10);	
    // doors
     for (y=PMSpriteStart-8;y<PMSpriteStart;y++)
     {
@@ -1105,7 +1104,7 @@ PreloadGraphics (void)
 		readChunks(fileId, 0x1000, &pageOffsets[y], Chunks, ptr);
 		ptr+=0x1000;
 	}
-
+PreloadUpdate (2, 10);
 	// walls in map
     for (y=1;y<NB_WALL_HWRAM/2;y++)
     {
@@ -1117,7 +1116,7 @@ PreloadGraphics (void)
 			ptr+=0x2000;		
 		}
 	}
-
+PreloadUpdate (3, 10);
 	int *val = (int *)ptr;	
 	slPrintHex((int)val,slLocate(10,21));	
 
@@ -1133,7 +1132,7 @@ PreloadGraphics (void)
 			ptr+=0x2000;		
 		}
 	}
-
+PreloadUpdate (5, 10);
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr; // retourner l'adresse du pointeur
 	// ennemies
@@ -1150,7 +1149,7 @@ PreloadGraphics (void)
 		else
 			PMPages[y] = ptr;
 	}
-
+PreloadUpdate (8, 10);
 	// weapons  doit être après les ennemis
 #ifdef APOGEE_1_1	
 	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets+2,pageLengths+2,ptr,fileId);
@@ -1158,7 +1157,7 @@ PreloadGraphics (void)
 	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,ptr,fileId);
 #endif
 	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
-
+PreloadUpdate (10, 10);
 	val = (int *)ptr;
 	slPrintHex((int)val,slLocate(10,22));	
 //----------------------------------------------------------------------
@@ -1173,7 +1172,7 @@ PreloadGraphics (void)
     IN_UserInput (70);
     VW_FadeOut ();
 
-    DrawPlayBorder ();
+    DrawPlayScreen ();
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
 #endif	

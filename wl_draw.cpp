@@ -1811,9 +1811,7 @@ void    ThreeDRefresh (void)
 			memset(texture_list,0x00,SPR_NULLSPRITE);
 			position_vram = (SATURN_WIDTH+64)*64;
 		}
-//		slDMAWait();
 #else
-	VL_UnlockSurface(screenBuffer); // met à jour l'affichage de la barre de statut
 	vbuf = NULL;
 #endif
 

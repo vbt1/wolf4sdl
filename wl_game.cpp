@@ -789,86 +789,7 @@ void SetupGameLevel (void)
 			itemmap[statobjlist[i].shapenum+PMSpriteStart]=1;
 		}
     }
-//-----------------------------------------------------------------------------------	
-#if 0
-	if(wallData== NULL) wallData = (uint8_t *) malloc(((NB_WALL_HWRAM*2)+8)*0x1000);
-	uint8_t *ptr = (uint8_t *)wallData;	
-	
-	// walls 0/1
-	PMPages[0]=ptr;
-	readChunks(fileId, 0x2000, &pageOffsets[0], Chunks+0x8000, ptr);
-	PMPages[1]=ptr+0x1000;
-	ptr+=0x2000;		
-	// walls 40/41
-	PMPages[42]=ptr;
-	readChunks(fileId, 0x2000, &pageOffsets[40], Chunks+0x8000, ptr);
-	PMPages[43]=ptr+0x1000;
-	ptr+=0x2000;
-	
-   // doors
-//    for (y=90;y<AREATILE;y++)
-    for (y=PMSpriteStart-8;y<PMSpriteStart;y++)
-    {
-        if(!pageOffsets[y])
-            continue;
-		
-		PMPages[y]=ptr;
-		readChunks(fileId, 0x1000, &pageOffsets[y], Chunks+0x8000, ptr);
-		ptr+=0x1000;
-	}
 
-	// walls in map
-    for (y=1;y<NB_WALL_HWRAM/2;y++)
-    {
-		if(itemmap[y+1]==1)
-		{
-			PMPages[(y*2)]=ptr;
-			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks+0x8000, ptr);
-			PMPages[(y*2)+1]=ptr+0x1000;
-			ptr+=0x2000;		
-		}
-	}
-
-	int *val = (int *)ptr;	
-	slPrintHex((int)val,slLocate(10,21));	
-
-	ptr = (uint8_t *)0x00202000;
-
-    for (y=NB_WALL_HWRAM/2;y<64;y++)
-    {
-		if(itemmap[y+1]==1)
-		{
-			PMPages[(y*2)]=ptr;
-			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks+0x8000, ptr);
-			PMPages[(y*2)+1]=ptr+0x1000;
-			ptr+=0x2000;		
-		}
-	}
-
-    // last page points after page buffer
-    PMPages[ChunksInFile] = ptr; // retourner l'adresse du pointeur
-	// ennemies
-    for (y=PMSpriteStart;y<PMSpriteStart+SPR_KNIFEREADY;y++)
-    {
-		if(itemmap[y]==1)
-			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
-		else
-			PMPages[y] = ptr;
-	}
-
-	// weapons  doit être après les ennemis
-#ifdef APOGEE_1_1	
-	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets+2,pageLengths+2,ptr,fileId);
-#else
-	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,ptr,fileId);
-#endif
-	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
-
-	val = (int *)ptr;
-	slPrintHex((int)val,slLocate(10,22));	
-	
-#endif	
-//-----------------------------------------------------------------------------------	
 	slScrTransparent(0);
 	slSynch();
 	extern const void * TransList;
@@ -941,7 +862,7 @@ void DrawPlayBorderSides(void)
 
 void DrawStatusBorder (byte color)
 {
-    int statusborderw = (screenWidth-scaleFactor*SATURN_WIDTH)/2;
+ /*   int statusborderw = (screenWidth-scaleFactor*SATURN_WIDTH)/2;
 
     VWB_BarScaledCoord (0,0,screenWidth,screenHeight-scaleFactor*(STATUSLINES-3),color);
     VWB_BarScaledCoord (0,screenHeight-scaleFactor*(STATUSLINES-3),
@@ -959,7 +880,7 @@ void DrawStatusBorder (byte color)
     VWB_BarScaledCoord (screenWidth-statusborderw-scaleFactor*9, screenHeight-scaleFactor*(STATUSLINES-4),
         scaleFactor*1, scaleFactor*20, color-2);
     VWB_BarScaledCoord (screenWidth-statusborderw-scaleFactor*9, screenHeight-scaleFactor*(STATUSLINES/2-4),
-        scaleFactor*1, scaleFactor*14, color-3);
+        scaleFactor*1, scaleFactor*14, color-3);*/
 }
 
 
@@ -971,7 +892,7 @@ void DrawStatusBorder (byte color)
 ===================
 */
 
-void DrawPlayBorder (void)
+inline void DrawPlayBorder (void)
 {
 	const int px = scaleFactor; // size of one "pixel"
 
@@ -1028,7 +949,6 @@ void DrawPlayBorder (void)
         // Just paint a lower border line
         VWB_BarScaledCoord(0, yl+viewheight, viewwidth, px, bordercol-2);       // lower border
     }
-
 }
 
 
@@ -1044,11 +964,7 @@ void DrawPlayScreen (void)
 {
 	//vbt à remettre
   	//		slPrint("VWB_DrawPicScaledCoord",slLocate(10,10));
-#if SATURN_WIDTH == 352
-	VWB_DrawPicScaledCoord (16+(screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
-#else
-	VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
-#endif	
+	VWB_DrawPicScaledCoord (SATURN_ADJUST+(screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
     DrawPlayBorder ();
 }
@@ -1060,7 +976,7 @@ void DrawStatusBar (void)
 //			VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*SATURN_WIDTH)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
   	//		slPrint("DrawPlayBorder",slLocate(10,11));
 //    DrawPlayBorder ();
-    DrawFace ();
+    DrawFace (); // deja fait dans update face
     DrawHealth ();
     DrawLives ();
     DrawLevel ();
@@ -1296,10 +1212,6 @@ void Died (void)
 	
     IN_UserInput(100);
     SD_WaitSoundDone ();
-	
-//    VL_UnlockSurface(curSurface);
-//	VGAClearScreen(); // vbt : maj du fond d'écran
-//    VL_UnlockSurface(curSurface);
 	
     gamestate.lives--;
 

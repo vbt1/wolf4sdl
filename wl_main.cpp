@@ -109,7 +109,6 @@ TransCount*=2;	*/
 //	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
 	SDL_SetColors(curSurface, curpal, 0, 256);
 	VGAClearScreen (); // vbt : maj du fond d'écran
-//	VL_UnlockSurface(curSurface);
 #ifdef PONY
 	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;
 #endif
@@ -1323,13 +1322,13 @@ void ShowViewSize (int width)
     {
         viewwidth = screenWidth;
         viewheight = screenHeight - scaleFactor*STATUSLINES;
-        DrawPlayBorder ();
+        DrawPlayScreen ();
     }
     else
     {
         viewwidth = width*16*screenWidth/SATURN_WIDTH;
         viewheight = (int) (width_to_height(width*16)*screenHeight/200);
-        DrawPlayBorder ();
+        DrawPlayScreen ();
     }
 
     viewwidth = oldwidth;
