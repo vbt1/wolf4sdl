@@ -637,15 +637,15 @@ LevelCompleted (void)
 #else
         i = 26 * 8;
 #endif
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (min / 10));
+        VWB_DrawPic (i+SATURN_ADJUST, 10 * 8, L_NUM0PIC + (min / 10));
         i += 2 * 8;
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (min % 10));
+        VWB_DrawPic (i+SATURN_ADJUST, 10 * 8, L_NUM0PIC + (min % 10));
         i += 2 * 8;
-        Write (i / 8, 10, ":");
+        Write (i / 8 + SATURN_ADJUST /8, 10, ":");
         i += 1 * 8;
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (sec / 10));
+        VWB_DrawPic (i+SATURN_ADJUST, 10 * 8, L_NUM0PIC + (sec / 10));
         i += 2 * 8;
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (sec % 10));
+        VWB_DrawPic (i+SATURN_ADJUST, 10 * 8, L_NUM0PIC + (sec % 10));
 #ifndef USE_SPRITES
         VW_UpdateScreen ();
 #else
@@ -688,7 +688,7 @@ LevelCompleted (void)
             {
                 ltoa ((int32_t) i * PAR_AMOUNT, tempstr);
                 x = 36 - (int) strlen(tempstr) * 2;
-                Write (x, 7, tempstr);
+                Write (x + SATURN_ADJUST /8, 7, tempstr);
                 if (!(i % (PAR_AMOUNT / 10)))
                     SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES				
@@ -726,7 +726,7 @@ LevelCompleted (void)
         {
             itoa (i, tempstr, 10);
             x = RATIOXX - (int) strlen(tempstr) * 2;
-            Write (x, 14, tempstr);
+            Write (x + SATURN_ADJUST /8, 14, tempstr);
             if (!(i % 10))
                 SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES			
@@ -748,7 +748,7 @@ LevelCompleted (void)
             bonus += PERCENT100AMT;
             ltoa (bonus, tempstr);
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
-            Write (x, 7, tempstr);
+            Write (x + SATURN_ADJUST /8, 7, tempstr);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #else
@@ -780,7 +780,7 @@ LevelCompleted (void)
         {
             itoa (i, tempstr);
             x = RATIOXX - (int) strlen(tempstr) * 2;
-            Write (x, 16, tempstr);
+            Write (x + SATURN_ADJUST /8, 16, tempstr);
             if (!(i % 10))
                 SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES			
@@ -801,7 +801,7 @@ LevelCompleted (void)
             bonus += PERCENT100AMT;
             ltoa (bonus, tempstr);
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
-            Write (x, 7, tempstr);
+            Write (x + SATURN_ADJUST /8, 7, tempstr);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #else
@@ -833,7 +833,7 @@ LevelCompleted (void)
         {
             itoa (i, tempstr);
             x = RATIOXX - (int) strlen(tempstr) * 2;
-            Write (x, 18, tempstr);
+            Write (x + SATURN_ADJUST /8, 18, tempstr);
             if (!(i % 10))
                 SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES			
@@ -854,7 +854,7 @@ LevelCompleted (void)
             bonus += PERCENT100AMT;
             ltoa (bonus, tempstr);
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
-            Write (x, 7, tempstr);
+            Write (x + SATURN_ADJUST /8, 7, tempstr);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #else
@@ -884,15 +884,15 @@ LevelCompleted (void)
         //
 done:   itoa (kr, tempstr);
         x = RATIOXX - (int) strlen(tempstr) * 2;
-        Write (x, 14, tempstr);
+        Write (x + SATURN_ADJUST /8, 14, tempstr);
 
         itoa (sr, tempstr);
         x = RATIOXX - (int) strlen(tempstr) * 2;
-        Write (x, 16, tempstr);
+        Write (x + SATURN_ADJUST /8, 16, tempstr);
 
         itoa (tr, tempstr);
         x = RATIOXX - (int) strlen(tempstr) * 2;
-        Write (x, 18, tempstr);
+        Write (x + SATURN_ADJUST /8, 18, tempstr);
 
         bonus = (int32_t) timeleft *PAR_AMOUNT +
             (PERCENT100AMT * (kr >= 100)) +
@@ -901,7 +901,7 @@ done:   itoa (kr, tempstr);
         GivePoints (bonus);
         ltoa (bonus, tempstr);
         x = 36 - (int) strlen(tempstr) * 2;
-        Write (x, 7, tempstr);
+        Write (x + SATURN_ADJUST /8, 7, tempstr);
 
         //
         // SAVE RATIO INFORMATION FOR ENDGAME
@@ -918,30 +918,30 @@ done:   itoa (kr, tempstr);
         switch (mapon)
         {
             case 4:
-                Write (14, 4, " trans\n" " grosse\n" STR_DEFEATED);
+                Write (14 + SATURN_ADJUST /8, 4, " trans\n" " grosse\n" STR_DEFEATED);
                 break;
             case 9:
-                Write (14, 4, "barnacle\n" "wilhelm\n" STR_DEFEATED);
+                Write (14 + SATURN_ADJUST /8, 4, "barnacle\n" "wilhelm\n" STR_DEFEATED);
                 break;
             case 15:
-                Write (14, 4, "ubermutant\n" STR_DEFEATED);
+                Write (14 + SATURN_ADJUST /8, 4, "ubermutant\n" STR_DEFEATED);
                 break;
             case 17:
-                Write (14, 4, " death\n" " knight\n" STR_DEFEATED);
+                Write (14 + SATURN_ADJUST /8, 4, " death\n" " knight\n" STR_DEFEATED);
                 break;
             case 18:
-                Write (13, 4, "secret tunnel\n" "    area\n" "  completed!");
+                Write (13 + SATURN_ADJUST /8, 4, "secret tunnel\n" "    area\n" "  completed!");
                 break;
             case 19:
-                Write (13, 4, "secret castle\n" "    area\n" "  completed!");
+                Write (13 + SATURN_ADJUST /8, 4, "secret castle\n" "    area\n" "  completed!");
                 break;
         }
 #endif
 #else
-        Write (14, 4, "secret floor\n completed!");
+        Write (14 + SATURN_ADJUST /8, 4, "secret floor\n completed!");
 #endif
 
-        Write (10, 16, "15000 bonus!");
+        Write (10 + SATURN_ADJUST /8, 16, "15000 bonus!");
 #ifndef USE_SPRITES
         VW_UpdateScreen ();
 #else
@@ -1018,14 +1018,14 @@ void
 PreloadUpdate (unsigned current, unsigned total)
 {
     unsigned w = WindowW - scaleFactor * 10;
-    VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
+    VL_BarScaledCoordNBG (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
         w, scaleFactor * 2, BLACK);
     w = ((int32_t) w * current) / total;
     if (w)
     {
-        VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
+        VL_BarScaledCoordNBG (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
             w, scaleFactor * 2, 0x37);       //SECONDCOLOR);
-        VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
+        VL_BarScaledCoordNBG (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
             w - scaleFactor * 1, scaleFactor * 1, 0x32);
 
     }
@@ -1042,7 +1042,7 @@ PreloadUpdate (unsigned current, unsigned total)
 }
 #endif
 void
-PreloadGraphics (void)
+PreloadGraphics (int loaded)
 {
     DrawLevel ();
     ClearSplitVWB ();           // set up for double buffering in split screen
@@ -1081,30 +1081,41 @@ PreloadGraphics (void)
 	Uint8 *Chunks	 		= (uint8_t *)saturnChunk+0xC000;
 	
 	if(wallData== NULL) wallData = (uint8_t *) malloc(((NB_WALL_HWRAM*2)+8)*0x1000);
-	uint8_t *ptr = (uint8_t *)wallData;	
+	uint8_t *ptr = (uint8_t *)wallData;
+	loaded += (12+(SPR_NULLSPRITE-SPR_KNIFEREADY));
+    for (y=1;y<64;y++)
+    {
+		if(itemmap[y+1]==1)
+			loaded+=2;
+	}
 	
+	int i = 0;
+
 	// walls 0/1
 	PMPages[0]=ptr;
 	readChunks(fileId, 0x2000, &pageOffsets[0], Chunks, ptr);
 	PMPages[1]=ptr+0x1000;
-	ptr+=0x2000;		
+	ptr+=0x2000;
+	PreloadUpdate ((i+=2), loaded);	
 	// walls 40/41
 	PMPages[42]=ptr;
 	readChunks(fileId, 0x2000, &pageOffsets[40], Chunks, ptr);
 	PMPages[43]=ptr+0x1000;
 	ptr+=0x2000;
-PreloadUpdate (1, 10);	
+	PreloadUpdate ((i+=2), loaded);
+	
    // doors
     for (y=PMSpriteStart-8;y<PMSpriteStart;y++)
     {
-        if(!pageOffsets[y])
+		if(!pageOffsets[y])
             continue;
 		
 		PMPages[y]=ptr;
 		readChunks(fileId, 0x1000, &pageOffsets[y], Chunks, ptr);
 		ptr+=0x1000;
+		PreloadUpdate (i++, loaded); 
 	}
-PreloadUpdate (2, 10);
+
 	// walls in map
     for (y=1;y<NB_WALL_HWRAM/2;y++)
     {
@@ -1113,10 +1124,11 @@ PreloadUpdate (2, 10);
 			PMPages[(y*2)]=ptr;
 			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks, ptr);
 			PMPages[(y*2)+1]=ptr+0x1000;
-			ptr+=0x2000;		
+			ptr+=0x2000;
+			PreloadUpdate ((i+=2), loaded);
 		}
 	}
-PreloadUpdate (3, 10);
+
 	int *val = (int *)ptr;	
 	slPrintHex((int)val,slLocate(10,21));	
 
@@ -1129,43 +1141,47 @@ PreloadUpdate (3, 10);
 			PMPages[(y*2)]=ptr;
 			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks, ptr);
 			PMPages[(y*2)+1]=ptr+0x1000;
-			ptr+=0x2000;		
+			ptr+=0x2000;
+			PreloadUpdate ((i+=2), loaded);
 		}
 	}
-PreloadUpdate (5, 10);
     // last page points after page buffer
     PMPages[ChunksInFile] = ptr; // retourner l'adresse du pointeur
 	// ennemies
     for (y=PMSpriteStart;y<PMSpriteStart+SPR_KNIFEREADY;y++)
     {
 		if(itemmap[y]==1)
+		{
 #ifdef APOGEE_1_1				
 			if(y>=PMSpriteStart+SPR_BJ_W1-2 && y<=PMSpriteStart+SPR_BJ_JUMP4)
 			ptr=PM_DecodeSprites2(y,y+1,pageOffsets+2,pageLengths+2,ptr,fileId);
 			else
 #endif
 			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
-	
+			PreloadUpdate (i++, loaded);
+		}
 		else
 			PMPages[y] = ptr;
 	}
-PreloadUpdate (8, 10);
 	// weapons  doit être après les ennemis
+	for (y=PMSpriteStart+SPR_KNIFEREADY;y<PMSpriteStart+SPR_NULLSPRITE;y++)
+    {
 #ifdef APOGEE_1_1	
-	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets+2,pageLengths+2,ptr,fileId);
+		ptr=PM_DecodeSprites2(y,y+1,pageOffsets+2,pageLengths+2,ptr,fileId);
 #else
-	ptr=PM_DecodeSprites2(PMSpriteStart+SPR_KNIFEREADY,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,ptr,fileId);
+		ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
 #endif
+		PreloadUpdate (i++, loaded);
+	}
 	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
-PreloadUpdate (10, 10);
+	PreloadUpdate (10, 10);
 	val = (int *)ptr;
 	slPrintHex((int)val,slLocate(10,22));	
 //----------------------------------------------------------------------
 #endif
 
-
-
-
+//	slPrintHex(i,slLocate(10,10));
+//	slPrintHex(loaded,slLocate(10,11));
 
 //      PM_Preload (PreloadUpdate);
 //    PreloadUpdate (10, 10);

@@ -205,20 +205,9 @@ static int32_t GRFILEPOS(const size_t idx)
 int32_t CAL_GetGrChunkLength (int chunk)
 {
 	int32_t   chunkexplen;
-#if 1
+
 	uint32_t pos = GRFILEPOS(chunk);
 	readChunks(grhandle, sizeof(chunkexplen), &pos, saturnChunk, (uint8_t *)&chunkexplen);
-#else
-	uint8_t *Chunks;
-	uint16_t delta = (uint16_t)(GRFILEPOS(chunk)/2048);
-	uint32_t delta2 = (GRFILEPOS(chunk) - delta*2048);
-	Chunks=(uint8_t*)saturnChunk;
-	
-//	CHECKMALLOCRESULT(Chunks);
-GFS_Load(grhandle, delta, (void *)Chunks, sizeof(chunkexplen)+delta2); // lecture partielle ok
-memcpy(&chunkexplen,&Chunks[delta2],sizeof(chunkexplen));
-//	Chunks = NULL;
-#endif	
 
 	chunkexplen = SWAP_BYTES_32(chunkexplen);
     return GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
@@ -950,14 +939,6 @@ void CA_CacheMap (int mapnum)
 //
     size = maparea*2;
 	uint8_t *Chunks=(uint8_t*)saturnChunk;   // ?crase les sons
-//	uint8_t *Chunks=(uint8_t*)malloc(fileSize);   // ?crase les sons
-//slPrintHex(maphandle,slLocate(10,19));
-//slPrintHex(fileSize,slLocate(10,20));
-
-//	GFS_Load(maphandle, 0, (void *)Chunks, fileSize);
-//	readChunks(maphandle, size, &pageOffsets[i], Chunks, ptr);
-
-//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 	
     for (plane = 0; plane<MAPPLANES; plane++)
     {

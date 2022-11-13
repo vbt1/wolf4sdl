@@ -302,53 +302,7 @@ US_ControlPanel (ScanCode scancode)
     SetupControlPanel ();
 //VBT déplacé
 	StartCPMusic (MENUSONG);
-    //
-    // F-KEYS FROM WITHIN GAME
-    //
-/*
-    switch (scancode)
-    {
 
-        case sc_F1:
-#ifdef SPEAR
-            BossKey ();
-#else
-#ifdef GOODTIMES
-            BossKey ();
-#else
-            HelpScreens ();
-#endif
-#endif
-            goto finishup;
-	   
-        case sc_F2:
-            CP_SaveGame (0);
-            goto finishup;
-		
-        case sc_F3:
-            CP_LoadGame (0);
-            goto finishup;
-		
-        case sc_F4:
-            CP_Sound (0);
-            goto finishup;
-		
-        case sc_F5:
-            CP_ChangeView (0);
-            goto finishup;
-
-        case sc_F6:
-            CP_Control (0);
-            goto finishup;
-		 
-        finishup:
-            CleanupControlPanel ();
-#ifdef SPEAR
-            UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
-#endif
-            return;
-    }
-*/
 #ifdef SPEAR
     CacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
 #endif
@@ -417,8 +371,6 @@ US_ControlPanel (ScanCode scancode)
                 if (MainMenu[viewscores].routine == NULL)
                 {
                     if (CP_EndGame (0))
-	//slPrint("exit game 5!!!!",slLocate(10,11));	
-						
                         StartGame = 1;
                 }
                 else
@@ -499,9 +451,7 @@ void EnableEndGameMenuItem()
 void
 DrawMainMenu (void)
 {
-//slPrint("slScrTransparent7",slLocate(1,17));		
 	slScrTransparent(NBG1ON);
-//	slPrint("DrawMainMenu",slLocate(10,15));
 #ifdef JAPAN
     CA_CacheScreen (S_OPTIONSPIC);
 #else

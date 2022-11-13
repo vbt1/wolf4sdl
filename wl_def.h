@@ -13,9 +13,15 @@
 #define NB_WALL_HWRAM 50/2
 // 240 pour du 320, 264 pour du 352
 #define	LINE_COLOR_TABLE		(VDP2_VRAM_A0	+ 0x1f400)
-#define PRELOAD_ITEMS(START,STOP) \
-for(int i=START;i<=STOP;i++) \
-itemmap[i+PMSpriteStart]=1;
+#define PRELOAD_ITEMS(START,STOP) ({\
+int retvalue=0; \
+if(itemmap[START+PMSpriteStart]==0) {\
+for(int i=START;i<=STOP;i++){ \
+itemmap[i+PMSpriteStart]=1;} \
+retvalue=STOP+1-START; \
+} \
+retvalue; \
+})
 
 extern unsigned char *saturnChunk;
 
@@ -1047,7 +1053,7 @@ extern  byte            bordercol;
 extern  SDL_Surface     *latchpics[NUMLATCHPICS];
 //extern  char            demoname[13];
 
-void    SetupGameLevel (void);
+int    SetupGameLevel (void);
 void    GameLoop (void);
 inline void    DrawPlayBorder (void);
 void    DrawStatusBorder (byte color);
@@ -1180,7 +1186,7 @@ void Victory (void);
 void LevelCompleted (void);
 void ClearSplitVWB (void);
 
-void PreloadGraphics(void);
+void PreloadGraphics(int loaded);
 
 
 /*
