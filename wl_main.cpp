@@ -109,7 +109,6 @@ TransCount*=2;	*/
 //	SDL_SetPalette(curSurface, SDL_PHYSPAL, curpal, 0, 256);
 	SDL_SetColors(curSurface, curpal, 0, 256);
 	VGAClearScreen (); // vbt : maj du fond d'écran
-//	VL_UnlockSurface(curSurface);
 #ifdef PONY
 	m68k_com->start = (m68k_com->start != 0xFFFF) ? 1 : m68k_com->start;
 #endif
@@ -965,7 +964,7 @@ void InitDigiMap (void)
         DigiMap[map[0]] = map[1];
     }
 #endif	
-    for (int i = 0; i<47; i++)
+    for (int i = 0; i<73; i++)
     {
         SD_PrepareSound(i);
     }
@@ -1233,8 +1232,9 @@ static void InitGame()
 //
 // load in and lock down some basic chunks
 //
-//slPrint((char *)"CA_CacheGrChunk     ",slLocate(10,12));
+//slPrint((char *)"CA_CacheGrChunk1     ",slLocate(10,12));
     CA_CacheGrChunk(STARTFONT);
+//slPrint((char *)"CA_CacheGrChunk2     ",slLocate(10,12));	
     CA_CacheGrChunk(STATUSBARPIC);
 //slPrint((char *)"LoadLatchMem     ",slLocate(10,12));	
 //	slTVOff();
@@ -1259,7 +1259,7 @@ SDL_SetColors(curSurface, gamepal, 0, 256);
 //
     InitRedShifts ();	
 #ifndef SPEARDEMO
-    if(!didjukebox)
+//    if(!didjukebox)
 #endif
         FinishSignon();
 #ifdef NOTYET
@@ -1322,13 +1322,13 @@ void ShowViewSize (int width)
     {
         viewwidth = screenWidth;
         viewheight = screenHeight - scaleFactor*STATUSLINES;
-        DrawPlayBorder ();
+        DrawPlayScreen ();
     }
     else
     {
         viewwidth = width*16*screenWidth/SATURN_WIDTH;
         viewheight = (int) (width_to_height(width*16)*screenHeight/200);
-        DrawPlayBorder ();
+        DrawPlayScreen ();
     }
 
     viewwidth = oldwidth;
@@ -1454,7 +1454,9 @@ void Quit (const char *errorStr, ...)
 
 static void DemoLoop()
 {
+#ifndef SPEARDEMO
     int LastDemo = 0;
+#endif	
 //
 // check for launch from ted
 //
@@ -1481,7 +1483,7 @@ static void DemoLoop()
 //
 
 #ifndef DEMOTEST
-
+/*
     #ifndef UPLOAD
 
         #ifndef GOODTIMES
@@ -1503,6 +1505,7 @@ static void DemoLoop()
         #endif
         #endif
     #endif
+	*/
     //StartCPMusic(INTROSONG);
 #ifndef JAPAN
 //slPrint((char*)"PG13 or StartCPMusic",slLocate(10,22));	
@@ -1538,13 +1541,16 @@ static void DemoLoop()
             VL_ConvertPalette(grsegs[TITLEPALETTE], pal, 256);
 
             CA_CacheGrChunk (TITLE1PIC);
-            VWB_DrawPic (0,0,TITLE1PIC);
+            VWB_DrawPic (SATURN_ADJUST,0,TITLE1PIC);
             UNCACHEGRCHUNK (TITLE1PIC);
 
             CA_CacheGrChunk (TITLE2PIC);
-            VWB_DrawPic (0,80,TITLE2PIC);
+            VWB_DrawPic (SATURN_ADJUST,80,TITLE2PIC);
             UNCACHEGRCHUNK (TITLE2PIC);
+#ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#endif
+			slTVOn();
             VL_FadeIn(0,255,pal,30);
 
             UNCACHEGRCHUNK (TITLEPALETTE);
@@ -1552,11 +1558,11 @@ static void DemoLoop()
 //slPrint((char*)"CA_CacheScreen1",slLocate(10,22));	
             CA_CacheScreen (TITLEPIC);
 //slPrint((char*)"VW_UpdateScreen1",slLocate(10,22));
-slTVOn();
+
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
 #endif
-
+			slTVOn();
 //slPrint((char*)"VW_FadeIn1",slLocate(10,22));				
             VW_FadeIn();
 		
@@ -1572,13 +1578,16 @@ slTVOn();
 //
 // credits page
 //
+//slPrint((char*)"CA_CacheScreen",slLocate(10,22));
             CA_CacheScreen (CREDITSPIC);
 #ifndef USE_SPRITES			
             VW_UpdateScreen();
-#endif			
+#endif
+//slPrint((char*)"VW_FadeIn2",slLocate(10,22));				
             VW_FadeIn ();
             if (IN_UserInput(TickBase*10))
                 break;
+//slPrint((char*)"VW_FadeOut2",slLocate(10,22));			
             VW_FadeOut ();
 //
 // high scores
@@ -1594,7 +1603,7 @@ slTVOn();
 //
 // demo
 //
-
+//slPrint((char*)"VW_FadeOut2",slLocate(10,22));
             #ifndef SPEARDEMO
             PlayDemo (LastDemo++%4);
             #else

@@ -352,9 +352,7 @@ byte VL_GetPixel (int x, int y)
             && y >= 0 && (unsigned) y < screenHeight
             && "VL_GetPixel: Pixel out of bounds!");
 
-//    VL_LockSurface(curSurface);
 	return ((byte *) curSurface->pixels)[y * curPitch + x];
-//    VL_UnlockSurface(curSurface);
 //	return col;
 }
 
@@ -372,10 +370,8 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, int color)
             && y >= 0 && y < screenHeight
             && "VL_Hlin: Destination rectangle out of bounds!");
 
-    VL_LockSurface(curSurface);
     Uint8 *dest = ((byte *) curSurface->pixels) + y * curPitch + x;
     memset(dest, color, width);
-//    VL_UnlockSurface(curSurface); // vbt on vire pour voir
 }
 
 /*
@@ -392,7 +388,6 @@ void VL_Vlin (int x, int y, int height, int color)
 			&& y >= 0 && (unsigned) y + height <= screenHeight
 			&& "VL_Vlin: Destination rectangle out of bounds!");
 
-	VL_LockSurface(curSurface);
 	Uint8 *dest = ((byte *) curSurface->pixels) + y * curPitch + x;
 
 	while (height--)
@@ -400,7 +395,6 @@ void VL_Vlin (int x, int y, int height, int color)
 		*dest = color;
 		dest += curPitch;
 	}
-//	VL_UnlockSurface(curSurface);// vbt on vire pour voir
 }
 
 /*
@@ -421,7 +415,7 @@ void VL_BarScaledCoord (int scx, int scy, int scwidth, int scheight, int color)
 			&& scy >= 0 && (unsigned) scy + scheight <= screenHeight
 			&& "VL_BarScaledCoord: Destination rectangle out of bounds!");
 */
-	VL_LockSurface(curSurface);
+//	VL_LockSurface(curSurface);
 	Uint8 *dest = ((byte *) curSurface->pixels) + scy * curPitch + scx;
 
 	while (scheight--)
@@ -430,6 +424,39 @@ void VL_BarScaledCoord (int scx, int scy, int scwidth, int scheight, int color)
 		dest += curPitch;
 	}
 	VL_UnlockSurface(curSurface);// vbt utile
+}
+
+void VL_BarScaledCoordNBG (int scx, int scy, int scwidth, int scheight, int color)
+{
+	if (scy<0 || scy>screenHeight)
+		scy=0;
+		
+/*
+	assert3(scx >= 0 && (unsigned) scx + scwidth <= screenWidth
+			&& scy >= 0 && (unsigned) scy + scheight <= screenHeight
+			&& "VL_BarScaledCoord: Destination rectangle out of bounds!");
+*/
+//	VL_LockSurface(curSurface);
+//	Uint8 *dest = ((byte *) curSurface->pixels) + scy * curPitch + scx;
+/*
+	while (scheight--)
+	{
+		memset(dest, color, scwidth);
+		dest += curPitch;
+	}
+	VL_UnlockSurface(curSurface);// vbt utile
+	*/
+//	unsigned char *surfacePtr = (unsigned char*)src->pixels + ((srcrect->y) * src->pitch) + srcrect->x;
+//	unsigned char *surfacePtrD = (unsigned char*)dst->pixels + (dstrect->y* dst->pitch)+ dstrect->x;
+	unsigned int *dest = (unsigned int*)(VDP2_VRAM_A0 + (scy<<9)+ scx);
+	
+	while (scheight--)
+	{
+		memset(dest, color, scwidth);
+		dest+=128;
+	}	
+	
+	
 }
 
 /*
@@ -466,8 +493,7 @@ void VL_MemToLatch(byte *source, int width, int height,
                 + (xsrc & 3) * (width >> 2) * height];
         }
 		dest+=pitch;
-    }	 
-//    VL_UnlockSurface(destSurface); // vbt : evite l'affichage des chargements au boot
+    }
 }
 
 //===========================================================================
@@ -488,7 +514,7 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
 //    assert5(destx >= 0 && destx + width * scaleFactor <= screenWidth
 //            && desty >= 0 && desty + height * scaleFactor <= screenHeight
 //            && "VL_MemToScreenScaledCoord: Destination rectangle out of bounds!");
-
+#if 1
 //    VL_LockSurface(curSurface);
 	byte *vbuf = (byte *)curSurface->pixels+(desty*curPitch)+destx;
 	unsigned char w2 = width>>2;
@@ -505,7 +531,7 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
 			vbuf+=curPitch;
 			source+=w2;
 		}
-    }		
+    }
 /*	else
 	{
 		for(unsigned int j=0,scj=0; j<height; j++, scj+=scaleFactor)
@@ -524,49 +550,9 @@ void VL_MemToScreenScaledCoord (byte *source, int width, int height, int destx, 
 		}
 	}*/
     VL_UnlockSurface(curSurface); // vbt utile pour signon screen
+#endif	
 }
 
-/*
-=================
-=
-= VL_MemToScreenScaledCoord
-=
-= Draws a part of a block of data to the screen.
-= The block has the size origwidth*origheight.
-= The part at (srcx, srcy) has the size width*height
-= and will be painted to (destx, desty) with scaling according to scaleFactor.
-=
-=================
-*/
-// vbt : à améliorer
-/*
-void VL_MemToScreenScaledCoord (byte *source, int origwidth, int origheight, int srcx, int srcy,
-                                int destx, int desty, int width, int height)
-{
-    assert6(destx >= 0 && destx + width * scaleFactor <= screenWidth
-            && desty >= 0 && desty + height * scaleFactor <= screenHeight
-            && "VL_MemToScreenScaledCoord: Destination rectangle out of bounds!");
-
-    VL_LockSurface(curSurface);
-    byte *vbuf = (byte *) curSurface->pixels;
-    for(int j=0,scj=0; j<height; j++, scj+=scaleFactor)
-    {
-        for(int i=0,sci=0; i<width; i++, sci+=scaleFactor)
-        {
-            byte col = source[((j+srcy)*(origwidth>>2)+((i+srcx)>>2))+((i+srcx)&3)*(origwidth>>2)*origheight];
-            for(unsigned m=0; m<scaleFactor; m++)
-            {
-                for(unsigned n=0; n<scaleFactor; n++)
-                {
-                    vbuf[(scj+m+desty)*curPitch+sci+n+destx] = col;
-                }
-            }
-        }
-    }
-	
-    VL_UnlockSurface(curSurface); // vbt utile
-}
-*/
 //==========================================================================
 
 /*
@@ -583,7 +569,7 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
 	assert(scxdest >= 0 && scxdest + width * scaleFactor <= screenWidth
 		&& scydest >= 0 && scydest + height * scaleFactor <= screenHeight
 		&& "VL_LatchToScreenScaledCoord: Destination rectangle out of bounds!");
-		
+
 	if(scaleFactor == 1)
     {
 		SDL_Rect srcrect = { xsrc, ysrc, width, height };
@@ -592,11 +578,11 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
     }
     else
     {
-        VL_LockSurface(source);
+ //       VL_LockSurface(source);
         byte *src = (byte *) source->pixels;
         unsigned srcPitch = source->pitch;
 
-        VL_LockSurface(curSurface);
+//        VL_LockSurface(curSurface);
         byte *vbuf = (byte *) curSurface->pixels;
         for(int j=0,scj=0; j<height; j++, scj+=scaleFactor)
         {
@@ -612,9 +598,8 @@ void VL_LatchToScreenScaledCoord(SDL_Surface *source, int xsrc, int ysrc,
                 }
             }
         }
-        VL_UnlockSurface(curSurface); // pas de cas de scale
- //       VL_UnlockSurface(source);
-    }	
+    }
+	//VL_UnlockSurface(curSurface); // pas de cas de scale
 }
 
 /*
@@ -654,14 +639,12 @@ void VL_LatchToScreenScaledCoordIndirect(SDL_Surface *source, int scxdest, int s
 //if(TransCount!=0)
 //			slPrintHex(TransCount,slLocate(10,4));
 			
-		for( Sint16 i=0;i<source->h;i++)
-		{
-			slDMACopy((void*)surfacePtr,(void *)nbg1Ptr,source->w);
+	for( Sint16 i=0;i<source->h;i++)
+	{
+		slDMACopy((void*)surfacePtr,(void *)nbg1Ptr,source->w);
 //			slTransferEntry((void *)surfacePtr,(void *)nbg1Ptr,source->w);
-			surfacePtr+=source->pitch;
+		surfacePtr+=source->pitch;
 //					nb_unlock+=source->w;
-			nbg1Ptr+=128;
-		}
-//      VL_UnlockSurface(curSurface);
-//      VL_UnlockSurface(source);
+		nbg1Ptr+=128;
+	}
 }

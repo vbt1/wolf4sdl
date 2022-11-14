@@ -56,6 +56,7 @@ void VL_Plot            (int x, int y, int color);
 void VL_Hlin            (unsigned x, unsigned y, unsigned width, int color);
 void VL_Vlin            (int x, int y, int height, int color);
 void VL_BarScaledCoord  (int scx, int scy, int scwidth, int scheight, int color);
+void VL_BarScaledCoordNBG (int scx, int scy, int scwidth, int scheight, int color);
 void inline VL_Bar      (int x, int y, int width, int height, int color)
 {
     VL_BarScaledCoord(scaleFactor*x, scaleFactor*y,

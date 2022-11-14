@@ -52,6 +52,9 @@ extern void	satPlayMusic( Uint8 track );
 extern void	satStopMusic( void );
 #ifndef PONY
 uintptr_t lowsound = (uintptr_t)0x002C0000;
+extern "C" {
+short	load_adx(Sint8 * filename);
+}
 #endif
 
 void SD_PrepareSound(int which)
@@ -123,6 +126,7 @@ void SD_PrepareSound(int which)
 boolean
 SD_PlaySound(int sound)
 {
+//	slPrintHex(sound,slLocate(10,18));
 #ifdef PONY
 #ifndef USE_ADX	
     if(Mix_PlayChannel(DigiMap[sound], NULL, 0) == -1)

@@ -1,8 +1,5 @@
 #include "wl_def.h"
 
-#define NB_WALL_HWRAM 50
-//#define NB_WALL_HWRAM 39
-
 int PMSpriteStart;
 //int PMSoundStart;
 
@@ -19,32 +16,33 @@ void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chun
 
 	GFS_Load(fileId, delta, (void *)Chunks, size+delta2);
 	
-	memcpyl(ptr,&Chunks[delta2],size);	
+	memcpy(ptr,&Chunks[delta2],size);	
 }
 
 void PM_Startup()
 {
+	
 	unsigned int PMSoundStart;	
     char fname[13] = "VSWAP.";
 	Uint32 i=0;
 	Uint8 *Chunks;
-	long fileSize;
+//	long fileSize;
 	
     strcat(fname,extension);
 	
 	Sint32 fileId;
 
 	fileId = GFS_NameToId((Sint8*)fname);
-	fileSize = GetFileSize(fileId);
+//	fileSize = GetFileSize(fileId);
 
     int ChunksInFile = 0;
 //    fread(&ChunksInFile, sizeof(word), 1, file);
 
 	Chunks=(Uint8*)saturnChunk;
 //	CHECKMALLOCRESULT(Chunks);
-	GFS_Load(fileId, 0, (void *)Chunks, 0x8000);
+	GFS_Load(fileId, 0, (void *)Chunks, 0x80);
 	ChunksInFile=Chunks[0]|Chunks[1]<<8;
-	slPrintHex(ChunksInFile,slLocate(10,18));	
+//	slPrintHex(ChunksInFile,slLocate(10,18));	
 	
     //fread(&PMSpriteStart, sizeof(word), 1, file);
 	PMSpriteStart=Chunks[2]|Chunks[3]<<8;
@@ -55,8 +53,8 @@ void PM_Startup()
 	ChunksInFile=PMSoundStart;
 
     PMPages = (uint8_t **) malloc((ChunksInFile + 1) * sizeof(uint8_t *));
-    CHECKMALLOCRESULT(PMPages);	
-
+//    CHECKMALLOCRESULT(PMPages);	
+/*
 	uint32_t* pageOffsets = (uint32_t *)saturnChunk; 
 	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
  
@@ -87,33 +85,10 @@ void PM_Startup()
         if(pageOffsets[i] < dataStart || pageOffsets[i] >= (size_t) fileSize)
             Quit("Illegal page offset for page %i: %u (filesize: %u)", i, pageOffsets[i], fileSize);
     }	
-#if 0
-	Chunks=(Uint8*)saturnChunk+0x8000;	
-    // Load pages and initialize PMPages pointers
-
-	uint8_t *ptr=(uint8_t *)0x00202000;
-///------------------------ fin murs
-//	ptr = PM_DecodeSprites2(PMSpriteStart,PMSpriteStart+SPR_NULLSPRITE,pageOffsets,pageLengths,fileId);
-
-//    for (int y=PMSpriteStart;y<PMSpriteStart+SPR_NULLSPRITE;y++)
-    for (int y=PMSpriteStart;y<PMSpriteStart+10;y++)	
-    {
-		ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
-	}
-xxxxxxxxxxxxxxxxxxxxxxxxxx
-	
-    // last page points after page buffer
-    PMPages[ChunksInFile] = ptr;
-
-	int *val = (int *)ptr;
-	
-	slPrintHex((int)val,slLocate(10,20));
-#endif
-//	free(pageLengths);
 	pageLengths = NULL;	
-//    free(pageOffsets);
 	pageOffsets = NULL;		
-	Chunks = NULL;		
+	Chunks = NULL;
+*/	
 }	
 
 uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId)
@@ -152,25 +127,17 @@ uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOf
 		shape->leftpix =SWAP_BYTES_16(shape->leftpix);
 		shape->rightpix=SWAP_BYTES_16(shape->rightpix);
 
-		for (int x=0;x<(shape->rightpix-shape->leftpix)+1;x++ )
-		{
-			shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
-		}
-
 		byte *bmpptr,*sprdata8;
 		unsigned short  *cmdptr;
-
-		// set the texel index to the first texel
-		unsigned char  *sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
-		// clear the buffers
 		
 		// setup a pointer to the column offsets	
 		cmdptr = shape->dataofs;
 		int count_00=63;
 //		int count_01=0;
 
-		for (unsigned int x = (shape->leftpix); x <= (shape->rightpix); x++)
+		for (int x=0;x<=(shape->rightpix-shape->leftpix);x++ )	
 		{
+			shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
 			sprdata8 = ((unsigned char  *)shape+*cmdptr);			
 			
 			while ((sprdata8[0]|sprdata8[1]<<8) != 0)
@@ -190,7 +157,7 @@ uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOf
 		}
 		memset(bmpbuff,0x00,(64-count_00)<<6);
 
-		sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
+		unsigned char *sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
 
 		cmdptr = shape->dataofs;		
 

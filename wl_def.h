@@ -4,8 +4,18 @@
 #define SATURN_WIDTH 352
 #define SATURN_SORT_VALUE 240
 #define MAX_WALLS 120
+#define NB_WALL_HWRAM 50/2
 // 240 pour du 320, 264 pour du 352
-#define		LINE_COLOR_TABLE		(VDP2_VRAM_A0	+ 0x1f400)
+#define	LINE_COLOR_TABLE		(VDP2_VRAM_A0	+ 0x1f400)
+#define PRELOAD_ITEMS(START,STOP) ({\
+int retvalue=0; \
+if(itemmap[START+PMSpriteStart]==0) {\
+for(int i=START;i<=STOP;i++){ \
+itemmap[i+PMSpriteStart]=1;} \
+retvalue=STOP+1-START; \
+} \
+retvalue; \
+})
 
 extern unsigned char *saturnChunk;
 
@@ -545,7 +555,7 @@ enum
     SPR_BOOM_1,SPR_BOOM_2,SPR_BOOM_3,
 
 //
-// Angel of Death's DeathSparks(tm)
+// ok Angel of Death's DeathSparks(tm)
 //
 #ifdef SPEAR
     SPR_HROCKET_1,SPR_HROCKET_2,SPR_HROCKET_3,SPR_HROCKET_4,
@@ -592,7 +602,7 @@ enum
 //
 
 //
-// Trans Grosse
+// ok Trans Grosse
 //
     SPR_TRANS_W1,SPR_TRANS_W2,SPR_TRANS_W3,SPR_TRANS_W4,
     SPR_TRANS_SHOOT1,SPR_TRANS_SHOOT2,SPR_TRANS_SHOOT3,SPR_TRANS_DEAD,
@@ -600,7 +610,7 @@ enum
     SPR_TRANS_DIE1,SPR_TRANS_DIE2,SPR_TRANS_DIE3,
 
 //
-// Wilhelm
+// ok Wilhelm
 //
     SPR_WILL_W1,SPR_WILL_W2,SPR_WILL_W3,SPR_WILL_W4,
     SPR_WILL_SHOOT1,SPR_WILL_SHOOT2,SPR_WILL_SHOOT3,SPR_WILL_SHOOT4,
@@ -608,7 +618,7 @@ enum
     SPR_WILL_DIE1,SPR_WILL_DIE2,SPR_WILL_DIE3,SPR_WILL_DEAD,
 
 //
-// UberMutant
+// ok UberMutant
 //
     SPR_UBER_W1,SPR_UBER_W2,SPR_UBER_W3,SPR_UBER_W4,
     SPR_UBER_SHOOT1,SPR_UBER_SHOOT2,SPR_UBER_SHOOT3,SPR_UBER_SHOOT4,
@@ -617,7 +627,7 @@ enum
     SPR_UBER_DEAD,
 
 //
-// Death Knight
+// ok Death Knight
 //
     SPR_DEATH_W1,SPR_DEATH_W2,SPR_DEATH_W3,SPR_DEATH_W4,
     SPR_DEATH_SHOOT1,SPR_DEATH_SHOOT2,SPR_DEATH_SHOOT3,SPR_DEATH_SHOOT4,
@@ -626,13 +636,13 @@ enum
     SPR_DEATH_DIE5,SPR_DEATH_DIE6,SPR_DEATH_DEAD,
 
 //
-// Ghost
+// ok Ghost
 //
     SPR_SPECTRE_W1,SPR_SPECTRE_W2,SPR_SPECTRE_W3,SPR_SPECTRE_W4,
     SPR_SPECTRE_F1,SPR_SPECTRE_F2,SPR_SPECTRE_F3,SPR_SPECTRE_F4,
 
 //
-// Angel of Death
+// ok Angel of Death
 //
     SPR_ANGEL_W1,SPR_ANGEL_W2,SPR_ANGEL_W3,SPR_ANGEL_W4,
     SPR_ANGEL_SHOOT1,SPR_ANGEL_SHOOT2,SPR_ANGEL_TIRED1,SPR_ANGEL_TIRED2,
@@ -1037,9 +1047,9 @@ extern  byte            bordercol;
 extern  SDL_Surface     *latchpics[NUMLATCHPICS];
 //extern  char            demoname[13];
 
-void    SetupGameLevel (void);
+int    SetupGameLevel (void);
 void    GameLoop (void);
-void    DrawPlayBorder (void);
+inline void    DrawPlayBorder (void);
 void    DrawStatusBorder (byte color);
 void    DrawPlayScreen (void);
 void	DrawStatusBar (void);
@@ -1170,7 +1180,7 @@ void Victory (void);
 void LevelCompleted (void);
 void ClearSplitVWB (void);
 
-void PreloadGraphics(void);
+void PreloadGraphics(int loaded);
 
 
 /*

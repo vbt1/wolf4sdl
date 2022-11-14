@@ -495,6 +495,7 @@ void SDL_PauseAudio(int pause_on)
 int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
 {
 	unsigned char *surfacePtr = (unsigned char*)src->pixels + ((srcrect->y) * src->pitch) + srcrect->x;
+//	unsigned char *surfacePtrD = (unsigned char*)dst->pixels + (dstrect->y* dst->pitch)+ dstrect->x;
 	unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + (dstrect->y<<9)+ dstrect->x);
 	
 	if((srcrect)!=NULL)
@@ -502,9 +503,13 @@ int SDL_UpperBlit (SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Re
 		{
 //			slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(VDP2_VRAM_A0 + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
 //			memcpyl((unsigned long*)nbg1Ptr, (unsigned long*)surfacePtr, srcrect->w); // vbt : 22-24fps
+// VBT copie en VRAM au lieu de copier dans la destination
+//			slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)surfacePtrD,dstrect->w); // vbt à remettre
+//			memcpy(surfacePtrD,surfacePtr,srcrect->w);
 			slDMACopy((unsigned long*)surfacePtr,(unsigned long*)(void *)nbg1Ptr,srcrect->w); // vbt à remettre
 //			slDMACopy((unsigned long*)((byte*)src->pixels + ((i + srcrect->y) * src->pitch) + srcrect->x),(unsigned long*)(void *)(VDP2_VRAM_A0 + ((i + dstrect->y)<<9)+ dstrect->x),srcrect->w);
 			surfacePtr+=src->pitch;
+//			surfacePtrD+=352;
 //			    nb_unlock+=srcrect->w;
 			nbg1Ptr+=128;
 		}

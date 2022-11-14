@@ -431,6 +431,7 @@ void CheckKeys (void)
 
 
 #ifdef SPEAR
+#if 0
     //
     // SECRET CHEAT CODE: TAB-G-F10
     //
@@ -454,6 +455,7 @@ void CheckKeys (void)
         IN_ClearKeysDown ();
         return;
     }
+#endif
 #endif
 
 /*

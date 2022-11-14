@@ -4,7 +4,10 @@
 
 LRstruct LevelRatios[LRpack];
 int32_t lastBreathTime = 0;
+extern uint8_t *wallData;
 
+uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
+void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
 void Write (int x, int y, const char *string);
 
 //==========================================================================
@@ -141,17 +144,26 @@ Victory (void)
 
     VWB_Bar (0, 0, SATURN_WIDTH, 200, VIEWCOLOR);
     VWB_DrawPic (124, 44, BJCOLLAPSE1PIC);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif
+
     VW_FadeIn ();
     VW_WaitVBL (2 * 70);
     VWB_DrawPic (124, 44, BJCOLLAPSE2PIC);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     VW_WaitVBL (105);
     VWB_DrawPic (124, 44, BJCOLLAPSE3PIC);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif	
     VW_WaitVBL (105);
     VWB_DrawPic (124, 44, BJCOLLAPSE4PIC);
+#ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#endif
     VW_WaitVBL (3 * 70);
 
     UNCACHEGRCHUNK (BJCOLLAPSE1PIC);
@@ -169,7 +181,7 @@ Victory (void)
 #ifndef SPEAR
     CA_CacheGrChunk (C_TIMECODEPIC);
 #endif
-
+DrawPlayScreen(); // vbt ajout
     VWB_Bar (0, 0, SATURN_WIDTH, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
     if (bordercol != VIEWCOLOR)
         DrawStatusBorder (VIEWCOLOR);
@@ -282,8 +294,11 @@ Victory (void)
 #ifndef USE_SPRITES
     VW_UpdateScreen ();
 #endif	
-    VW_FadeIn ();
 
+DrawStatusBar(); // vbt ajout
+
+    VW_FadeIn ();
+//DrawPlayScreen(); // vbt ajout
     IN_Ack ();
 
     VW_FadeOut ();
@@ -378,6 +393,15 @@ BJ_Breathe (void)
 {
     static int which = 0, max = 10;
     int pics[2] = { L_GUYPIC, L_GUY2PIC };
+
+	/*if(curSurface==screen)
+	{
+		curSurface = screenBuffer;
+
+		DrawStatusBar(); // vbt : ajout
+		curSurface = screen;
+	}*/
+	DrawStatusBar(); // vbt : ajout
 
     SDL_Delay(5);
 
@@ -556,8 +580,6 @@ LevelCompleted (void)
     VWB_DrawPic (0, 0, C_INTERMISSIONPIC);
     UNCACHEGRCHUNK (C_INTERMISSIONPIC);
 #endif
-//   slPrint("VWB_DrawPic",slLocate(10,14));
-
     VWB_DrawPic (0, 16, L_GUYPIC);
 
 #ifndef SPEAR
@@ -573,27 +595,27 @@ LevelCompleted (void)
         Write (14, 2, "floor\ncompleted");
 #endif
 
-        Write (14, 7, STR_BONUS "     0");
-        Write (16, 10, STR_TIME);
-        Write (16, 12, STR_PAR);
+        Write (14+ SATURN_ADJUST/8, 7, STR_BONUS "     0");
+        Write (16+ SATURN_ADJUST/8, 10, STR_TIME);
+        Write (16+ SATURN_ADJUST/8, 12, STR_PAR);
 
 #ifdef SPANISH
         Write (11, 14, STR_RAT2KILL);
         Write (11, 16, STR_RAT2SECRET);
         Write (11, 18, STR_RAT2TREASURE);
 #else
-        Write (9, 14, STR_RAT2KILL);
-        Write (5, 16, STR_RAT2SECRET);
-        Write (1, 18, STR_RAT2TREASURE);
+        Write (9+ SATURN_ADJUST/8, 14, STR_RAT2KILL);
+        Write (5+ SATURN_ADJUST/8, 16, STR_RAT2SECRET);
+        Write (1+ SATURN_ADJUST/8, 18, STR_RAT2TREASURE);
 #endif
 
-        Write (26, 2, itoa (gamestate.mapon + 1, tempstr, 10));
+        Write (26+ SATURN_ADJUST/8, 2, itoa (gamestate.mapon + 1, tempstr, 10));
 #endif
 
 #ifdef SPANISH
         Write (30, 12, parTimes[gamestate.episode * 10 + mapon].timestr);
 #else
-        Write (26, 12, parTimes[gamestate.episode * 10 + mapon].timestr);
+        Write (26+ SATURN_ADJUST/8, 12, parTimes[gamestate.episode * 10 + mapon].timestr);
 #endif
 
         //
@@ -615,18 +637,33 @@ LevelCompleted (void)
 #else
         i = 26 * 8;
 #endif
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (min / 10));
+        VWB_DrawPic (i+SATURN_ADJUST, 10 * 8, L_NUM0PIC + (min / 10));
         i += 2 * 8;
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (min % 10));
+        VWB_DrawPic (i+SATURN_ADJUST, 10 * 8, L_NUM0PIC + (min % 10));
         i += 2 * 8;
-        Write (i / 8, 10, ":");
+        Write (i / 8 + SATURN_ADJUST /8, 10, ":");
         i += 1 * 8;
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (sec / 10));
+        VWB_DrawPic (i+SATURN_ADJUST, 10 * 8, L_NUM0PIC + (sec / 10));
         i += 2 * 8;
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (sec % 10));
+        VWB_DrawPic (i+SATURN_ADJUST, 10 * 8, L_NUM0PIC + (sec % 10));
 #ifndef USE_SPRITES
         VW_UpdateScreen ();
+#else
+	/*if(curSurface==screen)
+	{
+		DrawStatusBar(); // vbt : ajout
+		curSurface = screenBuffer;
+		DrawStatusBar(); // vbt : ajout
+	}
+	else*/
+	{
+		DrawStatusBar(); // vbt : ajout
+//		curSurface = screen;
+//		DrawStatusBar(); // vbt : ajout		
+	}
+
 #endif		
+
         VW_FadeIn ();
 
         //
@@ -651,12 +688,14 @@ LevelCompleted (void)
             {
                 ltoa ((int32_t) i * PAR_AMOUNT, tempstr);
                 x = 36 - (int) strlen(tempstr) * 2;
-                Write (x, 7, tempstr);
+                Write (x + SATURN_ADJUST /8, 7, tempstr);
                 if (!(i % (PAR_AMOUNT / 10)))
                     SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES				
                 VW_UpdateScreen ();
-#endif				
+#else
+//		DrawStatusBar(); // vbt ajout				
+#endif
                 while (SD_SoundPlaying ())
                     BJ_Breathe ();
                 if (IN_CheckAck ())
@@ -664,7 +703,10 @@ LevelCompleted (void)
             }
 #ifndef USE_SPRITES
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif
+	
             SD_PlaySound (ENDBONUS2SND);
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
@@ -684,12 +726,15 @@ LevelCompleted (void)
         {
             itoa (i, tempstr, 10);
             x = RATIOXX - (int) strlen(tempstr) * 2;
-            Write (x, 14, tempstr);
+            Write (x + SATURN_ADJUST /8, 14, tempstr);
             if (!(i % 10))
                 SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
+	
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
 
@@ -703,9 +748,11 @@ LevelCompleted (void)
             bonus += PERCENT100AMT;
             ltoa (bonus, tempstr);
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
-            Write (x, 7, tempstr);
+            Write (x + SATURN_ADJUST /8, 7, tempstr);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             SD_PlaySound (PERCENT100SND);
         }
@@ -719,6 +766,8 @@ LevelCompleted (void)
             SD_PlaySound (ENDBONUS2SND);
 #ifndef USE_SPRITES
         VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout		
 #endif		
         while (SD_SoundPlaying ())
             BJ_Breathe ();
@@ -731,11 +780,13 @@ LevelCompleted (void)
         {
             itoa (i, tempstr);
             x = RATIOXX - (int) strlen(tempstr) * 2;
-            Write (x, 16, tempstr);
+            Write (x + SATURN_ADJUST /8, 16, tempstr);
             if (!(i % 10))
                 SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
@@ -750,9 +801,11 @@ LevelCompleted (void)
             bonus += PERCENT100AMT;
             ltoa (bonus, tempstr);
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
-            Write (x, 7, tempstr);
+            Write (x + SATURN_ADJUST /8, 7, tempstr);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             SD_PlaySound (PERCENT100SND);
         }
@@ -766,6 +819,8 @@ LevelCompleted (void)
             SD_PlaySound (ENDBONUS2SND);
 #ifndef USE_SPRITES		
         VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout		
 #endif		
         while (SD_SoundPlaying ())
             BJ_Breathe ();
@@ -778,11 +833,13 @@ LevelCompleted (void)
         {
             itoa (i, tempstr);
             x = RATIOXX - (int) strlen(tempstr) * 2;
-            Write (x, 18, tempstr);
+            Write (x + SATURN_ADJUST /8, 18, tempstr);
             if (!(i % 10))
                 SD_PlaySound (ENDBONUS1SND);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
@@ -797,9 +854,11 @@ LevelCompleted (void)
             bonus += PERCENT100AMT;
             ltoa (bonus, tempstr);
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
-            Write (x, 7, tempstr);
+            Write (x + SATURN_ADJUST /8, 7, tempstr);
 #ifndef USE_SPRITES			
             VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout			
 #endif			
             SD_PlaySound (PERCENT100SND);
         }
@@ -813,6 +872,8 @@ LevelCompleted (void)
             SD_PlaySound (ENDBONUS2SND);
 #ifndef USE_SPRITES		
         VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout		
 #endif		
         while (SD_SoundPlaying ())
             BJ_Breathe ();
@@ -823,15 +884,15 @@ LevelCompleted (void)
         //
 done:   itoa (kr, tempstr);
         x = RATIOXX - (int) strlen(tempstr) * 2;
-        Write (x, 14, tempstr);
+        Write (x + SATURN_ADJUST /8, 14, tempstr);
 
         itoa (sr, tempstr);
         x = RATIOXX - (int) strlen(tempstr) * 2;
-        Write (x, 16, tempstr);
+        Write (x + SATURN_ADJUST /8, 16, tempstr);
 
         itoa (tr, tempstr);
         x = RATIOXX - (int) strlen(tempstr) * 2;
-        Write (x, 18, tempstr);
+        Write (x + SATURN_ADJUST /8, 18, tempstr);
 
         bonus = (int32_t) timeleft *PAR_AMOUNT +
             (PERCENT100AMT * (kr >= 100)) +
@@ -840,7 +901,7 @@ done:   itoa (kr, tempstr);
         GivePoints (bonus);
         ltoa (bonus, tempstr);
         x = 36 - (int) strlen(tempstr) * 2;
-        Write (x, 7, tempstr);
+        Write (x + SATURN_ADJUST /8, 7, tempstr);
 
         //
         // SAVE RATIO INFORMATION FOR ENDGAME
@@ -857,32 +918,34 @@ done:   itoa (kr, tempstr);
         switch (mapon)
         {
             case 4:
-                Write (14, 4, " trans\n" " grosse\n" STR_DEFEATED);
+                Write (14 + SATURN_ADJUST /8, 4, " trans\n" " grosse\n" STR_DEFEATED);
                 break;
             case 9:
-                Write (14, 4, "barnacle\n" "wilhelm\n" STR_DEFEATED);
+                Write (14 + SATURN_ADJUST /8, 4, "barnacle\n" "wilhelm\n" STR_DEFEATED);
                 break;
             case 15:
-                Write (14, 4, "ubermutant\n" STR_DEFEATED);
+                Write (14 + SATURN_ADJUST /8, 4, "ubermutant\n" STR_DEFEATED);
                 break;
             case 17:
-                Write (14, 4, " death\n" " knight\n" STR_DEFEATED);
+                Write (14 + SATURN_ADJUST /8, 4, " death\n" " knight\n" STR_DEFEATED);
                 break;
             case 18:
-                Write (13, 4, "secret tunnel\n" "    area\n" "  completed!");
+                Write (13 + SATURN_ADJUST /8, 4, "secret tunnel\n" "    area\n" "  completed!");
                 break;
             case 19:
-                Write (13, 4, "secret castle\n" "    area\n" "  completed!");
+                Write (13 + SATURN_ADJUST /8, 4, "secret castle\n" "    area\n" "  completed!");
                 break;
         }
 #endif
 #else
-        Write (14, 4, "secret floor\n completed!");
+        Write (14 + SATURN_ADJUST /8, 4, "secret floor\n completed!");
 #endif
 
-        Write (10, 16, "15000 bonus!");
+        Write (10 + SATURN_ADJUST /8, 16, "15000 bonus!");
 #ifndef USE_SPRITES
         VW_UpdateScreen ();
+#else
+//		DrawStatusBar(); // vbt ajout		
 #endif		
         VW_FadeIn ();
 
@@ -893,6 +956,8 @@ done:   itoa (kr, tempstr);
     DrawScore ();
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
+#else
+		DrawStatusBar(); // vbt ajout
 #endif
     lastBreathTime = GetTimeCount();
     IN_StartAck ();
@@ -933,7 +998,7 @@ done:   itoa (kr, tempstr);
 #endif
 
     VW_FadeOut ();
-    DrawPlayBorder();
+//    DrawPlayBorder();
 
     UnCacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
 	slBackColTable((void *)LINE_COLOR_TABLE);
@@ -948,20 +1013,19 @@ done:   itoa (kr, tempstr);
 =
 =================
 */
-#if 0
-boolean
+#if 1
+void
 PreloadUpdate (unsigned current, unsigned total)
 {
     unsigned w = WindowW - scaleFactor * 10;
-
-    VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
+    VL_BarScaledCoordNBG (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
         w, scaleFactor * 2, BLACK);
     w = ((int32_t) w * current) / total;
     if (w)
     {
-        VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
+        VL_BarScaledCoordNBG (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
             w, scaleFactor * 2, 0x37);       //SECONDCOLOR);
-        VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
+        VL_BarScaledCoordNBG (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
             w - scaleFactor * 1, scaleFactor * 1, 0x32);
 
     }
@@ -974,11 +1038,11 @@ PreloadUpdate (unsigned current, unsigned total)
 //              return(true);
 //      }
 //      else
-    return (false);
+//    return (false);
 }
 #endif
 void
-PreloadGraphics (void)
+PreloadGraphics (int loaded)
 {
     DrawLevel ();
     ClearSplitVWB ();           // set up for double buffering in split screen
@@ -995,15 +1059,136 @@ PreloadGraphics (void)
     WindowH = scaleFactor * 48;
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
-#endif	
+#endif
+	DrawStatusBar(); // vbt ajout
     VW_FadeIn ();
+
+#if 1
+//----------------------------------------------------------------------
+    char fname[13] = "VSWAP.";
+	Uint32 y;
+	extern int ChunksInFile;
+	
+    strcat(fname,extension);
+	
+	Sint32 fileId;
+
+	fileId = GFS_NameToId((Sint8*)fname);
+
+	word *pageLengths		= (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
+	uint32_t* pageOffsets	= (uint32_t*)saturnChunk+0x2000; 
+	uint8_t *itemmap 		= (uint8_t *)saturnChunk+0x4000;
+	Uint8 *Chunks	 		= (uint8_t *)saturnChunk+0xC000;
+	
+	if(wallData== NULL) wallData = (uint8_t *) malloc(((NB_WALL_HWRAM*2)+8)*0x1000);
+	uint8_t *ptr = (uint8_t *)wallData;
+	loaded += (12+(SPR_NULLSPRITE-SPR_KNIFEREADY));
+    for (y=1;y<64;y++)
+    {
+		if(itemmap[y+1]==1)
+			loaded+=2;
+	}
+	
+	int i = 0;
+
+	// walls 0/1
+	PMPages[0]=ptr;
+	readChunks(fileId, 0x2000, &pageOffsets[0], Chunks, ptr);
+	PMPages[1]=ptr+0x1000;
+	ptr+=0x2000;
+	PreloadUpdate ((i+=2), loaded);	
+	// walls 40/41
+	PMPages[42]=ptr;
+	readChunks(fileId, 0x2000, &pageOffsets[40], Chunks, ptr);
+	PMPages[43]=ptr+0x1000;
+	ptr+=0x2000;
+	PreloadUpdate ((i+=2), loaded);
+	
+   // doors
+    for (y=PMSpriteStart-8;y<PMSpriteStart;y++)
+    {
+		if(!pageOffsets[y])
+            continue;
+		
+		PMPages[y]=ptr;
+		readChunks(fileId, 0x1000, &pageOffsets[y], Chunks, ptr);
+		ptr+=0x1000;
+		PreloadUpdate (i++, loaded); 
+	}
+
+	// walls in map
+    for (y=1;y<NB_WALL_HWRAM/2;y++)
+    {
+		if(itemmap[y+1]==1)
+		{
+			PMPages[(y*2)]=ptr;
+			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks, ptr);
+			PMPages[(y*2)+1]=ptr+0x1000;
+			ptr+=0x2000;
+			PreloadUpdate ((i+=2), loaded);
+		}
+	}
+
+	int *val = (int *)ptr;	
+	slPrintHex((int)val,slLocate(10,21));	
+
+	ptr = (uint8_t *)0x00202000;
+
+    for (y=NB_WALL_HWRAM/2;y<64;y++)
+    {
+		if(itemmap[y+1]==1)
+		{
+			PMPages[(y*2)]=ptr;
+			readChunks(fileId, 0x2000, &pageOffsets[(y*2)], Chunks, ptr);
+			PMPages[(y*2)+1]=ptr+0x1000;
+			ptr+=0x2000;
+			PreloadUpdate ((i+=2), loaded);
+		}
+	}
+    // last page points after page buffer
+    PMPages[ChunksInFile] = ptr; // retourner l'adresse du pointeur
+	// ennemies
+    for (y=PMSpriteStart;y<PMSpriteStart+SPR_KNIFEREADY;y++)
+    {
+		if(itemmap[y]==1)
+		{
+#ifdef APOGEE_1_1				
+			if(y>=PMSpriteStart+SPR_BJ_W1-2 && y<=PMSpriteStart+SPR_BJ_JUMP4)
+			ptr=PM_DecodeSprites2(y,y+1,pageOffsets+2,pageLengths+2,ptr,fileId);
+			else
+#endif
+			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+			PreloadUpdate (i++, loaded);
+		}
+		else
+			PMPages[y] = ptr;
+	}
+	// weapons  doit être après les ennemis
+	for (y=PMSpriteStart+SPR_KNIFEREADY;y<PMSpriteStart+SPR_NULLSPRITE;y++)
+    {
+#ifdef APOGEE_1_1	
+		ptr=PM_DecodeSprites2(y,y+1,pageOffsets+2,pageLengths+2,ptr,fileId);
+#else
+		ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+#endif
+		PreloadUpdate (i++, loaded);
+	}
+	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
+	PreloadUpdate (10, 10);
+	val = (int *)ptr;
+	slPrintHex((int)val,slLocate(10,22));	
+//----------------------------------------------------------------------
+#endif
+
+//	slPrintHex(i,slLocate(10,10));
+//	slPrintHex(loaded,slLocate(10,11));
 
 //      PM_Preload (PreloadUpdate);
 //    PreloadUpdate (10, 10);
     IN_UserInput (70);
     VW_FadeOut ();
 
-    DrawPlayBorder ();
+    DrawPlayScreen ();
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
 #endif	
@@ -1056,11 +1241,11 @@ DrawHighScores (void)
     UNCACHEGRCHUNK (HIGHSCORESPIC);
 
 #ifndef APOGEE_1_0
-    VWB_DrawPic (SATURN_ADJUST + 4 * 8, 68, C_NAMEPIC);
+    VWB_DrawPic (SATURN_ADJUST + 4  * 8, 68, C_NAMEPIC);
     VWB_DrawPic (SATURN_ADJUST + 20 * 8, 68, C_LEVELPIC);
     VWB_DrawPic (SATURN_ADJUST + 28 * 8, 68, C_SCOREPIC);
 #else
-    VWB_DrawPic(SATURN_ADJUST + 35*8,68,C_CODEPIC);
+    VWB_DrawPic (SATURN_ADJUST + 35 * 8, 68, C_CODEPIC);
 #endif
     fontnumber = 0;
 
@@ -1072,11 +1257,10 @@ DrawHighScores (void)
 
     CacheLump (HIGHSCORES_LUMP_START, HIGHSCORES_LUMP_END);
     CA_CacheGrChunk (STARTFONT + 1);
-    VWB_DrawPic (0, 0, HIGHSCORESPIC);
+    VWB_DrawPic (0+SATURN_ADJUST, 0, HIGHSCORESPIC);
 
     fontnumber = 1;
 #endif
-
 
 #ifndef SPEAR
     SETFONTCOLOR (15, 0x29);
@@ -1124,7 +1308,7 @@ DrawHighScores (void)
 
 #ifdef SPEAR
         if (s->completed == 21)
-            VWB_DrawPic (PrintX + 8, PrintY - 1, C_WONSPEARPIC);
+            VWB_DrawPic (SATURN_ADJUST + PrintX + 8, PrintY - 1, C_WONSPEARPIC);
         else
 #endif
             US_Print (buffer);
@@ -1245,7 +1429,7 @@ CheckHighScore (int32_t score, word other)
 #endif		
         backcolor = 0x9c;
         fontcolor = 15;
-        US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130);
+//        US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130);
 #endif
     }
     else

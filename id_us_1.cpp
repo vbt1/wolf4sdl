@@ -19,7 +19,6 @@
 //		WindowX,WindowY,WindowW,WindowH - The dimensions of the current
 //			window
 //
-
 #include "wl_def.h"
 #include <stdlib.h>
 //#include <string.h>

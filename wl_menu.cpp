@@ -273,7 +273,7 @@ int color_norml[] = {
 };
 
 #ifdef APOGEE_1_1
-int EpisodeSelect[6] = { 1 ,1,1};
+int EpisodeSelect[6] = { 1 ,1, 1, 1, 1, 1};
 #else
 int EpisodeSelect[6] = {1};
 #endif
@@ -302,53 +302,7 @@ US_ControlPanel (ScanCode scancode)
     SetupControlPanel ();
 //VBT déplacé
 	StartCPMusic (MENUSONG);
-    //
-    // F-KEYS FROM WITHIN GAME
-    //
-/*
-    switch (scancode)
-    {
 
-        case sc_F1:
-#ifdef SPEAR
-            BossKey ();
-#else
-#ifdef GOODTIMES
-            BossKey ();
-#else
-            HelpScreens ();
-#endif
-#endif
-            goto finishup;
-	   
-        case sc_F2:
-            CP_SaveGame (0);
-            goto finishup;
-		
-        case sc_F3:
-            CP_LoadGame (0);
-            goto finishup;
-		
-        case sc_F4:
-            CP_Sound (0);
-            goto finishup;
-		
-        case sc_F5:
-            CP_ChangeView (0);
-            goto finishup;
-
-        case sc_F6:
-            CP_Control (0);
-            goto finishup;
-		 
-        finishup:
-            CleanupControlPanel ();
-#ifdef SPEAR
-            UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
-#endif
-            return;
-    }
-*/
 #ifdef SPEAR
     CacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
 #endif
@@ -370,7 +324,7 @@ US_ControlPanel (ScanCode scancode)
         //
         // EASTER EGG FOR SPEAR OF DESTINY!
         //
-        if (Keyboard[sc_I] && Keyboard[sc_D])
+        /*if (Keyboard[sc_I] && Keyboard[sc_D])
         {
             VW_FadeOut ();
             StartCPMusic (XJAZNAZI_MUS);
@@ -407,7 +361,7 @@ US_ControlPanel (ScanCode scancode)
             DrawMainMenu ();
             StartCPMusic (MENUSONG);
             MenuFadeIn ();
-        }
+        }*/
 #endif
 #endif
 
@@ -417,8 +371,6 @@ US_ControlPanel (ScanCode scancode)
                 if (MainMenu[viewscores].routine == NULL)
                 {
                     if (CP_EndGame (0))
-	//slPrint("exit game 5!!!!",slLocate(10,11));	
-						
                         StartGame = 1;
                 }
                 else
@@ -499,9 +451,7 @@ void EnableEndGameMenuItem()
 void
 DrawMainMenu (void)
 {
-//slPrint("slScrTransparent7",slLocate(1,17));		
 	slScrTransparent(NBG1ON);
-//	slPrint("DrawMainMenu",slLocate(10,15));
 #ifdef JAPAN
     CA_CacheScreen (S_OPTIONSPIC);
 #else
@@ -711,7 +661,7 @@ CP_CheckQuick (ScanCode scancode)
                 Quit (NULL);
             }
 
-            DrawPlayBorder ();
+            DrawPlayScreen ();
             WindowH = 200;
             fontnumber = 0;
             return 1;
@@ -1209,9 +1159,9 @@ void
 ClearMScreen (void)
 {
 #ifndef SPEAR
-    VWB_Bar (0, 0, SATURN_WIDTH, 200, BORDCOLOR);
+    VWB_Bar (0+SATURN_ADJUST, 0, SATURN_WIDTH, 200, BORDCOLOR);
 #else
-    VWB_DrawPic (0, 0, C_BACKDROPPIC);
+    VWB_DrawPic (0+SATURN_ADJUST, 0, C_BACKDROPPIC);
 #endif
 }
 
@@ -1329,9 +1279,9 @@ CleanupControlPanel (void)
 int
 HandleMenu (CP_iteminfo * item_i, CP_itemtype * items, void (*routine) (int w))
 {
-    char key;
+//    char key;
     static int redrawitem = 1, lastitem = -1;
-    int i, x, y, basey, exit, which, shape;
+    int /*i,*/ x, y, basey, exit, which, shape;
     int32_t lastBlinkTime, timer;
     ControlInfo ci;
 
@@ -2072,7 +2022,7 @@ CheckForEpisodes (void)
 // ENGLISH
 //
 #ifdef UPLOAD
-    if(!stat("vswap.wl1", &statbuf))
+    if(!stat("VSWAP.WL1", &statbuf))
     {
         strcpy (extension, "WL1");
 //        numEpisodesMissing = 5;
@@ -2081,22 +2031,22 @@ CheckForEpisodes (void)
         Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
 #else
 #ifndef SPEAR
-    if(!stat("vswap.wl6", &statbuf))
+    if(!stat("VSWAP.WL6", &statbuf))
     {
-        strcpy (extension, "wl6");
-        NewEmenu[2].active =
+        strcpy (extension, "WL6");
+  /*      NewEmenu[2].active =
             NewEmenu[4].active =
             NewEmenu[6].active =
             NewEmenu[8].active =
             NewEmenu[10].active =
             EpisodeSelect[1] =
-            EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;
+            EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;*/
     }
     else
     {
-        if(!stat("vswap.wl3", &statbuf))
+        if(!stat("VSWAP.WL3", &statbuf))
         {
-            strcpy (extension, "wl3");
+            strcpy (extension, "WL3");
 //            numEpisodesMissing = 3;
             NewEmenu[2].active = NewEmenu[4].active = EpisodeSelect[1] = EpisodeSelect[2] = 1;
         }
@@ -2117,13 +2067,14 @@ CheckForEpisodes (void)
 
 #ifdef SPEAR
 #ifndef SPEARDEMO
-    if(param_mission == 1)
+//    if(param_mission == 1)
     {
-        if(!stat("vswap.sod", &statbuf))
-            strcpy (extension, "sod");
+        if(!stat("VSWAP.SOD", &statbuf))
+            strcpy (extension, "SOD");
         else
             Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
     }
+/*
     else if(param_mission == 2)
     {
         if(!stat("vswap.sd2", &statbuf))
@@ -2138,18 +2089,20 @@ CheckForEpisodes (void)
         else
             Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
     }
+	
     else
         Quit ("UNSUPPORTED MISSION!");
-    strcpy (graphext, "sod");
+	*/
+//    strcpy (graphext, "sod");
 //    strcpy (audioext, "sod");
 #else
-    if(!stat("vswap.sdm", &statbuf))
+    if(!stat("VSWAP.SDM", &statbuf))
     {
-        strcpy (extension, "sdm");
+        strcpy (extension, "SDM");
     }
     else
         Quit ("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
-    strcpy (graphext, "sdm");
+//    strcpy (graphext, "sdm");
 //    strcpy (audioext, "sdm");
 #endif
 #else
