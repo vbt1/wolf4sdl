@@ -531,7 +531,7 @@ CP_ReadThis (int)
     HelpScreens ();
     StartCPMusic (MENUSONG);
     return true;
-}		  */
+}*/
 #endif
 #endif
 
@@ -2022,6 +2022,22 @@ CheckForEpisodes (void)
 // ENGLISH
 //
 #ifdef UPLOAD
+#ifdef APOGEE_1_1
+    if(!stat("VSWAP.WL6", &statbuf))
+    {
+        strcpy (extension, "WL6");
+  /*      NewEmenu[2].active =
+            NewEmenu[4].active =
+            NewEmenu[6].active =
+            NewEmenu[8].active =
+            NewEmenu[10].active =
+            EpisodeSelect[1] =
+            EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;*/
+    }
+
+#else
+
+
     if(!stat("VSWAP.WL1", &statbuf))
     {
         strcpy (extension, "WL1");
@@ -2029,6 +2045,7 @@ CheckForEpisodes (void)
     }
     else
         Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
+#endif	
 #else
 #ifndef SPEAR
     if(!stat("VSWAP.WL6", &statbuf))

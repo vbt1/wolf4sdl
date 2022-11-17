@@ -1,5 +1,12 @@
 # source_program
   SRCS =	low.s \
+l:/saturn/SBL6/SEGALIB/GFS2/gfs2.c \
+l:/saturn/SBL6/SEGALIB/GFS2/gfs_cdb2.c \
+l:/saturn/SBL6/SEGALIB/GFS2/gfs_cdc2.c \
+l:/saturn/SBL6/SEGALIB/GFS2/gfs_cdf2.c \
+l:/saturn/SBL6/SEGALIB/GFS2/gfs_trn2.c \
+l:/saturn/SBL6/SEGALIB/GFS2/gfs_buf2.c \
+l:/saturn/SBL6/SEGALIB/GFS2/gfs_dir2.c \
 		saturn.cpp \
     	pcmsys.cpp \
 		signon.cpp \
@@ -26,13 +33,6 @@
 
 OBJS = $(filter %.o, $(SRCS:.s=.o) $(SRCS:.c=.o) $(SRCS:.cpp=.o))
 LIBS = C:/SaturnOrbit/SGL_302j/LIB_ELF/libsgl_real_elf.a \
-l:/saturn/SBL6/SEGALIB/GFS/elf/gfs2.o \
-l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdb2.o \
-l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdc2.o \
-l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_cdf2.o \
-l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_trn2.o \
-l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_buf2.o \
-l:/saturn/SBL6/SEGALIB/GFS/elf/gfs_dir2.o \
 L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_mth.a \
 L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_dma.a \
 L:/saturn/SBL6/SEGALIB/LIB/vbtelf2/sega_int.a \

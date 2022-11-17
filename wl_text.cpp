@@ -775,7 +775,7 @@ void HelpScreens (void)
 #ifdef JAPAN
     ShowArticle (0);
     VW_FadeOut();
-    FreeMusic ();
+//    FreeMusic ();
     CA_DownLevel ();
     MM_SortMem ();
 #else
@@ -799,7 +799,7 @@ void HelpScreens (void)
 
     VW_FadeOut();
 
-    FreeMusic ();
+ //   FreeMusic ();
 #endif
 }
 #endif
