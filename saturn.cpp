@@ -145,6 +145,7 @@ static unsigned int get_hz(void)
 //	slZdspLevel(8);
 // vbt 26/07/2020
 //	slDynamicFrame(ON);
+slTVOff();
 
 	if(bpp==8)
 	{

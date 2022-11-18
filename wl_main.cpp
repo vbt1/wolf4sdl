@@ -765,6 +765,7 @@ extern void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
     VL_MungePic ((void *) SDDRV_ADDR,320,200);
 //    VL_MemToScreen (signon,320,200,0,0);
     VL_MemToScreen ((byte*)SDDRV_ADDR,320,200,16,0);
+	slTVOn();
 }
 
 
@@ -1170,9 +1171,6 @@ static void InitGame()
     }
 	SDL_SetVideoMode  (screenWidth, screenHeight, screenBits, NULL);
 	SDL_Init(SDL_INIT_AUDIO);
-//#ifndef REMDEBUG
-
-//#endif
 //    atexit(SDL_Quit);
     SignonScreen ();
 //slPrint("slScrTransparent4",slLocate(1,17));		
@@ -1692,9 +1690,8 @@ int main (int argc, char *argv[])
     //CheckParameters(argc, argv);
 #endif
 // vbt : invincible
-	godmode = 1;
+//	godmode = 1;
     CheckForEpisodes();
-
     InitGame();
 //slPrintHex(screen->pixels,slLocate(20,14));
 //slPrint((char*)"DemoLoop",slLocate(10,22));	
