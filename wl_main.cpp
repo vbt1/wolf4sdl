@@ -742,7 +742,12 @@ void SignonScreen (void)                        // VGA version
 {
     VL_SetVGAPlaneMode ();
 #define	SDDRV_ADDR	0x00202000
+
+#ifdef SPEAR
+	GFS_Load(GFS_NameToId((Sint8*)"BOOTSODP.BIN"),0,(void *) SDDRV_ADDR,512);
+#else
 	GFS_Load(GFS_NameToId((Sint8*)"BOOTPAL.BIN"),0,(void *) SDDRV_ADDR,512);
+#endif
 //	VL_SetPalette ((SDL_Color *)SDDRV_ADDR);
 //    SDL_SetColors(curSurface, SDDRV_ADDR, 0, 256);
 extern void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
@@ -752,12 +757,15 @@ extern void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
 	
 	for(unsigned int  i = 0; i < 256; i++ )
 		*(VRAM++) = *(Pal_Data++);
-
+#ifdef SPEAR
+	GFS_Load(GFS_NameToId((Sint8*)"BOOTSOD.BIN"),0,(void *) SDDRV_ADDR,64000);
+#else
 	GFS_Load(GFS_NameToId((Sint8*)"BOOT.BIN"),0,(void *) SDDRV_ADDR,64000);
-
+#endif
     VL_MungePic ((void *) SDDRV_ADDR,320,200);
 //    VL_MemToScreen (signon,320,200,0,0);
     VL_MemToScreen ((byte*)SDDRV_ADDR,320,200,16,0);
+	slTVOn();
 }
 
 
@@ -1144,9 +1152,7 @@ void DoJukebox(void)
 
 static void InitGame()
 {
-#ifndef SPEARDEMO
-    boolean didjukebox=false;
-#endif
+
 
 #ifdef EMBEDDED
 	for (int i = 0;i < MAPSIZE; i++)
@@ -1165,9 +1171,6 @@ static void InitGame()
     }
 	SDL_SetVideoMode  (screenWidth, screenHeight, screenBits, NULL);
 	SDL_Init(SDL_INIT_AUDIO);
-//#ifndef REMDEBUG
-
-//#endif
 //    atexit(SDL_Quit);
     SignonScreen ();
 //slPrint("slScrTransparent4",slLocate(1,17));		
@@ -1687,9 +1690,8 @@ int main (int argc, char *argv[])
     //CheckParameters(argc, argv);
 #endif
 // vbt : invincible
-	godmode = 1;
+//	godmode = 1;
     CheckForEpisodes();
-
     InitGame();
 //slPrintHex(screen->pixels,slLocate(20,14));
 //slPrint((char*)"DemoLoop",slLocate(10,22));	

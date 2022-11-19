@@ -1079,7 +1079,7 @@ PreloadGraphics (int loaded)
 	uint32_t* pageOffsets	= (uint32_t*)saturnChunk+0x2000; 
 	uint8_t *itemmap 		= (uint8_t *)saturnChunk+0x4000;
 	Uint8 *Chunks	 		= (uint8_t *)saturnChunk+0xC000;
-	
+
 	if(wallData== NULL) wallData = (uint8_t *) malloc(((NB_WALL_HWRAM*2)+8)*0x1000);
 	uint8_t *ptr = (uint8_t *)wallData;
 	loaded += (12+(SPR_NULLSPRITE-SPR_KNIFEREADY));
