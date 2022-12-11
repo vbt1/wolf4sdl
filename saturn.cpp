@@ -18,6 +18,10 @@ extern "C" {
 
 }
 unsigned char *saturnChunk;
+unsigned int vdds = 0;
+unsigned char vtno = 0;
+unsigned short vrep = 0;
+
 //
 #ifdef USE_SPRITES
 extern TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
@@ -296,8 +300,22 @@ int SDL_InitSubSystem(Uint32 flags)
 		
 #ifdef PONY
 	sound_external_audio_enable(5, 5);
-	load_drv(ADX_MASTER_768);
-	
+/*
+//unsigned char *tno = (unsigned char *) 0x6000CCD;
+slPrintHex(vtno, slLocate(10,8));
+//unsigned short *rep = (unsigned short *) 0x6000CCF;
+slPrintHex(vrep, slLocate(10,9));
+
+slPrint((Uint8 *)GFS_IdToName(2), slLocate(10,11));
+slPrint((Uint8 *)GFS_IdToName(3), slLocate(10,12));
+slPrint((char *)GFS_IdToName(vrep), slLocate(10,13));
+*/
+ChangeDir(GFS_IdToName(vrep));
+
+//slPrint((Uint8 *)GFS_IdToName(2), slLocate(10,14));
+//slPrint((Uint8 *)GFS_IdToName(3), slLocate(10,15));
+//	load_drv(ADX_MASTER_768);
+
 //	add_raw_pcm_buffer(0,SOUNDRATE,nBurnSoundLen*20);
 #else		
 		
@@ -313,7 +331,7 @@ unsigned char *sndDrvAddr;
 		sndDrvAddr = (unsigned char *)SDDRV_ADDR;
 		GFS_Load(GFS_NameToId((Sint8*)SDDRV_NAME),0,(void *) sndDrvAddr,SDDRV_SIZE);
 		slInitSound(sndDrvAddr , SDDRV_SIZE , (Uint8 *)sound_map , sizeof(sound_map)) ;
-		sndDrvAddr = NULL;		
+		sndDrvAddr = NULL;
 //	slPrint("                                    ",slLocate(2,21));
 #endif
 
@@ -1093,8 +1111,17 @@ CdUnlock();
 #endif
 
 //	Sint32 ret;
- 
 	CDC_CdInit(0x00,0x00,0x05,0x0f);
+
+unsigned int *dds   = (unsigned int *) 0x6000CCC;
+unsigned char *tno  = (unsigned char *) 0x6000CCD;
+unsigned short *rep = (unsigned short *) 0x6000CCF;
+
+vdds = SWAP_BYTES_32(*dds);
+vtno = *tno;
+vrep = SWAP_BYTES_16(*rep);
+
+	*((Uint32 *)GFS_DDS_ADDR) = vdds;
     GFS_DIRTBL_TYPE(&dirtbl) = GFS_DIR_NAME;
     GFS_DIRTBL_DIRNAME(&dirtbl) = dir_name;
     GFS_DIRTBL_NDIR(&dirtbl) = MAX_DIR;
@@ -1107,7 +1134,7 @@ void ChangeDir(char *dirname)
 #ifndef ACTION_REPLAY	
     Sint32 fid;
 	GfsDirTbl dirtbl; 
-	
+//	*((Uint32 *)GFS_DDS_ADDR) = 0x20202020;		
     fid = GFS_NameToId((Sint8 *)dirname);
 
 	GFS_DIRTBL_TYPE(&dirtbl) = GFS_DIR_NAME;
@@ -1161,10 +1188,10 @@ void	satStopMusic( void ){
 //--------------------------------------------------------------------------------------------------------------------------------------
 void	satPlayMusic( Uint8 track ){
    track -= (STARTMUSIC-2);
-	unsigned char *tno = (unsigned char *) 0x6000CCD;
-	if (tno[0] >30)
+
+	if (vtno >30)
 	{
-		tno[0]=0;
+		vtno=0;
 	}
   
 //	char toto[50];
@@ -1174,8 +1201,8 @@ void	satPlayMusic( Uint8 track ){
 
 //    CDC_PLY_PMODE(&playdata) = CDC_PTYPE_NOCHG;//CDC_PM_DFL + 30;	// Play Mode. 
 	CDC_POS_PTYPE( &posdata ) = CDC_PTYPE_TNO;
-    CDC_PLY_STNO( &playdata ) = (Uint8) (track + tno[0]);
-    CDC_PLY_ETNO( &playdata ) = (Uint8) (track + tno[0]);
+    CDC_PLY_STNO( &playdata ) = (Uint8) (track + vtno);
+    CDC_PLY_ETNO( &playdata ) = (Uint8) (track + vtno);
     CDC_CdPlay(&playdata);
 //	slCDDAOn(127,127,0,0);
 //	slSndVolume(127);

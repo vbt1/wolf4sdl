@@ -737,7 +737,6 @@ void SetupWalls (void)
 =
 ==========================
 */
-
 void SignonScreen (void)                        // VGA version
 {
     VL_SetVGAPlaneMode ();
@@ -748,6 +747,7 @@ void SignonScreen (void)                        // VGA version
 #else
 	GFS_Load(GFS_NameToId((Sint8*)"BOOTPAL.BIN"),0,(void *) SDDRV_ADDR,512);
 #endif
+
 //	VL_SetPalette ((SDL_Color *)SDDRV_ADDR);
 //    SDL_SetColors(curSurface, SDDRV_ADDR, 0, 256);
 extern void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
@@ -1673,8 +1673,7 @@ int main (int argc, char *argv[])
 	for( dst = (Uint8 *)SystemWork, i = 0;i < SystemSize; i++) {
 		*dst = 0;
 	}	
-	
-	
+
 #if defined(_arch_dreamcast)
     DC_Main();
     DC_CheckParameters();
@@ -1691,6 +1690,7 @@ int main (int argc, char *argv[])
 #endif
 // vbt : invincible
 //	godmode = 1;
+
     CheckForEpisodes();
     InitGame();
 //slPrintHex(screen->pixels,slLocate(20,14));

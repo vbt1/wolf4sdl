@@ -103,7 +103,7 @@ void	VL_SetVGAPlaneMode (void)
 		screen = SDL_SetVideoMode(screenWidth, screenHeight, screenBits,
 			SDL_SWSURFACE | (screenBits == 8 ? SDL_HWPALETTE : 0) );
 	}
-//slPrintHex(screen->pixels,slLocate(20,8));	
+
     if(!screen)
     {
 //        printf("Unable to set %ix%ix%i video mode: %s\n", screenWidth,
