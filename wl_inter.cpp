@@ -1914,9 +1914,8 @@ CopyProtection (void)
 
     
 //    ShutdownId ();
-
 //    printf ("%s\n", DosMessages[US_RndT () % 9]);
-    SYS_Exit (1);
+//    SYS_Exit (1);
 }
 #endif //copy
 

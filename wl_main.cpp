@@ -1370,7 +1370,7 @@ void Quit (const char *errorStr, ...)
     byte *screen;
 #endif
     char error[256];
-	
+
     if(errorStr != NULL)
     {
         va_list vlist;
@@ -1394,7 +1394,7 @@ void Quit (const char *errorStr, ...)
 #endif
             VW_WaitVBL(100);
         }
-        SYS_Exit(1);
+        SYS_Exit(0);
     }
 
     if (!error || !*error)
@@ -1427,7 +1427,6 @@ void Quit (const char *errorStr, ...)
         SetTextCursor(0,7);
 #endif
         VW_WaitVBL(200);
-        SYS_Exit(1);
     }
     else
     if (!error || !(*error))
