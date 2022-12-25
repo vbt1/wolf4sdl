@@ -1362,10 +1362,12 @@ void NewViewSize (int width)
 =
 ==========================
 */
+void ChangeDir(char *dirname);
 
 void Quit (const char *errorStr, ...)
 {
-
+    SYS_Exit(0);	
+#if 0
 #ifdef NOTYET
     byte *screen;
 #endif
@@ -1439,6 +1441,7 @@ void Quit (const char *errorStr, ...)
 #endif
     }
     SYS_Exit(0);
+#endif	
 }
 
 //===========================================================================

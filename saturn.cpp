@@ -236,6 +236,7 @@ int SDL_Init(Uint32 flags)
 		initcddone=1;
 	}
 #endif
+//	SYS_Exit(0);
 //	DMA_ScuInit();
 //	SPR_InitSlaveSH();
 	SDL_InitSubSystem(flags);
@@ -314,7 +315,7 @@ ChangeDir(GFS_IdToName(vrep));
 
 //slPrint((Uint8 *)GFS_IdToName(2), slLocate(10,14));
 //slPrint((Uint8 *)GFS_IdToName(3), slLocate(10,15));
-//	load_drv(ADX_MASTER_768);
+	load_drv(ADX_MASTER_768);
 
 //	add_raw_pcm_buffer(0,SOUNDRATE,nBurnSoundLen*20);
 #else		
@@ -1121,11 +1122,12 @@ vdds = SWAP_BYTES_32(*dds);
 vtno = *tno;
 vrep = SWAP_BYTES_16(*rep);
 
-	*((Uint32 *)GFS_DDS_ADDR) = vdds;
+	*((Uint32 *)GFS_DDS_ADDR) = vdds; 
     GFS_DIRTBL_TYPE(&dirtbl) = GFS_DIR_NAME;
     GFS_DIRTBL_DIRNAME(&dirtbl) = dir_name;
     GFS_DIRTBL_NDIR(&dirtbl) = MAX_DIR;
     GFS_Init(MAX_OPEN, lib_work, &dirtbl);
+*dds = 	SWAP_BYTES_32(vdds);
 #endif	    
 }
 //--------------------------------------------------------------------------------------------------------------------------------------

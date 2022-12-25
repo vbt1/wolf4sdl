@@ -200,6 +200,12 @@ int current;
                         gamestate.secrettotal++;
                     break;
 
+
+                case 99:
+					loaded += PRELOAD_ITEMS (SPR_DEATHCAM,SPR_DEATHCAM);
+					loaded += PRELOAD_ITEMS (SPR_BJ_W1,SPR_BJ_JUMP4);
+                   break;
+
 //
 // guard
 //
@@ -537,11 +543,13 @@ int current;
         }
     }
 #ifndef SPEAR	
+	/*
 	if(gamestate.mapon == 8)
 	{
 		loaded += PRELOAD_ITEMS (SPR_DEATHCAM,SPR_DEATHCAM);
 		loaded += PRELOAD_ITEMS (SPR_BJ_W1,SPR_BJ_JUMP4);
 	}
+	*/
 #endif	
 	return loaded;
 }
