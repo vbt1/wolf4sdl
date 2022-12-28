@@ -429,8 +429,8 @@ void VL_BarScaledCoord (int scx, int scy, int scwidth, int scheight, int color)
 
 void VL_BarScaledCoordNBG (int scx, int scy, int scwidth, int scheight, int color)
 {
-	if (scy<0 || scy>screenHeight)
-		scy=0;
+//	if (scy<0 || scy>screenHeight)
+//		scy=0;
 		
 /*
 	assert3(scx >= 0 && (unsigned) scx + scwidth <= screenWidth
