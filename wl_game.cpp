@@ -200,12 +200,12 @@ int current;
                         gamestate.secrettotal++;
                     break;
 
-
+#ifndef SPEAR
                 case 99:
 					loaded += PRELOAD_ITEMS (SPR_DEATHCAM,SPR_DEATHCAM);
 					loaded += PRELOAD_ITEMS (SPR_BJ_W1,SPR_BJ_JUMP4);
                    break;
-
+#endif
 //
 // guard
 //

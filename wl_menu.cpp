@@ -1062,8 +1062,6 @@ CP_ChangeView (int)
 void
 DrawChangeView (int view)
 {
-//slPrint("slScrTransparent8",slLocate(1,17));		
-	slScrTransparent(0);
     int rescaledHeight = screenHeight / scaleFactor;
     if(view != 21) VWB_Bar (0, rescaledHeight - 40, SATURN_WIDTH, 40, bordercol);
 
