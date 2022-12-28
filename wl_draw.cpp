@@ -1753,8 +1753,7 @@ void    ThreeDRefresh (void)
     if(GetFeatureFlags() & FF_STARSKY)
         DrawStarSky(vbuf, vbufPitch);
 #endif
-
-    unsigned int nb = WallRefresh ();
+    int nb = WallRefresh ();
 
 #if defined(USE_FEATUREFLAGS) && defined(USE_PARALLAX)
     if(GetFeatureFlags() & FF_PARALLAXSKY)
@@ -1767,7 +1766,6 @@ void    ThreeDRefresh (void)
 #ifdef USE_FLOORCEILINGTEX
     DrawFloorAndCeiling(vbuf, vbufPitch, min_wallheight);
 #endif
-
 //---------------------------------------------------------------------------	
 //
 // draw all the scaled images
@@ -1793,7 +1791,6 @@ void    ThreeDRefresh (void)
 	{
         ShowActStatus();
 	}*/
-
 #ifdef USE_SPRITES
 //		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
 		slTransferEntry((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
@@ -1805,7 +1802,6 @@ void    ThreeDRefresh (void)
 			int depth = (user_wall->YB+user_wall->YC)/2;
 			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
 		}
-		
 		if(position_vram>0x77000)
 		{
 			memset(texture_list,0x00,SPR_NULLSPRITE);
@@ -1825,7 +1821,6 @@ void    ThreeDRefresh (void)
 
 //		VGAClearScreen(); // vbt : maj du fond d'écran
 //		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
-
         FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 70, false);
 //		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
         fizzlein = false;
@@ -1842,18 +1837,14 @@ void    ThreeDRefresh (void)
 
 		user_wall = (SPRITE *)user_walls+(MAX_WALLS/2);
 		
-//		while(tutu==0);
-		
-		
 		nb=tutu-(MAX_WALLS/2);
 
-		for(unsigned int pixx=0;pixx<=nb;pixx++)
+		for(int pixx=0;pixx<=nb;pixx++)
 		{
 			int depth = (user_wall->YB+user_wall->YC)/2;			
 			slSetSprite(user_wall, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
 			user_wall++;
 		}
-
 		
 		DrawPlayerWeapon ();    // draw player's hands
 		

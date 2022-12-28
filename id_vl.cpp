@@ -92,7 +92,7 @@ void	VL_Shutdown (void)
 
 void	VL_SetVGAPlaneMode (void)
 {
-    if(screenBits == -1)
+    if(screenBits == 0)
     {
         const SDL_VideoInfo *vidInfo = SDL_GetVideoInfo();
         screenBits = vidInfo->vfmt->BitsPerPixel;
@@ -234,12 +234,13 @@ void VL_GetPalette (SDL_Color *palette)
 void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 {
 	int		    i,j,orig,delta;
+
 	SDL_Color palette1[256], palette2[256];	
 	SDL_Color   *origptr, *newptr;
 
-    red = red * 255 / 63;
-    green = green * 255 / 63;
-    blue = blue * 255 / 63;
+	red = red * 255 / 63;
+	green = green * 255 / 63;
+	blue = blue * 255 / 63;
 
 	VL_GetPalette(palette1);
 	VL_WaitVBL(1);	
@@ -366,8 +367,8 @@ byte VL_GetPixel (int x, int y)
 
 void VL_Hlin (unsigned x, unsigned y, unsigned width, int color)
 {
-    assert1(x >= 0 && x + width <= screenWidth
-            && y >= 0 && y < screenHeight
+    assert1(x + width <= screenWidth
+            && y < screenHeight
             && "VL_Hlin: Destination rectangle out of bounds!");
 
     Uint8 *dest = ((byte *) curSurface->pixels) + y * curPitch + x;

@@ -1317,8 +1317,6 @@ restartgame:
             fizzlein = true;
         }
 		StartMusic ();
-        DrawLevel ();
-	
 #ifdef SPEAR
 startplayloop:
 #endif

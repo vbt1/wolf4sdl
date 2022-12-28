@@ -96,7 +96,7 @@ CP_itemtype MainMenu[] = {
 
     {1, STR_VS, CP_ViewScores},
     {0, STR_BD, 0},
-    {0, STR_QT, 0}
+    {1, STR_QT, CP_Quit}
 #endif
 };
 /*
@@ -564,7 +564,7 @@ BossKey (void)
     for (int i = 0; i < 768; i++)
         palette1[0][i] = 0;
 
-    VL_SetPalette (&palette1[0][0]);
+    VL_SetPalette (palette1[0]);
     LoadLatchMem ();
 #endif
 }
@@ -592,7 +592,7 @@ BossKey (void)
     for (int i = 0; i < 768; i++)
         palette1[0][i] = 0;
 
-    VL_SetPalette (&palette1[0][0]);
+    VL_SetPalette (palette1[0]);
     LoadLatchMem ();
 #endif
 }
@@ -1116,30 +1116,9 @@ DrawChangeView (int view)
 int
 CP_Quit (int)
 {
-		//slPrint("exit game 1 !!!!",slLocate(10,11));
-#ifdef JAPAN
-    if (GetYorN (7, 11, C_QUITMSGPIC))
-#else
-
-#ifdef SPANISH
-    if (Confirm (ENDGAMESTR))
-#else
-    if (Confirm (endStrings[US_RndT () & 0x7 + (US_RndT () & 1)]))
-#endif
-
-#endif
-    {
-#ifndef USE_SPRITES		
-        VW_UpdateScreen ();
-#endif		
-        SD_MusicOff ();
-        SD_StopSound ();
-        MenuFadeOut ();
-        Quit (NULL);
-    }
-
-    DrawMainMenu ();
-    return 0;
+    SD_MusicOff ();
+	SYS_Exit(0);
+	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////
