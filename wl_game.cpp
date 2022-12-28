@@ -30,7 +30,7 @@ extern boolean startgame;
     int ChunksInFile = 0;
 
 void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
-uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
+//uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
 
 #undef atan2
 //#define atan2(a,b) slAtan(a,b)
@@ -644,13 +644,13 @@ int SetupGameLevel (void)
 	uint32_t* pageOffsets = (uint32_t *)saturnChunk+0x2000; 
 	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
  
-	for(int i=0;i<ChunksInFile;i++)
+	for(int i=0;i<ChunksInFile+1;i++)
 	{
 		pageOffsets[i]=Chunks[6]<<0|Chunks[7]<<8|Chunks[8]<<16|Chunks[9]<<24;
 		Chunks+=4;
 	}
 
-	for(int i=PMSpriteStart;i<ChunksInFile;i++)
+	for(int i=PMSpriteStart;i<ChunksInFile+1;i++)
 	{
 		pageLengths[i-PMSpriteStart]=Chunks[6]|Chunks[7]<<8;
 		Chunks+=2;
@@ -661,7 +661,7 @@ int SetupGameLevel (void)
     if(pageDataSize > (size_t) -1)
         Quit("The page file \"%s\" is too large!", fname);
 
-    pageOffsets[ChunksInFile] = fileSize;
+//    pageOffsets[ChunksInFile] = fileSize;
 
 #endif
 
@@ -1208,6 +1208,7 @@ void Died (void)
     // fade to red
     //
     FinishPaletteShifts ();
+	memset (screenBuffer->pixels,4,screenBuffer->pitch*240);
 
     IN_ClearKeysDown ();
 
@@ -1260,6 +1261,7 @@ void GameLoop (void)
 //gamestate.mapon = 3;
 //gamestate.episode=3;
 //GiveWeapon (gamestate.bestweapon+2);
+
 gamestate.ammo = 99;	
 gamestate.keys = 3;
 // vbt dernier niveau

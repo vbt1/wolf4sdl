@@ -1811,29 +1811,7 @@ void    ThreeDRefresh (void)
 	vbuf = NULL;
 #endif
 
-//
-// show screen and time last cycle
-//
-    if (fizzlein)
-    {
-//		SDL_Rect destrect = { viewscreenx, viewscreeny, viewwidth, viewheight }; 
-//		SDL_FillRect (screenBuffer, &destrect, 0);
 
-//		VGAClearScreen(); // vbt : maj du fond d'écran
-//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
-        FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 70, false);
-//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
-        fizzlein = false;
-		DrawStatusBar(); // vbt ajout
-        lasttimecount = GetTimeCount();          // don't make a big tic count
-    }
-#ifndef USE_SPRITES		
-	else
-	{
-        SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-//        SDL_UpdateRect(screen, 0, 0, 0, 0);
-    }
-#endif
 
 		user_wall = (SPRITE *)user_walls+(MAX_WALLS/2);
 		
@@ -1845,8 +1823,27 @@ void    ThreeDRefresh (void)
 			slSetSprite(user_wall, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
 			user_wall++;
 		}
-		
+
 		DrawPlayerWeapon ();    // draw player's hands
-		
 		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
+//
+// show screen and time last cycle
+//
+    if (fizzlein)
+    {
+		memset (screenBuffer->pixels,0,screenBuffer->pitch*240);
+        FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 70, false);
+        fizzlein = false;
+		DrawStatusBar(); // vbt ajout
+        lasttimecount = GetTimeCount();          // don't make a big tic count
+    }
+#ifndef USE_SPRITES		
+	else
+	{
+        SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
+//        SDL_UpdateRect(screen, 0, 0, 0, 0);
+    }
+#endif
+		
+
 }

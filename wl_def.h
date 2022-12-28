@@ -11,9 +11,9 @@
 #define SATURN_SORT_VALUE 240
 #define MAX_WALLS 120
 #ifndef SPEAR
-#define NB_WALL_HWRAM 50/2
+#define NB_WALL_HWRAM 25
 #else
-#define NB_WALL_HWRAM 50/2
+#define NB_WALL_HWRAM 27
 #endif
 	
 // 240 pour du 320, 264 pour du 352
