@@ -1325,13 +1325,15 @@ void ShowViewSize (int width)
     {
         viewwidth = screenWidth;
         viewheight = screenHeight - scaleFactor*STATUSLINES;
-        DrawPlayScreen ();
+ //       DrawPlayScreen ();
+		DrawPlayBorder ();
     }
     else
     {
         viewwidth = width*16*screenWidth/SATURN_WIDTH;
         viewheight = (int) (width_to_height(width*16)*screenHeight/200);
-        DrawPlayScreen ();
+ //       DrawPlayScreen ();
+		DrawPlayBorder ();
     }
 
     viewwidth = oldwidth;
