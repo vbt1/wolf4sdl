@@ -123,6 +123,7 @@ uint8_t *PM_DecodeSprites2(unsigned int i,uint32_t* pageOffsets,word *pageLength
 		memset(&ptr[size],0x00,end-size);
 	}
 	readChunks(fileId, size, &pageOffsets[i], Chunks, ptr);
+
 	t_compshape   *shape = (t_compshape   *)ptr;
 	shape->leftpix =SWAP_BYTES_16(shape->leftpix);
 	shape->rightpix=SWAP_BYTES_16(shape->rightpix);
@@ -133,7 +134,7 @@ uint8_t *PM_DecodeSprites2(unsigned int i,uint32_t* pageOffsets,word *pageLength
 	// setup a pointer to the column offsets	
 	cmdptr = shape->dataofs;
 	int count_00=63;
-
+	
 	for (int x=0;x<=(shape->rightpix-shape->leftpix);x++ )	
 	{
 		shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
@@ -141,17 +142,14 @@ uint8_t *PM_DecodeSprites2(unsigned int i,uint32_t* pageOffsets,word *pageLength
 		
 		while ((sprdata8[0]|sprdata8[1]<<8) != 0)
 		{
-			for (int y = (sprdata8[4]|sprdata8[5]<<8)/2; y < (sprdata8[0]|sprdata8[1]<<8)/2; y++)
-			{
-				unsigned int min_y=(sprdata8[4]|sprdata8[5]<<8)/2;
-				if(min_y<count_00)
-					count_00=min_y;
-			}
+			unsigned int min_y=(sprdata8[4]|sprdata8[5]<<8)/2;
+			if(min_y<count_00)
+				count_00=min_y;
 			sprdata8 += 6;
 		}			
 		cmdptr++;
 	}
-	memset(bmpbuff,0x00,(64-count_00)<<6);
+	memset4_fast(bmpbuff,0x00,(64-count_00)<<6);
 
 	unsigned char *sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
 
@@ -163,10 +161,10 @@ uint8_t *PM_DecodeSprites2(unsigned int i,uint32_t* pageOffsets,word *pageLength
 
 		while ((sprdata8[0]|sprdata8[1]<<8) != 0)
 		{
-			int y = ((sprdata8[4]|sprdata8[5]<<8)/2)-count_00;
-			bmpptr = (byte *)bmpbuff+x+(y<<6);
+			int y = ((sprdata8[4]|sprdata8[5]<<8)/2);
+			bmpptr = (byte *)bmpbuff+x+((y-count_00)<<6);
 			
-			for (; y < ((sprdata8[0]|sprdata8[1]<<8)/2)-count_00; y++)
+			for (; y < ((sprdata8[0]|sprdata8[1]<<8)/2); y++)
 			{
 				*bmpptr = *sprptr++;
 				if(*bmpptr==0) *bmpptr=0xa0;
@@ -177,6 +175,7 @@ uint8_t *PM_DecodeSprites2(unsigned int i,uint32_t* pageOffsets,word *pageLength
 		cmdptr++;
 	}
 	memcpyl((void *)ptr,bmpbuff,(64-count_00)<<6);
+//	slDMACopy(bmpbuff,(void *)ptr,(64-count_00)*64);
 	ptr+=((64-count_00)<<6);
 	return ptr;
 }

@@ -390,7 +390,7 @@ US_ControlPanel (ScanCode scancode)
             case -1:
             case quit:
 				//slPrint("exit game !!!!",slLocate(10,11));
-                CP_Quit (0);
+//                CP_Quit (0); //// ne pas remettre quitte dans le menu
                 break;
 
             default:

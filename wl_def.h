@@ -13,7 +13,7 @@
 #ifndef SPEAR
 #define NB_WALL_HWRAM 25
 #else
-#define NB_WALL_HWRAM 27
+#define NB_WALL_HWRAM 25
 #endif
 	
 // 240 pour du 320, 264 pour du 352

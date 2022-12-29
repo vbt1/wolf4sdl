@@ -3,8 +3,6 @@
 #include <math.h>
 #include "wl_def.h"
 //#include <SDL_mixer.h>
-//#define NB_WALL_HWRAM 50/2
-//#define NB_WALL_HWRAM 39
 
 #ifdef MYPROFILE
 #include <TIME.H>
