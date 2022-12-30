@@ -893,7 +893,7 @@ void DrawStatusBorder (byte color)
 ===================
 */
 
-inline void DrawPlayBorder (void)
+ void DrawPlayBorder (void)
 {
 	const int px = scaleFactor; // size of one "pixel"
 
@@ -922,17 +922,7 @@ inline void DrawPlayBorder (void)
     VWB_BarScaledCoord (xl,yl,viewwidth,viewheight,0);
 
     if(xl != 0)
-//    if(viewsize == 19)
     {
-		SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
-		(*sys_clip).XC = (xl+viewwidth)-1;
-		(*sys_clip).YC = (yl+viewheight)-1;
-	
-		slWindow(xl , yl, (xl+viewwidth)-1 , (yl+viewheight)-1, 300 , screenWidth/2, (yl*2+viewheight)/2);
-//viewwidth+px =321	
-//xl=16	
-//xl-px=15
-//yl=9
         // Paint game view border lines
         VWB_BarScaledCoord(xl-px, yl-px, viewwidth+px, px, 160);                      // upper border
         VWB_BarScaledCoord(xl, yl+viewheight, viewwidth+px, px, bordercol-2);       // lower border
@@ -942,12 +932,6 @@ inline void DrawPlayBorder (void)
     }
     else
     {
-		SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
-		(*sys_clip).XC = SATURN_WIDTH-1;
-		(*sys_clip).YC = 239;
-
-		slWindow(0 , 0, SATURN_WIDTH-1 , 239 , 300 , screenWidth/2, screenHeight/2);		
-        // Just paint a lower border line
         VWB_BarScaledCoord(0, yl+viewheight, viewwidth, px, bordercol-2);       // lower border
     }
 }

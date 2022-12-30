@@ -477,6 +477,8 @@ static const byte vgaCeiling[]=
 =
 =====================
 */
+extern SDL_Color curpal[256];
+
 void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 {
 #ifndef USE_SPRITES	
@@ -502,7 +504,6 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 //if(viewsize!=-1)
 {
 //	extern byte vgaCeiling[];
-	extern SDL_Color curpal[256];
 	unsigned char y;
 
 	SDL_Color *sdlCeilingColor = (SDL_Color *)&curpal[vgaCeiling[gamestate.episode*10+mapon]];

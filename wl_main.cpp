@@ -1325,14 +1325,12 @@ void ShowViewSize (int width)
     {
         viewwidth = screenWidth;
         viewheight = screenHeight - scaleFactor*STATUSLINES;
- //       DrawPlayScreen ();
 		DrawPlayBorder ();
     }
     else
     {
         viewwidth = width*16*screenWidth/SATURN_WIDTH;
         viewheight = (int) (width_to_height(width*16)*screenHeight/200);
- //       DrawPlayScreen ();
 		DrawPlayBorder ();
     }
 
@@ -1344,13 +1342,32 @@ void ShowViewSize (int width)
 void NewViewSize (int width)
 {
     viewsize = width;
-    if(viewsize == 21)
+
+	SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
+    const int xl = screenWidth/2-viewwidth/2;
+    const int yl = (screenHeight-px*STATUSLINES-viewheight)/2;
+
+    if(width == 21)
+	{
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = 239;
+		slWindow(0 , 0, (*sys_clip).XC , (*sys_clip).YC, 300 , screenWidth/2, screenHeight/2);
         SetViewSize(screenWidth, screenHeight);
-    else if(viewsize == 20)
+	}
+    else if(width == 20)
+	{
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = (screenHeight - scaleFactor * STATUSLINES)-1;
+		slWindow(0 , 0, (*sys_clip).XC , (*sys_clip).YC , 300 , screenWidth/2, screenHeight/2);
         SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
+	}
     else
+	{
+		(*sys_clip).XC = (xl+viewwidth)-1;
+		(*sys_clip).YC = (yl+viewheight)-1;
+		slWindow(xl , yl, (xl+viewwidth)-1 , (yl+viewheight)-1, 300 , screenWidth/2, (yl*2+viewheight)/2);
         SetViewSize(width*16*screenWidth/SATURN_WIDTH, (unsigned) (width_to_height(width*16)*screenHeight/200));
-// xxx	VGAClearScreen ();
+	}
 }
 
 

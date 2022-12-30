@@ -1060,7 +1060,7 @@ extern  SDL_Surface     *latchpics[NUMLATCHPICS];
 
 int    SetupGameLevel (void);
 void    GameLoop (void);
-inline void    DrawPlayBorder (void);
+void    DrawPlayBorder (void);
 void    DrawStatusBorder (byte color);
 void    DrawPlayScreen (void);
 void	DrawStatusBar (void);

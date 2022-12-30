@@ -33,7 +33,7 @@ int CP_ReadThis (int);
 #define STARTITEM       newgame
 
 #else
-#define STARTITEM       readthis
+#define STARTITEM       newgame //readthis
 #endif
 #endif
 
@@ -88,7 +88,7 @@ CP_itemtype MainMenu[] = {
 #ifdef SPANISH
     {2, "Ve esto!", 0}, //CP_ReadThis},
 #else
-    {2, "Read This!", 0}, //CP_ReadThis},
+    {0, "Read This!", 0}, //CP_ReadThis},
 #endif
 
 #endif
@@ -1064,7 +1064,6 @@ DrawChangeView (int view)
 {
     int rescaledHeight = screenHeight / scaleFactor;
     if(view != 21) VWB_Bar (0, rescaledHeight - 40, SATURN_WIDTH, 40, bordercol);
-
 #ifdef JAPAN
     CA_CacheScreen (S_CHANGEPIC);
 
