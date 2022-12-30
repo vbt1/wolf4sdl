@@ -1,4 +1,5 @@
 // WL_DRAW.C
+#pragma GCC optimize ("O3")
 //#define USE_SPRITES 1
 #include "wl_def.h"
 

@@ -1047,7 +1047,6 @@ PreloadGraphics (int loaded)
     DrawLevel ();
     ClearSplitVWB ();           // set up for double buffering in split screen
 	slScrTransparent(2);
-	slSynch();
 	
     VWB_BarScaledCoord (0, 0, screenWidth, screenHeight - scaleFactor * (STATUSLINES - 1), bordercol);
     LatchDrawPicScaledCoord ((screenWidth-scaleFactor*224)/16,
@@ -1057,6 +1056,9 @@ PreloadGraphics (int loaded)
     WindowY = (screenHeight - scaleFactor*(STATUSLINES+48))/2;
     WindowW = scaleFactor * 28 * 8;
     WindowH = scaleFactor * 48;
+//	NewViewSize (viewsize);
+//	DrawChangeView(viewsize);	
+	slSynch();	
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
 #endif

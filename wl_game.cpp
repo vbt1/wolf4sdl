@@ -1,4 +1,5 @@
 // WL_GAME.C
+#pragma GCC optimize ("O3")
 //#define USE_SPRITES 1
 #include <math.h>
 #include "wl_def.h"
@@ -893,8 +894,65 @@ void DrawStatusBorder (byte color)
 ===================
 */
 
- void DrawPlayBorder (void)
+void DrawPlayBorder (void)
 {
+	const int px = scaleFactor; // size of one "pixel"
+
+    if (bordercol != VIEWCOLOR)
+        DrawStatusBorder(bordercol);
+    else
+    {
+        const int statusborderw = (screenWidth-px*SATURN_WIDTH)/2;
+#if SATURN_WIDTH==352		
+        VWB_BarScaledCoord (0, screenHeight-px*STATUSLINES,
+            8+statusborderw+px*8, px*STATUSLINES, bordercol);
+        VWB_BarScaledCoord (screenWidth-8-statusborderw-px*8, screenHeight-px*STATUSLINES,
+            8+statusborderw+px*8, px*STATUSLINES, bordercol);
+#else
+        VWB_BarScaledCoord (0, screenHeight-px*STATUSLINES,
+            statusborderw+px*8, px*STATUSLINES, bordercol);
+        VWB_BarScaledCoord (screenWidth-statusborderw-px*8, screenHeight-px*STATUSLINES,
+            statusborderw+px*8, px*STATUSLINES, bordercol);
+#endif
+    }
+
+    VWB_BarScaledCoord (0,0,screenWidth,screenHeight-px*STATUSLINES,bordercol);
+
+    const int xl = screenWidth/2-viewwidth/2;
+    const int yl = (screenHeight-px*STATUSLINES-viewheight)/2;
+    VWB_BarScaledCoord (xl,yl,viewwidth,viewheight,0);
+
+    if(xl != 0)
+//    if(viewsize == 19)
+    {
+		SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
+		(*sys_clip).XC = (xl+viewwidth)-1;
+		(*sys_clip).YC = (yl+viewheight)-1;
+	
+		slWindow(xl , yl, (xl+viewwidth)-1 , (yl+viewheight)-1, 300 , screenWidth/2, (yl*2+viewheight)/2);
+//viewwidth+px =321	
+//xl=16	
+//xl-px=15
+//yl=9
+        // Paint game view border lines
+        VWB_BarScaledCoord(xl-px, yl-px, viewwidth+px, px, 160);                      // upper border
+        VWB_BarScaledCoord(xl, yl+viewheight, viewwidth+px, px, bordercol-2);       // lower border
+        VWB_BarScaledCoord(xl-px, yl-px, px, viewheight+px, 160);                     // left border
+        VWB_BarScaledCoord(xl+viewwidth, yl-px, px, viewheight+2*px, bordercol-2);  // right border
+        VWB_BarScaledCoord(xl-px, yl+viewheight, px, px, bordercol-3);              // lower left highlight
+    }
+    else
+    {
+	/*	SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = 239;
+
+		slWindow(0 , 0, SATURN_WIDTH-1 , 239 , 300 , screenWidth/2, screenHeight/2);		*/
+        // Just paint a lower border line
+        VWB_BarScaledCoord(0, yl+viewheight, viewwidth, px, bordercol-2);       // lower border
+    }
+	
+/*	
 	const int px = scaleFactor; // size of one "pixel"
 
     if (bordercol != VIEWCOLOR)
@@ -934,6 +992,7 @@ void DrawStatusBorder (byte color)
     {
         VWB_BarScaledCoord(0, yl+viewheight, viewwidth, px, bordercol-2);       // lower border
     }
+*/	
 }
 
 
@@ -1244,8 +1303,8 @@ void GameLoop (void)
 //gamestate.episode=3;
 //GiveWeapon (gamestate.bestweapon+2);
 
-gamestate.ammo = 99;	
-gamestate.keys = 3;
+//gamestate.ammo = 99;	
+//gamestate.keys = 3;
 // vbt dernier niveau
 		
     boolean died;
@@ -1265,7 +1324,6 @@ restartgame:
 	
     do
     {
-
         //if (!loadedgame)
             gamestate.score = gamestate.oldscore;
         if(!died || viewsize != 21) 
@@ -1347,7 +1405,7 @@ startplayloop:
                 VW_FadeOut ();
                 LevelCompleted ();              // do the intermission
 // vbt pour garder les clefs.
-	gamestate.keys = 3;				
+//	gamestate.keys = 3;				
                 if(viewsize == 21) DrawPlayScreen();
 
 #ifdef SPEARDEMO

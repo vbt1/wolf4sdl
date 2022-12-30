@@ -1248,6 +1248,9 @@ static void InitGame()
     SetupWalls ();
 #endif
 //slPrint((char *)"NewViewSize     ",slLocate(10,12));   
+//	viewwidth = viewsize*16*screenWidth/SATURN_WIDTH;
+//	viewheight = (int) (width_to_height(viewsize*16)*screenHeight/200);
+
     NewViewSize (viewsize);
 //slPrint((char *)"slIntFunction     ",slLocate(10,12));	
 	slIntFunction(VblIn) ;
@@ -1342,8 +1345,13 @@ void ShowViewSize (int width)
 void NewViewSize (int width)
 {
     viewsize = width;
-
+	SPRITE *sys_clip = (SPRITE *) SpriteVRAM;	
+/*	
+    viewwidth = width&~15;                  // must be divisable by 16
+    viewheight = height&~1;                 // must be even
+	
 	SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
+	const int px = scaleFactor; // size of one "pixel"
     const int xl = screenWidth/2-viewwidth/2;
     const int yl = (screenHeight-px*STATUSLINES-viewheight)/2;
 
@@ -1351,23 +1359,45 @@ void NewViewSize (int width)
 	{
 		(*sys_clip).XC = SATURN_WIDTH-1;
 		(*sys_clip).YC = 239;
-		slWindow(0 , 0, (*sys_clip).XC , (*sys_clip).YC, 300 , screenWidth/2, screenHeight/2);
         SetViewSize(screenWidth, screenHeight);
+		slWindow(0 , 0, SATURN_WIDTH-1 , 239 , 300 , screenWidth/2, screenHeight/2);	
 	}
     else if(width == 20)
 	{
 		(*sys_clip).XC = SATURN_WIDTH-1;
-		(*sys_clip).YC = (screenHeight - scaleFactor * STATUSLINES)-1;
+		(*sys_clip).YC = (screenHeight - px * STATUSLINES)-1;
+        SetViewSize(screenWidth, screenHeight - px * STATUSLINES);
 		slWindow(0 , 0, (*sys_clip).XC , (*sys_clip).YC , 300 , screenWidth/2, screenHeight/2);
-        SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
 	}
     else
 	{
-		(*sys_clip).XC = (xl+viewwidth)-1;
-		(*sys_clip).YC = (yl+viewheight)-1;
-		slWindow(xl , yl, (xl+viewwidth)-1 , (yl+viewheight)-1, 300 , screenWidth/2, (yl*2+viewheight)/2);
+
         SetViewSize(width*16*screenWidth/SATURN_WIDTH, (unsigned) (width_to_height(width*16)*screenHeight/200));
+		(*sys_clip).XC = (xl+viewwidth)-1;
+		(*sys_clip).YC = (yl+viewheight)-1;		
+		slWindow(xl , yl, (xl+viewwidth)-1 , (yl+viewheight)-1, 300 , screenWidth/2, (yl*2+viewheight)/2);
 	}
+*/
+
+    if(width == 21)
+	{
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = 239;	
+        SetViewSize(screenWidth, screenHeight);
+		slWindow(0 , 0, SATURN_WIDTH-1 , 239 , 300 , screenWidth/2, screenHeight/2);			
+	}
+    else if(width == 20)
+	{
+		
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = (screenHeight - scaleFactor * STATUSLINES)-1;		
+        SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
+		slWindow(0 , 0, (*sys_clip).XC , (*sys_clip).YC , 300 , screenWidth/2, screenHeight/2);		
+	}
+    else
+	{
+        SetViewSize(width*16*screenWidth/SATURN_WIDTH, (unsigned) (width_to_height(width*16)*screenHeight/200));
+	}	
 }
 
 

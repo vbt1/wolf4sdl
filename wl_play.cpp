@@ -1,4 +1,5 @@
 // WL_PLAY.C
+#pragma GCC optimize ("O3")
 #include "wl_def.h"
 
 #include "wl_cloudsky.h"

@@ -88,7 +88,7 @@ CP_itemtype MainMenu[] = {
 #ifdef SPANISH
     {2, "Ve esto!", 0}, //CP_ReadThis},
 #else
-    {0, "Read This!", 0}, //CP_ReadThis},
+    {2, "Read This!", 0}, //CP_ReadThis},
 #endif
 
 #endif
@@ -1082,25 +1082,6 @@ DrawChangeView (int view)
 #endif
 #ifndef USE_SPRITES
     VW_UpdateScreen ();
-#else
-	//viewsize = view;
-/*
-	NewViewSize (view);
-//	ThreeDRefresh();
-//
-
-//	DrawScaleds();
-//		slTransferEntry((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
- 
- extern SPRITE user_walls[120];
-		SPRITE *user_wall = user_walls;
-
-		for(unsigned int pixx=0;pixx<=80;pixx++)
-		{
-			int depth = (user_wall->YB+user_wall->YC)/2;
-			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
-		}
-	slSynch();*/
 #endif	
 }
 
