@@ -144,8 +144,8 @@ void Quit(const char *errorStr, ...);
 =============================================================================
 */
 
-#define MAXTICS 8
-#define DEMOTICS        8
+#define MAXTICS 10
+#define DEMOTICS        4
 
 #define MAXACTORS       150         // max number of nazis, etc / map
 #define MAXSTATS        400         // max number of lamps, bonus, etc
