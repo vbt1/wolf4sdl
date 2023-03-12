@@ -29,7 +29,7 @@ void wait_vblank(int nb);
 // VGA hardware routines
 //
 
-#define VL_WaitVBL(a)	wait_vblank(a*1)  //SDL_Delay((a)*8)
+#define VL_WaitVBL(a)				wait_vblank(a*1)  //SDL_Delay((a)*8)
 
 void VL_SetVGAPlaneMode (void);
 void VL_SetTextMode (void);

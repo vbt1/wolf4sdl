@@ -18,6 +18,10 @@ extern "C" {
 
 }
 unsigned char *saturnChunk;
+unsigned int vdds = 0;
+unsigned char vtno = 0;
+unsigned short vrep = 0;
+
 //
 #ifdef USE_SPRITES
 extern TEXTURE tex_spr[SPR_NULLSPRITE+SATURN_WIDTH];
@@ -232,6 +236,7 @@ int SDL_Init(Uint32 flags)
 		initcddone=1;
 	}
 #endif
+//	SYS_Exit(0);
 //	DMA_ScuInit();
 //	SPR_InitSlaveSH();
 	SDL_InitSubSystem(flags);
@@ -296,8 +301,22 @@ int SDL_InitSubSystem(Uint32 flags)
 		
 #ifdef PONY
 	sound_external_audio_enable(5, 5);
+/*
+//unsigned char *tno = (unsigned char *) 0x6000CCD;
+slPrintHex(vtno, slLocate(10,8));
+//unsigned short *rep = (unsigned short *) 0x6000CCF;
+slPrintHex(vrep, slLocate(10,9));
+
+slPrint((Uint8 *)GFS_IdToName(2), slLocate(10,11));
+slPrint((Uint8 *)GFS_IdToName(3), slLocate(10,12));
+slPrint((char *)GFS_IdToName(vrep), slLocate(10,13));
+*/
+ChangeDir(GFS_IdToName(vrep));
+
+//slPrint((Uint8 *)GFS_IdToName(2), slLocate(10,14));
+//slPrint((Uint8 *)GFS_IdToName(3), slLocate(10,15));
 	load_drv(ADX_MASTER_768);
-	
+
 //	add_raw_pcm_buffer(0,SOUNDRATE,nBurnSoundLen*20);
 #else		
 		
@@ -313,7 +332,7 @@ unsigned char *sndDrvAddr;
 		sndDrvAddr = (unsigned char *)SDDRV_ADDR;
 		GFS_Load(GFS_NameToId((Sint8*)SDDRV_NAME),0,(void *) sndDrvAddr,SDDRV_SIZE);
 		slInitSound(sndDrvAddr , SDDRV_SIZE , (Uint8 *)sound_map , sizeof(sound_map)) ;
-		sndDrvAddr = NULL;		
+		sndDrvAddr = NULL;
 //	slPrint("                                    ",slLocate(2,21));
 #endif
 
@@ -803,146 +822,7 @@ void SDL_PollEvent(int start,int end, SDL_Event *event)
 //	return found;
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
-#if 0
-int SDL_WaitEvent(SDL_Event *event)
-{
-	//event->type = SDL_NOEVENT;
-	if (event->type== SDL_KEYUP) {
-		event->type = SDL_NOEVENT;
-		event->key.keysym.sym = SDLK_FIRST;	
-		return 1;
-	}
- 
-	do {	
-		 /*
-		 take pressed buttons of both pads, to enable two player
-		 */
-		Uint16 push = 0, data = 0;
-		if(Per_Connect1) {
-			push = ~Smpc_Peripheral[0].push;
-			data = ~Smpc_Peripheral[0].data;
-		}
-		if(Per_Connect2) {
-			push |= ~Smpc_Peripheral[15].push;
-			data |= ~Smpc_Peripheral[15].data;
-		}
-		/*
-		 quit?
-		*/
-		if(data & PER_DGT_ST && data & PER_DGT_TA && data & PER_DGT_TB && data & PER_DGT_TC) {
-			event->type = SDL_QUIT;
-			return 1;
-		}		
-		/*
-			move cursor
-		*/
-/*		if(data & PER_DGT_ST) {
-			event->type = SDL_KEYDOWN;
-			event->key.keysym.sym = SDLK_SPACE;
-			return;
-		}
 
-		if(!(data & PER_DGT_ST) 
-			&& event->key.keysym.sym == SDLK_SPACE
-			&& event->type                     == SDL_KEYDOWN) {
-			event->type = SDL_KEYUP;
-			return;
-		}
-  */
-		if(data & PER_DGT_TA) {
-			event->type = SDL_KEYDOWN;
-			event->key.keysym.sym = SDLK_KP_ENTER;
-			return 1;
-		}
-		
-		if(!(data & PER_DGT_TA) 
-			&& event->key.keysym.sym == SDLK_KP_ENTER
-			&& event->type                     == SDL_KEYDOWN) {
-			event->type = SDL_KEYUP;
-			return 1;
-		}
-
-		if(data & PER_DGT_TB) {
-			event->type = SDL_KEYDOWN;
-			event->key.keysym.sym = SDLK_e;
-			return 1;
-		}		
-		
-		if(!(data & PER_DGT_TB) 
-			&& event->key.keysym.sym == SDLK_e
-			&& event->type                     == SDL_KEYDOWN) {
-			event->type = SDL_KEYUP;
-			return 1;
-		}
-
-		if(data & PER_DGT_TC) {
-			event->type = SDL_KEYDOWN;
-			event->key.keysym.sym = SDLK_p;
-			return 1;
-		}
-		
-		if(!(data & PER_DGT_TC) 
-			&& event->key.keysym.sym == SDLK_p
-			&& event->type                     == SDL_KEYDOWN) {
-			event->type = SDL_KEYUP;
-			return 1;
-		}
-
-		if(data & PER_DGT_KL) {
-			event->type = SDL_KEYDOWN;
-			event->key.keysym.sym = SDLK_z;
-			return 1;
-		}
-		
-		if(!(data & PER_DGT_KL) 
-			&& event->key.keysym.sym == SDLK_z
-			&& event->type                     == SDL_KEYDOWN) {
-			event->type = SDL_KEYUP;
-			return 1;
-		}
-
-		if(data & PER_DGT_KR) {
-			event->type = SDL_KEYDOWN;
-			event->key.keysym.sym = SDLK_x;
-			return 1;
-		}
-		
-		if(!(data & PER_DGT_KR) 
-			&& event->key.keysym.sym == SDLK_x
-			&& event->type                     == SDL_KEYDOWN) {
-			event->type = SDL_KEYUP;
-			return 1;
-		}
-
-		if(data & PER_DGT_KU) {
-			event->type = SDL_KEYDOWN;
-			event->key.keysym.sym = SDLK_o;
-			return 1;
-		}
-		
-		if(!(data & PER_DGT_KU) 
-			&& event->key.keysym.sym == SDLK_o
-			&& event->type                     == SDL_KEYDOWN) {
-			event->type = SDL_KEYUP;
-			return 1;
-		}
-
-		if(data & PER_DGT_KD) {
-			event->type = SDL_KEYDOWN;
-			event->key.keysym.sym = SDLK_k;
-			return 1;
-		}
-		
-		if(!(data & PER_DGT_KD) 
-			&& event->key.keysym.sym == SDLK_k
-			&& event->type                     == SDL_KEYDOWN) {
-			event->type = SDL_KEYUP;
-			return 1;
-		}
-	} while(event->type == SDL_NOEVENT);
-	return 0;
-}
-#endif
 /*
 //--------------------------------------------------------------------------------------------------------------------------------------
 void SDL_DestroyMutex(SDL_mutex *mutex)
@@ -1013,6 +893,7 @@ void wait_vblank(int nb)
 {
 	for(int i=0;i<nb;i++)
 	{
+//		slSynch();
 		 while((TVSTAT & 8) == 8);
 		 while((TVSTAT & 8) == 0);		 
 	}
@@ -1093,12 +974,22 @@ CdUnlock();
 #endif
 
 //	Sint32 ret;
- 
 	CDC_CdInit(0x00,0x00,0x05,0x0f);
+
+unsigned int *dds   = (unsigned int *) 0x6000CCC;
+unsigned char *tno  = (unsigned char *) 0x6000CCD;
+unsigned short *rep = (unsigned short *) 0x6000CCF;
+
+vdds = SWAP_BYTES_32(*dds);
+vtno = *tno;
+vrep = SWAP_BYTES_16(*rep);
+
+	*((Uint32 *)GFS_DDS_ADDR) = vdds; 
     GFS_DIRTBL_TYPE(&dirtbl) = GFS_DIR_NAME;
     GFS_DIRTBL_DIRNAME(&dirtbl) = dir_name;
     GFS_DIRTBL_NDIR(&dirtbl) = MAX_DIR;
     GFS_Init(MAX_OPEN, lib_work, &dirtbl);
+*dds = 	SWAP_BYTES_32(vdds);
 #endif	    
 }
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -1107,7 +998,7 @@ void ChangeDir(char *dirname)
 #ifndef ACTION_REPLAY	
     Sint32 fid;
 	GfsDirTbl dirtbl; 
-	
+//	*((Uint32 *)GFS_DDS_ADDR) = 0x20202020;		
     fid = GFS_NameToId((Sint8 *)dirname);
 
 	GFS_DIRTBL_TYPE(&dirtbl) = GFS_DIR_NAME;
@@ -1161,10 +1052,10 @@ void	satStopMusic( void ){
 //--------------------------------------------------------------------------------------------------------------------------------------
 void	satPlayMusic( Uint8 track ){
    track -= (STARTMUSIC-2);
-	unsigned char *tno = (unsigned char *) 0x6000CCD;
-	if (tno[0] >30)
+
+	if (vtno >30)
 	{
-		tno[0]=0;
+		vtno=0;
 	}
   
 //	char toto[50];
@@ -1174,8 +1065,8 @@ void	satPlayMusic( Uint8 track ){
 
 //    CDC_PLY_PMODE(&playdata) = CDC_PTYPE_NOCHG;//CDC_PM_DFL + 30;	// Play Mode. 
 	CDC_POS_PTYPE( &posdata ) = CDC_PTYPE_TNO;
-    CDC_PLY_STNO( &playdata ) = (Uint8) (track + tno[0]);
-    CDC_PLY_ETNO( &playdata ) = (Uint8) (track + tno[0]);
+    CDC_PLY_STNO( &playdata ) = (Uint8) (track + vtno);
+    CDC_PLY_ETNO( &playdata ) = (Uint8) (track + vtno);
     CDC_CdPlay(&playdata);
 //	slCDDAOn(127,127,0,0);
 //	slSndVolume(127);

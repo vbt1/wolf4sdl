@@ -1,4 +1,5 @@
 // WL_DRAW.C
+#pragma GCC optimize ("O3")
 //#define USE_SPRITES 1
 #include "wl_def.h"
 
@@ -477,6 +478,8 @@ static const byte vgaCeiling[]=
 =
 =====================
 */
+extern SDL_Color curpal[256];
+
 void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 {
 #ifndef USE_SPRITES	
@@ -502,7 +505,6 @@ void VGAClearScreen () // vbt : fond d'écran 2 barres grises
 //if(viewsize!=-1)
 {
 //	extern byte vgaCeiling[];
-	extern SDL_Color curpal[256];
 	unsigned char y;
 
 	SDL_Color *sdlCeilingColor = (SDL_Color *)&curpal[vgaCeiling[gamestate.episode*10+mapon]];
@@ -1753,8 +1755,7 @@ void    ThreeDRefresh (void)
     if(GetFeatureFlags() & FF_STARSKY)
         DrawStarSky(vbuf, vbufPitch);
 #endif
-
-    unsigned int nb = WallRefresh ();
+    int nb = WallRefresh ();
 
 #if defined(USE_FEATUREFLAGS) && defined(USE_PARALLAX)
     if(GetFeatureFlags() & FF_PARALLAXSKY)
@@ -1767,7 +1768,6 @@ void    ThreeDRefresh (void)
 #ifdef USE_FLOORCEILINGTEX
     DrawFloorAndCeiling(vbuf, vbufPitch, min_wallheight);
 #endif
-
 //---------------------------------------------------------------------------	
 //
 // draw all the scaled images
@@ -1793,7 +1793,6 @@ void    ThreeDRefresh (void)
 	{
         ShowActStatus();
 	}*/
-
 #ifdef USE_SPRITES
 //		slDMACopy((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
 		slTransferEntry((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
@@ -1805,7 +1804,6 @@ void    ThreeDRefresh (void)
 			int depth = (user_wall->YB+user_wall->YC)/2;
 			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
 		}
-		
 		if(position_vram>0x77000)
 		{
 			memset(texture_list,0x00,SPR_NULLSPRITE);
@@ -1815,19 +1813,28 @@ void    ThreeDRefresh (void)
 	vbuf = NULL;
 #endif
 
+
+
+		user_wall = (SPRITE *)user_walls+(MAX_WALLS/2);
+		
+		nb=tutu-(MAX_WALLS/2);
+
+		for(int pixx=0;pixx<=nb;pixx++)
+		{
+			int depth = (user_wall->YB+user_wall->YC)/2;			
+			slSetSprite(user_wall, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
+			user_wall++;
+		}
+
+		DrawPlayerWeapon ();    // draw player's hands
+		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
 //
 // show screen and time last cycle
 //
     if (fizzlein)
     {
-//		SDL_Rect destrect = { viewscreenx, viewscreeny, viewwidth, viewheight }; 
-//		SDL_FillRect (screenBuffer, &destrect, 0);
-
-//		VGAClearScreen(); // vbt : maj du fond d'écran
-//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
-
+		memset (screenBuffer->pixels,0,screenBuffer->pitch*240);
         FizzleFade(screenBuffer, screen, viewscreenx,viewscreeny,viewwidth,viewheight, 70, false);
-//		VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,0);
         fizzlein = false;
 		DrawStatusBar(); // vbt ajout
         lasttimecount = GetTimeCount();          // don't make a big tic count
@@ -1839,23 +1846,6 @@ void    ThreeDRefresh (void)
 //        SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
 #endif
+		
 
-		user_wall = (SPRITE *)user_walls+(MAX_WALLS/2);
-		
-//		while(tutu==0);
-		
-		
-		nb=tutu-(MAX_WALLS/2);
-
-		for(unsigned int pixx=0;pixx<=nb;pixx++)
-		{
-			int depth = (user_wall->YB+user_wall->YC)/2;			
-			slSetSprite(user_wall, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
-			user_wall++;
-		}
-
-		
-		DrawPlayerWeapon ();    // draw player's hands
-		
-		slSynch(); // vbt ajout 26/05 à remettre // utile ingame !!	
 }

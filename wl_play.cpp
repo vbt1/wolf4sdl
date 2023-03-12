@@ -1,4 +1,5 @@
 // WL_PLAY.C
+#pragma GCC optimize ("O3")
 #include "wl_def.h"
 
 #include "wl_cloudsky.h"
@@ -1274,7 +1275,6 @@ void PlayLoop (void)
 	if (demoplayback)
         IN_StartAck ();
 	UpdatePaletteShifts ();
-	
 	DrawStatusBar(); // vbt : ajout
 
     do
@@ -1285,15 +1285,12 @@ void PlayLoop (void)
 // actor thinking
 //
         madenoise = false;
-
         MoveDoors ();
        MovePWalls ();
 
         for (obj = player; obj; obj = obj->next)
             DoActor (obj);
-
         UpdatePaletteShifts ();
-
         ThreeDRefresh ();
 
         //
@@ -1315,7 +1312,6 @@ void PlayLoop (void)
 //        UpdateSoundLoc ();      // JAB
         if (screenfaded)
             VW_FadeIn ();
-
         CheckKeys ();
 
 //
@@ -1343,7 +1339,6 @@ void PlayLoop (void)
 		frame_x++;
     }
     while (!playstate && !startgame);
-//slPrint("end play loop",slLocate(1,20));
     if (playstate != ex_died)
         FinishPaletteShifts ();
 }

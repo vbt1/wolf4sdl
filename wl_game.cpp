@@ -1,10 +1,9 @@
 // WL_GAME.C
+#pragma GCC optimize ("O3")
 //#define USE_SPRITES 1
 #include <math.h>
 #include "wl_def.h"
 //#include <SDL_mixer.h>
-//#define NB_WALL_HWRAM 50/2
-//#define NB_WALL_HWRAM 39
 
 #ifdef MYPROFILE
 #include <TIME.H>
@@ -30,7 +29,7 @@ extern boolean startgame;
     int ChunksInFile = 0;
 
 void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
-uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
+//uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
 
 #undef atan2
 //#define atan2(a,b) slAtan(a,b)
@@ -200,6 +199,12 @@ int current;
                         gamestate.secrettotal++;
                     break;
 
+#ifndef SPEAR
+                case 99:
+					loaded += PRELOAD_ITEMS (SPR_DEATHCAM,SPR_DEATHCAM);
+					loaded += PRELOAD_ITEMS (SPR_BJ_W1,SPR_BJ_JUMP4);
+                   break;
+#endif
 //
 // guard
 //
@@ -537,11 +542,13 @@ int current;
         }
     }
 #ifndef SPEAR	
+	/*
 	if(gamestate.mapon == 8)
 	{
 		loaded += PRELOAD_ITEMS (SPR_DEATHCAM,SPR_DEATHCAM);
 		loaded += PRELOAD_ITEMS (SPR_BJ_W1,SPR_BJ_JUMP4);
 	}
+	*/
 #endif	
 	return loaded;
 }
@@ -636,13 +643,13 @@ int SetupGameLevel (void)
 	uint32_t* pageOffsets = (uint32_t *)saturnChunk+0x2000; 
 	word *pageLengths = (word *)saturnChunk+(ChunksInFile + 1) * sizeof(int32_t);
  
-	for(int i=0;i<ChunksInFile;i++)
+	for(int i=0;i<ChunksInFile+1;i++)
 	{
 		pageOffsets[i]=Chunks[6]<<0|Chunks[7]<<8|Chunks[8]<<16|Chunks[9]<<24;
 		Chunks+=4;
 	}
 
-	for(int i=PMSpriteStart;i<ChunksInFile;i++)
+	for(int i=PMSpriteStart;i<ChunksInFile+1;i++)
 	{
 		pageLengths[i-PMSpriteStart]=Chunks[6]|Chunks[7]<<8;
 		Chunks+=2;
@@ -653,7 +660,7 @@ int SetupGameLevel (void)
     if(pageDataSize > (size_t) -1)
         Quit("The page file \"%s\" is too large!", fname);
 
-    pageOffsets[ChunksInFile] = fileSize;
+//    pageOffsets[ChunksInFile] = fileSize;
 
 #endif
 
@@ -887,7 +894,7 @@ void DrawStatusBorder (byte color)
 ===================
 */
 
-inline void DrawPlayBorder (void)
+void DrawPlayBorder (void)
 {
 	const int px = scaleFactor; // size of one "pixel"
 
@@ -936,14 +943,56 @@ inline void DrawPlayBorder (void)
     }
     else
     {
-		SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
+	/*	SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
 		(*sys_clip).XC = SATURN_WIDTH-1;
 		(*sys_clip).YC = 239;
 
-		slWindow(0 , 0, SATURN_WIDTH-1 , 239 , 300 , screenWidth/2, screenHeight/2);		
+		slWindow(0 , 0, SATURN_WIDTH-1 , 239 , 300 , screenWidth/2, screenHeight/2);		*/
         // Just paint a lower border line
         VWB_BarScaledCoord(0, yl+viewheight, viewwidth, px, bordercol-2);       // lower border
     }
+	
+/*	
+	const int px = scaleFactor; // size of one "pixel"
+
+    if (bordercol != VIEWCOLOR)
+        DrawStatusBorder(bordercol);
+    else
+    {
+        const int statusborderw = (screenWidth-px*SATURN_WIDTH)/2;
+#if SATURN_WIDTH==352		
+        VWB_BarScaledCoord (0, screenHeight-px*STATUSLINES,
+            8+statusborderw+px*8, px*STATUSLINES, bordercol);
+        VWB_BarScaledCoord (screenWidth-8-statusborderw-px*8, screenHeight-px*STATUSLINES,
+            8+statusborderw+px*8, px*STATUSLINES, bordercol);
+#else
+        VWB_BarScaledCoord (0, screenHeight-px*STATUSLINES,
+            statusborderw+px*8, px*STATUSLINES, bordercol);
+        VWB_BarScaledCoord (screenWidth-statusborderw-px*8, screenHeight-px*STATUSLINES,
+            statusborderw+px*8, px*STATUSLINES, bordercol);
+#endif
+    }
+
+    VWB_BarScaledCoord (0,0,screenWidth,screenHeight-px*STATUSLINES,bordercol);
+
+    const int xl = screenWidth/2-viewwidth/2;
+    const int yl = (screenHeight-px*STATUSLINES-viewheight)/2;
+    VWB_BarScaledCoord (xl,yl,viewwidth,viewheight,0);
+
+    if(xl != 0)
+    {
+        // Paint game view border lines
+        VWB_BarScaledCoord(xl-px, yl-px, viewwidth+px, px, 160);                      // upper border
+        VWB_BarScaledCoord(xl, yl+viewheight, viewwidth+px, px, bordercol-2);       // lower border
+        VWB_BarScaledCoord(xl-px, yl-px, px, viewheight+px, 160);                     // left border
+        VWB_BarScaledCoord(xl+viewwidth, yl-px, px, viewheight+2*px, bordercol-2);  // right border
+        VWB_BarScaledCoord(xl-px, yl+viewheight, px, px, bordercol-3);              // lower left highlight
+    }
+    else
+    {
+        VWB_BarScaledCoord(0, yl+viewheight, viewwidth, px, bordercol-2);       // lower border
+    }
+*/	
 }
 
 
@@ -1200,6 +1249,7 @@ void Died (void)
     // fade to red
     //
     FinishPaletteShifts ();
+	memset (screenBuffer->pixels,4,screenBuffer->pitch*240);
 
     IN_ClearKeysDown ();
 
@@ -1252,8 +1302,9 @@ void GameLoop (void)
 //gamestate.mapon = 3;
 //gamestate.episode=3;
 //GiveWeapon (gamestate.bestweapon+2);
-gamestate.ammo = 99;	
-gamestate.keys = 3;
+
+//gamestate.ammo = 99;	
+//gamestate.keys = 3;
 // vbt dernier niveau
 		
     boolean died;
@@ -1273,7 +1324,6 @@ restartgame:
 	
     do
     {
-
         //if (!loadedgame)
             gamestate.score = gamestate.oldscore;
         if(!died || viewsize != 21) 
@@ -1309,8 +1359,6 @@ restartgame:
             fizzlein = true;
         }
 		StartMusic ();
-        DrawLevel ();
-	
 #ifdef SPEAR
 startplayloop:
 #endif
@@ -1357,7 +1405,7 @@ startplayloop:
                 VW_FadeOut ();
                 LevelCompleted ();              // do the intermission
 // vbt pour garder les clefs.
-	gamestate.keys = 3;				
+//	gamestate.keys = 3;				
                 if(viewsize == 21) DrawPlayScreen();
 
 #ifdef SPEARDEMO

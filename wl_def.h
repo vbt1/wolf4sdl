@@ -5,9 +5,9 @@
 #define SATURN_SORT_VALUE 240
 #define MAX_WALLS 120
 #ifndef SPEAR
-#define NB_WALL_HWRAM 50/2
+#define NB_WALL_HWRAM 25
 #else
-#define NB_WALL_HWRAM 50/2
+#define NB_WALL_HWRAM 25
 #endif
 	
 // 240 pour du 320, 264 pour du 352
@@ -138,8 +138,8 @@ void Quit(const char *errorStr, ...);
 =============================================================================
 */
 
-#define MAXTICS 8
-#define DEMOTICS        8
+#define MAXTICS 10
+#define DEMOTICS        4
 
 #define MAXACTORS       150         // max number of nazis, etc / map
 #define MAXSTATS        400         // max number of lamps, bonus, etc
@@ -1054,7 +1054,7 @@ extern  SDL_Surface     *latchpics[NUMLATCHPICS];
 
 int    SetupGameLevel (void);
 void    GameLoop (void);
-inline void    DrawPlayBorder (void);
+void    DrawPlayBorder (void);
 void    DrawStatusBorder (byte color);
 void    DrawPlayScreen (void);
 void	DrawStatusBar (void);

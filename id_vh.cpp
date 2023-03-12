@@ -397,10 +397,10 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
     pixperframe = width * height / frames;
 
     IN_StartAck ();
-
+//	memset (source->pixels,4,source->pitch*(height+y1));
 	frame = GetTimeCount();
 	byte *srcptr = (byte *)source->pixels;
-	byte color = (srcptr[x1+(y1*width)]?0:4);
+	byte color = srcptr[0];
 
 	SDL_Rect rect = { x1,y1,width,height };
 	
@@ -418,9 +418,11 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
             return true;
         }
 
-
+//	unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + (dstrect->y<<9)+ dstrect->x);
+//	unsigned int *nbg1Ptr = (unsigned int*)(VDP2_VRAM_A0 + (dstrect->y<<9)+ dstrect->x);
 		byte *destptr = (byte *)dest->pixels;
-
+//		byte *destptr = (byte *)(VDP2_VRAM_A0 + (y1<<11)+ x1);
+		
         rndval = lastrndval;
 
         // When using double buffering, we have to copy the pixels of the last AND the current frame.
@@ -474,6 +476,7 @@ boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest,	int x1, int y1,
 
 finished:
 	SDL_BlitSurface(dest, &rect, source, &rect);
+//	VL_BarScaledCoord (x1,y1,width,height,4);
 	return false;
 #endif
 }

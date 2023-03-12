@@ -6,7 +6,7 @@ int PMSpriteStart;
 // ChunksInFile+1 pointers to page starts.
 // The last pointer points one byte after the last page.
 uint8_t **PMPages;
-uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
+uint8_t *PM_DecodeSprites2(unsigned int i,/*unsigned int endi,*/uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
 
 
 void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr)
@@ -91,96 +91,92 @@ void PM_Startup()
 */	
 }	
 
-uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId)
+uint8_t *PM_DecodeSprites2(unsigned int i,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId)
 {
 	uint8_t *Chunks   = (uint8_t *)saturnChunk+0x9000;
-	uint8_t *bmpbuff  = (uint8_t *)saturnChunk+0xA000;	//0x00202000;
+	uint8_t *bmpbuff  = (uint8_t *)saturnChunk+0xC000;
     uint32_t size;
 		
-    for(unsigned int i = start; i < endi; i++)
-    {
-        PMPages[i] = ptr;
-	
-        if(!pageOffsets[i])
-            continue;               // sparse page
+	PMPages[i] = ptr;
 
-        // Use specified page length, when next page is sparse page.
-        // Otherwise, calculate size from the offset difference between this and the next page.
+	if(!pageOffsets[i])
+		return ptr;               // sparse page
 
-        if(!pageOffsets[i + 1]) size = pageLengths[i-PMSpriteStart];
-        else size = pageOffsets[i + 1] - pageOffsets[i];
+	// Use specified page length, when next page is sparse page.
+	// Otherwise, calculate size from the offset difference between this and the next page.
 
-        if(!size)
-            continue;
-
-		int end = size;
-		if (size % 4 != 0)
-		{
-			end = ((size + (4 - 1)) & -4);
-		}
-//		memcpy(ptr,&Chunks[pageOffsets[i]],size);
-		readChunks(fileId, size, &pageOffsets[i], Chunks, ptr);
-
-		memset(&ptr[size],0x00,end-size);
-
-		t_compshape   *shape = (t_compshape   *)ptr;
-		shape->leftpix =SWAP_BYTES_16(shape->leftpix);
-		shape->rightpix=SWAP_BYTES_16(shape->rightpix);
-
-		byte *bmpptr,*sprdata8;
-		unsigned short  *cmdptr;
-		
-		// setup a pointer to the column offsets	
-		cmdptr = shape->dataofs;
-		int count_00=63;
-//		int count_01=0;
-
-		for (int x=0;x<=(shape->rightpix-shape->leftpix);x++ )	
-		{
-			shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
-			sprdata8 = ((unsigned char  *)shape+*cmdptr);			
-			
-			while ((sprdata8[0]|sprdata8[1]<<8) != 0)
-			{
-				for (int y = (sprdata8[4]|sprdata8[5]<<8)/2; y < (sprdata8[0]|sprdata8[1]<<8)/2; y++)
-				{
-					unsigned int min_y=(sprdata8[4]|sprdata8[5]<<8)/2;
-					if(min_y<count_00)
-						count_00=min_y;
-					
-//					if(min_y>count_01)
-//						count_01=min_y;					
-				}
-				sprdata8 += 6;
-			}			
-			cmdptr++;
-		}
-		memset(bmpbuff,0x00,(64-count_00)<<6);
-
-		unsigned char *sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
-
-		cmdptr = shape->dataofs;		
-
-		for (int x = (shape->leftpix); x <= (shape->rightpix); x++)
-		{
-			sprdata8 = ((unsigned char  *)shape+*cmdptr);
-			bmpptr = (byte *)bmpbuff+x;
-
-			while ((sprdata8[0]|sprdata8[1]<<8) != 0)
-			{
-				for (int y = (sprdata8[4]|sprdata8[5]<<8)/2; y < (sprdata8[0]|sprdata8[1]<<8)/2; y++)
-//				for (int y = (sprdata8[4]|sprdata8[5]<<8)/2; y < count_01; y++)
-				{
-					bmpptr[(y-count_00)<<6] = *sprptr++;
-					if(bmpptr[(y-count_00)<<6]==0) bmpptr[(y-count_00)<<6]=0xa0;					
-				}
-				sprdata8 += 6;
-			}
-			cmdptr++;
-		}
-		memcpyl((void *)ptr,bmpbuff,(64-count_00)<<6);
-		ptr+=((64-count_00)<<6);
+	if(!pageOffsets[i + 1]) 
+	{	
+		size = pageLengths[i-PMSpriteStart];
 	}
+	else 
+	{
+		size = pageOffsets[i + 1] - pageOffsets[i];
+	}
+	
+	if(!size)
+		return ptr;
+
+	if (size % 4 != 0)
+	{
+		int end = ((size + (4 - 1)) & -4);
+		memset(&ptr[size],0x00,end-size);
+	}
+	readChunks(fileId, size, &pageOffsets[i], Chunks, ptr);
+
+	t_compshape   *shape = (t_compshape   *)ptr;
+	shape->leftpix =SWAP_BYTES_16(shape->leftpix);
+	shape->rightpix=SWAP_BYTES_16(shape->rightpix);
+
+	byte *bmpptr,*sprdata8;
+	unsigned short  *cmdptr;
+	
+	// setup a pointer to the column offsets	
+	cmdptr = shape->dataofs;
+	int count_00=63;
+	
+	for (int x=0;x<=(shape->rightpix-shape->leftpix);x++ )	
+	{
+		shape->dataofs[x]=SWAP_BYTES_16(shape->dataofs[x]);
+		sprdata8 = ((unsigned char  *)shape+*cmdptr);			
+		
+		while ((sprdata8[0]|sprdata8[1]<<8) != 0)
+		{
+			unsigned int min_y=(sprdata8[4]|sprdata8[5]<<8)/2;
+			if(min_y<count_00)
+				count_00=min_y;
+			sprdata8 += 6;
+		}			
+		cmdptr++;
+	}
+	memset4_fast(bmpbuff,0x00,(64-count_00)<<6);
+
+	unsigned char *sprptr = (unsigned char  *)shape+(((((shape->rightpix)-(shape->leftpix))+1)*2)+4);
+
+	cmdptr = shape->dataofs;		
+
+	for (int x = (shape->leftpix); x <= (shape->rightpix); x++)
+	{
+		sprdata8 = ((unsigned char  *)shape+*cmdptr);
+
+		while ((sprdata8[0]|sprdata8[1]<<8) != 0)
+		{
+			int y = ((sprdata8[4]|sprdata8[5]<<8)/2);
+			bmpptr = (byte *)bmpbuff+x+((y-count_00)<<6);
+			
+			for (; y < ((sprdata8[0]|sprdata8[1]<<8)/2); y++)
+			{
+				*bmpptr = *sprptr++;
+				if(*bmpptr==0) *bmpptr=0xa0;
+				bmpptr+=64;
+			}
+			sprdata8 += 6;
+		}
+		cmdptr++;
+	}
+	memcpyl((void *)ptr,bmpbuff,(64-count_00)<<6);
+//	slDMACopy(bmpbuff,(void *)ptr,(64-count_00)*64);
+	ptr+=((64-count_00)<<6);
 	return ptr;
 }
 /*

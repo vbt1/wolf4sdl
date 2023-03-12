@@ -737,7 +737,6 @@ void SetupWalls (void)
 =
 ==========================
 */
-
 void SignonScreen (void)                        // VGA version
 {
     VL_SetVGAPlaneMode ();
@@ -748,6 +747,7 @@ void SignonScreen (void)                        // VGA version
 #else
 	GFS_Load(GFS_NameToId((Sint8*)"BOOTPAL.BIN"),0,(void *) SDDRV_ADDR,512);
 #endif
+
 //	VL_SetPalette ((SDL_Color *)SDDRV_ADDR);
 //    SDL_SetColors(curSurface, SDDRV_ADDR, 0, 256);
 extern void Pal2CRAM( Uint16 *Pal_Data , void *Col_Adr , Uint32 suu );
@@ -1248,6 +1248,9 @@ static void InitGame()
     SetupWalls ();
 #endif
 //slPrint((char *)"NewViewSize     ",slLocate(10,12));   
+//	viewwidth = viewsize*16*screenWidth/SATURN_WIDTH;
+//	viewheight = (int) (width_to_height(viewsize*16)*screenHeight/200);
+
     NewViewSize (viewsize);
 //slPrint((char *)"slIntFunction     ",slLocate(10,12));	
 	slIntFunction(VblIn) ;
@@ -1325,13 +1328,13 @@ void ShowViewSize (int width)
     {
         viewwidth = screenWidth;
         viewheight = screenHeight - scaleFactor*STATUSLINES;
-        DrawPlayScreen ();
+		DrawPlayBorder ();
     }
     else
     {
         viewwidth = width*16*screenWidth/SATURN_WIDTH;
         viewheight = (int) (width_to_height(width*16)*screenHeight/200);
-        DrawPlayScreen ();
+		DrawPlayBorder ();
     }
 
     viewwidth = oldwidth;
@@ -1342,13 +1345,59 @@ void ShowViewSize (int width)
 void NewViewSize (int width)
 {
     viewsize = width;
-    if(viewsize == 21)
+	SPRITE *sys_clip = (SPRITE *) SpriteVRAM;	
+/*	
+    viewwidth = width&~15;                  // must be divisable by 16
+    viewheight = height&~1;                 // must be even
+	
+	SPRITE *sys_clip = (SPRITE *) SpriteVRAM;
+	const int px = scaleFactor; // size of one "pixel"
+    const int xl = screenWidth/2-viewwidth/2;
+    const int yl = (screenHeight-px*STATUSLINES-viewheight)/2;
+
+    if(width == 21)
+	{
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = 239;
         SetViewSize(screenWidth, screenHeight);
-    else if(viewsize == 20)
-        SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
+		slWindow(0 , 0, SATURN_WIDTH-1 , 239 , 300 , screenWidth/2, screenHeight/2);	
+	}
+    else if(width == 20)
+	{
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = (screenHeight - px * STATUSLINES)-1;
+        SetViewSize(screenWidth, screenHeight - px * STATUSLINES);
+		slWindow(0 , 0, (*sys_clip).XC , (*sys_clip).YC , 300 , screenWidth/2, screenHeight/2);
+	}
     else
+	{
+
         SetViewSize(width*16*screenWidth/SATURN_WIDTH, (unsigned) (width_to_height(width*16)*screenHeight/200));
-// xxx	VGAClearScreen ();
+		(*sys_clip).XC = (xl+viewwidth)-1;
+		(*sys_clip).YC = (yl+viewheight)-1;		
+		slWindow(xl , yl, (xl+viewwidth)-1 , (yl+viewheight)-1, 300 , screenWidth/2, (yl*2+viewheight)/2);
+	}
+*/
+
+    if(width == 21)
+	{
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = 239;	
+        SetViewSize(screenWidth, screenHeight);
+		slWindow(0 , 0, SATURN_WIDTH-1 , 239 , 300 , screenWidth/2, screenHeight/2);			
+	}
+    else if(width == 20)
+	{
+		
+		(*sys_clip).XC = SATURN_WIDTH-1;
+		(*sys_clip).YC = (screenHeight - scaleFactor * STATUSLINES)-1;		
+        SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
+		slWindow(0 , 0, (*sys_clip).XC , (*sys_clip).YC , 300 , screenWidth/2, screenHeight/2);		
+	}
+    else
+	{
+        SetViewSize(width*16*screenWidth/SATURN_WIDTH, (unsigned) (width_to_height(width*16)*screenHeight/200));
+	}	
 }
 
 
@@ -1362,15 +1411,17 @@ void NewViewSize (int width)
 =
 ==========================
 */
+void ChangeDir(char *dirname);
 
 void Quit (const char *errorStr, ...)
 {
-
+    SYS_Exit(0);	
+#if 0
 #ifdef NOTYET
     byte *screen;
 #endif
     char error[256];
-	
+
     if(errorStr != NULL)
     {
         va_list vlist;
@@ -1394,7 +1445,7 @@ void Quit (const char *errorStr, ...)
 #endif
             VW_WaitVBL(100);
         }
-        SYS_Exit(1);
+        SYS_Exit(0);
     }
 
     if (!error || !*error)
@@ -1427,7 +1478,6 @@ void Quit (const char *errorStr, ...)
         SetTextCursor(0,7);
 #endif
         VW_WaitVBL(200);
-        SYS_Exit(1);
     }
     else
     if (!error || !(*error))
@@ -1440,6 +1490,7 @@ void Quit (const char *errorStr, ...)
 #endif
     }
     SYS_Exit(0);
+#endif	
 }
 
 //===========================================================================
@@ -1673,8 +1724,7 @@ int main (int argc, char *argv[])
 	for( dst = (Uint8 *)SystemWork, i = 0;i < SystemSize; i++) {
 		*dst = 0;
 	}	
-	
-	
+
 #if defined(_arch_dreamcast)
     DC_Main();
     DC_CheckParameters();
@@ -1691,6 +1741,7 @@ int main (int argc, char *argv[])
 #endif
 // vbt : invincible
 //	godmode = 1;
+
     CheckForEpisodes();
     InitGame();
 //slPrintHex(screen->pixels,slLocate(20,14));

@@ -6,7 +6,7 @@ LRstruct LevelRatios[LRpack];
 int32_t lastBreathTime = 0;
 extern uint8_t *wallData;
 
-uint8_t *PM_DecodeSprites2(unsigned int start,unsigned int endi,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
+uint8_t *PM_DecodeSprites2(unsigned int i/*,unsigned int endi*/,uint32_t* pageOffsets,word *pageLengths,uint8_t *ptr, Sint32 fileId);
 void readChunks(Sint32 fileId, uint32_t size, uint32_t *pageOffsets, Uint8 *Chunks, uint8_t *ptr);
 void Write (int x, int y, const char *string);
 
@@ -1047,7 +1047,6 @@ PreloadGraphics (int loaded)
     DrawLevel ();
     ClearSplitVWB ();           // set up for double buffering in split screen
 	slScrTransparent(2);
-	slSynch();
 	
     VWB_BarScaledCoord (0, 0, screenWidth, screenHeight - scaleFactor * (STATUSLINES - 1), bordercol);
     LatchDrawPicScaledCoord ((screenWidth-scaleFactor*224)/16,
@@ -1057,6 +1056,9 @@ PreloadGraphics (int loaded)
     WindowY = (screenHeight - scaleFactor*(STATUSLINES+48))/2;
     WindowW = scaleFactor * 28 * 8;
     WindowH = scaleFactor * 48;
+//	NewViewSize (viewsize);
+//	DrawChangeView(viewsize);	
+	slSynch();	
 #ifndef USE_SPRITES	
     VW_UpdateScreen ();
 #endif
@@ -1117,7 +1119,7 @@ PreloadGraphics (int loaded)
 	}
 
 	// walls in map
-    for (y=1;y<NB_WALL_HWRAM/2;y++)
+    for (y=1;y<NB_WALL_HWRAM;y++)
     {
 		if(itemmap[y+1]==1)
 		{
@@ -1130,11 +1132,11 @@ PreloadGraphics (int loaded)
 	}
 
 	int *val = (int *)ptr;	
-	slPrintHex((int)val,slLocate(10,21));	
+	slPrintHex((int)val,slLocate(10,21));	// mémoire haute
 
 	ptr = (uint8_t *)0x00202000;
 
-    for (y=NB_WALL_HWRAM/2;y<64;y++)
+    for (y=NB_WALL_HWRAM;y<64;y++)
     {
 		if(itemmap[y+1]==1)
 		{
@@ -1154,29 +1156,31 @@ PreloadGraphics (int loaded)
 		{
 #ifdef APOGEE_1_1				
 			if(y>=PMSpriteStart+SPR_BJ_W1-2 && y<=PMSpriteStart+SPR_BJ_JUMP4)
-			ptr=PM_DecodeSprites2(y,y+1,pageOffsets+2,pageLengths+2,ptr,fileId);
+			ptr=PM_DecodeSprites2(y,pageOffsets+2,pageLengths+2,ptr,fileId);
 			else
 #endif
-			ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+			ptr=PM_DecodeSprites2(y,pageOffsets,pageLengths,ptr,fileId);
 			PreloadUpdate (i++, loaded);
 		}
 		else
 			PMPages[y] = ptr;
 	}
 	// weapons  doit être après les ennemis
-	for (y=PMSpriteStart+SPR_KNIFEREADY;y<PMSpriteStart+SPR_NULLSPRITE;y++)
+	for (y=PMSpriteStart+SPR_KNIFEREADY;y<PMSpriteStart+SPR_NULLSPRITE;y++) 
     {
 #ifdef APOGEE_1_1	
-		ptr=PM_DecodeSprites2(y,y+1,pageOffsets+2,pageLengths+2,ptr,fileId);
+		ptr=PM_DecodeSprites2(y,pageOffsets+2,pageLengths+2,ptr,fileId);
 #else
-		ptr=PM_DecodeSprites2(y,y+1,pageOffsets,pageLengths,ptr,fileId);
+		ptr=PM_DecodeSprites2(y,pageOffsets,pageLengths,ptr,fileId);
 #endif
+//	val = (int *)ptr;
+//	slPrintHex((int)val,slLocate(10,22));	// mémoire basse	
 		PreloadUpdate (i++, loaded);
 	}
 	PMPages[PMSpriteStart+SPR_NULLSPRITE] = ptr;
 	PreloadUpdate (10, 10);
 	val = (int *)ptr;
-	slPrintHex((int)val,slLocate(10,22));	
+	slPrintHex((int)val,slLocate(10,22));	// mémoire basse	
 //----------------------------------------------------------------------
 #endif
 
@@ -1186,6 +1190,7 @@ PreloadGraphics (int loaded)
 //      PM_Preload (PreloadUpdate);
 //    PreloadUpdate (10, 10);
     IN_UserInput (70);
+
     VW_FadeOut ();
 
     DrawPlayScreen ();
@@ -1914,9 +1919,8 @@ CopyProtection (void)
 
     
 //    ShutdownId ();
-
 //    printf ("%s\n", DosMessages[US_RndT () % 9]);
-    SYS_Exit (1);
+//    SYS_Exit (1);
 }
 #endif //copy
 

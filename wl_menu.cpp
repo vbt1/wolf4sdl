@@ -33,7 +33,7 @@ int CP_ReadThis (int);
 #define STARTITEM       newgame
 
 #else
-#define STARTITEM       readthis
+#define STARTITEM       newgame //readthis
 #endif
 #endif
 
@@ -96,7 +96,7 @@ CP_itemtype MainMenu[] = {
 
     {1, STR_VS, CP_ViewScores},
     {0, STR_BD, 0},
-    {0, STR_QT, 0}
+    {1, STR_QT, CP_Quit}
 #endif
 };
 /*
@@ -390,7 +390,7 @@ US_ControlPanel (ScanCode scancode)
             case -1:
             case quit:
 				//slPrint("exit game !!!!",slLocate(10,11));
-                CP_Quit (0);
+//                CP_Quit (0); //// ne pas remettre quitte dans le menu
                 break;
 
             default:
@@ -564,7 +564,7 @@ BossKey (void)
     for (int i = 0; i < 768; i++)
         palette1[0][i] = 0;
 
-    VL_SetPalette (&palette1[0][0]);
+    VL_SetPalette (palette1[0]);
     LoadLatchMem ();
 #endif
 }
@@ -592,7 +592,7 @@ BossKey (void)
     for (int i = 0; i < 768; i++)
         palette1[0][i] = 0;
 
-    VL_SetPalette (&palette1[0][0]);
+    VL_SetPalette (palette1[0]);
     LoadLatchMem ();
 #endif
 }
@@ -1062,11 +1062,8 @@ CP_ChangeView (int)
 void
 DrawChangeView (int view)
 {
-//slPrint("slScrTransparent8",slLocate(1,17));		
-	slScrTransparent(0);
     int rescaledHeight = screenHeight / scaleFactor;
     if(view != 21) VWB_Bar (0, rescaledHeight - 40, SATURN_WIDTH, 40, bordercol);
-
 #ifdef JAPAN
     CA_CacheScreen (S_CHANGEPIC);
 
@@ -1085,25 +1082,6 @@ DrawChangeView (int view)
 #endif
 #ifndef USE_SPRITES
     VW_UpdateScreen ();
-#else
-	//viewsize = view;
-/*
-	NewViewSize (view);
-//	ThreeDRefresh();
-//
-
-//	DrawScaleds();
-//		slTransferEntry((void *)wall_buffer,(void *)(SpriteVRAM + cgaddress),(SATURN_WIDTH+64) * 64);
- 
- extern SPRITE user_walls[120];
-		SPRITE *user_wall = user_walls;
-
-		for(unsigned int pixx=0;pixx<=80;pixx++)
-		{
-			int depth = (user_wall->YB+user_wall->YC)/2;
-			slSetSprite(user_wall++, toFIXED(SATURN_SORT_VALUE-depth));	// à remettre // murs
-		}
-	slSynch();*/
 #endif	
 }
 
@@ -1116,30 +1094,9 @@ DrawChangeView (int view)
 int
 CP_Quit (int)
 {
-		//slPrint("exit game 1 !!!!",slLocate(10,11));
-#ifdef JAPAN
-    if (GetYorN (7, 11, C_QUITMSGPIC))
-#else
-
-#ifdef SPANISH
-    if (Confirm (ENDGAMESTR))
-#else
-    if (Confirm (endStrings[US_RndT () & 0x7 + (US_RndT () & 1)]))
-#endif
-
-#endif
-    {
-#ifndef USE_SPRITES		
-        VW_UpdateScreen ();
-#endif		
-        SD_MusicOff ();
-        SD_StopSound ();
-        MenuFadeOut ();
-        Quit (NULL);
-    }
-
-    DrawMainMenu ();
-    return 0;
+    SD_MusicOff ();
+	SYS_Exit(0);
+	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////
